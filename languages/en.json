@@ -6,8 +6,19 @@
 				"details": "Details",
 				"inventory": "Inventory",
 				"arcana": "Arcana",
+				"followers": "Followers",
 				"postDeath": "Post-Death"
 			}
+		},
+		"followers": {
+			"empty": "Drag followers here from the Followers compendium.",
+			"remove": "Remove",
+			"hp": "HP",
+			"armor": "Armor",
+			"damage": "Damage",
+			"loyalty": "Loyalty",
+			"notePlaceholder": "Tags…",
+			"add": "Add Follower"
 		},
 		"postDeath": {
 			"chooseFate": "Choose Your Fate",
@@ -95,7 +106,8 @@
 				"basicMoves": "Basic Moves",
 				"otherMoves": "Other Moves",
 				"addMove": "Add Move",
-				"removeMove": "Remove Move"
+				"removeMove": "Remove Move",
+				"requires": "Requires"
 			},
 			"selection": {
 				"select": "Select",

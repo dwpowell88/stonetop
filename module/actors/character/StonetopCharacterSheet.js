@@ -1,4 +1,3 @@
-import {MoveResourceButton} from "./elements/move-resource-button.js";
 import {BackgroundInputChoice} from "./elements/background-input-choice.js";
 import {PossessionUseButton} from "./elements/possession-use-button.js";
 
@@ -47,29 +46,24 @@ export function createStonetopCharacterSheetClass(Base) {
 				$(el).append(`<span class="stonetop-stat-abbr">(${el.dataset.stat.toUpperCase()})</span>`);
 			});
 
-			// Move playbook icon into header alongside playbook dropdown
-			const icon = html[0].querySelector(".stonetop-playbook-icon");
-			const playbookDiv = html[0].querySelector(".sheet-playbook");
-			if (icon && playbookDiv) playbookDiv.insertBefore(icon, playbookDiv.firstChild);
-
 			if (!this.isEditable) return;
 
 			html.find("[name=stonetop-background]").on("change", this._onBackgroundChange.bind(this));
-			html.find("[name=stonetop-instinct]").on("change", ev => {
-				const val = ev.currentTarget.value;
-				html.find(".stonetop-instinct-custom").val(val);
-				this._stonetopCharacter.instinct.select(val);
+			html.find(".stonetop-playbook-instinct").on("change", ev => {
+				const radio = ev.currentTarget;
+				const { choiceSlug, siblingSlugsCsv, displayLabel } = radio.dataset;
+				html.find(".stonetop-instinct-custom").val(displayLabel ?? "");
+				this._stonetopCharacter.instinct.selectOption(choiceSlug, siblingSlugsCsv);
 			});
 			html.find(".stonetop-instinct-custom").on("change", ev =>
-				this._stonetopCharacter.instinct.select(ev.currentTarget.value.trim())
+				this._stonetopCharacter.instinct.selectCustom(ev.currentTarget.value.trim())
 			);
 			html.find(".stonetop-appearance-radio").on("change", this._onAppearanceChange.bind(this));
 			html.find("[name=stonetop-origin]").on("change", ev =>
 				this._stonetopCharacter.origin.select(ev.currentTarget.value)
 			);
 			html.find(".stonetop-origin-name").on("click", this._onOriginNameClick.bind(this));
-			html.find(".stonetop-move-check").on("change", this._onMoveCheck.bind(this));
-			html.find(".stonetop-repeat-check").on("change", this._onRepeatCheck.bind(this));
+			html.find(".stonetop-move-check, .stonetop-repeat-check").on("change", this._onMoveCheck.bind(this));
 			html.find(".stonetop-bg-choice").on("change", this._onBgChoiceChange.bind(this));
 			html[0].addEventListener("click", ev => {
 				const btn = ev.target.closest(".stonetop-item-resource-check");
@@ -104,8 +98,8 @@ export function createStonetopCharacterSheetClass(Base) {
 				if (doc) doc.sheet.render(true);
 			});
 			html.find(".stonetop-other-move-delete").on("click", async ev => {
-				const { itemId } = ev.currentTarget.dataset;
-				await this._stonetopCharacter.removeMove(itemId);
+				const { moveName } = ev.currentTarget.dataset;
+				await this._stonetopCharacter.deleteMove(moveName);
 			});
 
 			html[0].addEventListener("click", ev => {
@@ -141,24 +135,27 @@ export function createStonetopCharacterSheetClass(Base) {
 			html[0].addEventListener("change", ev => {
 				const cb = ev.target.closest(".stonetop-arcanum-unlock-check");
 				if (!cb) return;
-				const { arcanumSlug, optionSlug, index } = cb.dataset;
-				const newCount = cb.checked ? Number(index) + 1 : Number(index);
+				const arcanumSlug = ev.target.closest("[data-slug]").dataset.slug;
+				const { optionSlug, idx } = cb.dataset;
+				const newCount = cb.checked ? Number(idx) + 1 : Number(idx);
 				this._stonetopCharacter.setArcanumUnlockCount(arcanumSlug, optionSlug, newCount);
 			}, true);
 
 			html[0].addEventListener("change", ev => {
-				const cb = ev.target.closest(".stonetop-lore-option-check");
+				const cb = ev.target.closest(".stonetop-option-check");
 				if (!cb || ev.target.closest("[data-pdi='lore']")) return;
-				const { loreSlug, optionSlug, idx } = cb.dataset;
+				const { optionSlug, idx } = cb.dataset;
+				const entrySlug = ev.target.closest("[data-slug]").dataset.slug;
 				const newCount = cb.checked ? Number(idx) + 1 : Number(idx);
-				this._stonetopCharacter.setLoreOptionCount(loreSlug, optionSlug, newCount);
+				this._stonetopCharacter.setLoreOptionCount(entrySlug, optionSlug, newCount);
 			}, true);
 
 			html[0].addEventListener("change", ev => {
-				const ta = ev.target.closest(".stonetop-lore-option-text");
+				const ta = ev.target.closest(".stonetop-option-text");
 				if (!ta || ev.target.closest("[data-pdi='lore']")) return;
-				const { loreSlug, optionSlug } = ta.dataset;
-				this._stonetopCharacter.setLoreOptionText(loreSlug, optionSlug, ta.value);
+				const { optionSlug } = ta.dataset;
+				const entrySlug = ev.target.closest("[data-slug]").dataset.slug;
+				this._stonetopCharacter.setLoreOptionText(entrySlug, optionSlug, ta.value);
 			}, true);
 
 			html[0].addEventListener("click", ev => {
@@ -178,84 +175,142 @@ export function createStonetopCharacterSheetClass(Base) {
 			html[0].addEventListener("change", ev => {
 				const radio = ev.target.closest(".stonetop-pdi-instinct");
 				if (!radio) return;
-				this._stonetopCharacter.setPostDeathInstinct(radio.value);
+				const { choiceSlug, siblingSlugsCsv } = radio.dataset;
+				this._stonetopCharacter.setPostDeathInstinct(choiceSlug, siblingSlugsCsv);
 			}, true);
 
 			html[0].addEventListener("change", ev => {
 				if (!ev.target.closest("[data-pdi='lore']")) return;
-				const cb = ev.target.closest(".stonetop-lore-option-check");
+				const cb = ev.target.closest(".stonetop-option-check");
 				if (!cb) return;
-				const { loreSlug, optionSlug, idx } = cb.dataset;
+				const { optionSlug, idx } = cb.dataset;
+				const entrySlug = ev.target.closest("[data-slug]").dataset.slug;
 				const newCount = cb.checked ? Number(idx) + 1 : Number(idx);
-				this._stonetopCharacter.setPostDeathLoreCount(loreSlug, optionSlug, newCount);
+				this._stonetopCharacter.setPostDeathLoreCount(entrySlug, optionSlug, newCount);
 			}, true);
 
 			html[0].addEventListener("change", ev => {
 				if (!ev.target.closest("[data-pdi='lore']")) return;
-				const ta = ev.target.closest(".stonetop-lore-option-text");
+				const ta = ev.target.closest(".stonetop-option-text");
 				if (!ta) return;
-				const { loreSlug, optionSlug } = ta.dataset;
-				this._stonetopCharacter.setPostDeathLoreText(loreSlug, optionSlug, ta.value);
+				const { optionSlug } = ta.dataset;
+				const entrySlug = ev.target.closest("[data-slug]").dataset.slug;
+				this._stonetopCharacter.setPostDeathLoreText(entrySlug, optionSlug, ta.value);
+			}, true);
+
+			html[0].addEventListener("click", ev => {
+				const btn = ev.target.closest(".stonetop-follower-add");
+				if (!btn) return;
+				this._stonetopCharacter.addCustomFollower().then(() => this.render(false));
+			}, true);
+
+			html[0].addEventListener("click", ev => {
+				const btn = ev.target.closest(".stonetop-follower-delete");
+				if (!btn) return;
+				ev.stopPropagation();
+				this._stonetopCharacter.removeFollower(btn.dataset.slug).then(() => this.render(false));
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-hp");
+				if (!input) return;
+				const card = ev.target.closest(".stonetop-follower-card");
+				const hpMax = Number(card?.querySelector(".stonetop-follower-hp-max")?.value ?? input.max);
+				const hp = Math.max(0, Math.min(Number(input.value), hpMax));
+				this._stonetopCharacter.setFollowerHp(input.dataset.slug, hp);
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-hp-max");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerHpMax(input.dataset.slug, Number(input.value));
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-name-input");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerName(input.dataset.slug, input.value);
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-note-input");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerNote(input.dataset.slug, input.value);
+			}, true);
+
+			html[0].addEventListener("click", ev => {
+				const btn = ev.target.closest(".stonetop-follower-loyalty-pip");
+				if (!btn) return;
+				ev.stopPropagation();
+				const { slug, index } = btn.dataset;
+				const isChecked = btn.classList.contains("is-checked");
+				const newVal = isChecked ? Number(index) : Number(index) + 1;
+				this._stonetopCharacter.setFollowerLoyalty(slug, newVal).then(() => this.render(false));
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const radio = ev.target.closest(".stonetop-follower-choice-radio");
+				if (!radio) return;
+				const card = ev.target.closest(".stonetop-follower-card");
+				const { choiceSlug, siblingSlugsCsv } = radio.dataset;
+				this._stonetopCharacter.setFollowerChoiceValue(card.dataset.slug, "choices", choiceSlug, siblingSlugsCsv);
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const ta = ev.target.closest(".stonetop-follower-choice-text");
+				if (!ta) return;
+				const card = ev.target.closest(".stonetop-follower-card");
+				this._stonetopCharacter.setFollowerChoiceText(card.dataset.slug, ta.dataset.optionSlug, ta.value);
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-armor");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerArmor(input.dataset.slug, Number(input.value));
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-damage");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerDamage(input.dataset.slug, input.value.trim());
 			}, true);
 		}
 
 		async _onDropItemCreate(itemData) {
-			const items  = Array.isArray(itemData) ? itemData : [itemData];
-			const arcana = items.filter(i => i.type === "move" && i.system?.moveType === "arcanum");
-			const moves  = items.filter(i => i.type === "move" && i.system?.moveType !== "arcanum");
-			const others = items.filter(i => i.type !== "move");
-			let anyAdded = false;
-			for (const item of arcana) {
-				const slug = item.flags?.stonetop?.slug;
-				if (slug) {
-					await this._stonetopCharacter.addArcanum(slug);
-					anyAdded = true;
-				}
-			}
-			for (const item of moves) {
-				if (await this._stonetopCharacter.onDropMove(item)) anyAdded = true;
-			}
+			const items = Array.isArray(itemData) ? itemData : [itemData];
+			const { anyAdded, others } = await this._stonetopCharacter.onDropItems(items);
 			if (others.length) await super._onDropItemCreate(others);
 			if (anyAdded) this.render(false);
 		}
 
 		async _onBackgroundChange(ev) {
-			const slug = ev.currentTarget.value;
-			await this._stonetopCharacter.background.selectBackground(slug);
-			await this._stonetopCharacter.ensureStartingMoves();
+			await this._stonetopCharacter.selectBackground(ev.currentTarget.value);
 		}
 
 		async _onAppearanceChange(ev) {
 			const el = ev.currentTarget;
-			await this._stonetopCharacter.appearance.select(Number(el.dataset.line), el.value);
+			await this._stonetopCharacter.appearance.select(Number(el.dataset.rowKey), el.dataset.choiceSlug);
 		}
 
 		async _onOriginNameClick(ev) {
-			const name = ev.currentTarget.textContent.trim();
-			await this._stonetopCharacter.updateName(name);
+			await this._stonetopCharacter.origin.selectName(ev.currentTarget.textContent.trim());
 		}
 
 		async _onMoveCheck(ev) {
 			const el = ev.currentTarget;
+			const { categoryKey, moveName } = el.dataset;
 			if (el.checked) {
-				await this._stonetopCharacter.addMove(el.dataset.compendiumId);
+				await this._stonetopCharacter.incrementMove(categoryKey, moveName);
 			} else {
-				await this._stonetopCharacter.removeMove(el.dataset.ownedId);
-			}
-		}
-
-		async _onRepeatCheck(ev) {
-			const el = ev.currentTarget;
-			if (el.checked) {
-				await this._stonetopCharacter.addMove(el.dataset.compendiumId);
-			} else {
-				await this._stonetopCharacter.removeMove(el.dataset.ownedId);
+				await this._stonetopCharacter.decrementMove(categoryKey, moveName);
 			}
 		}
 
 		async _onMoveResourceChange(ev) {
-			const button = new MoveResourceButton(ev);
-			await this._stonetopCharacter.moveResources.add(button);
+			const { categoryKey, moveName, index } = ev.currentTarget.dataset;
+			const isChecked = ev.currentTarget.classList.contains("is-checked");
+			const current = isChecked ? Number(index) : Number(index) + 1;
+			await this._stonetopCharacter.setMoveResourceCurrent(categoryKey, moveName, current);
 		}
 
 		async _onBgChoiceChange(ev) {
@@ -331,7 +386,7 @@ export function createStonetopCharacterSheetClass(Base) {
 							const name = html.find("[name=name]").val().trim();
 							if (!name) return;
 							if (isRegular) {
-								const weight = Math.max(1, parseInt(html.find("[name=weight]").val()) || 1);
+								const weight = parseInt(html.find("[name=weight]").val()) || 1;
 								this._stonetopCharacter.addCustomInventoryItem(name, weight)
 									.then(() => this.render(false));
 							} else {

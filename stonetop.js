@@ -33,15 +33,15 @@ Hooks.once("init", () => {
 	});
 
 	Handlebars.registerHelper("times", n => Array.from({ length: n ?? 0 }, (_, i) => i));
+	Handlebars.registerHelper("gt", (a, b) => a > b);
+	Handlebars.registerHelper("eq", (a, b) => a === b);
 
 	Handlebars.registerHelper("repeatChecks", move => {
-		if (!move?.repeat) return [];
-		const { max, current } = move.repeat;
-		const lastOwnedId = move.ownedIds[move.ownedIds.length - 1] ?? null;
-		return Array.from({ length: max }, (_, i) => ({
-			checked:  i < current,
-			ownedId:  i < current ? lastOwnedId : null,
-			disabled: move.isStarting || move.locked || (!(i < current) && i !== current),
+		const sel = move?.selection;
+		if (!sel || sel.max <= 1) return [];
+		return Array.from({ length: sel.max }, (_, i) => ({
+			checked:  i < sel.value,
+			disabled: i < sel.value ? move.isStarting : (!move.selectable || i !== sel.value),
 		}));
 	});
 
@@ -60,9 +60,11 @@ Hooks.once("init", () => {
 		"stonetop.tab-moves":        "modules/stonetop/templates/actor/partials/tab-moves.hbs",
 		"stonetop.tab-equipment":    "modules/stonetop/templates/actor/partials/tab-equipment.hbs",
 		"stonetop.tab-arcana":       "modules/stonetop/templates/actor/partials/tab-arcana.hbs",
+		"stonetop.tab-followers":    "modules/stonetop/templates/actor/partials/tab-followers.hbs",
 		"stonetop.tab-post-death":   "modules/stonetop/templates/actor/partials/tab-post-death.hbs",
 		"stonetop.move-group":       "modules/stonetop/templates/actor/partials/move-group.hbs",
-		"stonetop.lore-section":     "modules/stonetop/templates/actor/partials/lore-section.hbs",
+		"stonetop.choice-row":       "modules/stonetop/templates/actor/partials/choice-row.hbs",
+		"stonetop.choice-section":   "modules/stonetop/templates/actor/partials/lore-section.hbs",
 		"stonetop.section-heading":  "modules/stonetop/templates/actor/partials/section-heading.hbs",
 		"stonetop.resource-track":   "modules/stonetop/templates/actor/partials/resource-track.hbs",
 	});

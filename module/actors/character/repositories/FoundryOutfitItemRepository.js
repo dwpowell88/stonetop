@@ -1,16 +1,16 @@
-import { OutfitItemBuilder } from "../../../model/OutfitItem.js";
+import { OutfitItemBuilder } from "../../../model/data/character/OutfitItem.js";
 import { FoundryPackStore } from "./FoundryPackStore.js";
 
 const FIELDS = [
 	"flags.stonetop.slug", "flags.stonetop.inventoryColumn", "flags.stonetop.sortOrder",
 	"flags.stonetop.weight", "flags.stonetop.note", "flags.stonetop.resource",
-	"flags.stonetop.breakBefore", "flags.stonetop.smallGrid", "flags.stonetop.twoCol",
+	"flags.stonetop.breakBefore", "flags.stonetop.twoCol",
 	"flags.stonetop.armor",
 ];
 
 export class FoundryOutfitItemRepository {
 	constructor() {
-		this._store = new FoundryPackStore("stonetop.inventory-items", FIELDS);
+		this._store = new FoundryPackStore("stonetop.outfit-items", FIELDS);
 		this._cache = null;
 	}
 
@@ -29,7 +29,6 @@ export class FoundryOutfitItemRepository {
 					.withInventoryColumn(st.inventoryColumn ?? null)
 					.withResource(st.resource ?? null)
 					.withTwoCol(st.twoCol ?? false)
-					.withSmallGrid(st.smallGrid ?? false)
 					.withBreakBefore(st.breakBefore ?? false)
 					.withArmor(st.armor ?? null)
 					.build();

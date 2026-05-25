@@ -19,17 +19,23 @@
 				},
 				"description": "<p>It must have been a majestic beast, finely preserved with pale stones for eyes and a clip to wear it like a hooded cape. But no matter how you scrub, the red stains never come off its teeth.</p><p>The pelt is home to a powerful spirit, not just of a wolf but of The Hunt itself.</p>",
 				"unlock": {
-					"description": "To unlock its secrets, you must…",
-					"requirements": [
+					"slug": "wolf-pelt",
+					"list": [
 						{
-							"type": "option",
-							"slug": "hunt-moonlit",
-							"description": "… hunt a beast by moonlight, alone, while wearing the pelt."
+							"type": "heading",
+							"description": "To unlock its secrets, you must…"
 						},
 						{
-							"type": "option",
+							"type": "track",
+							"slug": "hunt-moonlit",
+							"description": "… hunt a beast by moonlight, alone, while wearing the pelt.",
+							"max": 1
+						},
+						{
+							"type": "track",
 							"slug": "eat-raw-liver",
-							"description": "… tear out its liver with your bare hands or teeth and eat it, raw."
+							"description": "… tear out its liver with your bare hands or teeth and eat it, raw.",
+							"max": 1
 						}
 					]
 				}
@@ -43,8 +49,7 @@
 					"name": "When you howl at the rising moon, face smeared in blood and wearing only the pelt",
 					"rollType": null,
 					"description": "<p>You take on the aspect of a wolf and call a pack to your side. Name your quarry and roll (+1 if you have their scent, +1 if they are alone/-1 if not, -1 if they would not fear a pack). On 7+, you corner your prey and deal 2d6+4 damage (messy) before dispersing. On 6+, also pick 1; on 7-9, also pick 2 from: pack savages innocents; you suffer 2d6+4 messy damage; your instinct becomes wolflike until Level Up. On 6-, your prey eludes you and you still pick 2.</p>"
-				},
-				"options": []
+				}
 			}
 		}
 	}

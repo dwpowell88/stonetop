@@ -19,22 +19,29 @@
 				},
 				"description": "<p>About 4 feet by 7 feet unfurled, woven with stylized patterns of fire and flame. Flickering Maker-runes can be seen in the weaving, always out of focus but hinting at power.</p>",
 				"unlock": {
-					"description": "You can unlock the secrets of this rug, but you must first…",
-					"requirements": [
+					"slug": "richly-woven-rug",
+					"list": [
 						{
-							"type": "option",
+							"type": "heading",
+							"description": "You can unlock the secrets of this rug, but you must first…"
+						},
+						{
+							"type": "track",
 							"slug": "marked-by-fire",
-							"description": "… be marked by fire, losing yourself to the panic or pain of burning."
+							"description": "… be marked by fire, losing yourself to the panic or pain of burning.",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "weeks-meditation",
-							"description": "… then, spend weeks in meditation upon the rug and studying the now-clear runes."
+							"description": "… then, spend weeks in meditation upon the rug and studying the now-clear runes.",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "burned-by-flame",
-							"description": "… allow yourself to be burned by a terrible flame, refusing to cry out and mastering your fear."
+							"description": "… allow yourself to be burned by a terrible flame, refusing to cry out and mastering your fear.",
+							"max": 1
 						}
 					]
 				}
@@ -53,8 +60,7 @@
 					"name": "When you spend an hour or so on the rug, meditating on the fear of fire that all natural things possess",
 					"rollType": null,
 					"description": "<p>You hold Terror and mark 1 Heat.</p><p><strong>Terror</strong>: When you <strong><em>unleash the Terror you hold</em></strong>, all who see you fear you as they would fear the flame primeval, until you dismiss the effect.</p><p>When you <strong><em>dismiss the effect</em></strong>, roll 1d6. If the roll is less than your Heat, then clear all your Heat and you painfully manifest a permanent sign of your connection to the flames.</p><p>When <strong><em>a season passes without you unleashing Terror</em></strong>, reduce your Heat by 1.</p>"
-				},
-				"options": []
+				}
 			}
 		}
 	}

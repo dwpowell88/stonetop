@@ -1,84 +1,57 @@
 import {
-	ArcanaBackOptionSnapshotBuilder, ArcanaSnapshot, ArcanaSectionSnapshot,
-	ArcanaUnlockOptionSnapshotBuilder, ArcanaUnlockTextItem,
-	ArcanumBackMoveSnapshot, ArcanumUnlockSection,
+	ArcanaSnapshot, ArcanaSectionSnapshot,
+	ArcanumBackMoveSnapshot,
 	MinorArcanumBackSnapshotBuilder, MinorArcanumFrontSnapshotBuilder,
 	MinorArcanumSnapshotBuilder,
 	ResourceBuilder,
-} from "../../model/CharacterSnapshot.js";
-import { OutfitItemBuilder } from "../../model/OutfitItem.js";
-
-function _buildOutfitItem(slug, itemData, resolvedResource = undefined) {
-	if (!itemData) return null;
-	return new OutfitItemBuilder()
-		.withSlug(slug)
-		.withName(itemData.name)
-		.withWeight(itemData.weight ?? null)
-		.withNote(itemData.note ?? null)
-		.withInventoryColumn(itemData.inventoryColumn ?? null)
-		.withResource(resolvedResource !== undefined ? resolvedResource : (itemData.resource ?? null))
-		.withTwoCol(false)
-		.withBreakBefore(false)
-		.build();
-}
+	ChoiceGroup, ChoiceValues,
+} from "../../model/snapshot/character/CharacterSnapshot.js";
+import {EmbeddedOutfitItemBuilder} from "../../model/data/character/EmbeddedOutfitItem.js";
 
 export class CharacterArcana {
-	constructor(flags, arcanaRepo) {
+	constructor(flags, arcanaRepo, stats = null, outfitItems = null) {
 		this._flags = flags;
 		this._arcanaRepo = arcanaRepo;
+		this._stats = stats;
+		this._outfitItems = outfitItems;
 	}
 
-	get ownedSlugs()      { return new Set(this._flags.getFlag("owned") ?? []); }
-	get flippedSlugs()    { return new Set(this._flags.getFlag("flipped") ?? []); }
-	get unlockCounts()    { return this._flags.getFlag("unlock") ?? {}; }
-	get backOptionCounts(){ return this._flags.getFlag("backOptions") ?? {}; }
+	get ownedSlugs() {
+		return new Set(this._flags.getFlag("owned") ?? []);
+	}
 
-	async buildSnapshot(stats = {}, checkedMap = {}, inventoryResources = {}) {
-		const ownedSlugs       = this.ownedSlugs;
-		const flippedSlugs     = this.flippedSlugs;
-		const unlockCounts     = this.unlockCounts;
-		const backOptionCounts = this.backOptionCounts;
+	get flippedSlugs() {
+		return new Set(this._flags.getFlag("flipped") ?? []);
+	}
+
+	get _unlockValues() {
+		return new ChoiceValues(this._flags.getFlag("unlock") ?? {});
+	}
+
+	async buildSnapshot(checkedMap = {}, inventoryResources = {}) {
+		const stats = this._stats?.getStats() ?? {};
+		const ownedSlugs = this.ownedSlugs;
+		const flippedSlugs = this.flippedSlugs;
+		const unlockValues = this._unlockValues;
 
 		const fetchedItems = await this._arcanaRepo.findBySlugs([...ownedSlugs]);
 
 		const minorItems = fetchedItems.map(item => {
 			const flipped = flippedSlugs.has(item.slug);
-
-			const unlockItems = item.front.unlock.requirements.map(li => {
-				if (li.type === "text") return new ArcanaUnlockTextItem(li.content);
-				const count = unlockCounts[`${item.slug}:${li.slug}`] ?? 0;
-				return new ArcanaUnlockOptionSnapshotBuilder()
-					.withSlug(li.slug)
-					.withDescription(li.description)
-					.withCount(count)
-					.withMax(li.max ?? 1)
-					.withSelected(count > 0)
-					.build();
-			});
+			const unlock = ChoiceGroup.fromPackData(item.front.unlock, unlockValues);
 
 			const front = new MinorArcanumFrontSnapshotBuilder()
 				.withTitle(item.front.title)
-				.withItem(_buildOutfitItem(item.slug, item.front.item))
+				.withItem(this._buildOutfitItem(item.slug, item.front.item))
 				.withDescription(item.front.description)
-				.withUnlock(new ArcanumUnlockSection(item.front.unlock.description, unlockItems))
+				.withUnlock(unlock)
 				.build();
-
-			const backOpts = (item.back.options ?? []).map(o => {
-				const count = backOptionCounts[`${item.slug}:${o.slug}`] ?? 0;
-				return new ArcanaBackOptionSnapshotBuilder()
-					.withSlug(o.slug)
-					.withDescription(o.description)
-					.withCount(count)
-					.withMax(o.max ?? 1)
-					.withSelected(count > 0)
-					.build();
-			});
 
 			const backResource = item.back.resource
 				? new ResourceBuilder()
 					.withCurrent(inventoryResources[item.slug] ?? 0)
 					.withMax(item.back.resource.maxStat
-						? (stats[item.back.resource.maxStat]?.value ?? 0)
+						? (stats.get(item.back.resource.maxStat))
 						: item.back.resource.max)
 					.withMaxStat(item.back.resource.maxStat ?? null)
 					.withTitle(item.back.resource.title ?? null)
@@ -86,16 +59,15 @@ export class CharacterArcana {
 					.build()
 				: null;
 
-			const backItemResourceDef = item.back.item?.resource ?? null;
-			const backItemResource = backItemResourceDef
+			const backItemResource = item.back.item?.resource
 				? new ResourceBuilder()
 					.withCurrent(inventoryResources[item.slug] ?? 0)
-					.withMax(backItemResourceDef.maxStat
-						? (stats[backItemResourceDef.maxStat]?.value ?? 0)
-						: backItemResourceDef.max)
-					.withMaxStat(backItemResourceDef.maxStat ?? null)
-					.withTitle(backItemResourceDef.title ?? null)
-					.withLabels(backItemResourceDef.labels ?? [])
+					.withMax(item.back.item.resource.maxStat
+						? (stats[item.back.item.resource.maxStat]?.value ?? 0)
+						: item.back.item.resource.max)
+					.withMaxStat(item.back.item.resource.maxStat ?? null)
+					.withTitle(item.back.item.resource.title ?? null)
+					.withLabels(item.back.item.resource.labels ?? [])
 					.build()
 				: null;
 
@@ -108,11 +80,10 @@ export class CharacterArcana {
 
 			const back = new MinorArcanumBackSnapshotBuilder()
 				.withTitle(item.back.title)
-				.withItem(_buildOutfitItem(item.slug, item.back.item, backItemResource))
+				.withItem(this._buildOutfitItem(item.slug, item.back.item, backItemResource))
 				.withDescription(item.back.description)
 				.withResource(backResource)
 				.withMove(backMove)
-				.withOptions(backOpts)
 				.build();
 
 			return new MinorArcanumSnapshotBuilder()
@@ -130,50 +101,67 @@ export class CharacterArcana {
 		return new ArcanaSnapshot(minor, major);
 	}
 
+	_buildOutfitItem(slug, itemData, resolvedResource = undefined) {
+		if (!itemData) return null;
+		return {
+			slug,
+			name:            itemData.name,
+			weight:          itemData.weight ?? null,
+			note:            itemData.note ?? null,
+			inventoryColumn: itemData.inventoryColumn ?? null,
+			resource:        resolvedResource !== undefined ? resolvedResource : (itemData.resource ?? null),
+		};
+	}
+
 	async addArcanum(slug) {
 		const slugsWeHae = this.ownedSlugs;
 		slugsWeHae.add(slug);
 		await this._flags.setFlag("owned", [...slugsWeHae]);
+		await this._syncEmbeddedItem(slug);
 	}
 
 	async removeArcanum(slug) {
 		const s = this.ownedSlugs;
 		s.delete(slug);
 		await this._flags.setFlag("owned", [...s]);
+		await this._outfitItems?.deleteBySource("arcana:" + slug);
 	}
 
 	async flipArcanum(slug) {
 		const s = this.flippedSlugs;
 		s.add(slug);
 		await this._flags.setFlag("flipped", [...s]);
+		await this._syncEmbeddedItem(slug);
 	}
 
 	async unflipArcanum(slug) {
 		const s = this.flippedSlugs;
 		s.delete(slug);
 		await this._flags.setFlag("flipped", [...s]);
+		await this._syncEmbeddedItem(slug);
 	}
 
 	async setUnlockCount(arcanumSlug, optionSlug, count) {
-		const key = `${arcanumSlug}:${optionSlug}`;
-		await this._flags.setFlag("unlock", { ...this.unlockCounts, [key]: count });
+		await this._flags.setFlag("unlock", this._unlockValues.set(arcanumSlug, optionSlug, count).toRaw());
 	}
 
-	async setBackOptionCount(arcanumSlug, optionSlug, count) {
-		const key = `${arcanumSlug}:${optionSlug}`;
-		await this._flags.setFlag("backOptions", { ...this.backOptionCounts, [key]: count });
-	}
-
-	async weightedInventoryItems() {
-		const ownedSlugs   = this.ownedSlugs;
-		const flippedSlugs = this.flippedSlugs;
-		const items = await this._arcanaRepo.findBySlugs([...ownedSlugs]);
-		return items.flatMap(item => {
-			const flipped  = flippedSlugs.has(item.slug);
-			const sideItem = flipped ? item.back.item : item.front.item;
-			if (!sideItem?.inventoryColumn) return [];
-			return [new OutfitItemBuilder()
-				.withSlug(item.slug)
+	async _syncEmbeddedItem(slug) {
+		if (!this._outfitItems) return;
+		const items = await this._arcanaRepo.findBySlugs([slug]);
+		const item = items[0];
+		if (!item) {
+			await this._outfitItems.deleteBySource("arcana:" + slug);
+			return;
+		}
+		const flipped = this.flippedSlugs.has(slug);
+		const sideItem = flipped ? item.back.item : item.front.item;
+		if (!sideItem?.inventoryColumn) {
+			await this._outfitItems.deleteBySource("arcana:" + slug);
+			return;
+		}
+		await this._outfitItems.sync("arcana:" + slug, [
+			new EmbeddedOutfitItemBuilder()
+				.withSlug(slug)
 				.withName(sideItem.name)
 				.withWeight(sideItem.weight ?? 0)
 				.withNote(sideItem.note ?? null)
@@ -181,8 +169,8 @@ export class CharacterArcana {
 				.withResource(sideItem.resource ?? null)
 				.withTwoCol(false)
 				.withBreakBefore(false)
-				.build()
-			];
-		});
+				.withSource("arcana:" + slug)
+				.build(),
+		]);
 	}
 }

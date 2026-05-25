@@ -19,27 +19,35 @@
 				},
 				"description": "<p>You got it off a stranger. Like, maybe on a bet, or in a contest, or as a gift in return for some kindness. Or maybe you took it without his consent? Regardless, he seemed a bit coy about the horn, almost glad to let you have it. And just before you parted ways, you noticed the missing finger on his left hand.</p><p>Since then, the horn has seemed to call to you, daring you to drink heavily from it.</p>",
 				"unlock": {
-					"description": "To unlock its mysteries, you must…",
-					"requirements": [
+					"slug": "fine-drinking-horn",
+					"list": [
 						{
-							"type": "option",
+							"type": "heading",
+							"description": "To unlock its mysteries, you must…"
+						},
+						{
+							"type": "track",
 							"slug": "fill-whisky",
-							"description": "… fill it with whisky or a similarly potent spirit."
+							"description": "… fill it with whisky or a similarly potent spirit.",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "drink-single-pull",
-							"description": "… drink the contents in a single pull (mark dazed)."
+							"description": "… drink the contents in a single pull (mark dazed).",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "risk-blacking-out",
-							"description": "… risk blacking out, acting the fool, or at least marking more debilities."
+							"description": "… risk blacking out, acting the fool, or at least marking more debilities.",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "survive-storm",
-							"description": "… survive the storm you summon as a result (see reverse)."
+							"description": "… survive the storm you summon as a result (see reverse).",
+							"max": 1
 						}
 					]
 				}
@@ -53,8 +61,7 @@
 					"name": "When you get yourself good and drunk from the horn",
 					"rollType": null,
 					"description": "<p>Mark a debility. You call up a storm, centered on your location. Roll four d4s (one extra per additional debility marked). Assign one d4 each to: Onset (1=next day, 4=within the hour); Intensity (1=dangerous to be out, 4=damages sturdy structures); Reach (1=a mile, 4=scores of miles); Duration (1=under an hour, 4=a day). Until the storm passes, you can't clear debilities.</p>"
-				},
-				"options": []
+				}
 			}
 		}
 	}

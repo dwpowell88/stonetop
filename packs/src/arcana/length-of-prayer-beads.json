@@ -19,22 +19,29 @@
 				},
 				"description": "<p>A cord almost 10 feet long, strung with bronze beads. Each bead is carved with a different glyph and a figure in a unique meditative pose. If you run your fingers along the beads, you feel a sense of stillness—but also a merciless weight of judgement.</p>",
 				"unlock": {
-					"description": "To unlock the secrets of the prayer beads, you must…",
-					"requirements": [
+					"slug": "length-of-prayer-beads",
+					"list": [
 						{
-							"type": "option",
+							"type": "heading",
+							"description": "To unlock the secrets of the prayer beads, you must…"
+						},
+						{
+							"type": "track",
 							"slug": "decipher-glyphs",
-							"description": "… decipher the Rime Lord glyphs embossed upon many of the beads."
+							"description": "… decipher the Rime Lord glyphs embossed upon many of the beads.",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "learn-chants",
-							"description": "… learn the meditative chants that accompany the beads (from a trove of knowledge or someone who knows)."
+							"description": "… learn the meditative chants that accompany the beads (from a trove of knowledge or someone who knows).",
+							"max": 1
 						},
 						{
-							"type": "option",
+							"type": "track",
 							"slug": "isolated-fasting",
-							"description": "… spend a season in isolation, naked and fasting, meditating with the prayer beads, risking illness, accident, and misadventure."
+							"description": "… spend a season in isolation, naked and fasting, meditating with the prayer beads, risking illness, accident, and misadventure.",
+							"max": 1
 						}
 					]
 				}
@@ -53,8 +60,7 @@
 					"name": "When you Bolster by spending downtime in isolation, fasting, and meditation with the prayer beads",
 					"rollType": null,
 					"description": "<p>Hold Preparation (as per the Bolster move). While you hold at least 1 Preparation, you require only an hour of sleep, can endure cold without warm clothing, and need not consume supplies while traveling. Spend 1 Preparation to: add +1 to any roll; clear or refuse a debility; perform a feat of extreme endurance; ignore elemental harm.</p>"
-				},
-				"options": []
+				}
 			}
 		}
 	}

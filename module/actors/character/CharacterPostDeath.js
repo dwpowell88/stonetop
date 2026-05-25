@@ -1,47 +1,63 @@
 import {
 	PostDeathInsertSnapshotBuilder,
 	PostDeathSectionSnapshotBuilder,
-} from "../../model/PostDeathInsertSnapshot.js";
-import {
-	LoreOptionSnapshotBuilder,
-	LoreEntrySnapshotBuilder,
-	LoreSection,
-	InstinctOptionSnapshotBuilder,
-	InstinctSection,
-	MoveSnapshotBuilder,
-} from "../../model/CharacterSnapshot.js";
+} from "../../model/snapshot/character/PostDeathInsertSnapshot.js";
 
 export class CharacterPostDeath {
-	constructor(insertFlags, instinct, lore, insertRepo, moveRepo) {
+	constructor(insertFlags, instinct, lore, insertRepo, moves) {
 		this._insertFlags = insertFlags;
-		this._instinct    = instinct;
-		this._lore        = lore;
-		this._insertRepo  = insertRepo;
-		this._moveRepo    = moveRepo;
+		this._instinct = instinct;
+		this._lore = lore;
+		this._insertRepo = insertRepo;
+		this._moves = moves;
 	}
 
-	get activeSlug()       { return this._insertFlags.getFlag("slug") ?? null; }
-	async setActiveSlug(s) { await this._insertFlags.setFlag("slug", s); }
-	get instinct()         { return this._instinct; }
-	get lore()             { return this._lore; }
+	get activeSlug() {
+		return this._insertFlags.getFlag("slug") ?? null;
+	}
+
+	async setActiveSlug(s) {
+		await this._insertFlags.setFlag("slug", s);
+	}
+
+	get instinct() {
+		return this._instinct;
+	}
+
+	get lore() {
+		return this._lore;
+	}
+
+	async setInsert(slug) {
+		const previousSlug = this.activeSlug;
+		if (previousSlug) {
+			await this._moves.removeCategory(`post-death-${previousSlug}`);
+		}
+		await this.setActiveSlug(slug);
+		if (slug) {
+			const insert = await this._insertRepo.findBySlug(slug);
+			const moveType = `post-death-${slug}`;
+			await this._moves.addCategory(moveType, insert?.name ?? slug, slug);
+		}
+	}
 
 	async buildSnapshot() {
-		const slug       = this.activeSlug;
+		const slug = this.activeSlug;
 		const allEntries = await this._insertRepo.getAll();
 
 		let activeInsert = null;
 		if (slug) {
 			const data = await this._insertRepo.findBySlug(slug);
 			if (data) {
-				const moves = await this._moveRepo.getPostDeathMoves(slug);
+				const moveType = `post-death-${slug}`;
 				activeInsert = new PostDeathInsertSnapshotBuilder()
 					.withSlug(data.slug)
 					.withName(data.name)
 					.withImg(data.img)
 					.withDescription(data.description)
-					.withInstinct(_buildInstinctSection(data.instincts, this._instinct.selectedValue))
-					.withLore(buildLoreSection(data.lore, this._lore))
-					.withMoves(_buildMoveSnapshots(moves))
+					.withInstinct(this._instinct.buildSnapshot(data.instinct))
+					.withLore(this._lore.buildSnapshot(data.lore))
+					.withMoves(this._moves.getMoveSnapshotsForCategory(moveType))
 					.build();
 			}
 		}
@@ -53,62 +69,3 @@ export class CharacterPostDeath {
 	}
 }
 
-// Exported so StonetopCharacter can reuse it for the playbook lore section.
-export function buildLoreSection(loreData, loreState) {
-	const entries = loreData.map(entry => {
-		const options = (entry.options ?? []).map(opt => {
-			const isText = (opt.type ?? "checkbox") === "text";
-			return new LoreOptionSnapshotBuilder()
-				.withSlug(opt.slug)
-				.withDescription(opt.description)
-				.withType(opt.type ?? "checkbox")
-				.withMax(isText ? 0 : (opt.max ?? 1))
-				.withCount(isText ? 0 : loreState.getCount(entry.slug, opt.slug))
-				.withTextValue(isText ? loreState.getText(entry.slug, opt.slug) : null)
-				.build();
-		});
-		return new LoreEntrySnapshotBuilder()
-			.withSlug(entry.slug)
-			.withTitle(entry.title)
-			.withDescription(entry.description ?? "")
-			.withOptions(options)
-			.build();
-	});
-	return new LoreSection(entries);
-}
-
-function _buildInstinctSection(instincts, selectedValue) {
-	const options = (instincts ?? []).map(({ word, description }) => {
-		const value = `${word} — ${description}`;
-		return new InstinctOptionSnapshotBuilder()
-			.withWord(word)
-			.withDescription(description)
-			.withValue(value)
-			.withSelected(selectedValue === value)
-			.build();
-	});
-	return new InstinctSection(selectedValue || null, options);
-}
-
-function _buildMoveSnapshots(entries) {
-	return entries.map(e => new MoveSnapshotBuilder()
-		.withId(e.id)
-		.withCompendiumId(e.id)
-		.withOwnedId(null)
-		.withName(e.name)
-		.withDescription(e.description ?? "")
-		.withRollType(e.rollType)
-		.withIsStarting(false)
-		.withSource({ type: "post-death" })
-		.withSourceLabel(null)
-		.withOwned(false)
-		.withOwnedIds([])
-		.withLocked(false)
-		.withRequirement(null)
-		.withRequiresLabel(null)
-		.withResource(null)
-		.withRepeat(null)
-		.withRepeatable(false)
-		.build()
-	);
-}

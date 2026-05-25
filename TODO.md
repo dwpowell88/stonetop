@@ -1,7 +1,6 @@
 * Implement special moves
 * Support for followers (follower moves)
 * support for steading (homefront moves)
-* playbook inserts for ghost, revenant, thrall
 * major arcana
 * Short for “experience points.” You start
   with no XP. You mark XP…
@@ -13,9 +12,15 @@
   “Mark XP” means that you make a tick
   mark in the XP box on your playbook,
   increasing your total XP by 1.
-* should item typing move from "move" to "equipment"?
 * Add prosperity to inventory tab
-* Add Thrall
+* Update all of our compendium items to include the json structure for adding outfit items
+* lore entry and choice should be the same data model.
+* other inventory section is missing
+* dark succor move should be rollable (support jsonpath to another item on the character move.post-death.favor)
+* Don't bold the options in special possessions.
+
+== bugs
+* adding outfit items adds them to the other section
 
 == Nice to have
 * toggle to turn off non-selected character options

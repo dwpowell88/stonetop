@@ -1,13 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import { CharacterArcana } from "../../../module/actors/character/CharacterArcana.js";
+import { Stats } from "../../../module/model/data/character/Stats.js";
 import {
 	ArcanaSnapshot, ArcanaSectionSnapshot,
-	ArcanaUnlockTextItem, ArcanaUnlockOptionSnapshot,
-	ArcanaBackOptionSnapshot,
 	MinorArcanumSnapshot, MinorArcanumFrontSnapshot, MinorArcanumBackSnapshot,
-	ArcanumUnlockSection,
-} from "../../../module/model/CharacterSnapshot.js";
-import { MinorArcanum } from "../../../module/model/MinorArcanum.js";
+	ChoiceGroup, ChoiceRow, HeadingRow,
+} from "../../../module/model/snapshot/character/CharacterSnapshot.js";
 import {FakeArcanaRepository} from "../../fakes/FakeArcanaRepository.js";
 
 // -- Helpers ------------------------------------------------------------------
@@ -20,7 +18,6 @@ function makeFlags(store = {}) {
 	};
 }
 
-
 // -- Fixture ------------------------------------------------------------------
 
 const FFYRNIG_SPHERE = {
@@ -30,13 +27,14 @@ const FFYRNIG_SPHERE = {
 		item: { name: "A Huge Wooden Sphere", weight: null, note: "immobile", inventoryColumn: null },
 		description: "<p>Half-buried and largely overgrown.</p>",
 		unlock: {
-			description: "The pictograms depict some sort of recipe, which you can learn but you must…",
-			requirements: [
-				{ type: "text",   content: "Some context text." },
-				{ type: "option", slug: "dig-sphere",   description: "… first dig up and clean the sphere." },
-				{ type: "option", slug: "study-glyphs", description: "… spend weeks studying the glyphs." },
-				{ type: "text",   content: "And then…" },
-				{ type: "option", slug: "risk-recipe",  description: "… risk getting the recipe wrong.", max: 3 },
+			slug: "huge-wooden-sphere",
+			list: [
+				{ type: "heading", description: "The pictograms depict some sort of recipe, which you can learn but you must…" },
+				{ type: "heading", description: "Some context text." },
+				{ type: "track",   slug: "dig-sphere",   description: "… first dig up and clean the sphere.", max: 1 },
+				{ type: "track",   slug: "study-glyphs", description: "… spend weeks studying the glyphs.", max: 1 },
+				{ type: "heading", description: "And then…" },
+				{ type: "track",   slug: "risk-recipe",  description: "… risk getting the recipe wrong.", max: 3 },
 			],
 		},
 	},
@@ -50,35 +48,26 @@ const FFYRNIG_SPHERE = {
 			rollType: null,
 			description: "<p>pick 1: regain HP or clear a debility.</p>",
 		},
-		options: [],
-	},
-};
-
-const ARCANUM_WITH_BACK_OPTS = {
-	slug: "test-arcanum",
-	front: {
-		title: "Test Arcanum (front)",
-		item: null,
-		description: "<p>Test.</p>",
-		unlock: { description: "Unlock by…", requirements: [] },
-	},
-	back: {
-		title: "Test Arcanum (back)",
-		item: null,
-		description: "<p>Test.</p>",
-		resource: null,
-		move: null,
-		options: [
-			{ slug: "opt-a", description: "<p>Option A.</p>", max: 1 },
-			{ slug: "opt-b", description: "<p>Option B.</p>", max: 2 },
-		],
 	},
 };
 
 // -- Build helper -------------------------------------------------------------
 
-function makeArcana(flagStore = {}, arcana = [FFYRNIG_SPHERE]) {
-	return new CharacterArcana(makeFlags(flagStore), new FakeArcanaRepository(arcana));
+function makeFakeStats(values = {}) {
+	return { getStats: () => new Stats(values) };
+}
+
+function makeActorOutfitItems() {
+	return { sync: vi.fn(async () => {}), deleteBySource: vi.fn(async () => {}) };
+}
+
+function makeArcana(flagStore = {}, arcana = [FFYRNIG_SPHERE], fakeStats = null, outfitItems = null) {
+	return new CharacterArcana(
+		makeFlags(flagStore),
+		new FakeArcanaRepository(arcana),
+		fakeStats ?? makeFakeStats(),
+		outfitItems ?? makeActorOutfitItems(),
+	);
 }
 
 // -- Tests --------------------------------------------------------------------
@@ -180,49 +169,51 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect(front.description).toContain("Half-buried");
 		});
 
-		it("front.unlock is an ArcanumUnlockSection", async () => {
-			expect((await getItem()).front.unlock).toBeInstanceOf(ArcanumUnlockSection);
+		it("front.unlock is a ChoiceGroup", async () => {
+			expect((await getItem()).front.unlock).toBeInstanceOf(ChoiceGroup);
 		});
 
-		it("front.unlock.description is set", async () => {
-			const { front } = await getItem();
-			expect(front.unlock.description).toBe("The pictograms depict some sort of recipe, which you can learn but you must…");
+		it("front.unlock.slug is the arcanum slug", async () => {
+			expect((await getItem()).front.unlock.slug).toBe("huge-wooden-sphere");
 		});
 
-		it("front.unlock.requirements has text and option nodes in order", async () => {
-			const { requirements } = (await getItem()).front.unlock;
-			expect(requirements).toHaveLength(5);
-			expect(requirements[0]).toBeInstanceOf(ArcanaUnlockTextItem);
-			expect(requirements[1]).toBeInstanceOf(ArcanaUnlockOptionSnapshot);
-			expect(requirements[2]).toBeInstanceOf(ArcanaUnlockOptionSnapshot);
-			expect(requirements[3]).toBeInstanceOf(ArcanaUnlockTextItem);
-			expect(requirements[4]).toBeInstanceOf(ArcanaUnlockOptionSnapshot);
+		it("front.unlock.list first item is a HeadingRow with the unlock description", async () => {
+			const row = (await getItem()).front.unlock.list[0];
+			expect(row).toBeInstanceOf(HeadingRow);
+			expect(row.description).toBe("The pictograms depict some sort of recipe, which you can learn but you must…");
 		});
 
-		it("unlock option has slug and description", async () => {
-			const opt = (await getItem()).front.unlock.requirements[1];
-			expect(opt.slug).toBe("dig-sphere");
-			expect(opt.description).toBe("… first dig up and clean the sphere.");
+		it("front.unlock.list has heading and choice nodes in order", async () => {
+			const { list } = (await getItem()).front.unlock;
+			expect(list).toHaveLength(6);
+			expect(list[0].type).toBe("heading");
+			expect(list[1].type).toBe("heading");
+			expect(list[2].type).toBe("choice");
+			expect(list[3].type).toBe("choice");
+			expect(list[4].type).toBe("heading");
+			expect(list[5].type).toBe("choice");
 		});
 
-		it("unlock option defaults to count 0 and selected false", async () => {
-			const opt = (await getItem()).front.unlock.requirements[1];
-			expect(opt.count).toBe(0);
-			expect(opt.selected).toBe(false);
+		it("choice row has correct option slug and description", async () => {
+			const row = (await getItem()).front.unlock.list[2];
+			expect(row).toBeInstanceOf(ChoiceRow);
+			expect(row.options[0].slug).toBe("dig-sphere");
+			expect(row.options[0].description).toBe("… first dig up and clean the sphere.");
 		});
 
-		it("unlock option max defaults to 1", async () => {
-			expect((await getItem()).front.unlock.requirements[1].max).toBe(1);
+		it("choice row defaults checks to all false when no count saved", async () => {
+			const row = (await getItem()).front.unlock.list[2];
+			expect(row.options[0].checks).toEqual([false]);
 		});
 
-		it("unlock option with explicit max reflects JSON value", async () => {
-			expect((await getItem()).front.unlock.requirements[4].max).toBe(3);
+		it("choice row with explicit max has checks array of that length", async () => {
+			const row = (await getItem()).front.unlock.list[5];
+			expect(row.options[0].checks).toHaveLength(3);
 		});
 
-		it("unlock option count and selected reflect saved flags", async () => {
-			const opt = (await getItem({ unlock: { "huge-wooden-sphere:dig-sphere": 1 } })).front.unlock.requirements[1];
-			expect(opt.count).toBe(1);
-			expect(opt.selected).toBe(true);
+		it("choice row checks reflect saved flag values", async () => {
+			const row = (await getItem({ unlock: { "huge-wooden-sphere": { "dig-sphere": 1 } } })).front.unlock.list[2];
+			expect(row.options[0].checks).toEqual([true]);
 		});
 	});
 
@@ -247,11 +238,9 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect((await getItem()).back.resource).toMatchObject({ current: 0, max: 3, title: "Ffyrnig Tonic" });
 		});
 
-		it("back.resource.current reflects inventoryResources param", async () => {
-			const item = await (async () => {
-				const arcana = makeArcana({ owned: ["huge-wooden-sphere"] });
-				return (await arcana.buildSnapshot({}, {}, { "huge-wooden-sphere": 2 })).minor.items[0];
-			})();
+		it("back.resource.current reflects inventoryResources", async () => {
+			const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
+				.buildSnapshot({}, { "huge-wooden-sphere": 2 })).minor.items[0];
 			expect(item.back.resource.current).toBe(2);
 		});
 
@@ -278,46 +267,6 @@ describe("CharacterArcana.buildSnapshot()", () => {
 				new FakeArcanaRepository([noMove]),
 			);
 			expect((await arcana.buildSnapshot()).minor.items[0].back.move).toBeNull();
-		});
-
-		it("back.options is [] when none defined", async () => {
-			expect((await getItem()).back.options).toEqual([]);
-		});
-	});
-
-	describe("back options", () => {
-		function makeWithOpts(flagStore = {}) {
-			return new CharacterArcana(
-				makeFlags({ owned: ["test-arcanum"], ...flagStore }),
-				new FakeArcanaRepository([ARCANUM_WITH_BACK_OPTS]),
-			);
-		}
-
-		async function getItem(flagStore = {}) {
-			return (await makeWithOpts(flagStore).buildSnapshot()).minor.items[0];
-		}
-
-		it("back.options are ArcanaBackOptionSnapshot instances", async () => {
-			const { options } = (await getItem()).back;
-			expect(options).toHaveLength(2);
-			expect(options[0]).toBeInstanceOf(ArcanaBackOptionSnapshot);
-		});
-
-		it("back option has correct slug, description, max", async () => {
-			const opt = (await getItem()).back.options[0];
-			expect(opt.slug).toBe("opt-a");
-			expect(opt.description).toBe("<p>Option A.</p>");
-			expect(opt.max).toBe(1);
-		});
-
-		it("back option max > 1 reflects JSON value", async () => {
-			expect((await getItem()).back.options[1].max).toBe(2);
-		});
-
-		it("back option count and selected reflect saved flags", async () => {
-			const opt = (await getItem({ backOptions: { "test-arcanum:opt-a": 1 } })).back.options[0];
-			expect(opt.count).toBe(1);
-			expect(opt.selected).toBe(true);
 		});
 	});
 
@@ -350,13 +299,12 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect(flags.setFlag).toHaveBeenCalledWith("flipped", []);
 		});
 
-		it("setUnlockCount stores the count under arcanumSlug:optionSlug key", async () => {
+		it("setUnlockCount stores the count nested by arcanumSlug then optionSlug", async () => {
 			const flags = makeFlags();
 			const arcana = new CharacterArcana(flags, new FakeArcanaRepository());
 			await arcana.setUnlockCount("huge-wooden-sphere", "dig-sphere", 1);
-			expect(flags.setFlag).toHaveBeenCalledWith("unlock", { "huge-wooden-sphere:dig-sphere": 1 });
+			expect(flags.setFlag).toHaveBeenCalledWith("unlock", { "huge-wooden-sphere": { "dig-sphere": 1 } });
 		});
-
 	});
 });
 
@@ -404,31 +352,21 @@ const BOW_WITH_NO_STRING = {
 	},
 };
 
-describe("CharacterArcana.buildSnapshot() — inventoryResources param", () => {
+describe("CharacterArcana.buildSnapshot() — inventoryResources", () => {
 	it("back.resource uses inventoryResources current for back.resource arcana", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		const item = (await arcana.buildSnapshot({}, {}, { "huge-wooden-sphere": 2 })).minor.items[0];
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
+			.buildSnapshot({}, { "huge-wooden-sphere": 2 })).minor.items[0];
 		expect(item.back.resource.current).toBe(2);
 	});
 
 	it("back.resource defaults to current 0 when not in inventoryResources", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		const item = (await arcana.buildSnapshot()).minor.items[0];
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] }).buildSnapshot()).minor.items[0];
 		expect(item.back.resource.current).toBe(0);
 	});
 
 	it("back.item.resource is a resolved Resource on the OutfitItem snapshot", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["bow-with-no-string"] }),
-			new FakeArcanaRepository([BOW_WITH_NO_STRING]),
-		);
-		const item = (await arcana.buildSnapshot({}, {}, { "bow-with-no-string": 1 })).minor.items[0];
+		const item = (await makeArcana({ owned: ["bow-with-no-string"] }, [BOW_WITH_NO_STRING])
+			.buildSnapshot({}, { "bow-with-no-string": 1 })).minor.items[0];
 		expect(item.back.item.resource).not.toBeNull();
 		expect(item.back.item.resource.current).toBe(1);
 		expect(item.back.item.resource.max).toBe(3);
@@ -436,28 +374,18 @@ describe("CharacterArcana.buildSnapshot() — inventoryResources param", () => {
 	});
 
 	it("back.item.resource defaults to current 0 when not in inventoryResources", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["bow-with-no-string"] }),
-			new FakeArcanaRepository([BOW_WITH_NO_STRING]),
-		);
-		const item = (await arcana.buildSnapshot()).minor.items[0];
+		const item = (await makeArcana({ owned: ["bow-with-no-string"] }, [BOW_WITH_NO_STRING]).buildSnapshot()).minor.items[0];
 		expect(item.back.item.resource.current).toBe(0);
 	});
 
 	it("back.resource is null for arcana whose resource lives on the item", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["bow-with-no-string"] }),
-			new FakeArcanaRepository([BOW_WITH_NO_STRING]),
-		);
-		expect((await arcana.buildSnapshot()).minor.items[0].back.resource).toBeNull();
+		const item = (await makeArcana({ owned: ["bow-with-no-string"] }, [BOW_WITH_NO_STRING]).buildSnapshot()).minor.items[0];
+		expect(item.back.resource).toBeNull();
 	});
 
 	it("back.item.resource is null for arcana with a standalone resource", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		expect((await arcana.buildSnapshot()).minor.items[0].back.item.resource).toBeNull();
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] }).buildSnapshot()).minor.items[0];
+		expect(item.back.item.resource).toBeNull();
 	});
 
 	it("back.resource is null when neither back.resource nor back.item.resource defined", async () => {
@@ -471,12 +399,13 @@ describe("CharacterArcana.buildSnapshot() — inventoryResources param", () => {
 });
 
 describe("CharacterArcana.buildSnapshot() — maxStat resolution", () => {
-	it("maxStat resolves to stat value from stats param", async () => {
+	it("maxStat resolves to stat value from stats", async () => {
 		const arcana = new CharacterArcana(
 			makeFlags({ owned: ["carvings-in-a-cave"] }),
 			new FakeArcanaRepository([CARVINGS_IN_A_CAVE]),
+			makeFakeStats({ con: 3 }),
 		);
-		const item = (await arcana.buildSnapshot({ con: { value: 3 } })).minor.items[0];
+		const item = (await arcana.buildSnapshot()).minor.items[0];
 		expect(item.back.resource.max).toBe(3);
 	});
 
@@ -484,46 +413,81 @@ describe("CharacterArcana.buildSnapshot() — maxStat resolution", () => {
 		const arcana = new CharacterArcana(
 			makeFlags({ owned: ["carvings-in-a-cave"] }),
 			new FakeArcanaRepository([CARVINGS_IN_A_CAVE]),
+			makeFakeStats(),
 		);
-		const item = (await arcana.buildSnapshot({})).minor.items[0];
+		const item = (await arcana.buildSnapshot()).minor.items[0];
 		expect(item.back.resource.max).toBe(0);
 	});
 
 	it("fixed max is used unchanged when maxStat is null", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		const item = (await arcana.buildSnapshot()).minor.items[0];
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] }).buildSnapshot()).minor.items[0];
 		expect(item.back.resource.max).toBe(3);
 	});
 });
 
 describe("CharacterArcana.buildSnapshot() — checked state", () => {
 	it("checked defaults to false when not in checkedMap", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		const item = (await arcana.buildSnapshot()).minor.items[0];
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] }).buildSnapshot()).minor.items[0];
 		expect(item.checked).toBe(false);
 	});
 
 	it("checked is true when slug is in checkedMap", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		const item = (await arcana.buildSnapshot({}, { "huge-wooden-sphere": true })).minor.items[0];
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
+			.buildSnapshot({ "huge-wooden-sphere": true }, {})).minor.items[0];
 		expect(item.checked).toBe(true);
 	});
 
 	it("checked is false when slug is not in checkedMap", async () => {
-		const arcana = new CharacterArcana(
-			makeFlags({ owned: ["huge-wooden-sphere"] }),
-			new FakeArcanaRepository([FFYRNIG_SPHERE]),
-		);
-		const item = (await arcana.buildSnapshot({}, { "other-slug": true })).minor.items[0];
+		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
+			.buildSnapshot({ "other-slug": true }, {})).minor.items[0];
 		expect(item.checked).toBe(false);
+	});
+});
+
+describe("CharacterArcana — outfitItems sync", () => {
+	it("addArcanum syncs embedded item when arcanum has a front inventoryColumn", async () => {
+		const outfitItems = makeActorOutfitItems();
+		const arcana = makeArcana({}, [BOW_WITH_NO_STRING], null, outfitItems);
+		await arcana.addArcanum("bow-with-no-string");
+		expect(outfitItems.sync).toHaveBeenCalledWith(
+			"arcana:bow-with-no-string",
+			expect.arrayContaining([expect.objectContaining({ flags: expect.objectContaining({ stonetop: expect.objectContaining({ source: "arcana:bow-with-no-string" }) }) })]),
+		);
+	});
+
+	it("addArcanum deletes source when front item has no inventoryColumn", async () => {
+		const outfitItems = makeActorOutfitItems();
+		const arcana = makeArcana({}, [FFYRNIG_SPHERE], null, outfitItems);
+		await arcana.addArcanum("huge-wooden-sphere");
+		expect(outfitItems.deleteBySource).toHaveBeenCalledWith("arcana:huge-wooden-sphere");
+	});
+
+	it("removeArcanum deletes embedded item by source", async () => {
+		const outfitItems = makeActorOutfitItems();
+		const arcana = makeArcana({ owned: ["bow-with-no-string"] }, [BOW_WITH_NO_STRING], null, outfitItems);
+		await arcana.removeArcanum("bow-with-no-string");
+		expect(outfitItems.deleteBySource).toHaveBeenCalledWith("arcana:bow-with-no-string");
+	});
+
+	it("flipArcanum syncs to the back item", async () => {
+		const outfitItems = makeActorOutfitItems();
+		const arcana = makeArcana({ owned: ["bow-with-no-string"] }, [BOW_WITH_NO_STRING], null, outfitItems);
+		await arcana.flipArcanum("bow-with-no-string");
+		expect(outfitItems.sync).toHaveBeenCalledWith("arcana:bow-with-no-string", expect.any(Array));
+	});
+
+	it("unflipArcanum syncs to the front item", async () => {
+		const outfitItems = makeActorOutfitItems();
+		const arcana = makeArcana(
+			{ owned: ["bow-with-no-string"], flipped: ["bow-with-no-string"] },
+			[BOW_WITH_NO_STRING], null, outfitItems,
+		);
+		await arcana.unflipArcanum("bow-with-no-string");
+		expect(outfitItems.sync).toHaveBeenCalledWith("arcana:bow-with-no-string", expect.any(Array));
+	});
+
+	it("does not throw when outfitItems is null", async () => {
+		const arcana = new CharacterArcana(makeFlags({}), new FakeArcanaRepository([BOW_WITH_NO_STRING]));
+		await expect(arcana.addArcanum("bow-with-no-string")).resolves.not.toThrow();
 	});
 });

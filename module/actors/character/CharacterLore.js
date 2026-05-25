@@ -1,31 +1,19 @@
+import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
+
 export class CharacterLore {
 	constructor(flags) {
 		this._flags = flags;
 	}
 
-	get counts() {
-		return this._flags.getFlag("counts") ?? {};
+	get values() {
+		return new ChoiceValues(this._flags.getFlag("values") ?? {});
 	}
 
-	getCount(loreSlug, optionSlug) {
-		return this.counts[`${loreSlug}:${optionSlug}`] ?? 0;
+	async set(groupSlug, optionSlug, value) {
+		await this._flags.setFlag("values", this.values.set(groupSlug, optionSlug, value).toRaw());
 	}
 
-	async setCount(loreSlug, optionSlug, count) {
-		const key = `${loreSlug}:${optionSlug}`;
-		await this._flags.setFlag("counts", { ...this.counts, [key]: count });
-	}
-
-	get texts() {
-		return this._flags.getFlag("texts") ?? {};
-	}
-
-	getText(loreSlug, optionSlug) {
-		return this.texts[`${loreSlug}:${optionSlug}`] ?? "";
-	}
-
-	async setText(loreSlug, optionSlug, value) {
-		const key = `${loreSlug}:${optionSlug}`;
-		await this._flags.setFlag("texts", { ...this.texts, [key]: value });
+	buildSnapshot(loreData) {
+		return (loreData ?? []).map(entry => ChoiceGroup.fromPackData(entry, this.values));
 	}
 }

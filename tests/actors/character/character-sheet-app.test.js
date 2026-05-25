@@ -19,13 +19,14 @@ function makeCharacterMock(actor) {
 		}),
 		saved: actor.getFlag("stonetop", "appearance.selected") ?? {},
 	};
-	const origin = { select: vi.fn() };
+	const origin = { select: vi.fn(), selectName: vi.fn() };
 	return {
 		background,
 		instinct,
 		appearance,
 		origin,
-		ensureStartingMoves: vi.fn(),
+		selectBackground: vi.fn(),
+		onDropItems: vi.fn(async () => ({ anyAdded: false, others: [] })),
 		updateName: vi.fn(async name => actor.update({ name })),
 		addMove: vi.fn(),
 		removeMove: vi.fn(),
@@ -79,82 +80,53 @@ describe("StonetopCharacterSheet event handlers", () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
 		await sheet._onBackgroundChange({ currentTarget: { value: "vessel" } });
-		expect(actor.typedActor.background.selectBackground).toHaveBeenCalledWith("vessel");
+		expect(actor.typedActor.selectBackground).toHaveBeenCalledWith("vessel");
 	});
 
-	it("_onBackgroundChange calls ensureStartingMoves after selecting background", async () => {
+	it("_onAppearanceChange calls appearance.select with rowKey and value", async () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
-		await sheet._onBackgroundChange({ currentTarget: { value: "vessel" } });
-		expect(actor.typedActor.ensureStartingMoves).toHaveBeenCalled();
+		await sheet._onAppearanceChange({ currentTarget: { dataset: { rowKey: "0", choiceSlug: "gray-and-wizened" } } });
+		expect(actor.typedActor.appearance.select).toHaveBeenCalledWith(0, "gray-and-wizened");
 	});
 
-	it("_onAppearanceChange calls appearance.select with lineIdx and value", async () => {
-		const actor = makeActor();
-		const sheet = makeSheet(actor);
-		await sheet._onAppearanceChange({ currentTarget: { dataset: { line: "0" }, value: "gray & wizened" } });
-		expect(actor.typedActor.appearance.select).toHaveBeenCalledWith(0, "gray & wizened");
-	});
-
-	it("_onOriginNameClick updates the actor name", async () => {
+	it("_onOriginNameClick calls origin.selectName with trimmed text", async () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
 		await sheet._onOriginNameClick({ currentTarget: { textContent: "  Arwel  " } });
-		expect(actor.typedActor.updateName).toHaveBeenCalledWith("Arwel");
+		expect(actor.typedActor.origin.selectName).toHaveBeenCalledWith("Arwel");
 	});
 });
 
 describe("StonetopCharacterSheet._onDropItemCreate", () => {
-	it("calls addArcanum with the slug from flags when an arcanum is dropped", async () => {
+	it("passes items array to onDropItems", async () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
-		await sheet._onDropItemCreate(makeArcanum("humble-broom"));
-		expect(actor.typedActor.addArcanum).toHaveBeenCalledWith("humble-broom");
+		const items = [makeArcanum("humble-broom"), makeMove()];
+		await sheet._onDropItemCreate(items);
+		expect(actor.typedActor.onDropItems).toHaveBeenCalledWith(items);
 	});
 
-	it("accepts an array of items", async () => {
+	it("wraps a single item in an array for onDropItems", async () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
-		await sheet._onDropItemCreate([makeArcanum("humble-broom"), makeArcanum("stone-idol")]);
-		expect(actor.typedActor.addArcanum).toHaveBeenCalledWith("humble-broom");
-		expect(actor.typedActor.addArcanum).toHaveBeenCalledWith("stone-idol");
+		const item = makeArcanum("humble-broom");
+		await sheet._onDropItemCreate(item);
+		expect(actor.typedActor.onDropItems).toHaveBeenCalledWith([item]);
 	});
 
-	it("skips arcanum with no slug in flags", async () => {
+	it("calls render when anyAdded is true", async () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
-		const noSlug = { type: "move", system: { moveType: "arcanum" }, flags: {} };
-		await sheet._onDropItemCreate(noSlug);
-		expect(actor.typedActor.addArcanum).not.toHaveBeenCalled();
-	});
-
-	it("routes regular moves to onDropMove", async () => {
-		const actor = makeActor();
-		const sheet = makeSheet(actor);
-		const move = makeMove();
-		await sheet._onDropItemCreate(move);
-		expect(actor.typedActor.onDropMove).toHaveBeenCalledWith(move);
-		expect(actor.typedActor.addArcanum).not.toHaveBeenCalled();
-	});
-
-	it("does not route non-move items to addArcanum or onDropMove", async () => {
-		const actor = makeActor();
-		const sheet = makeSheet(actor);
-		await sheet._onDropItemCreate(makeNonMove());
-		expect(actor.typedActor.addArcanum).not.toHaveBeenCalled();
-		expect(actor.typedActor.onDropMove).not.toHaveBeenCalled();
-	});
-
-	it("calls render after dropping an arcanum", async () => {
-		const actor = makeActor();
-		const sheet = makeSheet(actor);
+		actor.typedActor.onDropItems.mockResolvedValue({ anyAdded: true, others: [] });
 		await sheet._onDropItemCreate(makeArcanum("humble-broom"));
 		expect(sheet.render).toHaveBeenCalledWith(false);
 	});
 
-	it("does not call render when nothing was added", async () => {
+	it("does not call render when anyAdded is false", async () => {
 		const actor = makeActor();
 		const sheet = makeSheet(actor);
+		actor.typedActor.onDropItems.mockResolvedValue({ anyAdded: false, others: [] });
 		await sheet._onDropItemCreate(makeNonMove());
 		expect(sheet.render).not.toHaveBeenCalled();
 	});

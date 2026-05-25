@@ -6,7 +6,7 @@
 	"version": "0.7.0",
 	"compatibility": {
 		"minimum": "12",
-		"verified": "12"
+		"verified": "14"
 	},
 	"relationships": {
 		"systems": [
@@ -14,7 +14,8 @@
 				"id": "pbta",
 				"type": "system",
 				"compatibility": {
-					"verified": "1.1.1"
+					"minimum": "1.1.1",
+					"verified": "1.2.0"
 				}
 			}
 		]
@@ -97,9 +98,9 @@
 			"system": "pbta"
 		},
 		{
-			"name": "inventory-items",
+			"name": "outfit-items",
 			"label": "Inventory Items",
-			"path": "packs/inventory-items",
+			"path": "packs/outfit-items",
 			"type": "Item",
 			"system": "pbta"
 		},
@@ -121,6 +122,13 @@
 			"name": "post-death-moves",
 			"label": "Post-Death Moves",
 			"path": "packs/post-death-moves",
+			"type": "Item",
+			"system": "pbta"
+		},
+		{
+			"name": "followers",
+			"label": "Followers",
+			"path": "packs/followers",
 			"type": "Item",
 			"system": "pbta"
 		}
