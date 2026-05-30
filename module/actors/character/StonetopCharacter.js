@@ -139,6 +139,10 @@ export class StonetopCharacter {
 		await this._inventory.setSmallPool(count);
 	}
 
+	async setInventoryOtherItems(value) {
+		await this._inventory.setOtherItems(value);
+	}
+
 	async setMoveResourceCurrent(categoryKey, moveName, current) {
 		await this._moves.setMoveResourceCurrent(categoryKey, moveName, current);
 	}

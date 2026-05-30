@@ -178,10 +178,12 @@ export class PossessionItemSnapshotBuilder {
 /**
  * @property {OutfitSnapshot} outfit
  * @property {PossessionsSnapshot|null} possessions
+ * @property {string} otherItems
  */
 export class InventorySnapshot {
-	constructor(outfit, possessions) {
+	constructor(outfit, possessions, otherItems) {
 		this.outfit      = outfit;
 		this.possessions = possessions;
+		this.otherItems = otherItems;
 	}
 }

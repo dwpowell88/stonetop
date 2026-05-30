@@ -23,6 +23,7 @@ export class CharacterInventory {
 	get loadLevel()   { return this._flags.getFlag("loadLevel") ?? null; }
 	get regularPool() { return this._flags.getFlag("regularPool") ?? 0; }
 	get smallPool()   { return this._flags.getFlag("smallPool") ?? 0; }
+	get otherItems()  { return this._flags.getFlag("otherItems") ?? ""; }
 
 	async setItemChecked(slug, isChecked) {
 		await this._flags.setFlag("checked", {...this.checked, [slug]: isChecked});
@@ -42,6 +43,10 @@ export class CharacterInventory {
 
 	async setSmallPool(count) {
 		await this._flags.setFlag("smallPool", count);
+	}
+
+	async setOtherItems(value) {
+		await this._flags.setFlag("otherItems", value)
 	}
 
 	async addCustomItem(name, weight) {
@@ -125,7 +130,7 @@ export class CharacterInventory {
 			.withSmallPool(new ResourceBuilder().withCurrent(this.smallPool).withMax(9).withTitle(null).withLabels([]).build())
 			.build();
 
-		return new InventorySnapshot(outfit, await this._possessions.buildSnapshot(level ?? 1));
+		return new InventorySnapshot(outfit, await this._possessions.buildSnapshot(level ?? 1), this.otherItems);
 	}
 
 	buildLoadSnapshot(loadLevel) {
