@@ -33,13 +33,12 @@ export {
 } from "./PostDeathInsertSnapshot.js";
 export {
 	ArcanaSnapshot, ArcanaSectionSnapshot,
-	MinorArcanumSnapshot, MinorArcanumSnapshotBuilder,
-	MinorArcanumFrontSnapshot, MinorArcanumFrontSnapshotBuilder,
-	MinorArcanumBackSnapshot, MinorArcanumBackSnapshotBuilder,
-	ArcanumBackMoveSnapshot,
+	ArcanumSnapshot, ArcanumSnapshotBuilder,
+	ArcanumFrontSnapshot, ArcanumFrontSnapshotBuilder,
+	ArcanumBackSnapshot, ArcanumBackSnapshotBuilder,
 } from "./ArcanaSnapshot.js";
 export { FollowerSnapshot, FollowerSnapshotBuilder } from "./FollowerSnapshot.js";
-export { ChoiceOption, ChoiceRow, HeadingRow, TextRow, ChoiceGroup, ChoiceValues } from "./ChoiceGroup.js";
+export { ChoiceOption, ChoiceRow, HeadingRow, TextRow, FollowerRow, ChoiceGroup, ChoiceValues } from "./ChoiceGroup.js";
 
 /**
  * The canonical read-only data object returned by `StonetopCharacter.buildSnapshot()`.
