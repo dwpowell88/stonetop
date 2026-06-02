@@ -1,176 +1,79 @@
-import { describe, expect, it, vi } from "vitest";
-import { CharacterMoves } from "../../../module/actors/character/CharacterMoves.js";
-import { FakeMoveRepository } from "../../fakes/FakeMoveRepository.js";
+import {describe, expect, it} from "vitest";
+import {CharacterMoves} from "../../../src/actors/character/CharacterMoves.js";
+import {StonetopFlags} from "../../../src/actors/character/StonetopFlags.js";
+import {ChoiceGroupController} from "../../../src/actors/character/ChoiceGroupController.js";
+import {ResourceController} from "../../../src/actors/character/ResourceController.js";
+import {FakeMoveRepository} from "../../fakes/FakeMoveRepository.js";
+import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCompendiumMoveBuilder} from "../../fakes/FakeCompendiumMoveBuilder.js";
+import {TestChoiceGroupBuilder} from "../../fakes/TestChoiceGroupBuilder.js";
+import {TestChoiceRowBuilder} from "../../fakes/TestChoiceRowBuilder.js";
 import {
-	MoveSnapshot,
-	Movelist,
+	ChoiceGroup,
 	MoveCategorySnapshot,
+	Movelist,
+	MoveSnapshot,
 	ValueMax,
-} from "../../../module/model/snapshot/character/CharacterSnapshot.js";
+} from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeFlags(store = {}) {
-	return {
-		getFlag: (key) => store[key] ?? null,
-		setFlag: vi.fn(async (key, val) => { store[key] = val; }),
-	};
-}
+const CHOICES_DATA = new TestChoiceGroupBuilder()
+	.withSlug("potential")
+	.addChoice(
+		TestChoiceRowBuilder.heading()
+			.withSlug("stat1")
+			.withContentText("Increase the stat you rolled by 1")
+			.withTrack(1)
+			.withInput("level checked")
+	)
+	.build();
 
-function makeActor(level = 1) {
-	return {
-		system: { attributes: { level: { value: level } } },
-		createEmbeddedDocuments: vi.fn(async (_, docs) =>
-			docs.map((d, i) => ({ _id: `created-${i}`, name: d.name }))
-		),
-		deleteEmbeddedDocuments: vi.fn(async () => []),
-	};
-}
+function makeActor() { return new FakeActorBuilder().build(); }
 
 function makeMoves({
-	repo  = new FakeMoveRepository(),
-	flags = makeFlags(),
-	actor = makeActor(),
+	repo   = new FakeMoveRepository(),
+	actor  = makeActor(),
+	vitals = {level: 1},
 } = {}) {
-	return new CharacterMoves(repo, flags, actor);
+	const ctrl = new ChoiceGroupController(new StonetopFlags(actor, "choices"));
+	const res  = new ResourceController(new StonetopFlags(actor, "resources"));
+	const m    = new CharacterMoves(repo, actor, ctrl, res);
+	m.setVitals(vitals);
+	return m;
 }
 
 function makePlaybookData(overrides = {}) {
-	return {
-		slug: "the-heavy",
-		name: "The Heavy",
-		startingMovesNote: null,
-		backgrounds: [],
-		...overrides,
-	};
+	return {slug: "the-heavy", name: "The Heavy", startingMovesNote: null, backgrounds: [], ...overrides};
 }
 
-function makeFlagCategory(key, overrides = {}) {
-	return {
-		key,
-		label: overrides.label ?? key,
-		renderStyle: overrides.renderStyle ?? "standard",
-		allowAdditional: overrides.allowAdditional ?? false,
-		note: overrides.note ?? null,
-		moves: overrides.moves ?? [],
-	};
-}
-
-function makeFlagMove(name, overrides = {}) {
-	return {
-		name,
-		compendiumId: overrides.compendiumId ?? null,
-		rollType: overrides.rollType ?? null,
-		description: overrides.description ?? "",
-		isStarting: overrides.isStarting ?? false,
-		requirement: overrides.requirement ?? null,
-		selection: overrides.selection ?? { max: 1, value: 0 },
-		ownedIds: overrides.ownedIds ?? [],
-		resource: overrides.resource ?? null,
-	};
-}
-
-// ── sortPlaybookMoves ─────────────────────────────────────────────────────────
-
-function mv(name, { requires = null, minLevel = null } = {}) { return { name, requires, minLevel }; }
-function names(ms) { return ms.map(m => m.name); }
-
-describe("CharacterMoves.sortPlaybookMoves", () => {
-	const moves = makeMoves();
-
-	it("returns empty array for empty input", () => {
-		expect(moves.sortPlaybookMoves([])).toEqual([]);
-	});
-
-	it("single move with no requires is returned as-is", () => {
-		expect(names(moves.sortPlaybookMoves([mv("Alpha")]))).toEqual(["Alpha"]);
-	});
-
-	it("multiple independent moves are sorted alphabetically", () => {
-		expect(names(moves.sortPlaybookMoves([mv("Charlie"), mv("Alpha"), mv("Bravo")]))).toEqual(["Alpha", "Bravo", "Charlie"]);
-	});
-
-	it("a move that requires another follows it immediately", () => {
-		const result = names(moves.sortPlaybookMoves([mv("Child", { requires: "Parent" }), mv("Parent"), mv("Alpha")]));
-		expect(result).toEqual(["Alpha", "Parent", "Child"]);
-	});
-
-	it("multiple moves requiring the same parent are sorted alphabetically after it", () => {
-		const ms = [mv("Zeta", { requires: "Parent" }), mv("Alpha", { requires: "Parent" }), mv("Parent"), mv("Root")];
-		expect(names(moves.sortPlaybookMoves(ms))).toEqual(["Parent", "Alpha", "Zeta", "Root"]);
-	});
-
-	it("chains: grandchild follows child follows parent", () => {
-		const ms = [mv("Grandchild", { requires: "Child" }), mv("Child", { requires: "Parent" }), mv("Parent")];
-		expect(names(moves.sortPlaybookMoves(ms))).toEqual(["Parent", "Child", "Grandchild"]);
-	});
-
-	it("root moves stay alphabetical while dependents follow their parents", () => {
-		const ms = [
-			mv("Zeal"), mv("Zeal-Child", { requires: "Zeal" }),
-			mv("Armor"), mv("Armor-Child-B", { requires: "Armor" }), mv("Armor-Child-A", { requires: "Armor" }),
-		];
-		expect(names(moves.sortPlaybookMoves(ms))).toEqual(["Armor", "Armor-Child-A", "Armor-Child-B", "Zeal", "Zeal-Child"]);
-	});
-
-	it("move requiring a non-existent parent is treated as a root", () => {
-		expect(names(moves.sortPlaybookMoves([mv("Orphan", { requires: "Missing Parent" }), mv("Alpha")]))).toEqual(["Alpha", "Orphan"]);
-	});
-
-	it("circular dependency does not infinite-loop", () => {
-		const ms = [mv("A", { requires: "B" }), mv("B", { requires: "A" })];
-		expect(() => moves.sortPlaybookMoves(ms)).not.toThrow();
-		expect(moves.sortPlaybookMoves(ms)).toHaveLength(2);
-	});
-
-	it("level-6 moves come after all level-0 moves", () => {
-		expect(names(moves.sortPlaybookMoves([mv("Bravo", { minLevel: 6 }), mv("Alpha"), mv("Charlie", { minLevel: 6 })]))).toEqual(["Alpha", "Bravo", "Charlie"]);
-	});
-
-	it("level groups are sorted ascending: 0, 2, 6", () => {
-		expect(names(moves.sortPlaybookMoves([mv("L6", { minLevel: 6 }), mv("L2", { minLevel: 2 }), mv("L0")]))).toEqual(["L0", "L2", "L6"]);
-	});
-
-	it("within a level group, dependency chaining still applies", () => {
-		const ms = [mv("Child", { minLevel: 6, requires: "Parent" }), mv("Parent", { minLevel: 6 }), mv("Alpha", { minLevel: 6 })];
-		expect(names(moves.sortPlaybookMoves(ms))).toEqual(["Alpha", "Parent", "Child"]);
-	});
-
-	it("cross-level dependency is ignored: level-6 move requiring level-0 move stays in level-6 group", () => {
-		const ms = [mv("Root"), mv("Lv6-Child", { minLevel: 6, requires: "Root" }), mv("Alpha")];
-		expect(names(moves.sortPlaybookMoves(ms))).toEqual(["Alpha", "Root", "Lv6-Child"]);
-	});
-});
-
-// ── buildSnapshot ─────────────────────────────────────────────────────────────
+// ── buildSnapshot — empty ─────────────────────────────────────────────────────
 
 describe("CharacterMoves.buildSnapshot — empty", () => {
-	it("returns a Movelist when no categories in flags", () => {
-		expect(makeMoves().buildSnapshot()).toBeInstanceOf(Movelist);
+	it("returns a Movelist when no categories in flags", async () => {
+		expect(await makeMoves().buildSnapshot()).toBeInstanceOf(Movelist);
 	});
-
-	it("categories is empty when no categories stored in flags", () => {
-		expect(makeMoves().buildSnapshot().categories).toHaveLength(0);
+	it("categories is empty when no categories stored", async () => {
+		expect((await makeMoves().buildSnapshot()).categories).toHaveLength(0);
 	});
 });
 
-describe("CharacterMoves.buildSnapshot — categories from flags", () => {
-	it("returns one category per entry in flags", () => {
-		const flags = makeFlags({ categories: [makeFlagCategory("basic")] });
-		const result = makeMoves({ flags }).buildSnapshot();
-		expect(result.categories).toHaveLength(1);
-	});
+// ── buildSnapshot — category structure ───────────────────────────────────────
 
-	it("category is a MoveCategorySnapshot", () => {
-		const flags = makeFlags({ categories: [makeFlagCategory("basic")] });
-		const result = makeMoves({ flags }).buildSnapshot();
+describe("CharacterMoves.buildSnapshot — category structure", () => {
+	it("returns one MoveCategorySnapshot per initialized category", async () => {
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initBasicMoves();
+		const result = await m.buildSnapshot();
+		expect(result.categories).toHaveLength(1);
 		expect(result.categories[0]).toBeInstanceOf(MoveCategorySnapshot);
 	});
 
-	it("category key, label, renderStyle, allowAdditional, note preserved", () => {
-		const catData = { key: "playbook-the-heavy", label: "The Heavy", renderStyle: "standard", allowAdditional: false, note: "Pick 2.", moves: [] };
-		const flags = makeFlags({ categories: [catData] });
-		const cat = makeMoves({ flags }).buildSnapshot().categories[0];
+	it("category key, label, renderStyle, allowAdditional, note come from initPlaybookCategory data", async () => {
+		const m = makeMoves();
+		await m.initPlaybookCategory(makePlaybookData({startingMovesNote: "Pick 2."}));
+		const cat = (await m.buildSnapshot()).categories[0];
 		expect(cat.key).toBe("playbook-the-heavy");
 		expect(cat.label).toBe("The Heavy");
 		expect(cat.renderStyle).toBe("standard");
@@ -178,179 +81,213 @@ describe("CharacterMoves.buildSnapshot — categories from flags", () => {
 		expect(cat.note).toBe("Pick 2.");
 	});
 
-	it("each move in a category becomes a MoveSnapshot", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("basic", { moves: [makeFlagMove("Defy Danger", { selection: { max: 1, value: 1 } })] }),
-		]});
-		const cat = makeMoves({ flags }).buildSnapshot().categories[0];
-		expect(cat.moves[0]).toBeInstanceOf(MoveSnapshot);
+	it("each move becomes a MoveSnapshot", async () => {
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initBasicMoves();
+		expect((await m.buildSnapshot()).categories[0].moves[0]).toBeInstanceOf(MoveSnapshot);
 	});
 
-	it("move selection is a ValueMax", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("basic", { moves: [makeFlagMove("Defy Danger", { selection: { max: 1, value: 1 } })] }),
-		]});
-		const snap = makeMoves({ flags }).buildSnapshot().categories[0].moves[0];
+	it("move selection reflects acquired state", async () => {
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initBasicMoves();
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(snap.selection).toBeInstanceOf(ValueMax);
 		expect(snap.selection.value).toBe(1);
 		expect(snap.selection.max).toBe(1);
 	});
 
-	it("move ownedId is last entry in ownedIds", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("basic", { moves: [makeFlagMove("Defy Danger", { ownedIds: ["id1", "id2"] })] }),
-		]});
-		const snap = makeMoves({ flags }).buildSnapshot().categories[0].moves[0];
-		expect(snap.ownedId).toBe("id2");
+	it("move ownedId is last created doc id", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().withRepeatMax(2).build()]);
+		const actor = makeActor();
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		const firstId = actor.createdDocs[0]._id;
+		await m.incrementMove("playbook-the-heavy", "bulwark");
+		const secondId = actor.createdDocs[1]._id;
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
+		expect(snap.ownedId).toBe(secondId);
+		expect(snap.ownedId).not.toBe(firstId);
 	});
 
-	it("move ownedId is null when ownedIds is empty", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("basic", { moves: [makeFlagMove("Defy Danger")] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].ownedId).toBeNull();
+	it("move ownedId is null when move not acquired", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Optional").build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBeNull();
 	});
 
-	it("move resource is mapped from flags", () => {
-		const moveWithResource = makeFlagMove("Resource Move", {
-			resource: { max: 3, title: "Favor", labels: [], current: 2 },
-			selection: { max: 1, value: 1 },
-		});
-		const flags = makeFlags({ categories: [makeFlagCategory("cat", { moves: [moveWithResource] })] });
-		const snap = makeMoves({ flags }).buildSnapshot().categories[0].moves[0];
-		expect(snap.resource).not.toBeNull();
+	it("move resource is null when repo has no resource definition", async () => {
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initBasicMoves();
+		expect((await m.buildSnapshot()).categories[0].moves[0].resource).toBeNull();
+	});
+
+	it("resource definition comes from repo, current from ResourceController", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().withResource({max: 3, title: "Favor", labels: []}).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.setMoveResourceCurrent("bulwark", 2);
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(snap.resource.max).toBe(3);
 		expect(snap.resource.current).toBe(2);
 	});
+});
 
-	it("move resource is null when not set", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("basic", { moves: [makeFlagMove("Defy Danger")] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].resource).toBeNull();
+// ── buildSnapshot — repo enrichment ──────────────────────────────────────────
+
+describe("CharacterMoves.buildSnapshot — repo enrichment", () => {
+	it("name and description come from repo move", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Potential for Greatness").withDescription("<p>Once per level…</p>").build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
+		expect(snap.name).toBe("Potential for Greatness");
+		expect(snap.description).toBe("<p>Once per level…</p>");
+	});
+
+	it("choices from repo renders as ChoiceGroup", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Potential for Greatness").withChoices(CHOICES_DATA).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
+		expect(snap.choices).toBeInstanceOf(ChoiceGroup);
+		expect(snap.choices.list).toHaveLength(CHOICES_DATA.list.length);
+	});
+
+	it("selection.value comes from flag state (acquired), not repo", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
+	});
+
+	it("slug not in repo: choices and requirement are null", async () => {
+		const m = makeMoves();
+		await m.addMoveToOther({name: "Mystery Move", system: {}});
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
+		expect(snap.choices).toBeNull();
+		expect(snap.requirement).toBeNull();
 	});
 });
+
+// ── buildSnapshot — requiresLabel ─────────────────────────────────────────────
 
 describe("CharacterMoves.buildSnapshot — requiresLabel", () => {
-	it("requiresLabel is null when no requirement", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha")] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].requiresLabel).toBeNull();
+	async function snapMove(builder) {
+		const repo = new FakeMoveRepository([builder.build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		return (await m.buildSnapshot()).categories[0].moves[0];
+	}
+
+	it("requiresLabel is null when no requirement", async () => {
+		expect((await snapMove(new FakeCompendiumMoveBuilder().withName("Alpha"))).requiresLabel).toBeNull();
 	});
 
-	it("requiresLabel is 'Level N' when only a level requirement", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { requirement: { moves: [], level: 6, playbook: null } })] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].requiresLabel).toBe("Level 6");
+	it("requiresLabel is 'Level N' when only a level requirement", async () => {
+		expect((await snapMove(new FakeCompendiumMoveBuilder().withName("Alpha").withRequirement({moves: [], level: 6, playbook: null}))).requiresLabel).toBe("Level 6");
 	});
 
-	it("requiresLabel lists required move names when only moves requirement", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { requirement: { moves: ["Wild Speech", "Spirit Tongue"], level: null, playbook: null } })] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].requiresLabel).toBe("Wild Speech, Spirit Tongue");
+	it("requiresLabel lists required move names", async () => {
+		expect((await snapMove(new FakeCompendiumMoveBuilder().withName("Alpha").withRequirement({moves: ["Wild Speech", "Spirit Tongue"], level: null, playbook: null}))).requiresLabel).toBe("Wild Speech, Spirit Tongue");
 	});
 
-	it("requiresLabel combines moves and level", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { requirement: { moves: ["Wild Speech"], level: 6, playbook: null } })] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].requiresLabel).toBe("Wild Speech, Level 6");
+	it("requiresLabel combines moves and level", async () => {
+		expect((await snapMove(new FakeCompendiumMoveBuilder().withName("Alpha").withRequirement({moves: ["Wild Speech"], level: 6, playbook: null}))).requiresLabel).toBe("Wild Speech, Level 6");
 	});
 
-	it("requiresLabel is null when requirement has only playbook field", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { requirement: { moves: [], level: null, playbook: "The Ranger" } })] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].requiresLabel).toBeNull();
+	it("requiresLabel is null when requirement has only playbook field", async () => {
+		expect((await snapMove(new FakeCompendiumMoveBuilder().withName("Alpha").withRequirement({moves: [], level: null, playbook: "The Ranger"}))).requiresLabel).toBeNull();
 	});
 });
 
+// ── buildSnapshot — selectable computation ────────────────────────────────────
+
 describe("CharacterMoves.buildSnapshot — selectable computation", () => {
-	it("selectable=false when selection.value >= selection.max", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 1, value: 1 } })] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].selectable).toBe(false);
+	it("selectable=false when acquired count equals max", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].selectable).toBe(false);
 	});
 
-	it("selectable=true when selection.value < selection.max and no requirement", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 2, value: 1 } })] }),
-		]});
-		expect(makeMoves({ flags }).buildSnapshot().categories[0].moves[0].selectable).toBe(true);
+	it("selectable=true when acquired count is below max", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").withRepeatMax(2).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].selectable).toBe(true);
 	});
 
-	it("selectable=true but requirement.met=false when level requirement exceeds actor level", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { requirement: { moves: [], level: 6, playbook: null } })] }),
-		]});
-		const actor = makeActor(1);
-		const move = makeMoves({ flags, actor }).buildSnapshot().categories[0].moves[0];
+	it("requirement.met=false when level requirement exceeds actor level", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").withRequirement({moves: [], level: 6, playbook: null}).build()]);
+		const m = makeMoves({repo, vitals: {level: 1}});
+		await m.initPlaybookCategory(makePlaybookData());
+		const move = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(move.selectable).toBe(true);
 		expect(move.requirement.met).toBe(false);
 	});
 
-	it("selectable=true and requirement.met=true when level requirement equals actor level", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { requirement: { moves: [], level: 3, playbook: null } })] }),
-		]});
-		const actor = makeActor(3);
-		const move = makeMoves({ flags, actor }).buildSnapshot().categories[0].moves[0];
+	it("requirement.met=true when level requirement equals actor level", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").withRequirement({moves: [], level: 3, playbook: null}).build()]);
+		const m = makeMoves({repo, vitals: {level: 3}});
+		await m.initPlaybookCategory(makePlaybookData());
+		const move = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(move.selectable).toBe(true);
 		expect(move.requirement.met).toBe(true);
 	});
 
-	it("selectable=true but requirement.met=false when required move not yet acquired", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [
-				makeFlagMove("Parent"),
-				makeFlagMove("Child", { requirement: { moves: ["Parent"], level: null, playbook: null } }),
-			]}),
-		]});
-		const move = makeMoves({ flags }).buildSnapshot().categories[0].moves[1];
-		expect(move.selectable).toBe(true);
-		expect(move.requirement.met).toBe(false);
+	it("requirement.met=false when required move not yet acquired", async () => {
+		const repo = new FakeMoveRepository([
+			new FakeCompendiumMoveBuilder().withName("Parent").build(),
+			new FakeCompendiumMoveBuilder().withName("Child").withRequirement({moves: ["Parent"], level: null, playbook: null}).build(),
+		]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		const moves = (await m.buildSnapshot()).categories[0].moves;
+		const child = moves.find(mv => mv.slug === "child");
+		expect(child.selectable).toBe(true);
+		expect(child.requirement.met).toBe(false);
 	});
 
-	it("selectable=true and requirement.met=true when required move is acquired", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [
-				makeFlagMove("Parent", { selection: { max: 1, value: 1 } }),
-				makeFlagMove("Child", { requirement: { moves: ["Parent"], level: null, playbook: null } }),
-			]}),
-		]});
-		const move = makeMoves({ flags }).buildSnapshot().categories[0].moves[1];
-		expect(move.selectable).toBe(true);
-		expect(move.requirement.met).toBe(true);
+	it("requirement.met=true when required move is acquired", async () => {
+		const repo = new FakeMoveRepository([
+			new FakeCompendiumMoveBuilder().withName("Parent").asStarting().build(),
+			new FakeCompendiumMoveBuilder().withName("Child").withRequirement({moves: ["Parent"], level: null, playbook: null}).build(),
+		]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		const moves = (await m.buildSnapshot()).categories[0].moves;
+		const child = moves.find(mv => mv.slug === "child");
+		expect(child.selectable).toBe(true);
+		expect(child.requirement.met).toBe(true);
 	});
 });
 
 // ── getMoveSnapshotsForCategory ───────────────────────────────────────────────
 
 describe("CharacterMoves.getMoveSnapshotsForCategory", () => {
-	it("returns empty array when category not found", () => {
-		expect(makeMoves().getMoveSnapshotsForCategory("post-death-revenant")).toHaveLength(0);
+	it("returns empty array when category not found", async () => {
+		expect(await makeMoves().getMoveSnapshotsForCategory("post-death-revenant")).toHaveLength(0);
 	});
 
-	it("returns MoveSnapshot for each move in the category", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("post-death-revenant", { moves: [makeFlagMove("Haunt")] }),
-		]});
-		const snaps = makeMoves({ flags }).getMoveSnapshotsForCategory("post-death-revenant");
+	it("returns MoveSnapshot with name from repo", async () => {
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const m = makeMoves({repo});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		const snaps = await m.getMoveSnapshotsForCategory("post-death-revenant");
 		expect(snaps).toHaveLength(1);
 		expect(snaps[0]).toBeInstanceOf(MoveSnapshot);
 		expect(snaps[0].name).toBe("Haunt");
 	});
 
-	it("returned snapshot has correct source.type", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("post-death-revenant", { moves: [makeFlagMove("Haunt")] }),
-		]});
-		const snap = makeMoves({ flags }).getMoveSnapshotsForCategory("post-death-revenant")[0];
-		expect(snap.source.type).toBe("post-death-revenant");
+	it("returned snapshot has correct source.type", async () => {
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const m = makeMoves({repo});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		expect((await m.getMoveSnapshotsForCategory("post-death-revenant"))[0].source.type).toBe("post-death-revenant");
 	});
 });
 
@@ -358,430 +295,351 @@ describe("CharacterMoves.getMoveSnapshotsForCategory", () => {
 
 describe("CharacterMoves.initBasicMoves", () => {
 	it("does nothing when basic category already exists", async () => {
-		const store = { categories: [makeFlagCategory("basic")] };
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).initBasicMoves();
-		expect(actor.createEmbeddedDocuments).not.toHaveBeenCalled();
-		expect(flags.setFlag).not.toHaveBeenCalled();
+		const m = makeMoves({repo, actor});
+		await m.initBasicMoves();
+		const firstLen = actor.createdDocs.length;
+		await m.initBasicMoves();
+		expect(actor.createdDocs.length).toBe(firstLen);
+		expect((await m.buildSnapshot()).categories).toHaveLength(1);
 	});
 
-	it("creates embedded docs for each basic move", async () => {
-		const repo = new FakeMoveRepository([], [
-			{ _id: "b1", name: "Defy Danger", system: { rollType: "str" }, toObject: () => ({ name: "Defy Danger", type: "move", system: {} }) },
-		]);
+	it("creates embedded docs and assigns ownedId", async () => {
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
 		const actor = makeActor();
-		await makeMoves({ repo, actor }).initBasicMoves();
-		expect(actor.createEmbeddedDocuments).toHaveBeenCalledWith("Item", [
-			expect.objectContaining({ system: expect.objectContaining({ moveType: "basic" }) }),
-		]);
+		const m = makeMoves({repo, actor});
+		await m.initBasicMoves();
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBe(actor.createdDocs[0]._id);
 	});
 
-	it("writes a basic category to flags with side-bar renderStyle", async () => {
-		const store = {};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).initBasicMoves();
-		expect(flags.setFlag).toHaveBeenCalledWith("categories", expect.arrayContaining([
-			expect.objectContaining({ key: "basic", renderStyle: "side-bar" }),
-		]));
+	it("writes a basic category with side-bar renderStyle", async () => {
+		const m = makeMoves();
+		await m.initBasicMoves();
+		expect((await m.buildSnapshot()).categories[0].renderStyle).toBe("side-bar");
 	});
 
-	it("each move in the stored category has selection.value=1 (starting)", async () => {
-		const repo = new FakeMoveRepository([], [
-			{ _id: "b1", name: "Defy Danger", system: { rollType: "str" }, toObject: () => ({ name: "Defy Danger", type: "move", system: {} }) },
-		]);
-		const store = {};
-		const flags = makeFlags(store);
-		await makeMoves({ repo, flags }).initBasicMoves();
-		const saved = flags.setFlag.mock.calls[0][1];
-		expect(saved[0].moves[0].selection.value).toBe(1);
+	it("each move has selection.value=1 (all basic moves are starting)", async () => {
+		const repo = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initBasicMoves();
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 });
 
 // ── initPlaybookCategory ──────────────────────────────────────────────────────
 
 describe("CharacterMoves.initPlaybookCategory", () => {
-	it("writes a playbook-<slug> category to flags", async () => {
-		const store = {};
-		const flags = makeFlags(store);
-		const playbookData = makePlaybookData();
-		await makeMoves({ flags }).initPlaybookCategory(playbookData);
-		expect(flags.setFlag).toHaveBeenCalledWith("categories", expect.arrayContaining([
-			expect.objectContaining({ key: "playbook-the-heavy" }),
-		]));
+	it("creates a playbook-<slug> category", async () => {
+		const m = makeMoves();
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories.some(c => c.key === "playbook-the-heavy")).toBe(true);
 	});
 
-	it("creates embedded docs for starting moves", async () => {
-		const repo = new FakeMoveRepository([
-			{ _id: "m1", name: "Bulwark", system: { isStartingMove: true }, toObject: () => ({ name: "Bulwark", type: "move", system: {} }) },
-		]);
+	it("starting move gets an ownedId assigned", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().build()]);
 		const actor = makeActor();
-		const playbookData = makePlaybookData();
-		await makeMoves({ repo, actor }).initPlaybookCategory(playbookData);
-		expect(actor.createEmbeddedDocuments).toHaveBeenCalledWith("Item", [
-			expect.objectContaining({ system: expect.objectContaining({ moveType: "playbook-the-heavy" }) }),
-		]);
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBe(actor.createdDocs[0]._id);
 	});
 
-	it("does not create embedded docs for non-starting moves", async () => {
-		const repo = new FakeMoveRepository([
-			{ _id: "m1", name: "Optional", system: { isStartingMove: false }, toObject: () => ({ name: "Optional", type: "move", system: {} }) },
-		]);
+	it("non-starting move has no ownedId", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Optional").build()]);
 		const actor = makeActor();
-		const playbookData = makePlaybookData();
-		await makeMoves({ repo, actor }).initPlaybookCategory(playbookData);
-		expect(actor.createEmbeddedDocuments).not.toHaveBeenCalled();
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBeNull();
+		expect(actor.createdDocs).toHaveLength(0);
 	});
 
-	it("starting move has selection.value=1 in flags", async () => {
-		const repo = new FakeMoveRepository([
-			{ _id: "m1", name: "Bulwark", system: { isStartingMove: true }, toObject: () => ({ name: "Bulwark", type: "move", system: {} }) },
-		]);
-		const store = {};
-		const flags = makeFlags(store);
-		const playbookData = makePlaybookData();
-		await makeMoves({ repo, flags }).initPlaybookCategory(playbookData);
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		const cat = saved.find(c => c.key === "playbook-the-heavy");
-		expect(cat.moves.find(m => m.name === "Bulwark").selection.value).toBe(1);
+	it("starting move has selection.value=1", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 
-	it("non-starting move has selection.value=0 in flags", async () => {
-		const repo = new FakeMoveRepository([
-			{ _id: "m1", name: "Optional", system: { isStartingMove: false }, toObject: () => ({ name: "Optional", type: "move", system: {} }) },
-		]);
-		const store = {};
-		const flags = makeFlags(store);
-		const playbookData = makePlaybookData();
-		await makeMoves({ repo, flags }).initPlaybookCategory(playbookData);
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		const cat = saved.find(c => c.key === "playbook-the-heavy");
-		expect(cat.moves.find(m => m.name === "Optional").selection.value).toBe(0);
+	it("non-starting move has selection.value=0", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Optional").build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(0);
 	});
 
-	it("removes existing playbook-* category before adding new one", async () => {
-		const store = { categories: [makeFlagCategory("playbook-the-fox", { moves: [makeFlagMove("Fox Move", { ownedIds: ["old-id"] })] })] };
-		const flags = makeFlags(store);
+	it("removes existing playbook-* category and deletes its owned docs", async () => {
+		const repoFox = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Fox Move").asStarting().build()]);
 		const actor = makeActor();
-		const playbookData = makePlaybookData();
-		await makeMoves({ flags, actor }).initPlaybookCategory(playbookData);
-		expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledWith("Item", ["old-id"]);
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		expect(saved.find(c => c.key === "playbook-the-fox")).toBeUndefined();
+		const m = makeMoves({repo: repoFox, actor});
+		await m.initPlaybookCategory({slug: "the-fox", name: "The Fox", startingMovesNote: null, backgrounds: []});
+		const foxDocId = actor.createdDocs[0]._id;
+		m._moveRepo = new FakeMoveRepository();
+		await m.initPlaybookCategory(makePlaybookData());
+		expect(actor.deletedIds).toContain(foxDocId);
+		expect((await m.buildSnapshot()).categories.find(c => c.key === "playbook-the-fox")).toBeUndefined();
 	});
-
 });
 
 // ── addCategory ───────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.addCategory", () => {
-	it("appends the category to flags", async () => {
-		const store = {};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).addCategory("post-death-revenant", "Revenant", "revenant");
-		expect(flags.setFlag).toHaveBeenCalledWith("categories", expect.arrayContaining([
-			expect.objectContaining({ key: "post-death-revenant", label: "Revenant" }),
-		]));
+	it("appends the category", async () => {
+		const m = makeMoves();
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		expect((await m.buildSnapshot()).categories.some(c => c.key === "post-death-revenant" && c.label === "Revenant")).toBe(true);
 	});
 
 	it("does nothing when category already exists", async () => {
-		const store = { categories: [makeFlagCategory("post-death-revenant")] };
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).addCategory("post-death-revenant", "Revenant", "revenant");
-		expect(flags.setFlag).not.toHaveBeenCalled();
-		expect(actor.createEmbeddedDocuments).not.toHaveBeenCalled();
+		const m = makeMoves({repo, actor});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		const countBefore = actor.createdDocs.length;
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		expect(actor.createdDocs.length).toBe(countBefore);
 	});
 
-	it("creates embedded docs for each post-death move", async () => {
-		const repo = new FakeMoveRepository([], [], [
-			{ _id: "m1", name: "Haunt", system: { rollType: "wis", description: "A ghost." } },
-		]);
+	it("creates embedded docs and assigns ownedId", async () => {
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
 		const actor = makeActor();
-		await makeMoves({ repo, actor }).addCategory("post-death-revenant", "Revenant", "revenant");
-		expect(actor.createEmbeddedDocuments).toHaveBeenCalledWith("Item", [
-			expect.objectContaining({ system: expect.objectContaining({ moveType: "post-death-revenant" }) }),
-		]);
+		const m = makeMoves({repo, actor});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBe(actor.createdDocs[0]._id);
 	});
 
-	it("does not call createEmbeddedDocuments when repo returns no moves", async () => {
+	it("does not create embedded docs when repo returns no moves", async () => {
 		const actor = makeActor();
-		await makeMoves({ actor }).addCategory("post-death-revenant", "Revenant", "revenant");
-		expect(actor.createEmbeddedDocuments).not.toHaveBeenCalled();
+		await makeMoves({actor}).addCategory("post-death-revenant", "Revenant", "revenant");
+		expect(actor.createdDocs).toHaveLength(0);
 	});
 
 	it("stored category has renderStyle=standard and allowAdditional=false", async () => {
-		const store = {};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).addCategory("post-death-revenant", "Revenant", "revenant");
-		const cat = flags.setFlag.mock.calls[0][1].find(c => c.key === "post-death-revenant");
+		const m = makeMoves();
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		const cat = (await m.buildSnapshot()).categories.find(c => c.key === "post-death-revenant");
 		expect(cat.renderStyle).toBe("standard");
 		expect(cat.allowAdditional).toBe(false);
 	});
 
-	it("each move stored in the category has selection.value=1", async () => {
-		const repo = new FakeMoveRepository([], [], [
-			{ _id: "m1", name: "Haunt", system: { rollType: "wis", description: "" } },
-		]);
-		const store = {};
-		const flags = makeFlags(store);
-		await makeMoves({ repo, flags }).addCategory("post-death-revenant", "Revenant", "revenant");
-		const cat = flags.setFlag.mock.calls[0][1].find(c => c.key === "post-death-revenant");
-		expect(cat.moves[0].selection.value).toBe(1);
+	it("each move stored has selection.value=1", async () => {
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const m = makeMoves({repo});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 });
 
 // ── removeCategory ────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.removeCategory", () => {
-	it("removes the category from flags", async () => {
-		const store = { categories: [makeFlagCategory("post-death-revenant")] };
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).removeCategory("post-death-revenant");
-		const saved = flags.setFlag.mock.calls[0][1];
-		expect(saved.find(c => c.key === "post-death-revenant")).toBeUndefined();
+	it("removes the category", async () => {
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const actor = makeActor();
+		const m = makeMoves({repo, actor});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		await m.removeCategory("post-death-revenant");
+		expect((await m.buildSnapshot()).categories.find(c => c.key === "post-death-revenant")).toBeUndefined();
 	});
 
-	it("deletes embedded docs for all ownedIds in the category", async () => {
-		const store = { categories: [
-			makeFlagCategory("post-death-revenant", { moves: [makeFlagMove("Haunt", { ownedIds: ["pd1"] })] }),
-		]};
-		const flags = makeFlags(store);
+	it("deletes embedded docs for all ownedIds", async () => {
+		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).removeCategory("post-death-revenant");
-		expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledWith("Item", ["pd1"]);
+		const m = makeMoves({repo, actor});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		const hauntId = actor.createdDocs[0]._id;
+		await m.removeCategory("post-death-revenant");
+		expect(actor.deletedIds).toContain(hauntId);
 	});
 
-	it("does not call deleteEmbeddedDocuments when no ownedIds", async () => {
-		const store = { categories: [makeFlagCategory("post-death-revenant", { moves: [makeFlagMove("Haunt")] })] };
-		const flags = makeFlags(store);
+	it("does not delete any docs when no ownedIds", async () => {
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).removeCategory("post-death-revenant");
-		expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+		const m = makeMoves({actor});
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
+		await m.removeCategory("post-death-revenant");
+		expect(actor.deletedIds).toHaveLength(0);
 	});
 
 	it("does nothing when category does not exist", async () => {
-		const flags = makeFlags({});
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).removeCategory("post-death-revenant");
-		expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
-		expect(flags.setFlag).not.toHaveBeenCalled();
+		await makeMoves({actor}).removeCategory("post-death-revenant");
+		expect(actor.deletedIds).toHaveLength(0);
 	});
 
 	it("category is gone from subsequent buildSnapshot", async () => {
-		const store = { categories: [makeFlagCategory("post-death-revenant")] };
-		const flags = makeFlags(store);
-		const m = makeMoves({ flags });
+		const m = makeMoves();
+		await m.addCategory("post-death-revenant", "Revenant", "revenant");
 		await m.removeCategory("post-death-revenant");
-		expect(m.buildSnapshot().categories.find(c => c.key === "post-death-revenant")).toBeUndefined();
+		expect((await m.buildSnapshot()).categories.find(c => c.key === "post-death-revenant")).toBeUndefined();
 	});
 });
 
 // ── incrementMove ─────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.incrementMove", () => {
-	it("increments selection.value in flags", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 2, value: 0 } })] }),
-		]};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).incrementMove("cat", "Alpha");
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		const move = saved.find(c => c.key === "cat").moves.find(m => m.name === "Alpha");
-		expect(move.selection.value).toBe(1);
+	it("increments selection.value", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").withRepeatMax(2).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.incrementMove("playbook-the-heavy", "alpha");
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 
 	it("does nothing when already at max", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 1, value: 1 } })] }),
-		]};
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").asStarting().build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).incrementMove("cat", "Alpha");
-		expect(actor.createEmbeddedDocuments).not.toHaveBeenCalled();
-		expect(flags.setFlag).not.toHaveBeenCalled();
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		const docsBefore = actor.createdDocs.length;
+		await m.incrementMove("playbook-the-heavy", "alpha");
+		expect(actor.createdDocs.length).toBe(docsBefore);
 	});
 
-	it("creates an embedded doc", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 2, value: 0 } })] }),
-		]};
-		const flags = makeFlags(store);
+	it("assigns a new ownedId after creating embedded doc", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").withRepeatMax(2).build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).incrementMove("cat", "Alpha");
-		expect(actor.createEmbeddedDocuments).toHaveBeenCalledWith("Item", [
-			expect.objectContaining({ name: "Alpha", type: "move" }),
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.incrementMove("playbook-the-heavy", "alpha");
+		expect(actor.createdDocs).toHaveLength(1);
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBe(actor.createdDocs[0]._id);
+	});
+
+	it("stores moveResults from repo move in embedded doc", async () => {
+		const moveResults = { success: { label: "10+", value: "Yes!" }, partial: { label: "7-9", value: "Mostly." }, failure: { label: "6-", value: "No." } };
+		const repo = new FakeMoveRepository([
+			new FakeCompendiumMoveBuilder().withName("Alpha").withRepeatMax(2).withMoveResults(moveResults).build(),
 		]);
-	});
-
-	it("stores the new ownedId in flags", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 2, value: 0 } })] }),
-		]};
-		const flags = makeFlags(store);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).incrementMove("cat", "Alpha");
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		const move = saved.find(c => c.key === "cat").moves.find(m => m.name === "Alpha");
-		expect(move.ownedIds).toHaveLength(1);
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.incrementMove("playbook-the-heavy", "alpha");
+		expect(actor.createdDocs[0].system.moveResults).toEqual(moveResults);
 	});
 });
 
 // ── decrementMove ─────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.decrementMove", () => {
-	it("decrements selection.value in flags", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 1, value: 1 }, ownedIds: ["id1"] })] }),
-		]};
-		const flags = makeFlags(store);
+	it("decrements selection.value", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").asStarting().withRepeatMax(2).build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).decrementMove("cat", "Alpha");
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		const move = saved.find(c => c.key === "cat").moves.find(m => m.name === "Alpha");
-		expect(move.selection.value).toBe(0);
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.incrementMove("playbook-the-heavy", "alpha");
+		await m.decrementMove("playbook-the-heavy", "alpha");
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 
 	it("deletes the last owned embedded doc", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 1, value: 1 }, ownedIds: ["id1"] })] }),
-		]};
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").asStarting().withRepeatMax(2).build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).decrementMove("cat", "Alpha");
-		expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledWith("Item", ["id1"]);
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.incrementMove("playbook-the-heavy", "alpha");
+		const idToDelete = actor.createdDocs.at(-1)._id;
+		await m.decrementMove("playbook-the-heavy", "alpha");
+		expect(actor.deletedIds).toContain(idToDelete);
 	});
 
 	it("does nothing when value is already 0", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { selection: { max: 1, value: 0 } })] }),
-		]};
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).decrementMove("cat", "Alpha");
-		expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
-		expect(flags.setFlag).not.toHaveBeenCalled();
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.decrementMove("playbook-the-heavy", "alpha");
+		expect(actor.deletedIds).toHaveLength(0);
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(0);
 	});
 
 	it("does not decrement below 1 when isStarting", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha", { isStarting: true, selection: { max: 1, value: 1 }, ownedIds: ["id1"] })] }),
-		]};
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").asStarting().build()]);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).decrementMove("cat", "Alpha");
-		expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
-		expect(flags.setFlag).not.toHaveBeenCalled();
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		const deletedBefore = [...actor.deletedIds];
+		await m.decrementMove("playbook-the-heavy", "alpha");
+		expect(actor.deletedIds).toEqual(deletedBefore);
+		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 });
 
 // ── addMoveToOther ────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.addMoveToOther", () => {
-	it("returns true and adds the move to the other category", async () => {
-		const flags = makeFlags({});
-		const result = await makeMoves({ flags }).addMoveToOther({ name: "Custom Move", system: {} });
+	it("returns true and adds move to other category", async () => {
+		const m = makeMoves();
+		const result = await m.addMoveToOther({name: "Custom Move", system: {}});
 		expect(result).toBe(true);
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		const other = saved.find(c => c.key === "other");
-		expect(other.moves.find(m => m.name === "Custom Move")).toBeDefined();
+		const snap = await m.buildSnapshot();
+		expect(snap.categories.find(c => c.key === "other").moves.find(mv => mv.slug === "custom-move")).toBeDefined();
 	});
 
 	it("creates the other category if it does not exist", async () => {
-		const flags = makeFlags({});
-		await makeMoves({ flags }).addMoveToOther({ name: "Custom Move", system: {} });
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		expect(saved.find(c => c.key === "other")).toBeDefined();
+		const m = makeMoves();
+		await m.addMoveToOther({name: "Custom Move", system: {}});
+		expect((await m.buildSnapshot()).categories.find(c => c.key === "other")).toBeDefined();
 	});
 
 	it("other category has allowAdditional=true", async () => {
-		const flags = makeFlags({});
-		await makeMoves({ flags }).addMoveToOther({ name: "Custom Move", system: {} });
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		expect(saved.find(c => c.key === "other").allowAdditional).toBe(true);
+		const m = makeMoves();
+		await m.addMoveToOther({name: "Custom Move", system: {}});
+		expect((await m.buildSnapshot()).categories.find(c => c.key === "other").allowAdditional).toBe(true);
 	});
 
 	it("returns false when move with same name already in other", async () => {
-		const store = { categories: [
-			makeFlagCategory("other", { allowAdditional: true, moves: [makeFlagMove("Custom Move")] }),
-		]};
-		const flags = makeFlags(store);
 		const actor = makeActor();
-		const result = await makeMoves({ flags, actor }).addMoveToOther({ name: "Custom Move", system: {} });
+		const m = makeMoves({actor});
+		await m.addMoveToOther({name: "Custom Move", system: {}});
+		const docsBefore = actor.createdDocs.length;
+		const result = await m.addMoveToOther({name: "Custom Move", system: {}});
 		expect(result).toBe(false);
-		expect(actor.createEmbeddedDocuments).not.toHaveBeenCalled();
+		expect(actor.createdDocs.length).toBe(docsBefore);
 	});
 
-	it("creates an embedded doc for the move", async () => {
-		const flags = makeFlags({});
+	it("assigns an ownedId after creating embedded doc", async () => {
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).addMoveToOther({ name: "Custom Move", system: { rollType: "str" } });
-		expect(actor.createEmbeddedDocuments).toHaveBeenCalledWith("Item", [
-			expect.objectContaining({ name: "Custom Move", type: "move", system: expect.objectContaining({ moveType: "other" }) }),
-		]);
+		const m = makeMoves({actor});
+		await m.addMoveToOther({name: "Custom Move", system: {rollStat: "str"}});
+		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBe(actor.createdDocs[0]._id);
 	});
 });
 
 // ── deleteMove ────────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.deleteMove", () => {
-	it("removes the move from the other category in flags", async () => {
-		const store = { categories: [
-			makeFlagCategory("other", { moves: [makeFlagMove("To Delete")] }),
-		]};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).deleteMove("To Delete");
-		const saved = flags.setFlag.mock.calls[0][1];
-		expect(saved.find(c => c.key === "other").moves.find(m => m.name === "To Delete")).toBeUndefined();
+	it("removes the move from the other category", async () => {
+		const m = makeMoves();
+		await m.addMoveToOther({name: "To Delete", system: {}});
+		await m.deleteMove("to-delete");
+		const snap = await m.buildSnapshot();
+		expect(snap.categories.find(c => c.key === "other")?.moves.find(mv => mv.slug === "to-delete")).toBeUndefined();
 	});
 
 	it("deletes embedded docs", async () => {
-		const store = { categories: [
-			makeFlagCategory("other", { moves: [makeFlagMove("To Delete", { ownedIds: ["id1"] })] }),
-		]};
-		const flags = makeFlags(store);
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).deleteMove("To Delete");
-		expect(actor.deleteEmbeddedDocuments).toHaveBeenCalledWith("Item", ["id1"]);
+		const m = makeMoves({actor});
+		await m.addMoveToOther({name: "To Delete", system: {}});
+		const docId = actor.createdDocs[0]._id;
+		await m.deleteMove("to-delete");
+		expect(actor.deletedIds).toContain(docId);
 	});
 
-	it("does nothing when move not found in other", async () => {
-		const flags = makeFlags({});
+	it("does nothing when move not found", async () => {
 		const actor = makeActor();
-		await makeMoves({ flags, actor }).deleteMove("Nonexistent");
-		expect(flags.setFlag).not.toHaveBeenCalled();
-		expect(actor.deleteEmbeddedDocuments).not.toHaveBeenCalled();
+		await makeMoves({actor}).deleteMove("nonexistent");
+		expect(actor.deletedIds).toHaveLength(0);
 	});
 });
 
 // ── setMoveResourceCurrent ────────────────────────────────────────────────────
 
 describe("CharacterMoves.setMoveResourceCurrent", () => {
-	it("updates resource.current in flags", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [
-				makeFlagMove("Resource Move", {
-					selection: { max: 1, value: 1 },
-					resource: { max: 3, title: "Favor", labels: [], current: 0 },
-				}),
-			]}),
-		]};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).setMoveResourceCurrent("cat", "Resource Move", 2);
-		const saved = flags.setFlag.mock.calls[0][1];
-		const move = saved.find(c => c.key === "cat").moves.find(m => m.name === "Resource Move");
-		expect(move.resource.current).toBe(2);
-	});
-
-	it("does not modify moves without a resource", async () => {
-		const store = { categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("No Resource")] }),
-		]};
-		const flags = makeFlags(store);
-		await makeMoves({ flags }).setMoveResourceCurrent("cat", "No Resource", 5);
-		const saved = flags.setFlag.mock.calls[0][1];
-		const move = saved.find(c => c.key === "cat").moves.find(m => m.name === "No Resource");
-		expect(move.resource).toBeNull();
+	it("persists current — reflected in buildSnapshot resource.current", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().withResource({max: 3, title: "Favor", labels: []}).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.setMoveResourceCurrent("bulwark", 2);
+		expect((await m.buildSnapshot()).categories[0].moves[0].resource.current).toBe(2);
 	});
 });
 
@@ -789,61 +647,101 @@ describe("CharacterMoves.setMoveResourceCurrent", () => {
 
 describe("CharacterMoves.onDropMove", () => {
 	it("increments selection for existing playbook move", async () => {
-		const store = { categories: [
-			makeFlagCategory("playbook-the-heavy", { moves: [makeFlagMove("Bulwark", { selection: { max: 2, value: 0 } })] }),
-		]};
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").withRepeatMax(2).build()]);
 		const actor = makeActor();
-		const result = await makeMoves({ flags, actor }).onDropMove({ name: "Bulwark", system: {} });
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		const result = await m.onDropMove({name: "Bulwark", system: {}});
 		expect(result).toBe(true);
-		expect(actor.createEmbeddedDocuments).toHaveBeenCalled();
+		expect(actor.createdDocs).toHaveLength(1);
 	});
 
 	it("returns false when playbook move is already at max selection", async () => {
-		const store = { categories: [
-			makeFlagCategory("playbook-the-heavy", { moves: [makeFlagMove("Bulwark", { selection: { max: 1, value: 1 } })] }),
-		]};
-		const flags = makeFlags(store);
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().build()]);
 		const actor = makeActor();
-		const result = await makeMoves({ flags, actor }).onDropMove({ name: "Bulwark", system: {} });
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		const docsBefore = actor.createdDocs.length;
+		const result = await m.onDropMove({name: "Bulwark", system: {}});
 		expect(result).toBe(false);
+		expect(actor.createdDocs.length).toBe(docsBefore);
 	});
 
 	it("adds unknown move to other category", async () => {
-		const flags = makeFlags({});
-		const actor = makeActor();
-		const result = await makeMoves({ flags, actor }).onDropMove({ name: "Stranger Move", system: {} });
+		const m = makeMoves();
+		const result = await m.onDropMove({name: "Stranger Move", system: {}});
 		expect(result).toBe(true);
-		const saved = flags.setFlag.mock.calls.at(-1)[1];
-		expect(saved.find(c => c.key === "other")).toBeDefined();
+		expect((await m.buildSnapshot()).categories.find(c => c.key === "other")).toBeDefined();
 	});
 });
 
-// ── countOwnedByName ──────────────────────────────────────────────────────────
+// ── countOwnedBySlug ──────────────────────────────────────────────────────────
 
-describe("CharacterMoves.countOwnedByName", () => {
+describe("CharacterMoves.countOwnedBySlug", () => {
 	it("returns 0 when no categories exist", () => {
-		expect(makeMoves().countOwnedByName("Bulwark")).toBe(0);
+		expect(makeMoves().countOwnedBySlug("bulwark")).toBe(0);
 	});
 
-	it("returns 0 when move exists but selection.value=0", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Bulwark", { selection: { max: 1, value: 0 } })] }),
-		]});
-		expect(makeMoves({ flags }).countOwnedByName("Bulwark")).toBe(0);
+	it("returns 0 when move exists but not acquired", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect(m.countOwnedBySlug("bulwark")).toBe(0);
 	});
 
-	it("returns selection.value when move is acquired", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Bulwark", { selection: { max: 2, value: 2 } })] }),
-		]});
-		expect(makeMoves({ flags }).countOwnedByName("Bulwark")).toBe(2);
+	it("returns selection.value when move is acquired", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Bulwark").asStarting().withRepeatMax(2).build()]);
+		const actor = makeActor();
+		const m = makeMoves({repo, actor});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.incrementMove("playbook-the-heavy", "bulwark");
+		expect(m.countOwnedBySlug("bulwark")).toBe(2);
 	});
 
-	it("returns 0 when move name does not match any category", () => {
-		const flags = makeFlags({ categories: [
-			makeFlagCategory("cat", { moves: [makeFlagMove("Alpha")] }),
-		]});
-		expect(makeMoves({ flags }).countOwnedByName("Bulwark")).toBe(0);
+	it("returns 0 when slug does not match any move", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect(m.countOwnedBySlug("bulwark")).toBe(0);
+	});
+});
+
+// ── buildSnapshot — choices ───────────────────────────────────────────────────
+
+describe("CharacterMoves.buildSnapshot — choices", () => {
+	it("choices is null when repo has no choices for move", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Alpha").build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		expect((await m.buildSnapshot()).categories[0].moves[0].choices).toBeNull();
+	});
+
+	it("choices is a ChoiceGroup when repo move has choices", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Potential for Greatness").withChoices(CHOICES_DATA).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		const snap = (await m.buildSnapshot()).categories[0].moves[0];
+		expect(snap.choices).toBeInstanceOf(ChoiceGroup);
+		expect(snap.choices.list).toHaveLength(CHOICES_DATA.list.length);
+	});
+
+	it("HeadingRow.input reflects saved text value from setMoveChoiceText", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Potential for Greatness").withChoices(CHOICES_DATA).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.setMoveChoiceText("potential-for-greatness", "stat1-input", "level 2");
+		const row = (await m.buildSnapshot()).categories[0].moves[0].choices.list.find(r => r.slug === "stat1");
+		expect(row.input.value).toBe("level 2");
+		expect(row.input.slug).toBe("stat1-input");
+		expect(row.input.placeholder).toBe("level checked");
+	});
+
+	it("HeadingRow track reflects saved count from setMoveChoiceCount", async () => {
+		const repo = new FakeMoveRepository([new FakeCompendiumMoveBuilder().withName("Potential for Greatness").withChoices(CHOICES_DATA).build()]);
+		const m = makeMoves({repo});
+		await m.initPlaybookCategory(makePlaybookData());
+		await m.setMoveChoiceCount("potential-for-greatness", "stat1", 1);
+		const row = (await m.buildSnapshot()).categories[0].moves[0].choices.list.find(r => r.slug === "stat1");
+		expect(row.track.checks[0]).toBe(true);
 	});
 });

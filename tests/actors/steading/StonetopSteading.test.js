@@ -1,13 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { StonetopSteading } from "../../../module/actors/steading/StonetopSteading.js";
-import { SteadingDefaults } from "../../../module/model/data/steading/SteadingDefaults.js";
-import { SteadingSnapshot } from "../../../module/model/snapshot/steading/SteadingSnapshot.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { StonetopSteading } from "../../../src/actors/steading/StonetopSteading.js";
+import { SteadingSnapshot } from "../../../src/model/snapshot/steading/SteadingSnapshot.js";
+import { FakeSteadingBuilder } from "../../fakes/FakeSteadingBuilder.js";
 
 const fakeRepo = {getAll: async () => []};
 
 function make() {
-	return new StonetopSteading(new FakeActorBuilder().build(), fakeRepo);
+	return new StonetopSteading(new FakeSteadingBuilder().build(), fakeRepo);
 }
 
 describe("StonetopSteading.buildSnapshot", () => {
@@ -17,12 +16,12 @@ describe("StonetopSteading.buildSnapshot", () => {
 
 	it("uses default fortunes when no value set", async () => {
 		const snap = await make().buildSnapshot();
-		expect(snap.fortunes.current).toBe(SteadingDefaults.fortunes.current);
+		expect(snap.fortunes.current).toBe(2);
 	});
 
 	it("uses default surplus when no value set", async () => {
 		const snap = await make().buildSnapshot();
-		expect(snap.surplus.current).toBe(SteadingDefaults.surplus.current);
+		expect(snap.surplus.current).toBe(1);
 	});
 
 	it("defaults notes to empty string", async () => {
@@ -77,5 +76,73 @@ describe("StonetopSteading — notes", () => {
 		const s = make();
 		await s.setNotes("hello world");
 		expect((await s.buildSnapshot()).notes).toBe("hello world");
+	});
+});
+
+// -- Rolling interface ---------------------------------------------------------
+
+describe("StonetopSteading.rollMode", () => {
+	it("always returns 'def'", () => {
+		expect(make().rollMode).toBe("def");
+	});
+});
+
+describe("StonetopSteading.getRollableStats", () => {
+	it("returns 4 entries", () => {
+		expect(make().getRollableStats()).toHaveLength(4);
+	});
+
+	it("includes population with its current value", () => {
+		const stat = make().getRollableStats().find(s => s.key === "population");
+		expect(stat).toBeDefined();
+		expect(stat.value).toBe(1);
+	});
+
+	it("includes prosperity with its current value", () => {
+		const stat = make().getRollableStats().find(s => s.key === "prosperity");
+		expect(stat).toBeDefined();
+		expect(stat.value).toBe(1);
+	});
+
+	it("includes defenses with its current value", () => {
+		const stat = make().getRollableStats().find(s => s.key === "defenses");
+		expect(stat).toBeDefined();
+		expect(stat.value).toBe(1);
+	});
+
+	it("includes fortunes with its current value", () => {
+		const stat = make().getRollableStats().find(s => s.key === "fortunes");
+		expect(stat).toBeDefined();
+		expect(stat.value).toBe(2);
+	});
+});
+
+describe("StonetopSteading.resolveBonus", () => {
+	it("returns population.current for 'population'", () => {
+		expect(make().resolveBonus("population")).toBe(1);
+	});
+
+	it("returns prosperity.current for 'prosperity'", () => {
+		expect(make().resolveBonus("prosperity")).toBe(1);
+	});
+
+	it("returns defenses.current for 'defenses'", () => {
+		expect(make().resolveBonus("defenses")).toBe(1);
+	});
+
+	it("returns fortunes for 'fortunes'", () => {
+		expect(make().resolveBonus("fortunes")).toBe(2);
+	});
+
+	it("returns null for unknown rollStat", () => {
+		expect(make().resolveBonus("str")).toBeNull();
+	});
+});
+
+describe("StonetopSteading.applyRollMode", () => {
+	it("passes rollMode through unchanged", () => {
+		expect(make().applyRollMode("population", "adv")).toBe("adv");
+		expect(make().applyRollMode("fortunes", "def")).toBe("def");
+		expect(make().applyRollMode("defenses", "dis")).toBe("dis");
 	});
 });

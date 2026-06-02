@@ -1,21 +1,19 @@
 # Stonetop for Foundry VTT
 
-An unofficial [Foundry VTT](https://foundryvtt.com) module for playing [Stonetop](https://plusoneexp.com/collections/stonetop) by Jeremy Strandberg.
-Requires the [Powered by the Apocalypse](https://foundryvtt.com/packages/pbta) system.
+An unofficial [Foundry VTT](https://foundryvtt.com) system for playing [Stonetop](https://plusoneexp.com/collections/stonetop) by Jeremy Strandberg.
 
-> This module is under active development and may be unstable.
+> This system is under active development and may be unstable.
 
 ## Prerequisites
 
 - Foundry VTT v14
-- [Powered by the Apocalypse](https://foundryvtt.com/packages/pbta) system v1.2.0+
 
 ## Installation
 
-In Foundry VTT, go to **Add-on Modules → Install Module** and paste this manifest URL:
+In Foundry VTT, go to **Game Systems → Install System** and paste this manifest URL:
 
 ```
-https://github.com/taylor-nightingale/stonetop/releases/latest/download/module.json
+https://github.com/taylor-nightingale/stonetop/releases/latest/download/system.json
 ```
 
 ## Development
@@ -31,4 +29,8 @@ npm test           # run tests
 
 Code is licensed under the [MIT License](LICENSE).
 
-Game content (and icons) are derived from [Stonetop](https://plusoneexp.com/collections/stonetop) by Jeremy Strandberg and used under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+Some CSS/HTML and assets derived with permission from dice-goblin's beautiful [stonetop system](https://github.com/Dice-Goblin-Click-Clack/Stonetop)
+
+Game content (and trade dress) are derived from [Stonetop](https://plusoneexp.com/collections/stonetop) by Jeremy Strandberg and used under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
+The Stonetop maps are Lucie’s illustrations (C), and should not be distributed in this repository.

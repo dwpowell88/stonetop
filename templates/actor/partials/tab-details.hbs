@@ -1,5 +1,6 @@
 <div class="tab details" data-group="primary" data-tab="details">
 	<section class="sheet-tab">
+	<div class="stonetop-details-columns">
 
 		{{> "stonetop.choice-section" groups=stonetop.playbook.lore cgContext="lore"}}
 
@@ -9,27 +10,25 @@
 			{{#each stonetop.playbook.background.options}}
 			<label class="stonetop-item{{#if selected}} is-checked{{/if}}">
 				<div class="stonetop-item-header">
-					<input type="radio" class="stonetop-item-check" name="stonetop-background"
-					       value="{{slug}}"{{#if selected}} checked{{/if}}>
+					<input type="radio" class="stonetop-item-check" name="stonetop-background" value="{{slug}}"{{#if selected}} checked{{/if}}>
 					<strong class="stonetop-item-name">{{label}}</strong>
+					{{#if resource}}
+					<span class="stonetop-item-resources">
+						{{> "stonetop.resource-track" resource=resource btnClass="stonetop-background-resource-btn" slug=slug}}
+					</span>
+					{{/if}}
 				</div>
 				{{#if description}}
 				<div class="stonetop-item-description">{{{description}}}</div>
 				{{/if}}
+				{{#if choices}}
+				<div class="stonetop-bg-choices">
+					{{#each choices.list}}
+					{{> "stonetop.choice-row" cgContext="background" cgGroup=../choices.slug namePrefix=../slug}}
+					{{/each}}
+				</div>
+				{{/if}}
 			</label>
-			{{#if (and selected choices)}}
-			<div class="stonetop-bg-choices">
-				<p class="stonetop-bg-choices-label">{{choices.label}} (choose {{choices.countLabel}})</p>
-				{{#each choices.options}}
-				<label class="stonetop-bg-choice-option">
-					<input type="checkbox" class="stonetop-item-check stonetop-bg-choice"
-					       data-slug="{{slug}}"
-					       {{#if checked}}checked{{/if}}>
-					{{label}}
-				</label>
-				{{/each}}
-			</div>
-			{{/if}}
 			{{/each}}
 		</div>
 		{{/if}}
@@ -79,5 +78,6 @@
 		</div>
 		{{/if}}
 
+	</div>
 	</section>
 </div>

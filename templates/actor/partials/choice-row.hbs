@@ -1,6 +1,6 @@
 {{#if (eq type "heading")}}
 {{! Heading row }}
-{{#if title}}{{> "stonetop.section-heading" title=title}}{{/if}}
+{{#if content.title}}{{> "stonetop.section-heading" title=content.title}}{{/if}}
 {{#if track}}
 <div class="stonetop-choice-track">
     <span class="stonetop-choice-track-checks">
@@ -14,34 +14,46 @@
                {{#if this}}checked{{/if}}>
         {{/each}}
     </span>
-    <span class="stonetop-choice-track-desc">{{{description}}}</span>
+    <span class="stonetop-choice-track-desc">{{{content.text}}}</span>
 </div>
-{{else if description}}
-<div class="stonetop-choice-description">{{{description}}}</div>
+{{else if content.text}}
+<div class="stonetop-choice-description">{{{content.text}}}</div>
 {{/if}}
-{{else if (eq type "input")}}
-{{! Text input row (textarea) }}
+{{#if input}}
 <div class="stonetop-choice-option stonetop-choice-option--text">
-    {{#if text}}<label class="stonetop-option-desc">{{{text}}}</label>{{/if}}
     <textarea class="stonetop-cg-text"
               data-cg-context="{{cgContext}}"
               data-cg-group="{{cgGroup}}"
-              data-cg-option="{{slug}}">{{value}}</textarea>
+              data-cg-option="{{input.slug}}"
+              {{#if input.placeholder}}placeholder="{{input.placeholder}}"{{/if}}>{{input.value}}</textarea>
 </div>
+{{/if}}
 {{else if (eq type "follower")}}
 {{! Follower row (arcanum back) }}
 <div class="stonetop-arcanum-follower">
+    {{#if inlineDisplay}}
     {{#if track}}
+    <input type="checkbox" class="stonetop-arcanum-follower-check"
+           data-cg-context="{{cgContext}}"
+           data-slug="{{cgGroup}}"
+           data-option="{{slug}}"
+           data-index="0"
+           {{#if (lookup track.checks 0)}}checked{{/if}}>
+    {{/if}}
+    {{#if follower}}{{> "stonetop.follower-card" follower}}{{/if}}
+    {{else if title}}
     <label class="stonetop-arcanum-follower-label">
+        {{#if track}}
         <input type="checkbox" class="stonetop-arcanum-follower-check"
+               data-cg-context="{{cgContext}}"
                data-slug="{{cgGroup}}"
                data-option="{{slug}}"
                data-index="0"
                {{#if (lookup track.checks 0)}}checked{{/if}}>
-        {{localize "stonetop.arcana.addToFollowers"}}
+        {{/if}}
+        {{{title}}}
     </label>
     {{/if}}
-    {{#if follower}}{{> "stonetop.follower-card" follower}}{{/if}}
 </div>
 {{else}}
 {{! Pick or track row (type="choice") }}

@@ -1,11 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
-import { CharacterArcana } from "../../../module/actors/character/CharacterArcana.js";
-import { Stats } from "../../../module/model/data/character/Stats.js";
+import { CharacterArcana } from "../../../src/actors/character/CharacterArcana.js";
+import { ResourceController } from "../../../src/actors/character/ResourceController.js";
+import { StonetopFlags } from "../../../src/actors/character/StonetopFlags.js";
+import { FakeFlags } from "../../fakes/FakeFlags.js";
+import { Stats } from "../../../src/model/data/character/Stats.js";
 import {
 	ArcanaSnapshot, ArcanaSectionSnapshot,
 	ArcanumSnapshot, ArcanumFrontSnapshot, ArcanumBackSnapshot,
 	ChoiceGroup, HeadingRow, FollowerRow,
-} from "../../../module/model/snapshot/character/CharacterSnapshot.js";
+} from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 import {FakeArcanaRepository} from "../../fakes/FakeArcanaRepository.js";
 
 // -- Helpers ------------------------------------------------------------------
@@ -29,12 +32,12 @@ const FFYRNIG_SPHERE = {
 		unlock: {
 			slug: "huge-wooden-sphere",
 			list: [
-				{ type: "heading", description: "The pictograms depict some sort of recipe, which you can learn but you must…" },
-				{ type: "heading", description: "Some context text." },
-				{ type: "heading", slug: "dig-sphere",   description: "… first dig up and clean the sphere.", track: { max: 1 } },
-				{ type: "heading", slug: "study-glyphs", description: "… spend weeks studying the glyphs.", track: { max: 1 } },
-				{ type: "heading", description: "And then…" },
-				{ type: "heading", slug: "risk-recipe",  description: "… risk getting the recipe wrong.", track: { max: 3 } },
+				{ type: "heading", content: { text: "The pictograms depict some sort of recipe, which you can learn but you must…" } },
+				{ type: "heading", content: { text: "Some context text." } },
+				{ type: "heading", slug: "dig-sphere",   content: { text: "… first dig up and clean the sphere." }, track: { max: 1 } },
+				{ type: "heading", slug: "study-glyphs", content: { text: "… spend weeks studying the glyphs." }, track: { max: 1 } },
+				{ type: "heading", content: { text: "And then…" } },
+				{ type: "heading", slug: "risk-recipe",  content: { text: "… risk getting the recipe wrong." }, track: { max: 3 } },
 			],
 		},
 	},
@@ -178,7 +181,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 		it("front.unlock.list first item is a HeadingRow with the unlock description", async () => {
 			const row = (await getItem()).front.unlock.list[0];
 			expect(row).toBeInstanceOf(HeadingRow);
-			expect(row.description).toBe("The pictograms depict some sort of recipe, which you can learn but you must…");
+			expect(row.content.text).toBe("The pictograms depict some sort of recipe, which you can learn but you must…");
 		});
 
 		it("front.unlock.list has all heading nodes", async () => {
@@ -198,7 +201,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect(row).toBeInstanceOf(HeadingRow);
 			expect(row.track).not.toBeNull();
 			expect(row.track.slug).toBe("dig-sphere");
-			expect(row.description).toBe("… first dig up and clean the sphere.");
+			expect(row.content.text).toBe("… first dig up and clean the sphere.");
 		});
 
 		it("heading+track defaults checks to all false when no count saved", async () => {
@@ -238,9 +241,11 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect((await getItem()).back.resource).toMatchObject({ current: 0, max: 3, title: "Ffyrnig Tonic" });
 		});
 
-		it("back.resource.current reflects inventoryResources", async () => {
+		it("back.resource.current reflects resourceController", async () => {
+			const ctrl = new ResourceController(new StonetopFlags(new FakeFlags(), "resources"));
+			await ctrl.set("inventory", "huge-wooden-sphere", 2);
 			const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
-				.buildSnapshot({}, { "huge-wooden-sphere": 2 })).minor.items[0];
+				.buildSnapshot({}, ctrl)).minor.items[0];
 			expect(item.back.resource.current).toBe(2);
 		});
 
@@ -365,10 +370,12 @@ const BOW_WITH_NO_STRING = {
 	},
 };
 
-describe("CharacterArcana.buildSnapshot() — inventoryResources", () => {
-	it("back.resource uses inventoryResources current for back.resource arcana", async () => {
+describe("CharacterArcana.buildSnapshot() — resourceController", () => {
+	it("back.resource uses resourceController current for back.resource arcana", async () => {
+		const ctrl = new ResourceController(new StonetopFlags(new FakeFlags(), "resources"));
+		await ctrl.set("inventory", "huge-wooden-sphere", 2);
 		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
-			.buildSnapshot({}, { "huge-wooden-sphere": 2 })).minor.items[0];
+			.buildSnapshot({}, ctrl)).minor.items[0];
 		expect(item.back.resource.current).toBe(2);
 	});
 
@@ -378,8 +385,10 @@ describe("CharacterArcana.buildSnapshot() — inventoryResources", () => {
 	});
 
 	it("back.item.resource is a resolved Resource on the OutfitItem snapshot", async () => {
+		const ctrl = new ResourceController(new StonetopFlags(new FakeFlags(), "resources"));
+		await ctrl.set("inventory", "bow-with-no-string", 1);
 		const item = (await makeArcana({ owned: ["bow-with-no-string"] }, [BOW_WITH_NO_STRING])
-			.buildSnapshot({}, { "bow-with-no-string": 1 })).minor.items[0];
+			.buildSnapshot({}, ctrl)).minor.items[0];
 		expect(item.back.item.resource).not.toBeNull();
 		expect(item.back.item.resource.current).toBe(1);
 		expect(item.back.item.resource.max).toBe(3);
@@ -446,13 +455,13 @@ describe("CharacterArcana.buildSnapshot() — checked state", () => {
 
 	it("checked is true when slug is in checkedMap", async () => {
 		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
-			.buildSnapshot({ "huge-wooden-sphere": true }, {})).minor.items[0];
+			.buildSnapshot({ "huge-wooden-sphere": true })).minor.items[0];
 		expect(item.checked).toBe(true);
 	});
 
 	it("checked is false when slug is not in checkedMap", async () => {
 		const item = (await makeArcana({ owned: ["huge-wooden-sphere"] })
-			.buildSnapshot({ "other-slug": true }, {})).minor.items[0];
+			.buildSnapshot({ "other-slug": true })).minor.items[0];
 		expect(item.checked).toBe(false);
 	});
 });
@@ -464,7 +473,7 @@ describe("CharacterArcana — outfitItems sync", () => {
 		await arcana.addArcanum("bow-with-no-string");
 		expect(outfitItems.sync).toHaveBeenCalledWith(
 			"arcana:bow-with-no-string",
-			expect.arrayContaining([expect.objectContaining({ flags: expect.objectContaining({ stonetop: expect.objectContaining({ source: "arcana:bow-with-no-string" }) }) })]),
+			expect.arrayContaining([expect.objectContaining({ system: expect.objectContaining({ source: "arcana:bow-with-no-string" }) })]),
 		);
 	});
 
@@ -520,7 +529,7 @@ const CRACKED_FLUTE = {
 		choices: {
 			slug: "cracked-flute",
 			list: [
-				{ type: "follower", slug: "andalau-of-the-flute", followerSlug: "andalau-of-the-flute", track: { max: 1 } },
+				{ type: "follower", slug: "andalau-of-the-flute", inlineDisplay: true, title: "", track: { max: 1 } },
 			],
 		},
 		item: null,
@@ -543,7 +552,7 @@ const STONE_IDOL = {
 		choices: {
 			slug: "stone-idol",
 			list: [
-				{ type: "follower", slug: "all-mighty-thistlewisk", followerSlug: "all-mighty-thistlewisk", track: { max: 1 } },
+				{ type: "follower", slug: "all-mighty-thistlewisk", inlineDisplay: true, title: "", track: { max: 1 } },
 			],
 		},
 		item: null,
@@ -650,7 +659,7 @@ describe("CharacterArcana.buildSnapshot() — back.choices", () => {
 		const snap = await charArcana.buildSnapshot();
 		const row = snap.minor.items[0].back.choices.list[0];
 		expect(row).toBeInstanceOf(FollowerRow);
-		expect(row.followerSlug).toBe("andalau-of-the-flute");
+		expect(row.slug).toBe("andalau-of-the-flute");
 	});
 
 	it("FollowerRow.follower is null when not in followersBySlug", async () => {

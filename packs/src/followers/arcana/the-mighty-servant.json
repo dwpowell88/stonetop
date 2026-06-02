@@ -2,42 +2,50 @@
 	"_id": "q6rtLEUNcSqqcEbC",
 	"_key": "!items!q6rtLEUNcSqqcEbC",
 	"name": "The Mighty Servant",
-	"type": "equipment",
+	"type": "npc",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
-		"equipmentType": "follower"
-	},
-	"flags": {
-		"stonetop": {
-			"slug": "the-mighty-servant",
-			"arcanaSlug": "mindgem",
-			"note": "large, construct, Maker-wise, beautiful, meek, hardy, slow, strong, exceptional",
-			"hp": {
-				"max": 24
-			},
-			"armor": 4,
-			"damage": "stone fists d10+1 (hand, close, disadvantage)",
-			"loyalty": {
-				"max": 3
-			},
-			"choices": {
-				"slug": "choices",
-				"list": [
-					{
-						"type": "input",
-						"slug": "instinct",
-						"text": "Instinct",
-						"default": "to misunderstand\n-living stone, tireless"
+		"slug": "the-mighty-servant",
+		"arcanaSlug": "mindgem",
+		"tags": "large, construct, Maker-wise, beautiful, meek, hardy, slow, strong, exceptional",
+		"hp": {
+			"value": 0,
+			"min": 0,
+			"max": 24
+		},
+		"armor": {
+			"value": 4,
+			"note": ""
+		},
+		"damage": {
+			"die": "stone fists d10+1 (hand, close, disadvantage)",
+			"label": "",
+			"tags": ""
+		},
+		"specialQualities": "",
+		"instinct": "to misunderstand\n-living stone, tireless",
+		"loyalty": {
+			"value": 0,
+			"max": 3
+		},
+		"choices": {
+			"slug": "choices",
+			"list": [
+				{
+					"type": "heading",
+					"slug": "cost",
+					"content": {
+						"title": null,
+						"text": "Cost"
 					},
-					{
-						"type": "input",
-						"slug": "cost",
-						"text": "Cost",
+					"input": {
 						"default": "wonder, excitement, joy, discovery (Loyalty ◯◯◯)"
 					}
-				]
-			}
-		}
+				}
+			]
+		},
+		"description": ""
 	},
+	"flags": {},
 	"folder": "BNaYX2Y4eMe7EOPK"
 }

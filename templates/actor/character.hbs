@@ -1,7 +1,7 @@
 <form class="{{cssClass}} stonetop-playbook-{{stonetop.playbook.slug}}" autocomplete="off">
 	<div class="sheet-wrapper">
 
-		{{> "pbta.actor-header"}}
+		{{> "stonetop.actor-header"}}
 
 		<section class="sheet-top flexcol">
 			{{#if stonetop.playbook}}
@@ -22,54 +22,48 @@
 
 			{{> "stonetop.section-heading" title=(localize "stonetop.character.stats.sectionTitle") note=stonetop.playbook.statsNote}}
 
-			<section class="sheet-attributes flexrow">
-				{{> "pbta.actor-stats"}}
-			</section>
+			<div class="stonetop-stats-section">
+				{{> "stonetop.actor-stats" stats=stonetop.stats}}
+			</div>
 			<div class="stonetop-debilities">
 				<div class="stonetop-debility">
-					<span class="stonetop-debility-bracket"></span>
 					<label class="stonetop-debility-control">
-						<input type="checkbox" class="attr-list"
-						       name="system.attributes.debilities.options.weakened.value"
+						<span class="stonetop-debility-divider"></span>
+						<input type="checkbox" class="stonetop-debility-check"
+						       data-slug="weakened"
 						       {{#if system.attributes.debilities.options.weakened.value}}checked{{/if}}>
 						<span class="stonetop-debility-label">weakened</span>
 					</label>
 				</div>
 				<div class="stonetop-debility">
-					<span class="stonetop-debility-bracket"></span>
 					<label class="stonetop-debility-control">
-						<input type="checkbox" class="attr-list"
-						       name="system.attributes.debilities.options.dazed.value"
+						<span class="stonetop-debility-divider"></span>
+						<input type="checkbox" class="stonetop-debility-check"
+						       data-slug="dazed"
 						       {{#if system.attributes.debilities.options.dazed.value}}checked{{/if}}>
 						<span class="stonetop-debility-label">dazed</span>
 					</label>
 				</div>
 				<div class="stonetop-debility">
-					<span class="stonetop-debility-bracket"></span>
 					<label class="stonetop-debility-control">
-						<input type="checkbox" class="attr-list"
-						       name="system.attributes.debilities.options.miserable.value"
+						<span class="stonetop-debility-divider"></span>
+						<input type="checkbox" class="stonetop-debility-check"
+						       data-slug="miserable"
 						       {{#if system.attributes.debilities.options.miserable.value}}checked{{/if}}>
 						<span class="stonetop-debility-label">miserable</span>
 					</label>
 				</div>
 			</div>
 
-			<section class="sheet-attributes-top">
-				{{~> "pbta.actor-attributes" attrs=system.attrTop cssClass="cell--attributes-top flexrow" owner=owner editable=editable~}}
-			</section>
-
-			{{#if (objLen system.attrLeft)}}
-			<section class="sheet-attributes-left">
-				{{~> "pbta.actor-attributes" attrs=system.attrLeft cssClass="cell--attributes-left flexrow" owner=owner editable=editable~}}
-			</section>
-			{{/if}}
+			<div class="stonetop-vitals-section">
+				{{> "stonetop.actor-attributes"}}
+			</div>
 
 		</section>
 
 		<section class="sheet-main flexcol">
 			<nav class="sheet-tabs tabs" data-group="primary">
-				<a class="item" data-tab="moves">{{localize "PBTA.Moves"}}</a>
+				<a class="item" data-tab="moves">{{localize "stonetop.sheet.tabs.moves"}}</a>
 				<a class="item" data-tab="inventory">{{localize "stonetop.sheet.tabs.inventory"}}</a>
 				<a class="item" data-tab="arcana">{{localize "stonetop.sheet.tabs.arcana"}}</a>
 				<a class="item" data-tab="followers">{{localize "stonetop.sheet.tabs.followers"}}</a>
@@ -93,13 +87,13 @@
 					{{> "stonetop.section-heading" title=label}}
 					<ol class="items-list">
 					{{#each moves}}
-						{{#if (and ownedId rollType)}}
+						{{#if (and ownedId rollStat)}}
 						<li class="item stonetop-move-item" data-item-id="{{ownedId}}">
 						{{else}}
 						<li class="stonetop-move-item move-unowned">
 						{{/if}}
-							{{#if (and ownedId rollType)}}
-							<span class="rollable move-rollable" data-roll="{{rollType}}" data-mod="">
+							{{#if (and ownedId rollStat)}}
+							<span class="rollable move-rollable" data-roll="{{rollStat}}" data-mod="">
 								<i class="fas fa-dice-d6"></i>
 							</span>
 							{{/if}}

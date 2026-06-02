@@ -1,4 +1,6 @@
 import {FakeFlags} from "./FakeFlags.js";
+import {FakeActor} from "./FakeActor.js";
+import {StonetopFakeFlagsBuilder} from "./StonetopFakeFlagsBuilder.js";
 
 export class FakeStatBuilder {
 	_str = 0;
@@ -48,13 +50,14 @@ export class FakeStatBuilder {
 }
 
 export class FakeActorBuilder {
-	_flags = {};
-	_pbtaRollMode = null;
-	_playbook = {slug: null, name: null};
+	_flagsBuilder = new StonetopFakeFlagsBuilder();
+	_rollMode = null;
+	_playbookSlug = null;
 	_name = "Brakken";
 	_items = [];
 	_level = 1;
 	_armor = 0;
+	_damage = null;
 	_xp = {value: 0, max: 8};
 	_hp = {value: 8, max: 8};
 	_statBuilder = new FakeStatBuilder();
@@ -69,8 +72,13 @@ export class FakeActorBuilder {
 		return this;
 	}
 
-	withPlaybook(slug, name) {
-		this._playbook = {slug, name};
+	withPlaybook(slug) {
+		this._playbookSlug = slug;
+		return this;
+	}
+
+	withDamage(die) {
+		this._damage = die ? {value: die} : null;
 		return this;
 	}
 
@@ -105,22 +113,12 @@ export class FakeActorBuilder {
 	}
 
 	withRollMode(rollMode) {
-		this._pbtaRollMode = rollMode;
+		this._rollMode = rollMode;
 		return this;
 	}
 
 	addItem(item) {
 		this._items.push(item);
-		return this;
-	}
-
-	withFlag(key, value) {
-		this._flags[key] = value;
-		return this;
-	}
-
-	withFlags(flags) {
-		Object.assign(this._flags, flags);
 		return this;
 	}
 
@@ -133,40 +131,24 @@ export class FakeActorBuilder {
 	}
 
 	build() {
-		const fakeFlags = new FakeFlags();
-		for (const [key, value] of Object.entries(this._flags)) {
-			fakeFlags.setFlagNonAsync("stonetop", key, value);
-		}
-		fakeFlags.setFlagNonAsync("pbta", "rollMode", this._pbtaRollMode);
+		this.buildFlags();
 
-		return {
-			name: this._name,
-			type: "character",
-			system: {
-				playbook: this._playbook,
-				stats: this._statBuilder.build(),
-				attributes: {
-					level: {value: this._level},
-					hp: this._hp,
-					armor: {value: this._armor},
-					xp: this._xp,
-					damage: {value: "d4"},
-					debilities: {options: {...this._debilities}},
-				},
-			},
-			items: this.buildItems(),
-			flags: fakeFlags.toRaw(),
-			getFlag: (scope, key) => fakeFlags.getFlag(scope, key),
-			setFlag: (scope, key, value) => fakeFlags.setFlag(scope, key, value),
-			update: vi.fn(),
-			createEmbeddedDocuments: vi.fn(),
-			deleteEmbeddedDocuments: vi.fn(),
-		};
+		return new FakeActor(this);
+	}
+
+	buildFlags() {
+		return this._flagsBuilder.withFlag("rollMode", this._rollMode)
+			.withFlag("playbook.slug", this._playbookSlug)
+			.build();
 	}
 
 	buildItems() {
 		const items = this._items;
 		items.get = (id) => items.find(i => i._id === id) ?? null;
 		return items;
+	}
+
+	buildStats() {
+		return this._statBuilder.build();
 	}
 }

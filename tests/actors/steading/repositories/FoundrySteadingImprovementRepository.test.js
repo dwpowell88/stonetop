@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { FoundrySteadingImprovementRepository } from "../../../../module/actors/steading/repositories/FoundrySteadingImprovementRepository.js";
+import { FoundrySteadingImprovementRepository } from "../../../../src/actors/steading/repositories/FoundrySteadingImprovementRepository.js";
 
 function makeEntry(slug, sortOrder = 1, choices = null) {
 	return {
 		_id: `id-${slug}`,
 		name: slug,
-		flags: { stonetop: { slug, sortOrder, choices } },
+		type: "improvement",
+		system: { slug, sortOrder, choices },
 	};
 }
 
@@ -26,7 +27,7 @@ describe("FoundrySteadingImprovementRepository", () => {
 		expect(await repo.getAll()).toEqual([]);
 	});
 
-	it("maps slug and choices from flags", async () => {
+	it("maps slug and choices from system", async () => {
 		const choices = { slug: "inn", list: [] };
 		stubGame(makePack([makeEntry("inn", 1, choices)]));
 		const repo = new FoundrySteadingImprovementRepository();

@@ -2,7 +2,7 @@
 	{{> "stonetop.section-heading" title=title note=note}}
 	<ol class="items-list">
 	{{#each moves}}
-		{{#if (and ownedId rollType)}}
+		{{#if (and ownedId rollStat)}}
 		<li class="item stonetop-item{{#if isStarting}} move-starting{{/if}}" data-item-id="{{ownedId}}">
 		{{else}}
 		<li class="stonetop-item{{#if isStarting}} move-starting{{/if}}">
@@ -13,7 +13,7 @@
 					{{#each (repeatChecks this)}}
 					<input type="checkbox" class="stonetop-item-check stonetop-repeat-check"
 					       data-category-key="{{../../categoryKey}}"
-					       data-move-name="{{../name}}"
+					       data-move-slug="{{../slug}}"
 					       data-owned-id="{{../ownedId}}"
 					       {{#if checked}}checked{{/if}}
 					       {{#if disabled}}disabled{{/if}}>
@@ -22,7 +22,7 @@
 				{{else}}
 				<input type="checkbox" class="stonetop-item-check stonetop-move-check"
 				       data-category-key="{{../categoryKey}}"
-				       data-move-name="{{name}}"
+				       data-move-slug="{{slug}}"
 				       data-owned-id="{{ownedId}}"
 				       {{#if ownedId}}checked{{/if}}
 				       {{#if (or isStarting (and (not ownedId) (not selectable)))}}disabled{{/if}}>
@@ -30,8 +30,8 @@
 				<strong class="stonetop-item-name">{{name}}</strong>
 				{{#if requirement}}<span class="stonetop-item-requirement{{#unless requirement.met}} stonetop-item-requirement--unmet{{/unless}}">{{localize "stonetop.character.moves.requires"}}: {{requiresLabel}}{{#unless requirement.met}} ({{localize "stonetop.character.moves.notMet"}}){{/unless}}</span>{{/if}}
 				{{#if sourceLabel}}<span class="stonetop-item-source">{{sourceLabel}}</span>{{/if}}
-				{{#if (and ownedId rollType)}}
-				<span class="rollable move-rollable" data-roll="{{rollType}}" data-mod="">
+				{{#if (and ownedId rollStat)}}
+				<span class="rollable move-rollable" data-roll="{{rollStat}}" data-mod="">
 					<i class="fas fa-dice-d6"></i>
 				</span>
 				{{/if}}
@@ -40,8 +40,7 @@
 					{{#each (resourceChecks resource)}}
 					<span class="stonetop-item-resource-entry">
 						<button type="button" class="stonetop-item-resource-check{{#if checked}} is-checked{{/if}}"
-						        data-category-key="{{../../categoryKey}}"
-						        data-move-name="{{../name}}"
+						        data-move-slug="{{../slug}}"
 						        data-index="{{@index}}"></button>
 						{{#if label}}<span class="stonetop-resource-label">{{label}}</span>{{/if}}
 					</span>
@@ -49,12 +48,19 @@
 				</span>
 				{{/if}}
 				{{#if ../allowAdditional}}
-				<a class="stonetop-other-move-delete" data-move-name="{{name}}" title="{{localize 'stonetop.character.moves.removeMove'}}">
+				<a class="stonetop-other-move-delete" data-move-slug="{{slug}}" title="{{localize 'stonetop.character.moves.removeMove'}}">
 					<i class="fas fa-trash"></i>
 				</a>
 				{{/if}}
 			</div>
 			<div class="stonetop-item-description">{{{description}}}</div>
+			{{#if choices}}
+			<div class="stonetop-move-choices">
+				{{#each choices.list}}
+				{{> "stonetop.choice-row" cgContext="move" cgGroup=../slug namePrefix=../slug}}
+				{{/each}}
+			</div>
+			{{/if}}
 		</li>
 	{{/each}}
 	</ol>

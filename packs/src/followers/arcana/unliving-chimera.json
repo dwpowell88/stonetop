@@ -1,48 +1,61 @@
 {
 	"name": "Unliving chimera",
-	"type": "equipment",
+	"type": "npc",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
-		"equipmentType": "follower"
-	},
-	"flags": {
-		"stonetop": {
-			"slug": "unliving-chimera",
-			"arcanaSlug": "rusty-cauldron",
-			"note": "Undead, construct, terrifying, clumsy",
-			"hp": {
-				"max": 3
-			},
-			"armor": 4,
-			"damage": "d6",
-			"loyalty": {
-				"max": 3
-			},
-			"choices": {
-				"slug": "choices",
-				"list": [
-					{
-						"type": "input",
-						"slug": "weapon",
-						"text": "Weapon",
+		"slug": "unliving-chimera",
+		"arcanaSlug": "rusty-cauldron",
+		"tags": "Undead, construct, terrifying, clumsy",
+		"hp": {
+			"value": 0,
+			"min": 0,
+			"max": 3
+		},
+		"armor": {
+			"value": 4,
+			"note": ""
+		},
+		"damage": {
+			"die": "d6",
+			"label": "",
+			"tags": ""
+		},
+		"specialQualities": "",
+		"instinct": "to get confused and lash out\n-Do something one of its component beasts could do\n-Moan, wretchedly and disturbingly",
+		"loyalty": {
+			"value": 0,
+			"max": 3
+		},
+		"choices": {
+			"slug": "choices",
+			"list": [
+				{
+					"type": "heading",
+					"slug": "weapon",
+					"content": {
+						"title": null,
+						"text": "Weapon"
+					},
+					"input": {
 						"default": "varies d6 (band, maybe others)"
+					}
+				},
+				{
+					"type": "heading",
+					"slug": "cost",
+					"content": {
+						"title": null,
+						"text": "Cost"
 					},
-					{
-						"type": "input",
-						"slug": "instinct",
-						"text": "Instinct",
-						"default": "to get confused and lash out\n-Do something one of its component beasts could do\n-Moan, wretchedly and disturbingly"
-					},
-					{
-						"type": "input",
-						"slug": "cost",
-						"text": "Cost",
+					"input": {
 						"default": "lots of fresh blood (Loyalty ◯◯◯)"
 					}
-				]
-			}
-		}
+				}
+			]
+		},
+		"description": ""
 	},
+	"flags": {},
 	"folder": "BNaYX2Y4eMe7EOPK",
 	"_id": "fIh7TkvwIHduk4p5",
 	"_key": "!items!fIh7TkvwIHduk4p5"
