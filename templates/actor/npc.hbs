@@ -1,0 +1,62 @@
+<form class="{{cssClass}} stonetop-follower-card" autocomplete="off">
+	<div class="sheet-wrapper">
+		<div>
+			{{> "stonetop.actor-header"}}
+
+			<section>
+				<div>
+					<section>
+						<div class="stonetop-npc-attrs stonetop-follower-attrs">
+							<div class="stonetop-resource stonetop-resource--small stonetop-resource--follower">
+								<div class="flexrow">
+									<button class="stonetop-resource__label stonetop-damage-roll rollable" type="button" data-roll="{{stonetop.damage}}">{{localize "stonetop.followers.damage"}}</button>
+									<input id="npc-damage" type="text" class="stonetop-resource__input" value="{{stonetop.damage}}" data-slug="{{slug}}">
+								</div>								
+							</div>
+							<div class="stonetop-resource stonetop-resource--small stonetop-resource--follower">
+								<span class="stonetop-resource__label">{{localize "stonetop.followers.hp"}}</span>
+								<div class="stonetop-resource__split">
+									<input id="npc-hp" type="number" class="stonetop-resource__input stonetop-follower-hp" min="0" value="{{stonetop.hp}}" data-slug="{{slug}}">
+									<span>/</span>
+									<input id="npc-max-hp" type="number" class="stonetop-resource__input stonetop-follower-hp-max" min="0" value="{{stonetop.hpMax}}" data-slug="{{slug}}">
+								</div>
+							</div>
+							<div id="npc-armor-box" class="stonetop-resource stonetop-resource--small stonetop-resource--follower">
+								<span class="stonetop-resource__label">{{localize "stonetop.followers.armor"}}</span>
+								<input id="npc-armor" class="stonetop-resource__input" type="number" min="0" value="{{stonetop.armor}}" data-slug="{{slug}}">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<div class="flexcolumn">
+							<div>
+								<span class="stonetop-follower-label">Instinct</span>
+								<input id="npc-instinct" class="stonetop-follower-metadata-input" type="text" value="{{stonetop.instinct}}">
+							</div>
+							<div>
+								<span class="stonetop-follower-label">Special Qualities</span>
+								<input id="npc-special-qualities" class="stonetop-follower-metadata-input" type="text" value="{{stonetop.specialQuality}}">
+							</div>
+						</div>
+					</section>
+				</div>
+			</section>
+
+		</div>
+
+		<section class="flexcol">
+			{{#if stonetop.moves}}
+			<div>
+				<span class="stonetop-follower-label">{{localize "stonetop.followers.moves"}}</span>
+				<div style="min-height: 50px;">
+
+				</div>
+			</div>
+			{{/if}}
+			<span class="stonetop-follower-label">{{localize "stonetop.followers.description"}}</span>
+			<textarea class="stonetop-follower-description-textarea stonetop-notes st-notes-textarea" type="text" placeholder="" data-slug="{{slug}}" >{{stonetop.description}}</textarea>
+		</section>
+
+	</div>
+</form>

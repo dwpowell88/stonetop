@@ -274,6 +274,12 @@ body,
 	z-index: 1;
 }
 
+/* ── Character Sheet ────────────────────────────────────────────────────────── */
+
+.character {
+	min-width: 813px;
+}
+
 /* ── Stats row ──────────────────────────────────────────────────────────────── */
 
 .stonetop-stats-row {
@@ -1968,6 +1974,12 @@ body,
 	display: grid;
 	grid-template-columns: 88px 88px 155px;
 	gap: 4px;
+	align-items: stretch;
+}
+
+.stonetop-follower-card .stonetop-follower-damage {
+	width: 28px;
+	font-size: 0.8rem;
 }
 
 .stonetop-follower-loyalty {
@@ -1976,7 +1988,7 @@ body,
 	gap: 6px;
 }
 
-.stonetop-follower-loyalty-label {
+.stonetop-follower-label {
 	font-weight: bold;
 	font-size: 0.8rem;
 	text-transform: uppercase;
@@ -2006,6 +2018,14 @@ body,
 	display: flex;
 	flex-direction: column;
 	gap: 3px;
+}
+
+.stonetop-follower-card .stonetop-choice-description {
+	font-weight: bold;
+    font-size: 0.8rem;
+	font-style: italic;
+    text-transform: uppercase;
+    color: var(--color-text-dark-secondary, #555);
 }
 
 .stonetop-follower-choice-text {
@@ -2414,7 +2434,8 @@ body,
 .st-notes-textarea {
 	flex: 1;
 	min-height: 110px;
-	resize: vertical;
+	max-height: 200px;
+	field-sizing: content;
 	font-size: 0.8rem;
 	border: 1px solid var(--color-border-light-primary, #ccc);
 	border-radius: 3px;
@@ -2689,6 +2710,39 @@ body,
 	width: 100%;
 	border-radius: 3px;
 	display: block;
+}
+
+/* NPC Sheet Styling */
+
+.npc {
+	min-width: 315px;
+	min-height: 425px;
+}
+
+.npc .stonetop-follower-card::before {
+	background-image: none;
+}
+
+.npc .stonetop-follower-card {
+	background: none;
+}
+
+.stonetop-npc-attrs {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.npc .stonetop-follower-attrs {
+    grid-template-columns: 88px 88px 110px;
+}
+
+#npc-damage {
+	min-width: 50px;
+	field-sizing: content;
+}
+
+#npc-armor-box {
+	max-width: 88px;
 }
 
 /* NPC Traits — dynamic multi-column */

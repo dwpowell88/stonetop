@@ -4,6 +4,7 @@ import { createStonetopItemClass } from "./src/item/StonetopItem.js";
 import { StonetopActorSheet } from "./src/actors/StonetopActorSheet.js";
 import { createStonetopCharacterSheetClass } from "./src/actors/character/StonetopCharacterSheet.js";
 import { createStonetopSteadingSheetClass } from "./src/actors/steading/StonetopSteadingSheet.js";
+import { createStonetopNpcSheetClass } from "./src/actors/npc/StonetopNpcSheet.js";
 import { createStonetopMoveSheetClass } from "./src/item/StonetopMoveSheet.js";
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
@@ -68,6 +69,13 @@ Hooks.once("init", () => {
 		types: ["character"],
 		makeDefault: true,
 		label: "Stonetop Character Sheet",
+	});
+
+	const StonetopNpcSheet = createStonetopNpcSheetClass(StonetopActorSheet);
+	foundry.documents.collections.Actors.registerSheet("stonetop", StonetopNpcSheet, {
+		types: ["npc"],
+		makeDefault: true,
+		label: "Stonetop NPC Sheet",
 	});
 
 	const StonetopSteadingSheet = createStonetopSteadingSheetClass(foundry.appv1.sheets.ActorSheet);

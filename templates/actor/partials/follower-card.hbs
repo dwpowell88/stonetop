@@ -12,14 +12,12 @@
 	       placeholder="{{localize 'stonetop.followers.notePlaceholder'}}">
 
 	<div class="stonetop-follower-attrs">
-		{{#if damage}}
 		<div class="stonetop-resource stonetop-resource--small stonetop-resource--follower">
 			<button class="stonetop-resource__label stonetop-damage-roll rollable" type="button"
 			        data-roll="{{damage.value}}">{{localize "stonetop.followers.damage"}}</button>
 			<input class="stonetop-resource__input stonetop-follower-damage"
 			       type="text" value="{{damage.value}}" data-slug="{{slug}}">
 		</div>
-		{{/if}}
 		<div class="stonetop-resource stonetop-resource--small stonetop-resource--follower">
 			<span class="stonetop-resource__label">{{localize "stonetop.followers.armor"}}</span>
 			<input class="stonetop-resource__input stonetop-follower-armor"
@@ -38,7 +36,7 @@
 	</div>
 
 	<div class="stonetop-follower-loyalty">
-		<span class="stonetop-follower-loyalty-label">{{localize "stonetop.followers.loyalty"}}</span>
+		<span class="stonetop-follower-label">{{localize "stonetop.followers.loyalty"}}</span>
 		{{> "stonetop.resource-track" resource=loyalty btnClass="stonetop-follower-loyalty-btn" slug=slug}}
 	</div>
 

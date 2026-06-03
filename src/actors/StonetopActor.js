@@ -1,6 +1,7 @@
 import {StonetopCharacter} from "./character/StonetopCharacter.js";
 import {StonetopSteading} from "./steading/StonetopSteading.js";
 import {buildRollContent} from "../utils/rollDisplay.js";
+import { StonetopNpc } from "./npc/StonetopNpc.js";
 
 export function createStonetopActorClass(BaseActor) {
 	return class StonetopActor extends BaseActor {
@@ -16,6 +17,9 @@ export function createStonetopActorClass(BaseActor) {
 			switch (this.type) {
 				case "character":
 					this._typedActor = StonetopCharacter.create(this);
+					break;
+				case "npc":
+					this._typedActor = StonetopNpc.create(this);
 					break;
 				case "steading":
 					this._typedActor = new StonetopSteading(this);
