@@ -3,7 +3,7 @@
 	"id": "stonetop",
 	"title": "Stonetop",
 	"description": "An unofficial system for playing Stonetop in Foundry VTT.",
-	"version": "0.11.0",
+	"version": "0.12.0",
 	"compatibility": {
 		"minimum": "13",
 		"verified": "14"
@@ -120,6 +120,39 @@
 			"path": "packs/steading-improvements",
 			"type": "Item",
 			"system": "stonetop"
+		},
+		{
+			"name": "wider-world-npcs",
+			"label": "Wider World NPCs",
+			"path": "packs/wider-world-npcs",
+			"type": "Actor",
+			"system": "stonetop",
+			"ownership": {
+				"PLAYER": "NONE",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"name": "wider-world-and-other-wonders",
+			"label": "Wider World and Other Wonders",
+			"path": "packs/wider-world-and-other-wonders",
+			"type": "JournalEntry",
+			"system": "stonetop",
+			"ownership": {
+				"PLAYER": "NONE",
+				"ASSISTANT": "OWNER"
+			}
+		},
+		{
+			"name": "wonder-tables",
+			"label": "Wonder Tables",
+			"path": "packs/wonder-tables",
+			"type": "RollTable",
+			"system": "stonetop",
+			"ownership": {
+				"PLAYER": "NONE",
+				"ASSISTANT": "OWNER"
+			}
 		}
 	],
 	"url": "https://github.com/taylor-nightingale/stonetop",

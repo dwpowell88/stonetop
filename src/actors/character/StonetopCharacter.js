@@ -156,6 +156,14 @@ export class StonetopCharacter {
 		await this._possessions.deselect(slug);
 	}
 
+	async deletePossession(slug) {
+		await this._possessions.deletePossession(slug);
+	}
+
+	async setPossessionChoiceValue(possessionSlug, optionSlug, value) {
+		await this._possessions.setChoiceValue(possessionSlug, optionSlug, value);
+	}
+
 	async setPossessionUses(slug, count) {
 		await this._possessions.setUses(slug, count);
 	}
@@ -290,6 +298,14 @@ export class StonetopCharacter {
 		await this._arcana.setBackChoiceValue(arcanumSlug, optionSlug, count);
 	}
 
+	async setArcanumUnlockPick(arcanumSlug, optionSlug, siblingsCsv) {
+		await this._arcana.setUnlockPick(arcanumSlug, optionSlug, siblingsCsv);
+	}
+
+	async setArcanumUnlockText(arcanumSlug, optionSlug, text) {
+		await this._arcana.setUnlockText(arcanumSlug, optionSlug, text);
+	}
+
 	async setBackgroundResource(slug, count) {
 		await this._background.setResource(slug, count);
 	}
@@ -323,6 +339,8 @@ export class StonetopCharacter {
 				return await this._followers.setChoiceValue(group, "choices", option, siblingsCsv);
 			case "background":
 				return this._background.setChoiceValue(group, option, checked ? 1 : 0);
+			case "arcana-unlock":
+				return await this._arcana.setUnlockPick(group, option, siblingsCsv);
 		}
 	}
 
@@ -337,6 +355,8 @@ export class StonetopCharacter {
 				return await this._followers.setChoiceText(group, option, value);
 			case "move":
 				return await this._moves.setMoveChoiceText(group, option, value);
+			case "arcana-unlock":
+				return await this._arcana.setUnlockText(group, option, value);
 		}
 	}
 

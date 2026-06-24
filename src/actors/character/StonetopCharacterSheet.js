@@ -123,6 +123,7 @@ export function createStonetopCharacterSheetClass(Base) {
 			html.find(".stonetop-inv-delete").on("click", this._onDeleteCustomInventoryItem.bind(this));
 			html.find(".stonetop-outfit-load-radio").on("change", this._onOutfitLoad.bind(this));
 			html.find(".stonetop-possession-check").on("change", this._onPossessionCheck.bind(this));
+			html.find(".stonetop-possession-delete").on("click", this._onDeletePossession.bind(this));
 			html.find(".stonetop-possession-sub-check").on("change", this._onPossessionSubCheck.bind(this));
 			html.find(".stonetop-possession-sub-radio").on("change", this._onPossessionSubRadio.bind(this));
 			html.find(".stonetop-regular-pool-btn").on("change", this._onRegularPool.bind(this));
@@ -139,6 +140,10 @@ export function createStonetopCharacterSheetClass(Base) {
 			// Narrow-layout moves sidebar: toggle the slide-over overlay.
 			html.find(".stonetop-moves-toggle").on("click", ev => {
 				ev.currentTarget.closest(".stonetop-sheet-layout")?.classList.toggle("moves-open");
+			});
+			// Collapse the header + stats/portrait so the tabbed content fills the sheet.
+			html.find(".stonetop-top-toggle").on("click", ev => {
+				ev.currentTarget.closest(".sheet-wrapper")?.classList.toggle("top-collapsed");
 			});
 			html.find(".stonetop-basic-move-open").on("click", async ev => {
 				const { compendiumId } = ev.currentTarget.dataset;
@@ -201,6 +206,12 @@ export function createStonetopCharacterSheetClass(Base) {
 				if (!el) return;
 				const { cgContext, cgGroup, cgOption, cgIndex } = el.dataset;
 				const count = el.checked ? Number(cgIndex) + 1 : Number(cgIndex);
+				const possEl = el.closest("[data-possession-slug]");
+				if (possEl) {
+					await this._stonetopCharacter.setPossessionChoiceValue(
+						possEl.dataset.possessionSlug, cgOption, count);
+					return;
+				}
 				const insertEl = el.closest("[data-insert-item-id]");
 				if (insertEl) {
 					await this._stonetopCharacter.setInsertChoiceCount(
@@ -229,7 +240,14 @@ export function createStonetopCharacterSheetClass(Base) {
 
 			html[0].addEventListener("change", async ev => {
 				const el = ev.target.closest(".stonetop-cg-text");
-				if (!el?.dataset.cgContext) return;
+				if (!el) return;
+				const possEl = el.closest("[data-possession-slug]");
+				if (possEl) {
+					await this._stonetopCharacter.setPossessionChoiceValue(
+						possEl.dataset.possessionSlug, el.dataset.cgOption, el.value);
+					return;
+				}
+				if (!el.dataset.cgContext) return;
 				const { cgContext, cgGroup, cgOption } = el.dataset;
 				const insertEl = el.closest("[data-insert-item-id]");
 				if (insertEl) {
@@ -474,6 +492,10 @@ export function createStonetopCharacterSheetClass(Base) {
 			} else {
 				await this._stonetopCharacter.deselectPossession(slug);
 			}
+		}
+
+		async _onDeletePossession(ev) {
+			await this._stonetopCharacter.deletePossession(ev.currentTarget.dataset.slug);
 		}
 
 		async _onPossessionUseChange(ev) {

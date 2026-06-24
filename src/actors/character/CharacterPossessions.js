@@ -38,6 +38,14 @@ export class CharacterPossessions {
 		await this._outfitItems?.deleteBySource("possession:" + slug);
 	}
 
+	// Remove a drag-dropped (non-playbook) possession entirely, along with any outfit items it granted.
+	async deletePossession(slug) {
+		const item = _findPossessionItem(this._actor, slug);
+		if (!item) return;
+		await this._outfitItems?.deleteBySource("possession:" + slug);
+		await this._actor.deleteEmbeddedDocuments("Item", [item._id]);
+	}
+
 	async setUses(slug, count) {
 		const item = _findPossessionItem(this._actor, slug);
 		if (!item) return;
@@ -89,6 +97,20 @@ export class CharacterPossessions {
 		}]);
 	}
 
+	// Persist any other choice-group value on a possession — entry fill-tracks (count) and
+	// text/fill-in inputs (text). Keyed by the possession slug, which buildSnapshot forces the
+	// choice group's slug to match so reads line up with these writes.
+	async setChoiceValue(possessionSlug, optionSlug, value) {
+		const item = _findPossessionItem(this._actor, possessionSlug);
+		if (!item) return;
+		const cv = new ChoiceValues(item.system?.pickValues ?? {});
+		await this._actor.updateEmbeddedDocuments("Item", [{
+			_id: item._id,
+			system: { pickValues: cv.set(possessionSlug, optionSlug, value).toRaw() },
+		}]);
+		await this.syncPossessionItems(possessionSlug);
+	}
+
 	async addPossessionsFromPlaybook(sp, playbookSlug) {
 		if (!sp || !this._possessionRepo) return;
 		const { preselected = [], slugs = [] } = sp;
@@ -98,10 +120,9 @@ export class CharacterPossessions {
 			const possession = await this._possessionRepo.findBySlug(slug);
 			if (!possession) continue;
 			await this._actor.createEmbeddedDocuments("Item", [{
-				name: possession.label, type: "possession",
+				name: possession.name, type: "possession",
 				system: {
 					slug:         possession.slug,
-					label:        possession.label,
 					description:  possession.description,
 					resource:     possession.resource,
 					outfitItems:  possession.outfitItems,
@@ -197,7 +218,7 @@ export class CharacterPossessions {
 			const pickValues = new ChoiceValues(item.system?.pickValues ?? {});
 			return new PossessionItemSnapshotBuilder()
 				.withSlug(p.slug)
-				.withLabel(p.label)
+				.withLabel(item.name)
 				.withDescription(p.description ?? "")
 				.withSelected(isSelected)
 				.withChecked(isSelected)
@@ -206,12 +227,13 @@ export class CharacterPossessions {
 				.withPreselectedSource(isPre ? "Starting" : null)
 				.withResource(resource)
 				.withUsesLabel(resourceDef?.title ?? null)
-				.withChoices(isSelected && p.choices ? ChoiceGroup.fromPackData(p.choices, pickValues) : null)
+				.withChoices(isSelected && p.choices ? ChoiceGroup.fromPackData({ ...p.choices, slug: p.slug }, pickValues) : null)
 				.build();
 		});
 
 		for (const item of embeddedItems) {
 			const p = new Possession(item.system);
+			const isSelected = item.system?.selected ?? false;
 			const resourceDef = p.resource ?? null;
 			const currentUses = item.system?.uses ?? 0;
 			const resource = resourceDef
@@ -220,16 +242,17 @@ export class CharacterPossessions {
 			const pickValues = new ChoiceValues(item.system?.pickValues ?? {});
 			items.push(new PossessionItemSnapshotBuilder()
 				.withSlug(p.slug)
-				.withLabel(p.label)
+				.withLabel(item.name)
 				.withDescription(p.description ?? "")
-				.withSelected(true)
-				.withChecked(true)
+				.withSelected(isSelected)
+				.withChecked(isSelected)
 				.withDisabled(false)
 				.withPreselected(false)
 				.withPreselectedSource(null)
+				.withRemovable(true)
 				.withResource(resource)
 				.withUsesLabel(resourceDef?.title ?? null)
-				.withChoices(p.choices ? ChoiceGroup.fromPackData(p.choices, pickValues) : null)
+				.withChoices(p.choices ? ChoiceGroup.fromPackData({ ...p.choices, slug: p.slug }, pickValues) : null)
 				.build());
 		}
 

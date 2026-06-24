@@ -7,11 +7,14 @@ import { createStonetopSteadingSheetClass } from "./src/actors/steading/Stonetop
 import { createStonetopNpcSheetClass } from "./src/actors/npc/StonetopNpcSheet.js";
 import { createStonetopMoveSheetClass } from "./src/item/StonetopMoveSheet.js";
 import { createStonetopInsertSheetClass } from "./src/item/StonetopInsertSheet.js";
+import { createStonetopArcanumSheetClass } from "./src/item/StonetopArcanumSheet.js";
+import { createStonetopPossessionSheetClass } from "./src/item/StonetopPossessionSheet.js";
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
 import { info } from "./src/utils/logger.js";
 import { renderMarkdown } from "./src/utils/enrichGameText.js";
+import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
 import { CharacterData } from "./src/data/CharacterData.js";
 import { NpcData } from "./src/data/NpcData.js";
 import { SteadingData } from "./src/data/SteadingData.js";
@@ -44,6 +47,7 @@ Hooks.once("init", () => {
 	});
 
 	registerSettings();
+	registerDrawTableEnricher();
 
 	Handlebars.registerHelper("resourceChecks", resource => {
 		if (!resource) return [];
@@ -77,6 +81,13 @@ Hooks.once("init", () => {
 	});
 	Handlebars.registerHelper("gt", (a, b) => a > b);
 	Handlebars.registerHelper("eq", (a, b) => a === b);
+	Handlebars.registerHelper("join", (arr, sep) => (Array.isArray(arr) ? arr.join(typeof sep === "string" ? sep : ", ") : ""));
+	Handlebars.registerHelper("concat", (...args) => args.slice(0, -1).join(""));
+
+	// Render stored markdown -> HTML synchronously (no auto-roll for prose). Explicit
+	// [[ ]] rolls / @UUID links survive as text and are made clickable post-render by
+	// enrichRichTokens(). Use on .stonetop-rich containers: {{{md description}}}
+	Handlebars.registerHelper("md", text => new Handlebars.SafeString(renderMarkdown(text ?? "")));
 
 	// Render stored markdown -> HTML synchronously (no auto-roll for prose). Explicit
 	// [[ ]] rolls / @UUID links survive as text and are made clickable post-render by
@@ -130,6 +141,20 @@ Hooks.once("init", () => {
 		label: "Stonetop Insert Sheet",
 	});
 
+	const StonetopArcanumSheet = createStonetopArcanumSheetClass(foundry.appv1.sheets.ItemSheet);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopArcanumSheet, {
+		types: ["arcanum"],
+		makeDefault: true,
+		label: "Stonetop Arcanum Sheet",
+	});
+
+	const StonetopPossessionSheet = createStonetopPossessionSheetClass(foundry.appv1.sheets.ItemSheet);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopPossessionSheet, {
+		types: ["possession"],
+		makeDefault: true,
+		label: "Stonetop Possession Sheet",
+	});
+
 	foundry.applications.handlebars.loadTemplates({
 		"stonetop.actor-header":     "systems/stonetop/templates/actor/partials/actor-header.hbs",
 		"stonetop.actor-stats":      "systems/stonetop/templates/actor/partials/actor-stats.hbs",
@@ -157,9 +182,13 @@ Hooks.once("init", () => {
 		"stonetop.section-heading":  "systems/stonetop/templates/actor/partials/section-heading.hbs",
 		"stonetop.section-sub-heading":  "systems/stonetop/templates/actor/partials/section-sub-heading.hbs",
 		"stonetop.resource-track":   "systems/stonetop/templates/actor/partials/resource-track.hbs",
+		"stonetop.outfit-item-row":  "systems/stonetop/templates/actor/partials/outfit-item-row.hbs",
 		"stonetop.steading":              "systems/stonetop/templates/actor/steading.hbs",
 		"stonetop.choices-entry-fields":  "systems/stonetop/templates/item/partials/choices-entry-fields.hbs",
 		"stonetop.choice-group-editor":   "systems/stonetop/templates/item/partials/choice-group-editor.hbs",
+		"stonetop.arcanum-item-def":      "systems/stonetop/templates/item/partials/arcanum-item-def.hbs",
+		"stonetop.arcanum-resource":      "systems/stonetop/templates/item/partials/arcanum-resource.hbs",
+		"stonetop.arcanum-mystery-move":  "systems/stonetop/templates/item/partials/arcanum-mystery-move.hbs",
 	});
 });
 

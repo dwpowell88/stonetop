@@ -22,10 +22,9 @@ function makePossessionItem(p, opts = {}) {
 	return {
 		_id:    p.slug + "-item",
 		type:   "possession",
-		name:   p.label ?? p.slug,
+		name:   p.name ?? p.slug,
 		system: {
 			slug:         p.slug,
-			label:        p.label        ?? "",
 			description:  p.description  ?? "",
 			resource:     p.resource     ?? null,
 			outfitItems:  p.outfitItems  ?? [],
@@ -589,6 +588,58 @@ describe("CharacterPossessions — outfit item integration", () => {
 	});
 });
 
+// -- setChoiceValue: entry tracks / text inputs ────────────────────────────────
+
+describe("CharacterPossessions — setChoiceValue", () => {
+	const [smithy] = outfitPossessions();
+
+	it("persists a numeric track value under the possession slug in pickValues", async () => {
+		const actor = makeActor([makePossessionItem(smithy)]);
+		const cp = new CharacterPossessions(actor, makeMoves(), makeOutfitItems());
+		await cp.setChoiceValue("smithy", "forge-track", 2);
+		const item = [...actor.items].find(i => i.system.slug === "smithy");
+		expect(item.system.pickValues.smithy["forge-track"]).toBe(2);
+	});
+
+	it("persists a text input value", async () => {
+		const actor = makeActor([makePossessionItem(smithy)]);
+		const cp = new CharacterPossessions(actor, makeMoves(), makeOutfitItems());
+		await cp.setChoiceValue("smithy", "note-input", "a sword");
+		const item = [...actor.items].find(i => i.system.slug === "smithy");
+		expect(item.system.pickValues.smithy["note-input"]).toBe("a sword");
+	});
+});
+
+// -- choice-value keying: group slug is forced to the possession slug ───────────
+
+describe("CharacterPossessions — choice-value keying", () => {
+	it("renders selected picks when the choice group slug differs from the possession slug", async () => {
+		const possession = new TestPossessionBuilder()
+			.withSlug("sacred-pouch")
+			.withChoices(new TestChoiceGroupBuilder()
+				.withSlug("choices") // authoring sheet default — not the possession slug
+				.addChoice(TestChoiceRowBuilder.pick().withOptions(
+					{ slug: "mace", label: "Mace" },
+					{ slug: "axe",  label: "Axe" },
+				))
+				.build())
+			.build();
+		const actor = makeActor([
+			makePlaybookItem(baseSp()),
+			makePossessionItem(possession, {
+				playbookSlug: "test-playbook", selected: true,
+				pickValues: { "sacred-pouch": { mace: 1 } }, // keyed by possession slug
+			}),
+		]);
+		const cp = new CharacterPossessions(actor, makeMoves());
+		const snap = await cp.buildSnapshot(1);
+		const item = snap.items.find(i => i.slug === "sacred-pouch");
+		const pickRow = item.choices.list.find(r => r.type === "choice");
+		expect(pickRow.options.find(o => o.slug === "mace").checked).toBe(true);
+		expect(pickRow.options.find(o => o.slug === "axe").checked).toBe(false);
+	});
+});
+
 // -- buildSnapshot — embedded items ────────────────────────────────────────────
 
 describe("CharacterPossessions — buildSnapshot — embedded items", () => {
@@ -609,7 +660,7 @@ describe("CharacterPossessions — buildSnapshot — embedded items", () => {
 			_id: slug + "-dropped", type: "possession",
 			name: label,
 			system: {
-				slug, label, description: "", resource: null,
+				slug, description: "", resource: null,
 				outfitItems: [], choices: null, scaling: null, sortOrder: null,
 				selected: false, preselected: false, uses: 0,
 				pickValues: {}, choiceUses: {}, playbookSlug: null,
@@ -623,13 +674,31 @@ describe("CharacterPossessions — buildSnapshot — embedded items", () => {
 		expect(snap.items).toHaveLength(4);
 	});
 
-	it("drag-dropped possession is selected, not disabled, not preselected", async () => {
+	it("drag-dropped possession is unchecked by default, not disabled, not preselected", async () => {
 		const cp = makeCpWithEmbedded([droppedItem("smithy", "Smithy")]);
 		const snap = await cp.buildSnapshot(1);
 		const smithy = snap.items.find(i => i.slug === "smithy");
-		expect(smithy.selected).toBe(true);
+		expect(smithy.selected).toBe(false);
+		expect(smithy.checked).toBe(false);
 		expect(smithy.disabled).toBe(false);
 		expect(smithy.preselected).toBe(false);
+	});
+
+	it("drag-dropped possession honors stored selected state", async () => {
+		const dropped = droppedItem("smithy", "Smithy");
+		dropped.system.selected = true;
+		const cp = makeCpWithEmbedded([dropped]);
+		const snap = await cp.buildSnapshot(1);
+		const smithy = snap.items.find(i => i.slug === "smithy");
+		expect(smithy.selected).toBe(true);
+		expect(smithy.checked).toBe(true);
+	});
+
+	it("drag-dropped possession is removable; playbook ones are not", async () => {
+		const cp = makeCpWithEmbedded([droppedItem("smithy")]);
+		const snap = await cp.buildSnapshot(1);
+		expect(snap.items.find(i => i.slug === "smithy").removable).toBe(true);
+		expect(snap.items.find(i => i.slug === "apiary").removable).toBeFalsy();
 	});
 
 	it("drag-dropped possession appears after playbook possessions", async () => {
@@ -642,6 +711,35 @@ describe("CharacterPossessions — buildSnapshot — embedded items", () => {
 		const cp = makeCpWithEmbedded([droppedItem("apiary")]);
 		const snap = await cp.buildSnapshot(1);
 		expect(snap.items).toHaveLength(3);
+	});
+});
+
+// -- deletePossession ──────────────────────────────────────────────────────────
+
+describe("CharacterPossessions — deletePossession", () => {
+	function droppedItem(slug) {
+		return {
+			_id: slug + "-dropped", type: "possession", name: slug,
+			system: { slug, description: "", resource: null, outfitItems: [], choices: null,
+				scaling: null, sortOrder: null, selected: false, preselected: false, uses: 0,
+				pickValues: {}, choiceUses: {}, playbookSlug: null },
+		};
+	}
+
+	it("deletes the embedded item and clears its granted outfit items", async () => {
+		const outfitItems = makeOutfitItems();
+		const actor = makeActor([droppedItem("smithy")]);
+		const cp = new CharacterPossessions(actor, makeMoves(), outfitItems);
+		await cp.deletePossession("smithy");
+		expect(actor.deletedIds).toContain("smithy-dropped");
+		expect(outfitItems._deletedSources).toContain("possession:smithy");
+	});
+
+	it("is a no-op for an unknown slug", async () => {
+		const actor = makeActor([droppedItem("smithy")]);
+		const cp = new CharacterPossessions(actor, makeMoves(), makeOutfitItems());
+		await cp.deletePossession("nope");
+		expect(actor.deletedIds).toHaveLength(0);
 	});
 });
 
