@@ -2211,7 +2211,7 @@ body,
 	min-height: 260px;
 	border-width: 28px;
 	border-style: solid;
-	border-image: url('/systems/stonetop/assets/content/arcana/arcana-card-border.png') 40 / 28px stretch;
+	border-image: url('/systems/stonetop/assets/ui/decor/arcana-card-border.png') 40 / 28px stretch;
 }
 
 .stonetop-arcanum-header {
