@@ -80,7 +80,9 @@ body,
 }
 
 #pause img {
-	--fa-animation-duration: 15s
+	--fa-animation-duration: 15s;
+	width: 160px;
+	height: 160px;
 }
 
 #pause figcaption {
