@@ -8,6 +8,7 @@
     "test:watch": "vitest",
     "pack": "node scripts/pack.js",
     "unpack": "node scripts/unpack.js",
+    "extract-art": "node scripts/import/pdf/extract-art.js",
     "reorganize-packs": "node scripts/reorganize-playbook-moves.js"
   },
   "devDependencies": {

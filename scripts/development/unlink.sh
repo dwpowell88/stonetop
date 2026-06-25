@@ -18,3 +18,9 @@ fi
 
 rm "$LINK_PATH"
 echo "Removed: $LINK_PATH"
+
+ART_LINK="$FOUNDRY_DATA_PATH/stonetop-art"
+if [ -L "$ART_LINK" ]; then
+  rm "$ART_LINK"
+  echo "Removed: $ART_LINK"
+fi

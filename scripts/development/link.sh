@@ -25,3 +25,13 @@ fi
 
 ln -s "$REPO_ROOT" "$LINK_PATH"
 echo "Linked: $LINK_PATH -> $REPO_ROOT"
+
+# Also link the copyrighted illustration store so packs that reference `stonetop-art/...`
+# (resolved relative to the Foundry data root) resolve in a linked dev world. See stonetop-art/README.md.
+ART_LINK="$FOUNDRY_DATA_PATH/stonetop-art"
+if [ -e "$ART_LINK" ] || [ -L "$ART_LINK" ]; then
+  echo "Note: $ART_LINK already exists — leaving it as-is."
+else
+  ln -s "$REPO_ROOT/stonetop-art" "$ART_LINK"
+  echo "Linked: $ART_LINK -> $REPO_ROOT/stonetop-art"
+fi
