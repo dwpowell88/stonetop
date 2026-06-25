@@ -103,8 +103,13 @@ export function extractPageArt(pdf, page, outDir, slug, { minW = 40, minH = 40, 
 			const hash = sha256(readFileSync(src));
 			dest = dedup.index.get(hash);
 			if (!dest) {
-				mkdirSync(dedup.dir, { recursive: true });
-				dest = path.join(dedup.dir, `${hash}.png`);
+				// Recurring marker/bullet glyphs (trade dress) are routed by sha256 to a committed,
+				// human-named file under `dedup.markers.dir`; every other image is a copyrighted
+				// illustration, content-addressed into the gitignored `dedup.dir` store.
+				const markerName = dedup.markers?.map?.[hash];
+				const outForHash = markerName ? dedup.markers.dir : dedup.dir;
+				mkdirSync(outForHash, { recursive: true });
+				dest = path.join(outForHash, `${markerName ?? hash}.png`);
 				moveFile(src, dest);
 				dedup.index.set(hash, dest);
 			}

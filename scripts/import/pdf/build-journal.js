@@ -6,7 +6,7 @@
 // packs/src/wider-world-and-other-wonders/<slug>.json. Deterministic ids — the npc back-links
 // (creatures.js journalUuid) resolve to these entries.
 import { execFileSync } from "child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readdirSync } from "fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readdirSync, readFileSync } from "fs";
 import os from "os";
 import path from "path";
 import { loadOutline, articleRanges } from "./outline.js";
@@ -27,10 +27,17 @@ const PDF = process.env.BOOK_PDF ?? "helper/Book_II_-_The_Wider_World_and_Other_
 const OUT = `packs/src/${JOURNAL_PACK}`;
 const ASSET_DIR = "assets/content/wonders";                       // committed art, on disk
 const ASSET_URL = "systems/stonetop/assets/content/wonders";      // how Foundry serves it
-const SHARED_DIR = `${ASSET_DIR}/shared`;                         // content-addressed, deduped images
 const DECOR_DIR = `${ASSET_DIR}/decor`;                           // journal chrome (chain, rule)
 const DECOR_URL = `${ASSET_URL}/decor`;
 const UI_DECOR_DIR = "assets/ui/decor";                           // shared UI glyphs (swirl bullets)
+// Recurring marker/bullet glyphs are trade dress → committed, human-named, shipped in the system.
+const MARKERS_DIR = `${ASSET_DIR}/markers`;
+const MARKERS_URL = `${ASSET_URL}/markers`;
+const MARKERS = JSON.parse(readFileSync("scripts/import/pdf/trade-dress.json", "utf8")).markers;
+// Copyrighted illustrations → content-addressed into the gitignored external `stonetop-art/` root
+// (resolves to Foundry's Data/stonetop-art/, outside the system install). Never committed.
+const SHARED_DIR = "stonetop-art/wonders";
+const SHARED_URL = "stonetop-art/wonders";
 
 function totalPages() {
 	const out = execFileSync("mutool", ["info", PDF], { encoding: "utf8" });
@@ -67,7 +74,8 @@ if (wanted.length && build.length !== wanted.length) for (const t of wanted) if 
 mkdirSync(OUT, { recursive: true });
 if (!wanted.length) {
 	for (const f of readdirSync(OUT).filter((n) => n.endsWith(".json"))) rmSync(path.join(OUT, f)); // full rebuild
-	rmSync(ASSET_DIR, { recursive: true, force: true }); // clear old per-article + shared art so dedup starts clean
+	rmSync(ASSET_DIR, { recursive: true, force: true });   // clear committed wonders art (markers/decor regenerated below)
+	rmSync(SHARED_DIR, { recursive: true, force: true });  // clear the external illustration store so dedup starts clean
 }
 
 // Journal chrome (chain/rule) → content/wonders/decor; the swirl list-bullet glyphs are shared UI
@@ -97,8 +105,13 @@ for (const [i, r] of build.entries()) {
 		const { pages, pageRules, pageImages } = loadArticlePages(PDF, r, {
 			imgDir: scratch,
 			imgPrefix: slug,
-			dedup: { index: dedup, dir: SHARED_DIR },
-			mapFile: (f) => `${ASSET_URL}/${path.relative(ASSET_DIR, f)}`,
+			dedup: { index: dedup, dir: SHARED_DIR, markers: { dir: MARKERS_DIR, map: MARKERS } },
+			mapFile: (f) => {
+				const rel = path.relative(MARKERS_DIR, f);
+				return rel.startsWith("..") || path.isAbsolute(rel)
+					? `${SHARED_URL}/${path.relative(SHARED_DIR, f)}`   // copyrighted illustration (external root)
+					: `${MARKERS_URL}/${rel}`;                          // trade-dress marker glyph (system path)
+			},
 		});
 		art = extractArticle(pages, { title: r.title, pageRules, pageImages });
 		annotateTables(art, { slug, title: r.title }); // stamp dice tables → inline @DrawTable links
