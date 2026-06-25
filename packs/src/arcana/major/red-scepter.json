@@ -3,7 +3,7 @@
 	"_key": "!items!owVnAXfeM4rOBEnw",
 	"name": "Red Scepter",
 	"type": "arcanum",
-	"img": "systems/stonetop/assets/content/arcana/red-scepter.png",
+	"img": "stonetop-art/arcana/red-scepter.png",
 	"system": {
 		"slug": "red-scepter",
 		"front": {

@@ -22,5 +22,11 @@ test-scripts/
 # Working notes, plans, source PDFs, previews — never committed (incl. the copyrighted book PDF)
 helper/
 
+# Copyrighted book illustrations — never committed. Referenced by packs as `stonetop-art/...`
+# (resolves to Foundry's Data/stonetop-art/). Regenerate from a book you own with
+# `npm run extract-art`; see stonetop-art/README.md (the only tracked file here).
+/stonetop-art/*
+!/stonetop-art/README.md
+
 # Raw mutool stext dumps — large; compact *.lines.json fixtures are committed instead
 tests/import/pdf/fixtures/*.stext.xml
