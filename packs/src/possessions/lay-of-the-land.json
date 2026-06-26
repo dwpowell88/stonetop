@@ -7,7 +7,7 @@
 	"system": {
 		"slug": "lay-of-the-land",
 		"label": "Lay of the land",
-		"description": "○○○ uses: your intimate knowledge of the terrain within two days' march. Expend a use to ask the GM a question about what's out there; the GM answers honestly.",
+		"description": "expend a use to know where to find ___, without having to Know Things; GM can veto",
 		"resource": {
 			"max": 3,
 			"title": null,

@@ -16,14 +16,14 @@ contains only "trade dress" (UI chrome and the small marker glyphs under
 | -------------------- | ---------------------------- | ---------------------------------------- |
 | `wonders/<hash>.png` | Book II                      | `npm run extract-art -- <Book_II.pdf>`   |
 | `arcana/<slug>.png`  | Book II (separate tool)      | supply manually                          |
-| `steading/*.png`     | core book (Book I)           | supply manually                          |
-| `playbooks/*.png`    | core book (Book I)           | supply manually                          |
+| `steading/*.png`     | core book (Book I)           | supply manually (fortunes/residents/surplus only) |
 
 `npm run extract-art` reliably regenerates only the **wonders** illustrations: they are
 content-addressed (`<sha256>.png`) by the same pipeline that produced the shipped references, so the
 filenames always match. The **arcana** images were cropped/processed with a separate CLI tool (raw
-PDF extraction does not reproduce them byte-for-byte), and **steading/playbook** art comes from the
-core book — supply all three manually by dropping correctly-named files into the matching subfolder.
+PDF extraction does not reproduce them byte-for-byte), and the remaining **steading** illustrations
+come from the core book — supply both manually by dropping correctly-named files into the matching
+subfolder.
 
 ## Using it on a Foundry server
 

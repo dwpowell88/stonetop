@@ -5,7 +5,7 @@
 	"type": "possession",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
-		"slug": "weapons-of-war",
+		"slug": "weapons-of-war-marshal",
 		"label": "Weapons of war",
 		"description": "",
 		"resource": null,

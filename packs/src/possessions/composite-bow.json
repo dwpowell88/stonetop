@@ -7,9 +7,25 @@
 	"system": {
 		"slug": "composite-bow",
 		"label": "Composite bow",
-		"description": "*near/far*, 2 piercing. A powerful, well-crafted bow that can reach far and punch through armor.",
+		"description": "◇ (*far*, +1 damage, x piercing; ○ low ammo, ○ all out)",
 		"resource": null,
-		"outfitItems": [],
+		"outfitItems": [
+			{
+				"slug": "composite-bow",
+				"name": "Composite Bow",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "far",
+				"note": "+1 damage, _x_ piercing",
+				"resource": {
+					"max": 2,
+					"labels": [
+						"low ammo",
+						"all out"
+					]
+				}
+			}
+		],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null

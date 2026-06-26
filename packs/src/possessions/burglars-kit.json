@@ -11,19 +11,19 @@
 		"resource": null,
 		"outfitItems": [
 			{
-				"slug": "burglar-prybars",
+				"slug": "prybars",
 				"name": "Prybars",
 				"weight": 1,
 				"inventoryColumn": "regular"
 			},
 			{
-				"slug": "burglar-hacksaws",
+				"slug": "hacksaws",
 				"name": "Hacksaws",
 				"weight": 1,
 				"inventoryColumn": "regular"
 			},
 			{
-				"slug": "burglar-lantern",
+				"slug": "lantern",
 				"name": "Lantern",
 				"weight": 1,
 				"inventoryColumn": "regular",

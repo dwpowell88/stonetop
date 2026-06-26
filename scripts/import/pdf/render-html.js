@@ -127,6 +127,9 @@ function renderListItem(lines) {
 	let html = joinLines(lines).replace(/^(?:[•◦‣▪]\s*)/, "");
 	// A leading "ä" is the book's stylized arrow bullet → strip it and mark the item.
 	if (/^ä\s/.test(html)) { cls = "arrow"; html = html.replace(/^ä\s*/, ""); }
+	// A leading square marker (□/◻, from the vector layer) is a pick/track checkbox → render it as a
+	// checkbox bullet (CSS ::before) instead of leaving the glyph inline.
+	if (/^[□◻]/.test(html)) { cls = "checkbox"; html = html.replace(/^[□◻]+\s*/, ""); }
 	return { cls, html };
 }
 

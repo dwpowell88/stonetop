@@ -61,7 +61,7 @@ const isValueHeaderRow = (row) => row.cells.length >= 2 && /^value$/i.test(row.c
 // A check-marker cell (◇/○) injected from the vector layer (load.js). In a value table these are the
 // per-item checkbox glyphs; they sometimes land on their own row (a y-quantisation split) or as the
 // leading cell of an item row, so they must be skipped/stripped when reading the table.
-const isMarkerCell = (c) => c.font === "marker" || /^[◇○]+$/.test((c.text || "").trim());
+const isMarkerCell = (c) => c.font === "marker" || /^[◇○□◻]+$/.test((c.text || "").trim());
 const rowContentCells = (row) => row.cells.filter((c) => !isMarkerCell(c));
 // First value row at/after `from`, skipping lone ◇/○ checkbox-marker rows; -1 if the next content
 // row isn't a value row. Lets the value-table branch start past markers (Barrier Pass arms-and-armor).
@@ -78,7 +78,7 @@ const leadSpaces = (l) => (l.text.match(/^ */)[0].length);
 // (see joinLines), kept under its prompt rather than turned into a separate <li>.
 const isItemStart = (l) =>
 	(l.spans.length > 0 && (isDingbat(l.spans[0].font) || /^swirl/.test(l.spans[0].font)))
-	|| /^[•◦‣▪○◇●◆]/.test(l.text.trim()) || /^ä\s/.test(l.text.trim()) || leadSpaces(l) === 2;
+	|| /^[•◦‣▪○◇●◆□◻]/.test(l.text.trim()) || /^ä\s/.test(l.text.trim()) || leadSpaces(l) === 2;
 // A short, fully-AVARA line standing alone is a run-in sub-heading, e.g. "Various treasures" or the
 // Impressions seasons ("Spring"). The display (Avara) face is the signal: a bold BODY line
 // (ACaslonPro-Bold) is a lead-in label or a bolded sentence, not a heading — e.g. Barrow's "Everyone

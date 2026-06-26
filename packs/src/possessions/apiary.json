@@ -11,13 +11,13 @@
 		"resource": null,
 		"outfitItems": [
 			{
-				"slug": "apiary-bee-smokers",
+				"slug": "bee-smokers",
 				"name": "Bee smokers",
 				"weight": 1,
 				"inventoryColumn": "regular"
 			},
 			{
-				"slug": "apiary-hat-veils",
+				"slug": "hat-veils",
 				"name": "Hat & veils",
 				"weight": 1,
 				"inventoryColumn": "regular"

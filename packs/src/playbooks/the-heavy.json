@@ -1,7 +1,7 @@
 {
   "_id": "thDOuItwerMnLc0i",
   "_key": "!items!thDOuItwerMnLc0i",
-  "img": "stonetop-art/playbooks/the-heavy.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-heavy.png",
   "name": "The Heavy",
   "type": "playbook",
   "flags": {},
@@ -113,7 +113,7 @@
         "husbandry-tools",
         "smithy",
         "stoneworkers-tools",
-        "weapons-of-war"
+        "weapons-of-war-heavy"
       ]
     },
     "choices": [

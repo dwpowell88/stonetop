@@ -7,7 +7,7 @@
 	"system": {
 		"slug": "holy-relics",
 		"label": "Holy relics",
-		"description": "○○○ uses: sacred objects of Helior's worship. Expend a use to add +1 to a roll involving the god's favor or power. Restore 1 use each season.",
+		"description": "if you have one in inventory when you Invoke the Sun God, you can mark a use in lieu of choosing a consequence.",
 		"resource": {
 			"max": 3,
 			"title": null,

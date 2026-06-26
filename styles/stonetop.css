@@ -7,6 +7,13 @@
 	border: none;
 }
 
+/* Hide images that fail to load (tagged by installBrokenImageHider). Our copyrighted
+   illustrations live in the gitignored stonetop-art/ store; when it isn't populated those
+   refs would otherwise show Foundry's broken-image placeholder. */
+img.stonetop-broken-img {
+	display: none;
+}
+
 @font-face {
 	font-family: "StonetopUI";
 	src: url("/systems/stonetop/assets/fonts/Historical-FellTypeRomanSC.ttf") format("truetype");
@@ -4808,6 +4815,13 @@ form.stonetop.sheet.steading {
 .stonetop-wonder li.swirl-point { list-style: none; }
 .stonetop-wonder li.swirl::before { content: ""; display: inline-block; width: 0.9em; height: 0.9em; margin: 0 0.35em 0 -1.3em; vertical-align: -0.12em; background: url(/systems/stonetop/assets/ui/decor/swirl.png) no-repeat left center / contain; }
 .stonetop-wonder li.swirl-point::before { content: ""; display: inline-block; width: 1.4em; height: 0.9em; margin: 0 0.35em 0 -1.7em; vertical-align: -0.12em; background: url(/systems/stonetop/assets/ui/decor/swirl-point.png) no-repeat left center / contain; }
+/* square pick/track checkboxes (the book's □ vector mark) — render an empty box bullet */
+.stonetop-wonder li.checkbox { list-style: none; }
+.stonetop-wonder li.checkbox::before {
+	content: ""; display: inline-block; width: 0.85em; height: 0.85em;
+	margin: 0 0.4em 0 -1.3em; vertical-align: -0.05em;
+	border: 1px solid var(--color-text-dark-3, #444);
+}
 /* stylized arrow bullets (the book's "ä" dingbat) — stat-block moves and ä-lists */
 .stonetop-wonder ul.sb-moves,
 .stonetop-wonder li.arrow { list-style: none; }

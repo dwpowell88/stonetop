@@ -1,7 +1,7 @@
 {
   "_id": "SOzcXGFCdybiyHfO",
   "_key": "!items!SOzcXGFCdybiyHfO",
-  "img": "stonetop-art/playbooks/the-marshal.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-marshal.png",
   "name": "The Marshal",
   "type": "playbook",
   "flags": {},
@@ -114,7 +114,7 @@
         "engineers-tools",
         "personal-symbol",
         "scribes-tools",
-        "weapons-of-war"
+        "weapons-of-war-marshal"
       ]
     },
     "choices": [

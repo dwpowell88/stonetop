@@ -12,6 +12,8 @@ import { createStonetopPossessionSheetClass } from "./src/item/StonetopPossessio
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
+import { onPreCreateActor } from "./src/hooks/PreCreateActor.js";
+import { installBrokenImageHider } from "./src/hooks/HideBrokenImages.js";
 import { info } from "./src/utils/logger.js";
 import { renderMarkdown } from "./src/utils/enrichGameText.js";
 import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
@@ -33,6 +35,8 @@ import "./src/dev/quenchTests.js"; // registers in-Foundry integration tests (no
 // be registered here so they're available before any documents load.
 Hooks.once("init", () => {
 	info("Initializing");
+
+	installBrokenImageHider(); // hide broken-image placeholders when stonetop-art/ illustrations are absent
 
 	Object.assign(CONFIG.Actor.dataModels, { character: CharacterData, npc: NpcData, steading: SteadingData });
 	Object.assign(CONFIG.Item.dataModels, {
@@ -198,3 +202,7 @@ Hooks.once("ready", onReady);
 // -- RENDER ACTOR SHEET ----------------------------------------
 // Fires every time any actor sheet renders.
 Hooks.on("renderActorSheet", onRenderActorSheet);
+
+// -- PRE-CREATE ACTOR ------------------------------------------
+// Give new NPCs our house default icon instead of Foundry's mystery-man.
+Hooks.on("preCreateActor", onPreCreateActor);

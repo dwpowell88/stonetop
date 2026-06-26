@@ -1,7 +1,7 @@
 {
   "_id": "y3RtRdOWxLinZu5e",
   "_key": "!items!y3RtRdOWxLinZu5e",
-  "img": "stonetop-art/playbooks/the-judge.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-judge.png",
   "name": "The Judge",
   "type": "playbook",
   "flags": {},
@@ -94,15 +94,15 @@
       }
     ],
     "specialPossessions": {
-      "pickNote": "Pick 1, in addition to your symbol of authority and scribe's kit",
+      "pickNote": "Pick 1, in addition to your symbol of authority and scribe's tools",
       "pickCount": 1,
       "preselected": [
         "symbol-of-authority",
-        "scribes-kit"
+        "scribes-tools"
       ],
       "slugs": [
         "symbol-of-authority",
-        "scribes-kit",
+        "scribes-tools",
         "aviary",
         "carpenters-tools",
         "engineers-tools",

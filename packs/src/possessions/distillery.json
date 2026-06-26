@@ -15,7 +15,7 @@
 		},
 		"outfitItems": [
 			{
-				"slug": "distillery-firkins",
+				"slug": "firkins",
 				"name": "Firkins",
 				"weight": 2,
 				"inventoryColumn": "regular"
