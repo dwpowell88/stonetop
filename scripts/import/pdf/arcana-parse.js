@@ -63,11 +63,10 @@ export function parseTrack(raw) {
 	return { max: boxes + lRun, text: lRun ? "" : stripped.replace(/\s{2,}/g, " ").trim() };
 }
 
-/** Pull a trailing "(Loyalty ◯◯◯)" off a follower cost line → `{cost, loyaltyMax}`. */
-export function splitLoyalty(costRaw) {
-	const m = costRaw.match(/\(\s*loyalty\s+([○◯\s]+)\)\s*$/i);
-	if (!m) return { cost: costRaw.trim(), loyaltyMax: null };
-	return { cost: costRaw.slice(0, m.index).trim(), loyaltyMax: (m[1].match(/[○◯]/g) || []).length };
+/** Strip a trailing "(Loyalty ◯◯◯)" from a follower cost line. Loyalty is always max 3 (the schema
+ *  default), so the marker count is discarded — we only want the clean cost text. */
+export function stripLoyalty(costRaw) {
+	return costRaw.replace(/\s*\(\s*loyalty[\s○◯l]*\)\s*$/i, "").trim();
 }
 
 /** The item tags line under a title → an outfit-item-shaped object (name = arcanum name, weight from
@@ -152,12 +151,18 @@ export function parseBack(blocks, { slug }) {
 	for (const b of blocks) {
 		if (b.type === "heading" || b.type === "title") {
 			const t = b.line.text.trim();
-			if (/^mysteries of/i.test(t)) back.title = t;
-			else if (/^moves$/i.test(t)) section = "moves";
+			if (/^moves$/i.test(t)) section = "moves";
 			else if (/^consequences$/i.test(t)) section = "consequences";
+			else if (/^(front|back)$/i.test(t) || /^appendix [cd]/i.test(t)) { /* side label / running header */ }
+			else if (!back.title) back.title = t; // first real heading = spell name / "Mysteries of X"
 			continue;
 		}
 		if (b.type === "rule" || b.type === "boxstart" || b.type === "boxend" || b.type === "table" || b.type === "statblock") continue;
+		// A leading tags line right under the spell title → the back item (mirrors the front).
+		if (b.type === "para" && section === null && !back.item && !descParas.length) {
+			const t = joinMd(b.lines);
+			if (b.tags || /^,/.test(t.replace(/^[◇○□◻\s]+/, ""))) { back.item = parseItemLine(t, { name: back.title }); continue; }
+		}
 		if (b.type === "list") {
 			for (const it of b.items) {
 				const raw = rawOf(it);

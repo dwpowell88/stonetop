@@ -387,7 +387,11 @@ function segmentColumn(rows, base) {
 				const gap = rows[i].y0 - prevY;
 				if (l.rule || l.image || l.boxStart || l.boxEnd || isHead(l) || isBoldRunIn(l) || isFellRunIn(l)) break;
 				if (isItemStart(l)) items.push([l]);
-				else if (items.length && (l.bbox[0] > base + 3 || gap <= l.size * 1.7)) items[items.length - 1].push(l);
+				// A continuation hangs under its item — it may be indented past the base or just tight
+				// under it, but it is never far LEFT of the item's own start. A flush body line below an
+				// *indented* bullet (e.g. an arcanum's "◇ tags" line sitting above flush description
+				// prose) is a new block, not a wrap of the bullet.
+				else if (items.length && (l.bbox[0] > base + 3 || gap <= l.size * 1.7) && l.bbox[0] >= items[items.length - 1][0].bbox[0] - 8) items[items.length - 1].push(l);
 				else break;
 				prevY = rows[i].y0; i++;
 			}

@@ -35,26 +35,29 @@ for (const tier of ["minor", "major"]) {
 	}
 }
 
-/** First non-label, non-running-header heading text in a segment. */
-function segHeading(blocks) {
-	for (const b of blocks) {
-		if (b.type !== "heading" && b.type !== "title") continue;
-		if (isLabel(b, /^(front|back)$/i) || isLabel(b, /^appendix [cd]/i)) continue;
-		return b.line.text.trim();
-	}
+// Match a heading (possibly wrapped across 1–2 following blocks) against a name→record map.
+function matchHeading(blocks, i, map) {
+	const b = blocks[i];
+	if (b.type !== "heading" && b.type !== "title") return null;
+	let key = norm(lineText(b));
+	for (let k = 0; k <= 2; k++) { if (map.has(key)) return map.get(key); key += norm(lineText(blocks[i + 1 + k] || {})); }
 	return null;
 }
 
-// Split a flattened block stream into card sides at the "front"/"back" labels.
-function cardSides(blocks) {
-	const sides = []; let cur = [];
-	for (const b of blocks) {
-		cur.push(b);
-		if (isLabel(b, /^front$/i)) { sides.push({ side: "front", blocks: cur }); cur = []; }
-		else if (isLabel(b, /^back$/i)) { sides.push({ side: "back", blocks: cur }); cur = []; }
+// Segment a block stream into per-record chunks anchored on headings that match `map`, each bounded
+// to the side-label `endRe` (so a chunk stops at its "front"/"back" label and trailing neighbour
+// content from another column is excluded). Returns [{ rec, blocks }].
+function segmentBy(blocks, map, endRe) {
+	const out = []; let cur = null;
+	for (let i = 0; i < blocks.length; i++) {
+		const rec = matchHeading(blocks, i, map);
+		if (rec && (!cur || cur.rec.slug !== rec.slug)) { if (cur) out.push(cur); cur = { rec, blocks: [], done: false }; }
+		if (!cur || cur.done) continue;
+		cur.blocks.push(blocks[i]);
+		if (isLabel(blocks[i], endRe)) cur.done = true;
 	}
-	if (cur.length) sides.push({ side: "front", blocks: cur }); // trailing front with no label
-	return sides;
+	if (cur) out.push(cur);
+	return out;
 }
 
 // ── divergence ──────────────────────────────────────────────────────────────
@@ -92,18 +95,12 @@ for (const range of ranges) {
 	const blocks = [];
 	for (const s of art.sections) for (const c of [...s.left, ...s.right]) blocks.push(...c.blocks);
 
-	for (const { side, blocks: bl } of cardSides(blocks)) {
-		const heading = segHeading(bl);
-		if (!heading) continue;
-		if (side === "front") {
-			const rec = byName.get(norm(heading));
-			if (rec) parsedFront.set(rec.slug, parseFront(bl, { name: rec.doc.name, slug: rec.slug }));
-		} else {
-			// match the back side to its arcanum by the existing back.title (oracle for a known set)
-			const rec = byBackTitle.get(norm(heading));
-			if (rec) parsedBack.set(rec.slug, parseBack(bl, { slug: rec.slug }));
-		}
-	}
+	// Fronts: anchored on arcanum names, bounded at the "front" label.
+	for (const { rec, blocks: bl } of segmentBy(blocks, byName, /^front$/i))
+		if (!parsedFront.has(rec.slug)) parsedFront.set(rec.slug, parseFront(bl, { name: rec.doc.name, slug: rec.slug }));
+	// Backs: anchored on the existing back.title (the spell / "Mysteries of X"), bounded at "back".
+	for (const { rec, blocks: bl } of segmentBy(blocks, byBackTitle, /^back$/i))
+		if (!parsedBack.has(rec.slug)) parsedBack.set(rec.slug, parseBack(bl, { slug: rec.slug }));
 }
 
 const reviewBody = [];

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseTrack, stripMarkers, splitLoyalty, parseItemLine, unlockSlug } from "../../../scripts/import/pdf/arcana-parse.js";
+import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug } from "../../../scripts/import/pdf/arcana-parse.js";
 
 describe("parseTrack", () => {
 	it("counts a single leading box as a max-1 track and strips it", () => {
@@ -25,14 +25,13 @@ describe("stripMarkers", () => {
 	});
 });
 
-describe("splitLoyalty", () => {
-	it("pulls (Loyalty ◯◯◯) off a cost line into a max", () => {
-		expect(splitLoyalty("wonder, excitement, joy, discovery (Loyalty ◯◯◯)"))
-			.toEqual({ cost: "wonder, excitement, joy, discovery", loyaltyMax: 3 });
+describe("stripLoyalty", () => {
+	it("strips a trailing (Loyalty ◯◯◯) from a cost line (loyalty is always 3)", () => {
+		expect(stripLoyalty("wonder, excitement, joy, discovery (Loyalty ◯◯◯)")).toBe("wonder, excitement, joy, discovery");
 	});
-	it("handles ○ glyphs and extra spaces, no loyalty → null max", () => {
-		expect(splitLoyalty("to be useful (Loyalty ○ ○)")).toEqual({ cost: "to be useful", loyaltyMax: 2 });
-		expect(splitLoyalty("wonder and joy")).toEqual({ cost: "wonder and joy", loyaltyMax: null });
+	it("handles ○ glyphs / spaces and leaves a cost with no loyalty untouched", () => {
+		expect(stripLoyalty("to be useful (Loyalty ○ ○)")).toBe("to be useful");
+		expect(stripLoyalty("wonder and joy")).toBe("wonder and joy");
 	});
 });
 

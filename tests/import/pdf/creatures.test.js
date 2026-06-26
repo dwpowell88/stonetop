@@ -2,7 +2,49 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { extractArticle } from "../../../scripts/import/pdf/layout.js";
-import { parseStatBlock } from "../../../scripts/import/pdf/creatures.js";
+import { parseStatBlock, toFollowerDoc } from "../../../scripts/import/pdf/creatures.js";
+
+const L = (text, font = "ACaslonPro-Regular", size = 9) => ({ text, font, size, spans: [{ font, size, text }], bbox: [0, 0, 0, 0] });
+
+describe("parseStatBlock — follower Cost field", () => {
+	const sb = parseStatBlock([
+		L("The Servant", "Avara-Bold", 9), L("construct, large"),
+		L("HP 24; Armor 4"), L("Cost wonder, excitement, joy (Loyalty ◯◯◯)"),
+	]);
+	it("captures the Cost field (with the loyalty marker still attached — stripped later)", () => {
+		expect(sb.cost).toBe("wonder, excitement, joy (Loyalty ◯◯◯)");
+		expect(sb.hp).toEqual({ value: 24, max: 24 });
+		expect(sb.tagList).toEqual(["construct", "large"]);
+	});
+});
+
+describe("toFollowerDoc", () => {
+	const creature = {
+		name: "The Mighty Servant", tagList: ["large", "construct"], hp: { value: 0, max: 24 },
+		armor: "4", damage: "stone fists d10+1", specialQuality: "", instinct: "to misunderstand",
+		cost: "wonder, excitement, joy, discovery (Loyalty ◯◯◯)",
+		moves: [{ text: "living stone, tireless", prose: false }], description: "",
+	};
+	const doc = toFollowerDoc(creature, { arcanaSlug: "mindgem", id: "abc", key: "!items!abc",
+		img: "systems/stonetop/assets/content/icons/the-mighty-servant.png", folder: "F" });
+
+	it("is an npc Item that preserves id/key/img/folder and links its arcanum", () => {
+		expect(doc.type).toBe("npc");
+		expect([doc._id, doc._key, doc.img, doc.folder]).toEqual(["abc", "!items!abc", "systems/stonetop/assets/content/icons/the-mighty-servant.png", "F"]);
+		expect(doc.system.arcanaSlug).toBe("mindgem");
+		expect(doc.system.slug).toBe("the-mighty-servant");
+	});
+	it("strips (Loyalty ◯◯◯) from cost and defaults loyalty.max to 3", () => {
+		expect(doc.system.cost.selected).toEqual(["wonder, excitement, joy, discovery"]);
+		expect(doc.system.loyalty).toEqual({ value: 0, max: 3 });
+	});
+	it("builds Selection shapes + a bullet moves string + empty choices", () => {
+		expect(doc.system.tagList).toEqual({ selected: ["large", "construct"], options: [], multi: true, allowCustom: true });
+		expect(doc.system.instinct.selected).toEqual(["to misunderstand"]);
+		expect(doc.system.moves).toBe("- living stone, tireless");
+		expect(doc.system.choices).toEqual([{ slug: "choices", list: [] }]);
+	});
+});
 
 const load = (name) =>
 	JSON.parse(readFileSync(fileURLToPath(new URL(`./fixtures/${name}.lines.json`, import.meta.url)), "utf8"));

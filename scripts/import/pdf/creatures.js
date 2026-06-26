@@ -1,6 +1,7 @@
 import { isAvara } from "./fonts.js";
 import { deterministicId, documentKey } from "../ids.js";
 import { toSlug } from "../../../src/utils/slug.js";
+import { stripLoyalty } from "./arcana-parse.js";
 
 // The GM-locked journal pack the monsters link back to (built later, with deterministic ids).
 export const JOURNAL_PACK = "wider-world-and-other-wonders";
@@ -21,10 +22,11 @@ export function journalUuid(articleSlug) {
 // write-ups (e.g. Thornthumb) — the handwritten FeltTip-Heavy face.
 const isNameFont = (l) => (isAvara(l.font) && l.size < 11) || /FeltTip\w*-Heavy/i.test(l.font);
 const isMoveBullet = (l) => /^ä\s/.test(l.text.trim());
-const isFieldText  = (t) => /^(HP\b|Armor\b|Damage\b|Instinct\b|Special qualit)/i.test(t);
+const isFieldText  = (t) => /^(HP\b|Armor\b|Damage\b|Instinct\b|Special qualit|Cost\b)/i.test(t);
 
-// Field label → schema key. "Special qualities" (plural in the book) → specialQuality.
-const FIELDS = [[/^HP\b/i, "hp"], [/^Armor\b/i, "armor"], [/^Damage\b/i, "damage"], [/^Instinct\b/i, "instinct"], [/^Special qualit\w*/i, "specialQuality"]];
+// Field label → schema key. "Special qualities" (plural in the book) → specialQuality. `Cost` is
+// follower-only (monsters never have it); its trailing "(Loyalty ◯◯◯)" is stripped by toFollowerDoc.
+const FIELDS = [[/^HP\b/i, "hp"], [/^Armor\b/i, "armor"], [/^Damage\b/i, "damage"], [/^Instinct\b/i, "instinct"], [/^Special qualit\w*/i, "specialQuality"], [/^Cost\b/i, "cost"]];
 
 const splitTags = (t) => t.split(/,\s*/).map((s) => s.trim()).filter(Boolean);
 // A capitalised, multi-word line inside the moves is a transition sentence (e.g. the Crombil's "When
@@ -33,7 +35,7 @@ const looksTransition = (t) => /^[A-Z]/.test(t) && t.split(/\s+/).length > 4;
 
 /** Parse a stat block's lines into structured creature data. */
 export function parseStatBlock(lines) {
-	const out = { name: "", tagList: [], hp: { value: 0, max: 0 }, armor: "", damage: "", specialQuality: "", instinct: "", moves: [], description: [] };
+	const out = { name: "", tagList: [], hp: { value: 0, max: 0 }, armor: "", damage: "", specialQuality: "", instinct: "", cost: "", moves: [], description: [] };
 	const text = (l) => l.text.trim();
 
 	// The name is the first name-font line; anything before it is an in-character intro → description.
@@ -132,5 +134,39 @@ export function toNpcDoc(creature, { article } = {}) {
 		ownership: { default: 0 },
 		flags: {},
 		folder: null,
+	};
+}
+
+/** Build an arcanum-follower Item doc (src/data/creature.js schema) from a parsed stat block. Cost is
+ *  the key follower field; its "(Loyalty ◯◯◯)" is dropped (loyalty is always max 3). `_id`/`_key`/
+ *  `img`/`folder` come from the existing follower (preserved by build-arcana) when present. */
+export function toFollowerDoc(creature, { arcanaSlug = null, id, key, img = "icons/svg/item-bag.svg", folder = null } = {}) {
+	const followerSlug = toSlug(creature.name);
+	const cost = stripLoyalty(creature.cost || "");
+	return {
+		_id: id ?? deterministicId("followers", followerSlug),
+		_key: key ?? documentKey("Item", id ?? deterministicId("followers", followerSlug)),
+		name: creature.name,
+		type: "npc",
+		img,
+		system: {
+			slug: followerSlug,
+			reference: null,
+			arcanaSlug,
+			tagList: selection(creature.tagList, true),
+			hp: creature.hp,
+			armor: creature.armor,
+			damage: creature.damage,
+			specialQuality: creature.specialQuality,
+			instinct: selection(creature.instinct ? [creature.instinct] : [], false),
+			cost: selection(cost ? [cost] : [], false),
+			loyalty: { value: 0, max: 3 },
+			choices: [{ slug: "choices", list: [] }],
+			moves: creature.moves.map((m) => (m.prose ? `\n${m.text}\n` : `- ${m.text}`)).join("\n").replace(/\n{3,}/g, "\n\n").trim(),
+			description: creature.description,
+			notes: "",
+		},
+		flags: {},
+		folder,
 	};
 }
