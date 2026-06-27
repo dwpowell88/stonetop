@@ -1,7 +1,7 @@
 {
     "name": "Invocations",
     "type": "insert",
-    "img": "",
+    "img": "systems/stonetop/assets/content/playbooks/the-lightbearer.png",
     "system": {
         "slug": "lightbearer-invocations-insert",
         "description": "Lightbearer, you start knowing 2 Invocations. Each time you reach an even-numbered level, learn 1 new Invocation.\n\nWhile one Invocation is *ongoing*, you can't use another. You can end an Invocation whenever you wish, and it will end immediately if your holy light is extinguished. An invocation's range is equal to that of its light source.",

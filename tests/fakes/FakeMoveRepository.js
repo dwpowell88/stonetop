@@ -44,14 +44,12 @@ export class FakeMoveRepository {
 
 	addBasic(move) {
 		this._basicMoves.push(move);
+		return this;
 	}
 
 	addPlaybook(move) {
 		this._playbookMoves.push(move);
-	}
-
-	async getInsertMoves() {
-		return this._insertMoves.map(m => new Move(m));
+		return this;
 	}
 
 	async getMovesBySlugs(slugs = []) {
@@ -70,6 +68,7 @@ export class FakeMoveRepository {
 
 	addInsertMove(move) {
 		this._insertMoves.push(move);
+		return this;
 	}
 
 	async buildSlugIndex() {

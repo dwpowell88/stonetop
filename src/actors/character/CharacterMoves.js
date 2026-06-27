@@ -64,23 +64,20 @@ export class CharacterMoves {
 		);
 	}
 
-	async addCategory(key, label, slug, moveSlugs = []) {
+	// Register a move category (insert or arcanum) from a list of move slugs. Inserts pass their
+	// `system.moves`, arcana their `back.moveSlugs`; both resolve across compendium + world. Each
+	// move seeds its acquired/instanceCount from its own `isStartingMove` — built-in insert moves
+	// are authored starting (active on grant), arcana mystery moves are not (player ticks to unlock).
+	async addCategory(key, label, moveSlugs = []) {
 		const exists = [...this._actor.items].some(i => i.type === "move" && i.system?.categoryKey === key);
 		if (exists) return;
-		// An insert's moves come from two sources, unioned + de-duped by slug: legacy tag-based
-		// association (`move.system.playbook === slug`, used by built-in inserts) and the insert's
-		// own `system.moves` slug references (custom inserts attach existing moves this way).
-		const [tagged, referenced] = await Promise.all([
-			this._moveRepo.getInsertMoves(slug),
-			this._moveRepo.getMovesBySlugs(moveSlugs),
-		]);
-		const bySlug = new Map();
-		for (const m of [...tagged, ...referenced]) bySlug.set(m.slug, m);
-		const entries = [...bySlug.values()];
-		const docs = await Promise.all(entries.map(m => this._moveRepo.getInsertMoveDocument(m.id)));
+		const entries = await this._moveRepo.getMovesBySlugs(moveSlugs);
+		const pairs = await Promise.all(
+			entries.map(async move => ({ move, doc: await this._moveRepo.getInsertMoveDocument(move.id) }))
+		);
 		await this._actor.createEmbeddedDocuments("Item",
-			docs.filter(Boolean).map((doc, i) =>
-				_withCategoryFields(doc.toObject(), key, true, {
+			pairs.filter(({ doc }) => doc).map(({ move, doc }, i) =>
+				_withCategoryFields(doc.toObject(), key, move.isStarting, {
 					sortOrder:     i,
 					compendiumId:  doc._id ?? null,
 					categoryLabel: label,

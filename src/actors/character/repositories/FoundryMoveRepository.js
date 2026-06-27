@@ -11,7 +11,6 @@ export class FoundryMoveRepository {
 		this._moveStore       = new FoundryPackStore("stonetop.moves", MOVE_FIELDS);
 		this._worldMoveStore  = new WorldItemStore("move");
 		this._playbookCache   = new Map();
-		this._insertMoveCache = new Map();
 	}
 
 	async getPlaybookMoves(playbookName) {
@@ -90,22 +89,9 @@ export class FoundryMoveRepository {
 		return await this._moveStore.getDocument(id) ?? await this._worldMoveStore.getDocument(id);
 	}
 
-	async getInsertMoves(insertSlug) {
-		if (this._insertMoveCache.has(insertSlug)) return this._insertMoveCache.get(insertSlug);
-		// An insert's moves are moves tagged `system.playbook === <insert slug>`. Look in BOTH the
-		// compendium and the world (custom inserts authored in Foundry tag world moves), like
-		// getPlaybookMoves does.
-		const [entries, worldEntries] = await Promise.all([
-			this._moveStore.filterEntries(e => e.system?.playbook === insertSlug),
-			this._worldMoveStore.filterEntries(e => e.system?.playbook === insertSlug),
-		]);
-		const moves = [...entries, ...worldEntries].map(e => new Move(e));
-		this._insertMoveCache.set(insertSlug, moves);
-		return moves;
-	}
-
-	// Resolve referenced moves (custom inserts store a `system.moves` list of slugs) to Move objects,
-	// across both stores. Unknown slugs are dropped. Preserves the requested order.
+	// Resolve referenced moves (inserts store a `system.moves` list of slugs, arcana a
+	// `back.moveSlugs` list) to Move objects, across both stores. Unknown slugs are dropped.
+	// Preserves the requested order.
 	async getMovesBySlugs(slugs = []) {
 		if (!slugs?.length) return [];
 		const index = await this.buildSlugIndex();

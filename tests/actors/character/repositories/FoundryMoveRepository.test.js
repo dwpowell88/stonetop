@@ -25,8 +25,6 @@ const MARSHAL_MOVE_A = new FakeCompendiumMoveBuilder().withName("Read the Winds"
 const BASIC_MOVE_A   = new FakeCompendiumMoveBuilder().withName("Defy Danger").withRollType("stat").withMoveType("basic").build();
 const BASIC_MOVE_B   = new FakeCompendiumMoveBuilder().withName("Aid or Interfere").withRollType("stat").withMoveType("basic").build();
 const REVENANT_MOVE_A = new FakeCompendiumMoveBuilder().withName("Unliving").withPlaybook("revenant").build();
-const REVENANT_MOVE_B = new FakeCompendiumMoveBuilder().withName("Undying").withPlaybook("revenant").withRollType("con").build();
-const GHOST_MOVE_A   = new FakeCompendiumMoveBuilder().withName("Disembodied").withPlaybook("ghost").build();
 
 describe("FoundryMoveRepository", () => {
 	afterEach(() => vi.unstubAllGlobals());
@@ -139,59 +137,6 @@ describe("FoundryMoveRepository", () => {
 			const repo = new FoundryMoveRepository();
 			const doc = await repo.getBasicMoveDocument(worldMove._id);
 			expect(doc).toEqual(worldMove);
-		});
-	});
-
-	describe("getInsertMoves", () => {
-		it("returns [] when pack is not registered", async () => {
-			new FakeGameBuilder().build();
-			const repo = new FoundryMoveRepository();
-			expect(await repo.getInsertMoves("revenant")).toEqual([]);
-		});
-
-		it("returns Move instances filtered by insertSlug", async () => {
-			new FakeGameBuilder()
-				.withPack(FakePackBuilder.movesPack().withItem(REVENANT_MOVE_A).withItem(REVENANT_MOVE_B).withItem(GHOST_MOVE_A))
-				.build();
-
-			const repo = new FoundryMoveRepository();
-			const moves = await repo.getInsertMoves("revenant");
-			expect(moves).toHaveLength(2);
-			expect(moves[0]).toBeInstanceOf(Move);
-			expect(moves.map(m => m.id)).toEqual([REVENANT_MOVE_A._id, REVENANT_MOVE_B._id]);
-		});
-
-		it("returns [] when no moves match insertSlug", async () => {
-			new FakeGameBuilder()
-				.withPack(FakePackBuilder.movesPack().withItem(REVENANT_MOVE_A).withItem(REVENANT_MOVE_B).withItem(GHOST_MOVE_A))
-				.build();
-
-			const repo = new FoundryMoveRepository();
-			expect(await repo.getInsertMoves("thrall")).toEqual([]);
-		});
-
-		it("caches result — same array returned on second call for same insertSlug", async () => {
-			new FakeGameBuilder()
-				.withPack(FakePackBuilder.movesPack().withItem(REVENANT_MOVE_A))
-				.build();
-
-			const repo = new FoundryMoveRepository();
-			const first  = await repo.getInsertMoves("revenant");
-			const second = await repo.getInsertMoves("revenant");
-			expect(second).toBe(first);
-		});
-
-		it("includes insert moves from BOTH the compendium and the world (custom inserts)", async () => {
-			const worldMove = new FakeCompendiumMoveBuilder().withName("Custom Invocation").withPlaybook("revenant").build();
-			new FakeGameBuilder()
-				.withPack(FakePackBuilder.movesPack().withItem(REVENANT_MOVE_A).withItem(REVENANT_MOVE_B))
-				.withWorldItem(worldMove)
-				.build();
-
-			const repo = new FoundryMoveRepository();
-			const moves = names(await repo.getInsertMoves("revenant"));
-			expect(moves).toEqual(expect.arrayContaining(["Unliving", "Undying", "Custom Invocation"]));
-			expect(moves).toHaveLength(3);
 		});
 	});
 

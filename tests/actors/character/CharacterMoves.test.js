@@ -300,9 +300,9 @@ describe("CharacterMoves.getMoveSnapshotsForCategory", () => {
 	});
 
 	it("returns MoveSnapshot with name from repo", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(new FakeCompendiumMoveBuilder().withName("Haunt").build());
 		const m = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		const snaps = await m.getMoveSnapshotsForCategory("insert-revenant");
 		expect(snaps).toHaveLength(1);
 		expect(snaps[0]).toBeInstanceOf(MoveSnapshot);
@@ -310,16 +310,16 @@ describe("CharacterMoves.getMoveSnapshotsForCategory", () => {
 	});
 
 	it("returned snapshot has correct source.type", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(new FakeCompendiumMoveBuilder().withName("Haunt").build());
 		const m = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		expect((await m.getMoveSnapshotsForCategory("insert-revenant"))[0].source.type).toBe("insert-revenant");
 	});
 
 	it("reads move data from embedded item, not live repo", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(new FakeCompendiumMoveBuilder().withName("Haunt").build());
 		const m    = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		m._moveRepo = new FakeMoveRepository();
 		const snaps = await m.getMoveSnapshotsForCategory("insert-revenant");
 		expect(snaps[0].name).toBe("Haunt");
@@ -517,76 +517,85 @@ describe("CharacterMoves.initPlaybookCategory", () => {
 // ── addCategory ───────────────────────────────────────────────────────────────
 
 describe("CharacterMoves.addCategory", () => {
+	const haunt = () => new FakeCompendiumMoveBuilder().withName("Haunt");
+
 	it("appends the category", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(haunt().build());
 		const m = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		expect((await m.buildSnapshot()).categories.some(c => c.key === "insert-revenant" && c.label === "Revenant")).toBe(true);
 	});
 
-	it("unions slug-referenced moves with tag-based ones (de-duped by slug)", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
-		repo.addBasic(new FakeCompendiumMoveBuilder().withName("Spirit Sight").build()); // resolvable by slug
+	it("resolves referenced moves by slug, preserving order", async () => {
+		const repo = new FakeMoveRepository()
+			.addInsertMove(haunt().build())
+			.addBasic(new FakeCompendiumMoveBuilder().withName("Spirit Sight").build()); // resolvable by slug
 		const actor = makeActor();
-		await makeMoves({repo, actor}).addCategory("insert-revenant", "Revenant", "revenant", ["spirit-sight"]);
-		const names = actor.createdDocs.map(d => d.name);
-		expect(names).toContain("Haunt");        // tag-based association
-		expect(names).toContain("Spirit Sight"); // slug-referenced
+		await makeMoves({repo, actor}).addCategory("insert-revenant", "Revenant", ["spirit-sight", "haunt"]);
+		expect(actor.createdDocs.map(d => d.name)).toEqual(["Spirit Sight", "Haunt"]);
 	});
 
 	it("does nothing when category already exists", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(haunt().build());
 		const actor = makeActor();
 		const m = makeMoves({repo, actor});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		const countBefore = actor.createdDocs.length;
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		expect(actor.createdDocs.length).toBe(countBefore);
 	});
 
 	it("creates embedded docs and assigns ownedId", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(haunt().build());
 		const actor = makeActor();
 		const m = makeMoves({repo, actor});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		expect((await m.buildSnapshot()).categories[0].moves[0].ownedId).toBe(actor.createdDocs[0]._id);
 	});
 
-	it("created item has correct categoryKey, acquired, instanceCount", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+	it("starting move seeds categoryKey + acquired=true + instanceCount=1", async () => {
+		const repo = new FakeMoveRepository().addInsertMove(haunt().asStarting().build());
 		const actor = makeActor();
-		await makeMoves({repo, actor}).addCategory("insert-revenant", "Revenant", "revenant");
+		await makeMoves({repo, actor}).addCategory("insert-revenant", "Revenant", ["haunt"]);
 		expect(actor.createdDocs[0].system.categoryKey).toBe("insert-revenant");
 		expect(actor.createdDocs[0].system.acquired).toBe(true);
 		expect(actor.createdDocs[0].system.instanceCount).toBe(1);
 	});
 
-	it("does not create embedded docs when repo returns no moves", async () => {
+	it("non-starting move seeds acquired=false + instanceCount=0 (player ticks to unlock)", async () => {
+		const repo = new FakeMoveRepository().addInsertMove(haunt().build());
 		const actor = makeActor();
-		await makeMoves({actor}).addCategory("insert-revenant", "Revenant", "revenant");
+		await makeMoves({repo, actor}).addCategory("arcana-norubas-ice-sphere", "Noruba's Ice Sphere", ["haunt"]);
+		expect(actor.createdDocs[0].system.acquired).toBe(false);
+		expect(actor.createdDocs[0].system.instanceCount).toBe(0);
+	});
+
+	it("does not create embedded docs when no slugs resolve", async () => {
+		const actor = makeActor();
+		await makeMoves({actor}).addCategory("insert-revenant", "Revenant", ["nope"]);
 		expect(actor.createdDocs).toHaveLength(0);
 	});
 
 	it("stored category has renderStyle=standard and allowAdditional=false", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(haunt().build());
 		const m = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		const cat = (await m.buildSnapshot()).categories.find(c => c.key === "insert-revenant");
 		expect(cat.renderStyle).toBe("standard");
 		expect(cat.allowAdditional).toBe(false);
 	});
 
-	it("each move stored has selection.value=1", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+	it("starting move stored has selection.value=1", async () => {
+		const repo = new FakeMoveRepository().addInsertMove(haunt().asStarting().build());
 		const m = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 
 	it("preserves choices from repo move so snapshot shows a ChoiceGroup", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").withChoices(CHOICES_DATA).build()]);
+		const repo = new FakeMoveRepository().addInsertMove(haunt().withChoices(CHOICES_DATA).build());
 		const m = makeMoves({repo});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		const snap = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(snap.choices).toBeInstanceOf(ChoiceGroup);
 		expect(snap.choices.list).toHaveLength(CHOICES_DATA.list.length);
@@ -597,19 +606,19 @@ describe("CharacterMoves.addCategory", () => {
 
 describe("CharacterMoves.removeCategory", () => {
 	it("removes the category", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(new FakeCompendiumMoveBuilder().withName("Haunt").build());
 		const actor = makeActor();
 		const m = makeMoves({repo, actor});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		await m.removeCategory("insert-revenant");
 		expect((await m.buildSnapshot()).categories.find(c => c.key === "insert-revenant")).toBeUndefined();
 	});
 
 	it("deletes embedded docs for all ownedIds", async () => {
-		const repo = new FakeMoveRepository([], [], [new FakeCompendiumMoveBuilder().withName("Haunt").build()]);
+		const repo = new FakeMoveRepository().addInsertMove(new FakeCompendiumMoveBuilder().withName("Haunt").build());
 		const actor = makeActor();
 		const m = makeMoves({repo, actor});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", ["haunt"]);
 		const hauntId = actor.createdDocs[0]._id;
 		await m.removeCategory("insert-revenant");
 		expect(actor.deletedIds).toContain(hauntId);
@@ -618,7 +627,7 @@ describe("CharacterMoves.removeCategory", () => {
 	it("does not delete any docs when no ownedIds", async () => {
 		const actor = makeActor();
 		const m = makeMoves({actor});
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", []);
 		await m.removeCategory("insert-revenant");
 		expect(actor.deletedIds).toHaveLength(0);
 	});
@@ -631,7 +640,7 @@ describe("CharacterMoves.removeCategory", () => {
 
 	it("category is gone from subsequent buildSnapshot", async () => {
 		const m = makeMoves();
-		await m.addCategory("insert-revenant", "Revenant", "revenant");
+		await m.addCategory("insert-revenant", "Revenant", []);
 		await m.removeCategory("insert-revenant");
 		expect((await m.buildSnapshot()).categories.find(c => c.key === "insert-revenant")).toBeUndefined();
 	});

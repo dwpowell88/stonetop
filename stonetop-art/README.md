@@ -39,4 +39,4 @@ For local development, `scripts/development/link.sh` also symlinks `Data/stoneto
 folder so a linked dev world resolves the art with no copying.
 
 Players/GMs who don't own the books simply won't have these files; the system still works, those
-illustrations just show as missing images.
+illustrations are just absent.

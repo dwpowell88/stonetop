@@ -24,7 +24,7 @@ describe("CharacterInserts.onInsertDropped", () => {
 		const { inserts } = makeInserts({ moves });
 		await inserts.onInsertDropped(REVENANT);
 		expect(moves.addedCategories).toContainEqual({
-			type: "insert-revenant", name: "Revenant", slug: "revenant", moveSlugs: [],
+			type: "insert-revenant", name: "Revenant", moveSlugs: [],
 		});
 	});
 
@@ -225,7 +225,7 @@ describe("CharacterInserts.syncPlaybookInserts", () => {
 		expect(doc).toBeDefined();
 		expect(doc.type).toBe("insert");
 		expect(doc.flags?.stonetop?.grantedByPlaybook).toBe("the-lightbearer");
-		expect(moves.addedCategories).toContainEqual({ type: "insert-invoc", name: "Invocations", slug: "invoc", moveSlugs: [] });
+		expect(moves.addedCategories).toContainEqual({ type: "insert-invoc", name: "Invocations", moveSlugs: [] });
 	});
 
 	it("does not duplicate an already-embedded granted insert", async () => {

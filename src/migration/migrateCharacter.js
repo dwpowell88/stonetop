@@ -30,7 +30,7 @@ export async function migrateCharacter(actor, repos, insertRepo = null) {
 	await migrateStaleItemTypes(actor);
 	await migrateCharacterFlags(actor);
 	await migrateEmbeddedMoveSlugs(actor);
-	await migrateCharacterMoves(actor, repos.moves);
+	await migrateCharacterMoves(actor, repos.moves, insertRepo);
 	await migratePlaybookSpecialPossessions(actor);
 	await migratePlaybookChoices(actor, repos.playbooks);
 	await migratePlaybookIntroductions(actor, repos.playbooks);
@@ -106,7 +106,7 @@ export async function migrateEmbeddedMoveSlugs(actor) {
 
 // ── B. Embedded move items ────────────────────────────────────────────────────
 
-export async function migrateCharacterMoves(actor, moveRepo) {
+export async function migrateCharacterMoves(actor, moveRepo, insertRepo = null) {
 	const existing = [...actor.items].filter(i => i.type === "move");
 	if (existing.some(i => i.system?.categoryKey != null)) return;
 
@@ -150,7 +150,8 @@ export async function migrateCharacterMoves(actor, moveRepo) {
 
 	for (const cat of categories.filter(c => c.key.startsWith("post-death-"))) {
 		const insertSlug = cat.key.replace("post-death-", "");
-		await moves.addCategory(`insert-${insertSlug}`, cat.label ?? insertSlug, insertSlug);
+		const insertDoc  = insertRepo ? await insertRepo.findBySlug(insertSlug) : null;
+		await moves.addCategory(`insert-${insertSlug}`, cat.label ?? insertSlug, insertDoc?.system?.moves ?? []);
 	}
 }
 
@@ -345,7 +346,7 @@ export async function migrateInsert(actor, insertRepo, moves) {
 	if (!doc) return;
 
 	await actor.createEmbeddedDocuments("Item", [doc.toObject()]);
-	await moves.addCategory(`insert-${slug}`, doc.name ?? slug, slug);
+	await moves.addCategory(`insert-${slug}`, doc.name ?? slug, doc.system?.moves ?? []);
 }
 
 // ── I. Equipment → arcanum ────────────────────────────────────────────────────
