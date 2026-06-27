@@ -2409,8 +2409,11 @@ body,
 	margin-right: 4px;
 }
 
-.stonetop-arcanum-move-trigger {
-	margin: 6px 0 2px;
+/* Major-arcana mystery moves reuse the moves-tab move-item partial, but single-column. */
+.stonetop-arcanum-moves {
+	column-count: 1;
+	margin: 6px 0 0;
+	padding: 0;
 }
 
 .stonetop-arcanum-follower {

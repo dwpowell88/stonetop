@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildArcanumSnapshot, buildArcanumOutfitItem } from "../../../src/actors/character/arcanumSnapshot.js";
+import { buildArcanumSnapshot, buildArcanumOutfitItem, buildArcanumMoveSnapshot } from "../../../src/actors/character/arcanumSnapshot.js";
+import { MoveSnapshot } from "../../../src/model/snapshot/character/MoveSnapshot.js";
 import { Arcanum } from "../../../src/model/data/character/Arcanum.js";
 
 const richArcanum = () => new Arcanum({
@@ -26,6 +27,8 @@ describe("buildArcanumSnapshot", () => {
 		expect(s.front.unlock).toBeTruthy();            // ChoiceGroup
 		expect(s.back.resource).toBeTruthy();           // ResourceSnapshot
 		expect(s.back.moves).toHaveLength(1);
+		expect(s.back.moves[0]).toBeInstanceOf(MoveSnapshot);
+		expect(s.back.moves[0]).toMatchObject({ name: "Battery", description: "store energy" });
 		expect(s.back.consequences).toBeTruthy();
 		expect(s.back.unlockAt).toBe("after 4 marks");
 	});
@@ -43,5 +46,22 @@ describe("buildArcanumSnapshot", () => {
 	it("buildArcanumOutfitItem returns null for no item; maps fields otherwise", () => {
 		expect(buildArcanumOutfitItem("x", null)).toBeNull();
 		expect(buildArcanumOutfitItem("x", { name: "Cloak", weight: 1 })).toMatchObject({ slug: "x", name: "Cloak", weight: 1 });
+	});
+});
+
+describe("buildArcanumMoveSnapshot", () => {
+	it("maps an arcanum mystery move into an always-active, non-selectable MoveSnapshot", () => {
+		const m = buildArcanumMoveSnapshot({ id: "battery", name: "Battery", text: "store energy" });
+		expect(m).toBeInstanceOf(MoveSnapshot);
+		expect(m).toMatchObject({
+			id: "battery", slug: "battery", name: "Battery", description: "store energy",
+			rollStat: null, selectable: false, resource: null, requirement: null, choices: null,
+		});
+		expect(m.selection).toEqual({ value: 1, max: 1 });
+	});
+
+	it("carries a subtitle through as the move sourceLabel (null when absent)", () => {
+		expect(buildArcanumMoveSnapshot({ name: "Resonance", subtitle: "Requires: Battery" }).sourceLabel).toBe("Requires: Battery");
+		expect(buildArcanumMoveSnapshot({ name: "Unquenched" }).sourceLabel).toBeNull();
 	});
 });

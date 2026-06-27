@@ -11,10 +11,10 @@
 			"item": {
 				"name": "Noruba's Ice Sphere",
 				"weight": 1,
-				"note": "magical, awkward",
-				"inventoryColumn": null
+				"note": "*, magical*, *awkward*",
+				"inventoryColumn": "regular"
 			},
-			"description": "A perfect sphere of dark ice, the size of a fist, never melting, hard as stone, and set like a gaudy gem at the end of a finely wrought torc. Or not a torc, perhaps, but maybe a ring that once sat upon some giant's finger?\n\nStaring into the icy sphere brings a sense of calm, serenity, and detachment. Indeed, a lesser mind might find itself staring into its depths for hours on end.",
+			"description": "A perfect sphere of dark ice, the size of a fist, never melting, hard as stone, and set like a gaudy gem at the end of a finely wrought torc. Or not a torc, perhaps, but maybe a ring that once sat upon some giant’s finger?\n\nStaring into the icy sphere brings a sense of calm, serenity, and detachment. Indeed, a lesser mind might find itself staring into its depths for hours on end.",
 			"unlock": {
 				"slug": "norubas-ice-sphere",
 				"list": [
@@ -22,14 +22,21 @@
 						"type": "entry",
 						"content": {
 							"title": null,
-							"text": "When you **_peer into the Ice Sphere_**, Your mind is cleared of strong emotions."
+							"text": "When you **_peer into the Ice Sphere_**, your mind is cleared of strong emotions."
 						}
 					},
 					{
 						"type": "entry",
 						"content": {
 							"title": null,
-							"text": "When you **_gaze deeply into the Ice Sphere and ponder a situation, puzzle, or mystery_**, Ask the GM one of the questions below. The GM will answer honestly.\n\n- Who benefits (or would benefit) from ___?\n- What about ___ isn't what it seems to be?\n- How could I learn more about ___?\n- What's the most likely outcome if ___?\n- What am I overlooking?\nAfter the GM answers, roll +INT: **on a 10+**, hold 2 Acumen; **on a 7-9**, hold 1. While acting on the GM's answer, you can spend Acumen 1-for-1 to:\n\n- Ask another question from the list above, and get an honest answer\n- Treat a 6- that you rolled as a 7-9, or a 7-9 as a 10+\n**On a 6-**, your connection to your body weakens—mark a debility and mark 1 circle. The debility lasts until you spend a few days living wholly in your body and averting your gaze from the Ice Sphere."
+							"text": "When you **_gaze deeply into the Ice Sphere and ponder a situation, puzzle, or mystery_**, ask the GM one of the questions below. The GM will answer honestly.\n- Who benefits (or would benefit) from __?\n- What about __ isn’t what it seems to be?\n- How could I learn more about __?\n- What’s the most likely outcome if __?\n- What am I overlooking?\n\nAfter the GM answers, roll +INT: **on a 10+**, hold 2 Acumen; **on a 7-9**, hold 1. While acting on the GM’s answer, you can spend Acumen 1-for-1 to:\n- Ask another question from the list above, and get an honest answer\n- Treat a 6- that you rolled as a 7-9, or a 7-9 as a 10+ **On a 6-**, your connection to your body weakens—mark a debility and mark 1 circle. The debility lasts until you spend a few days living wholly in your body and averting your gaze from the Ice Sphere."
+						}
+					},
+					{
+						"type": "entry",
+						"content": {
+							"title": null,
+							"text": "When you **_make the last mark_**, you unlock the mysteries of the Ice Sphere and can use Mindwalking (see reverse)."
 						}
 					},
 					{

@@ -175,6 +175,7 @@ Hooks.once("init", () => {
 		"stonetop.selection-input":   "systems/stonetop/templates/actor/partials/selection-input.hbs",
 		"stonetop.instinct-section":  "systems/stonetop/templates/actor/partials/instinct-section.hbs",
 		"stonetop.move-group":       "systems/stonetop/templates/actor/partials/move-group.hbs",
+		"stonetop.move-item":        "systems/stonetop/templates/actor/partials/move-item.hbs",
 		"stonetop.choice-group":     "systems/stonetop/templates/actor/partials/choice-group.hbs",
 		"stonetop.choice-row":       "systems/stonetop/templates/actor/partials/choice-row.hbs",
 		"stonetop.choice-section":   "systems/stonetop/templates/actor/partials/lore-section.hbs",

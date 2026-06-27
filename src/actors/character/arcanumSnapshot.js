@@ -7,7 +7,32 @@ import {
 	ArcanumBackSnapshotBuilder, ArcanumFrontSnapshotBuilder, ArcanumSnapshotBuilder,
 	ChoiceGroup, ChoiceValues,
 } from "../../model/snapshot/character/CharacterSnapshot.js";
+import { MoveSnapshotBuilder, ValueMax } from "../../model/snapshot/character/MoveSnapshot.js";
 import { ResourceController } from "./ResourceController.js";
+
+// Shape a major-arcanum back "mystery move" ({id, name, text, subtitle?}) as a MoveSnapshot so it
+// renders through the SAME move-item partial as the moves tab. It's always active (you've unlocked
+// the mysteries) so selection is {1,1} and the acquisition checkbox is suppressed by the card. roll/
+// requirement/resource stay null for now (#43/#42 will populate them from the move data).
+export function buildArcanumMoveSnapshot(move) {
+	return new MoveSnapshotBuilder()
+		.withId(move.id ?? null)
+		.withOwnedId(null)
+		.withSlug(move.id ?? null)
+		.withName(move.name ?? "")
+		.withDescription(move.text ?? "")
+		.withRollStat(null)
+		.withIsStarting(false)
+		.withSource({ type: "arcanum" })
+		.withSourceLabel(move.subtitle || null)
+		.withSelection(new ValueMax(1, 1))
+		.withSelectable(false)
+		.withRequirement(null)
+		.withRequiresLabel(null)
+		.withResource(null)
+		.withChoices(null)
+		.build();
+}
 
 // Shape an arcanum side's item like an OutfitItemSnapshot so it renders through the shared
 // outfit-item-row partial. `slug` is the ARCANUM slug (the checkbox/resource toggle the character's
@@ -86,7 +111,7 @@ export function buildArcanumSnapshot(arcanum, {
 		.withDescription(item.back.description)
 		.withResource(backResource)
 		.withChoices(backChoices)
-		.withMoves(item.back.moves)
+		.withMoves((item.back.moves ?? []).map(buildArcanumMoveSnapshot))
 		.withConsequences(consequences)
 		.withUnlockAt(item.back.unlockAt)
 		.build();

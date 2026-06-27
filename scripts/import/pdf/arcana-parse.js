@@ -43,7 +43,8 @@ export function joinMd(lines) {
 		else out += " " + h;
 		prev = raw;
 	}
-	return out.replace(/[ \t]{2,}/g, " ").trim();
+	// Straighten curly double-quotes (the book's typography) to ASCII " — keeps the JSON clean.
+	return out.replace(/[“”]/g, '"').replace(/[ \t]{2,}/g, " ").trim();
 }
 
 // ─── pure helpers ─────────────────────────────────────────────────────────────
@@ -111,6 +112,40 @@ export function unlockSlug(text) {
 	return toSlug(words.slice(0, 2).join(" ")) || "step";
 }
 
+// ─── major arcana helpers ───────────────────────────────────────────────────────
+const MINOR_WORDS = new Set("a an the and or but for nor to in on at by with from as of".split(" "));
+/** Title-case an ALL-CAPS mystery-move name, lowercasing minor words except the first
+ *  ("SPIRITS OF THE HERD" → "Spirits of the Herd", "A FLICKERING FLAME" → "A Flickering Flame"). */
+export function titleCase(s) {
+	const words = (s || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+	return words.map((w, i) => (i > 0 && MINOR_WORDS.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+/** Split a major move header line's leading ALL-CAPS run (the move name) from any inline remainder
+ *  ("WHISPERS When you grip the shaft" → {name:"WHISPERS", rest:"When you grip the shaft"}). */
+export function majorMoveName(text) {
+	const words = stripMarkers(text).trim().split(/\s+/);
+	let n = 0;
+	while (n < words.length && /^[A-Z0-9][A-Z0-9'’-]*$/.test(words[n])) n++;
+	if (n < 1) return { name: "", rest: words.join(" ") };
+	return { name: words.slice(0, n).join(" "), rest: words.slice(n).join(" ") };
+}
+
+/** The front's mark-gate count for unlocking the mysteries: an explicit "marked N", or the length of
+ *  the standalone Marks run for "the last mark". Stored on `back.unlockAt`. */
+export function detectUnlockAt(blocks) {
+	const text = blocks.map((b) => b.type === "list" ? rawOf(b.items.flat()) : (b.lines ? rawOf(b.lines) : (b.line?.text ?? ""))).join(" ");
+	if (!/unlock/i.test(text)) return null;
+	const m = text.match(/marked\s+(\d+)/i);
+	if (m) return Number(m[1]);
+	if (/last mark/i.test(text)) {
+		let max = 0;
+		for (const b of blocks) if (b.type === "list") for (const it of b.items) { const { max: mx, text: t } = parseTrack(rawOf(it)); if (!t && mx > max) max = mx; }
+		return max || null;
+	}
+	return null;
+}
+
 // ─── blocks → front/back ──────────────────────────────────────────────────────
 const markerKind = (line) => { const t = (line?.text || "").trim(); return /^[□◻]/.test(t) ? "square" : /^◇/.test(t) ? "diamond" : /^[○◯]/.test(t) ? "circle" : null; };
 const rawOf = (lines) => (lines || []).map((l) => l.text).join(" ");
@@ -140,36 +175,132 @@ export function parseFront(blocks, { name, slug }) {
 	}
 	front.item = item;
 
+	// MAJOR-style unlock: the options are bold-italic "When you **_…_**" trigger paragraphs, each
+	// accreting its following option bullets / continuation paras; task checkboxes and the Marks run are
+	// their own tracked entries. (Minors have no such triggers — they fall through to the li logic below.)
+	const isTriggerPara = (s) => s.kind === "para" && /^When you \*\*_/i.test(joinMd(s.lines).trim());
+	if (seq.some(isTriggerPara)) {
+		const firstTrig = seq.findIndex(isTriggerPara);
+		front.description = seq.slice(0, firstTrig).map((s) => joinMd(s.lines)).filter(Boolean).join("\n\n") || null;
+		const list = [];
+		let cur = null;
+		const flushCur = () => { if (cur) list.push(cur); cur = null; };
+		for (const s of seq.slice(firstTrig)) {
+			if (isTriggerPara(s)) {
+				flushCur();
+				cur = { type: "entry", content: { title: null, text: stripMarkers(joinMd(s.lines)) } };
+			} else if (s.kind === "li") {
+				const { max, text: residual } = parseTrack(rawOf(s.lines));
+				if (max > 0 && !residual) { flushCur(); list.push({ type: "entry", slug: "marks", content: { title: null, text: "Marks" }, track: { max } }); }
+				else if (max > 0) { flushCur(); const t = stripMarkers(joinMd(s.lines)); const row = { type: "entry", content: { title: null, text: t } }; if (t) row.slug = unlockSlug(t); row.track = { max }; list.push(row); }
+				else if (cur) cur.content.text += "\n- " + stripMarkers(joinMd(s.lines)).replace(/^[ä••\-\s]+/, ""); // an option bullet of the current trigger
+			} else if (cur) cur.content.text += "\n\n" + stripMarkers(joinMd(s.lines)); // a continuation para (trailing orphans drop with no cur)
+		}
+		flushCur();
+		// Drop the trailing gate instruction ("When you make the last mark, you unlock …") after the track.
+		if (list.some((e) => e.track)) while (list.length && !list[list.length - 1].track) list.pop();
+		front.unlock = { slug, list };
+		return front;
+	}
+
 	// description = paras before the first option (li); unlock = the intro para + every li/para after.
 	const firstLi = seq.findIndex((s) => s.kind === "li");
 	if (firstLi < 0) {
 		front.description = seq.map((s) => joinMd(s.lines)).filter(Boolean).join("\n\n") || null;
 		return front;
 	}
-	const introAt = Math.max(0, firstLi - 1);
+	// The intro entry is the para right before the first option; majors precede it with several
+	// bold-italic "When you **_…_**" trigger paras that are unlock entries too — pull them all in.
+	const isTrigger = (s) => s?.kind === "para" && /^When you \*\*_/i.test(joinMd(s.lines).trim());
+	let introAt = Math.max(0, firstLi - 1);
+	while (introAt > 0 && isTrigger(seq[introAt - 1])) introAt--;
 	front.description = seq.slice(0, introAt).map((s) => joinMd(s.lines)).filter(Boolean).join("\n\n") || null;
 
 	const list = [];
 	for (const s of seq.slice(introAt)) {
 		const raw = rawOf(s.lines);
-		const { max } = parseTrack(raw);
+		const { max, text: residual } = parseTrack(raw); // residual is "" for a pure run ("l l l l" / "○ ○ ○")
 		const text = stripMarkers(joinMd(s.lines));
-		if (s.kind === "li" || max > 0) {
+		if (max > 0 && !residual) {
+			// A standalone marker run ("l l l l l" / "○ ○ ○") is the Marks track (its length is the max).
+			list.push({ type: "entry", slug: "marks", content: { title: null, text: "Marks" }, track: { max } });
+		} else if (s.kind === "li" || max > 0) {
 			const row = { type: "entry", content: { title: null, text } };
 			if (text) row.slug = unlockSlug(text);
-			if (max > 0) row.track = { max: 1 }; // each unlock option is a single mark
+			if (max > 0) row.track = { max }; // a task checkbox is max 1; an embedded run keeps its count
 			list.push(row);
 		} else {
 			list.push({ type: "entry", content: { title: null, text } });
 		}
 	}
+	// Drop trailing non-tracked instruction paras that follow the task/Marks track (e.g. "When you make
+	// the last mark, you unlock …") — they're informational, not unlock options.
+	if (list.some((e) => e.track)) while (list.length && !list[list.length - 1].track) list.pop();
 	front.unlock = { slug, list };
 	return front;
 }
 
+/** Build a MAJOR back: "Mysteries of X" with all-caps mystery moves and a consequence track. Majors
+ *  share the front's item (itemSameAsFront) and have no separate back item/description/resource. Each
+ *  move (a `□ ALL-CAPS NAME` list item) and each consequence (a `□`-marked list item) continues
+ *  through the following paras until the next list item / rule / heading. `unlockAt` is front-derived. */
+function parseMajorBack(blocks, { slug, name, unlockAt }) {
+	const back = { title: null, item: null, description: null, resource: null, itemSameAsFront: true, choices: null, moves: [], consequences: null, unlockAt: unlockAt ?? null };
+	const abbr = toSlug((name || "").trim().split(/\s+/).pop() || "c") || "c"; // "Twisted Spear" → "spear"
+	let section = null; // null | "moves" | "consequences"
+	let cur = null;     // the move/consequence currently accreting following paras/bullets
+	const flush = () => {
+		if (!cur) return;
+		const text = cur.text.replace(/\n{3,}/g, "\n\n").trim();
+		if (cur.kind === "move") {
+			const nm = titleCase(cur.name);
+			back.moves.push({ id: toSlug(nm), name: nm, text });
+		} else {
+			(back.consequences ??= { slug: "consequences", list: [] });
+			const row = { type: "entry", slug: `${abbr}-c${back.consequences.list.length + 1}`, content: { title: null, text } };
+			if (cur.max > 0) row.track = { max: cur.max };
+			back.consequences.list.push(row);
+		}
+		cur = null;
+	};
+	const bullet = (it) => "\n- " + stripMarkers(joinMd(it)).replace(/^[ä••\-\s]+/, "");
+	for (const b of blocks) {
+		if (b.type === "heading" || b.type === "title") {
+			const t = b.line.text.trim();
+			if (/^moves$/i.test(t)) { flush(); section = "moves"; }
+			else if (/^consequences$/i.test(t)) { flush(); section = "consequences"; }
+			else if (/^(front|back)$/i.test(t) || /^appendix [cd]/i.test(t)) { flush(); section = null; } // side label / running header ends back content
+			else if (!back.title) back.title = t;
+			continue;
+		}
+		if (b.type === "rule") { flush(); continue; } // a rule separates moves / consequences
+		if (b.type === "boxstart" || b.type === "boxend" || b.type === "table" || b.type === "statblock" || b.type === "image") continue;
+		if (section === "moves") {
+			if (b.type === "list") for (const it of b.items) {
+				const head = majorMoveName(it[0]?.text || "");
+				if (markerKind(it[0]) === "square" && head.name) {        // a "□ ALL-CAPS NAME" move header
+					flush();
+					const tail = stripMarkers(joinMd(it.slice(1)));
+					cur = { kind: "move", name: head.name, text: [head.rest, tail].filter(Boolean).join(" ") };
+				} else if (cur) cur.text += bullet(it);                   // a sub-bullet of the current move
+			} else if (b.type === "para" && cur) cur.text += "\n\n" + stripMarkers(joinMd(b.lines));
+		} else if (section === "consequences") {
+			if (b.type === "list") for (const it of b.items) {
+				if (markerKind(it[0]) === "square") {                     // each consequence is a "□"-marked item
+					flush();
+					cur = { kind: "consequence", max: parseTrack(rawOf(it)).max, text: stripMarkers(joinMd(it)) };
+				} else if (cur) cur.text += bullet(it);
+			} else if (b.type === "para" && cur) cur.text += "\n\n" + stripMarkers(joinMd(b.lines));
+		}
+	}
+	flush();
+	return back;
+}
+
 /** Build the back side (the spell / mysteries) from its blocks. Stat blocks (followers) are handled
  *  by build-arcana via toFollowerDoc; here we collect moves/consequences/resource. */
-export function parseBack(blocks, { slug }) {
+export function parseBack(blocks, { slug, name, major, unlockAt } = {}) {
+	if (major) return parseMajorBack(blocks, { slug, name, unlockAt });
 	const back = { title: null, item: null, description: null, resource: null, moves: [], consequences: null, unlockAt: null };
 	let section = null; // null | "moves" | "consequences"
 	const descParas = [];

@@ -290,11 +290,11 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect((await arcana.buildSnapshot()).minor.items[0].back.resource).toBeNull();
 		});
 
-		it("back.moves[0] has correct name and text", async () => {
+		it("back.moves[0] is a MoveSnapshot with name and description (the raw text)", async () => {
 			const item = await getItem();
 			expect(item.back.moves[0]).toMatchObject({
 				name: "When you take a draught of ffyrnig tonic",
-				text: "<p>pick 1: regain HP or clear a debility.</p>",
+				description: "<p>pick 1: regain HP or clear a debility.</p>",
 			});
 		});
 

@@ -1,7 +1,8 @@
 // Build the arcana pack source from Book II Appendix C (Minor) + D (Major).
 //   node scripts/import/pdf/build-arcana.js            # report only -> helper/arcanum-manual-review.md
 //   node scripts/import/pdf/build-arcana.js --write    # regenerate the 9 minor follower files
-//   node scripts/import/pdf/build-arcana.js --write-arcana  # ALSO overwrite packs/src/arcana/**.json
+//   node scripts/import/pdf/build-arcana.js --write-arcana  # ALSO overwrite packs/src/arcana/major/*.json
+//                                                            (minor fronts still WIP, left untouched)
 //
 // The book lays each arcanum out as a two-sided card: a FRONT (name, item, description, unlock) that
 // ends with a "front" side-label, and a BACK (spell / mysteries) that ends with a "back" side-label.
@@ -21,7 +22,7 @@ import { execFileSync } from "child_process";
 import { loadOutline, arcanaAppendixRanges } from "./outline.js";
 import { loadArticlePages } from "./load.js";
 import { extractArticle } from "./layout.js";
-import { parseFront, parseBack, isArcanaFollower, followerChoiceEntry } from "./arcana-parse.js";
+import { parseFront, parseBack, isArcanaFollower, detectUnlockAt } from "./arcana-parse.js";
 import { parseStatBlock, toFollowerDoc } from "./creatures.js";
 
 const PDF = process.env.BOOK_PDF ?? "helper/Book_II_-_The_Wider_World_and_Other_Wonders.pdf";
@@ -29,6 +30,9 @@ const WRITE_ARCANA = process.argv.includes("--write-arcana"); // overwrite arcan
 const WRITE = process.argv.includes("--write") || WRITE_ARCANA; // regenerate follower files + icons
 const REVIEW = "helper/arcanum-manual-review.md";
 const norm = (s) => (s ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+// A looser key that drops the connective words a/an/the/of, so a back heading like "Mysteries of
+// Noruba's Ice Sphere" still matches the hand-authored "Mysteries of the Noruba's Ice Sphere".
+const normLoose = (s) => norm((s ?? "").toLowerCase().replace(/\b(?:the|of|a|an)\b/g, " "));
 const totalPages = () => Number((execFileSync("mutool", ["info", PDF], { encoding: "utf8" }).match(/Pages:\s*(\d+)/) || [])[1] || 302);
 const lineText = (b) => b.type === "heading" || b.type === "title" ? b.line.text : (b.lines?.[0]?.text ?? "");
 const isLabel = (b, re) => (b.type === "heading" || b.type === "title") && re.test(b.line.text.trim());
@@ -41,16 +45,21 @@ for (const tier of ["minor", "major"]) {
 		const rec = { slug: doc.system.slug, tier, doc, file: `packs/src/arcana/${tier}/${f}` };
 		bySlug.set(rec.slug, rec);
 		byName.set(norm(doc.name), rec);
-		if (doc.system.back?.title) byBackTitle.set(norm(doc.system.back.title), rec);
+		if (doc.system.back?.title) { byBackTitle.set(norm(doc.system.back.title), rec); byBackTitle.set(normLoose(doc.system.back.title), rec); }
 	}
 }
 
-// Match a heading (possibly wrapped across 1–2 following blocks) against a name→record map.
+// Match a heading (possibly wrapped across 1–2 following blocks) against a name→record map, trying the
+// exact norm and the looser (a/an/the/of-dropped) key (byBackTitle is indexed under both).
 function matchHeading(blocks, i, map) {
 	const b = blocks[i];
 	if (b.type !== "heading" && b.type !== "title") return null;
-	let key = norm(lineText(b));
-	for (let k = 0; k <= 2; k++) { if (map.has(key)) return map.get(key); key += norm(lineText(blocks[i + 1 + k] || {})); }
+	let raw = lineText(b);
+	for (let k = 0; k <= 2; k++) {
+		if (map.has(norm(raw))) return map.get(norm(raw));
+		if (map.has(normLoose(raw))) return map.get(normLoose(raw));
+		raw += " " + lineText(blocks[i + 1 + k] || {});
+	}
 	return null;
 }
 
@@ -87,6 +96,12 @@ function diverge(parsed, doc) {
 		if (sim(pb.title, eb.title) < 0.6) fl.push(`back.title "${pb.title}" vs "${eb.title}"`);
 		if ((pb.moves?.length ?? 0) !== (eb.moves?.length ?? 0)) fl.push(`back.moves ${pb.moves?.length ?? 0} vs ${eb.moves?.length ?? 0}`);
 		if (rows(pb.consequences) !== rows(eb.consequences)) fl.push(`back.consequences ${rows(pb.consequences)} vs ${rows(eb.consequences)}`);
+		if (parsed.major) {
+			const pn = (pb.moves || []).map((m) => m.name).join("|"), en = (eb.moves || []).map((m) => m.name).join("|");
+			if (pn !== en) fl.push(`back.move names [${pn}] vs [${en}]`);
+			if (tracks(pb.consequences) !== tracks(eb.consequences)) fl.push(`back.consequence tracks [${tracks(pb.consequences)}] vs [${tracks(eb.consequences)}]`);
+			if ((pb.unlockAt ?? null) !== (eb.unlockAt ?? null)) fl.push(`back.unlockAt ${pb.unlockAt ?? null} vs ${eb.unlockAt ?? null}`);
+		}
 	}
 	return fl;
 }
@@ -120,6 +135,7 @@ if (existsSync(FOLLOWER_DIR)) for (const f of readdirSync(FOLLOWER_DIR).filter((
 const ranges = arcanaAppendixRanges(loadOutline(PDF), totalPages());
 const parsedFront = new Map(); // slug -> front
 const parsedBack = new Map();  // slug -> back
+const arcanaUnlockAt = new Map(); // slug -> unlockAt (front-derived, for major backs)
 const parsedByName = new Map(); // normName -> { creature, staged }  (parsed follower stat blocks)
 const review = [`# Arcanum parse — manual review`, ``];
 
@@ -135,10 +151,13 @@ for (const range of ranges) {
 
 	// Fronts: anchored on arcanum names, bounded at the "front" label.
 	for (const { rec, blocks: bl } of segmentBy(blocks, byName, /^front$/i))
-		if (!parsedFront.has(rec.slug)) parsedFront.set(rec.slug, parseFront(bl, { name: rec.doc.name, slug: rec.slug }));
+		if (!parsedFront.has(rec.slug)) {
+			parsedFront.set(rec.slug, parseFront(bl, { name: rec.doc.name, slug: rec.slug }));
+			if (rec.tier === "major") arcanaUnlockAt.set(rec.slug, detectUnlockAt(bl)); // mark-gate lives on the front, stored on back
+		}
 	// Backs: anchored on the existing back.title (the spell / "Mysteries of X"), bounded at "back".
 	for (const { rec, blocks: bl } of segmentBy(blocks, byBackTitle, /^back$/i))
-		if (!parsedBack.has(rec.slug)) parsedBack.set(rec.slug, parseBack(bl, { slug: rec.slug }));
+		if (!parsedBack.has(rec.slug)) parsedBack.set(rec.slug, parseBack(bl, { slug: rec.slug, name: rec.doc.name, major: rec.tier === "major", unlockAt: arcanaUnlockAt.get(rec.slug) }));
 
 	// Follower stat blocks (matched to the roster by name later). Copy each icon out of the per-range
 	// tmp into the staging dir before it's removed.
@@ -160,7 +179,6 @@ for (const range of ranges) {
 // arcanum's existing marker file (deduped) — or the npc default when it isn't a known marker.
 let followersWritten = 0, followersMatched = 0;
 const followerLines = [];
-const arcanaFollowers = new Map(); // arcanaSlug -> [followerSlug]
 for (const r of followerRoster.values()) {
 	if (!r.minor) continue; // majors preserved (inlined, hand-authored)
 	const hit = parsedByName.get(norm(r.name));
@@ -170,7 +188,6 @@ for (const r of followerRoster.values()) {
 	const img = marker || NPC_DEFAULT_IMG;
 	const doc = toFollowerDoc(hit.creature, { slug: r.slug, arcanaSlug: r.arcanaSlug, id: r.id, key: r.key, img, folder: r.folder });
 	if (WRITE) { writeFileSync(path.join(FOLLOWER_DIR, `${r.slug}.json`), JSON.stringify(doc, null, "\t") + "\n"); followersWritten++; }
-	if (r.arcanaSlug) { if (!arcanaFollowers.has(r.arcanaSlug)) arcanaFollowers.set(r.arcanaSlug, []); arcanaFollowers.get(r.arcanaSlug).push(r.slug); }
 	followerLines.push(`- \`${r.slug}\` ← ${r.arcanaSlug}  (img: ${img.split("/").pop()})`);
 }
 rmSync(iconStage, { recursive: true, force: true });
@@ -186,17 +203,16 @@ for (const rec of bySlug.values()) {
 	const fl = diverge(parsed, rec.doc);
 	if (fl.length) { flagged++; reviewBody.push(`## ${rec.doc.name} \`${rec.slug}\` (${rec.tier})`, ...fl.map((f) => `- ${f}`), ``); }
 
-	if (WRITE_ARCANA) {
-		// Decision: overwrite fronts everywhere + minor backs only. Major backs carry hand-authored
-		// choices/consequences/unlockAt that parseBack does not yet emit, so they're preserved.
-		const isMinor = rec.tier === "minor";
-		const back = isMinor ? (parsed.back ?? rec.doc.system.back ?? null) : (rec.doc.system.back ?? null);
-		// Link the arcanum to its follower(s): a single-pick choice row per follower in the back.
-		const fols = arcanaFollowers.get(rec.slug);
-		if (isMinor && back && fols?.length)
-			back.choices = { slug: rec.doc.system.back?.choices?.slug || rec.slug, list: fols.map(followerChoiceEntry) };
-		const sys = { slug: rec.slug, front, back };
-		if (parsed.major) sys.major = true;
+	// --write-arcana currently overwrites MAJOR arcana only (front + back); minor fronts are still
+	// divergent (WIP), so they're left untouched (their hand-authored follower wiring stays intact).
+	if (WRITE_ARCANA && rec.tier === "major") {
+		// Preserve the hand-authored back when the parse came up empty (unsegmented or no moves/
+		// consequences) — e.g. ineffable-words / redwood-effigy / staff-of-the-lidless-orb / norubas.
+		const parsedGood = parsed.back && ((parsed.back.moves?.length ?? 0) > 0 || parsed.back.consequences);
+		const back = parsedGood ? parsed.back : (rec.doc.system.back ?? null);
+		// Major follower cards (mindgem/blackwood) inline their followers — preserve that hand-authored choice group.
+		if (parsedGood && back && rec.doc.system.back?.choices) back.choices = rec.doc.system.back.choices;
+		const sys = { slug: rec.slug, front, back, major: true };
 		const out = { _id: rec.doc._id, _key: rec.doc._key, name: rec.doc.name, type: "arcanum",
 			...(rec.doc.img ? { img: rec.doc.img } : {}), system: sys, flags: {}, folder: rec.doc.folder };
 		writeFileSync(rec.file, JSON.stringify(out, null, "\t") + "\n");

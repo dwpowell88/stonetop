@@ -21,10 +21,15 @@
 	</div>
 	<div class="stonetop-arcanum-body">
 		<div class="stonetop-rich">{{{md back.description}}}</div>
-		{{#each back.moves}}
-		<p class="stonetop-arcanum-move-trigger"><strong>{{name}}</strong>{{#if subtitle}} <span class="stonetop-arcanum-move-subtitle">{{subtitle}}</span>{{/if}}</p>
-		<div class="stonetop-rich">{{{md text}}}</div>
-		{{/each}}
+		{{#if back.moves.length}}
+		<ol class="items-list stonetop-arcanum-moves">
+			{{#each back.moves}}
+			<li class="stonetop-item">
+				{{> "stonetop.move-item" showCheck=false}}
+			</li>
+			{{/each}}
+		</ol>
+		{{/if}}
 		{{#if back.choices}}
 		<div class="stonetop-arcanum-back-choices">
 			{{#each back.choices.list}}
