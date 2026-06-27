@@ -1,4 +1,4 @@
-import { isAvara } from "./fonts.js";
+import { isAvara, isItalic } from "./fonts.js";
 import { deterministicId, documentKey } from "../ids.js";
 import { toSlug } from "../../../src/utils/slug.js";
 import { stripLoyalty } from "./arcana-parse.js";
@@ -21,12 +21,39 @@ export function journalUuid(articleSlug) {
 // A stat-block name is set in the small Avara display face, or — for the book's "in-character"
 // write-ups (e.g. Thornthumb) — the handwritten FeltTip-Heavy face.
 const isNameFont = (l) => (isAvara(l.font) && l.size < 11) || /FeltTip\w*-Heavy/i.test(l.font);
-const isMoveBullet = (l) => /^ä\s/.test(l.text.trim());
-const isFieldText  = (t) => /^(HP\b|Armor\b|Damage\b|Instinct\b|Special qualit|Cost\b)/i.test(t);
+// The arcana load pipeline injects □/◻/○/◯/◇ vector markers (pick boxes, loyalty/track pips, item
+// load) into follower stat-block lines; they carry no creature-stat meaning here, so strip them
+// (monster stat blocks have none, so this is a no-op for them).
+const stripMk = (s) => s.replace(/[□◻○◯◇]/g, " ");
+const isMoveBullet = (l) => /^ä\s/.test(stripMk(l.text).trim());
+// A field label must be followed by whitespace or end-of-string — not punctuation — so a wrapped value
+// line that happens to start with a label word (e.g. damage wrapping to "armor, disadvantage)") is not
+// mistaken for a new field.
+const isFieldText  = (t) => /^(HP|Armor|Damage|Instinct|Special qualit\w*|Cost)(?=\s|$)/i.test(t);
 
 // Field label → schema key. "Special qualities" (plural in the book) → specialQuality. `Cost` is
 // follower-only (monsters never have it); its trailing "(Loyalty ◯◯◯)" is stripped by toFollowerDoc.
-const FIELDS = [[/^HP\b/i, "hp"], [/^Armor\b/i, "armor"], [/^Damage\b/i, "damage"], [/^Instinct\b/i, "instinct"], [/^Special qualit\w*/i, "specialQuality"], [/^Cost\b/i, "cost"]];
+const FIELDS = [[/^HP(?=\s|$)/i, "hp"], [/^Armor(?=\s|$)/i, "armor"], [/^Damage(?=\s|$)/i, "damage"], [/^Instinct(?=\s|$)/i, "instinct"], [/^Special qualit\w*/i, "specialQuality"], [/^Cost(?=\s|$)/i, "cost"]];
+
+// Build markdown from a line's spans, wrapping italic runs in _…_ (the book sets weapon/damage tags —
+// hand, close, reach — in italics; the npc sheet renders markdown). Adjacent same-emphasis runs merge.
+const spansItalicMd = (spans) => {
+	const toks = [];
+	for (const s of spans || []) {
+		const t = stripMk(s.text);
+		if (!t) continue;
+		const it = isItalic(s.font);
+		const last = toks[toks.length - 1];
+		if (last && last.it === it) last.text += t; else toks.push({ it, text: t });
+	}
+	let out = "";
+	for (const t of toks) {
+		if (!t.it) { out += t.text; continue; }
+		const m = t.text.match(/^(\s*)(.*?)(\s*)$/s);
+		out += m[2] ? `${m[1]}_${m[2]}_${m[3]}` : t.text;
+	}
+	return out;
+};
 
 const splitTags = (t) => t.split(/,\s*/).map((s) => s.trim()).filter(Boolean);
 // A capitalised, multi-word line inside the moves is a transition sentence (e.g. the Crombil's "When
@@ -36,7 +63,7 @@ const looksTransition = (t) => /^[A-Z]/.test(t) && t.split(/\s+/).length > 4;
 /** Parse a stat block's lines into structured creature data. */
 export function parseStatBlock(lines) {
 	const out = { name: "", tagList: [], hp: { value: 0, max: 0 }, armor: "", damage: "", specialQuality: "", instinct: "", cost: "", moves: [], description: [] };
-	const text = (l) => l.text.trim();
+	const text = (l) => stripMk(l.text).replace(/\s{2,}/g, " ").trim();
 
 	// The name is the first name-font line; anything before it is an in-character intro → description.
 	let nameIdx = lines.findIndex(isNameFont);
@@ -46,37 +73,50 @@ export function parseStatBlock(lines) {
 	for (let j = 0; j < nameIdx; j++) if (text(lines[j])) out.description.push(text(lines[j]));
 
 	// Tags follow the name and may wrap across lines (the book's "Solitary, large, fae, …,/ corrupted")
-	// until the first field or move.
+	// until the first field or move. Real tag lines/wraps are comma-delimited or a single word; a
+	// comma-less, multi-word continuation is a personality/options line (e.g. tulpa's "fierce kind sly
+	// timid willful"), not tags — skip it.
 	let k = nameIdx + 1;
+	let firstTag = true;
 	for (; k < lines.length; k++) {
 		const t = text(lines[k]);
 		if (!t) continue;
 		if (isFieldText(t) || isMoveBullet(lines[k])) break;
+		if (!firstTag && !t.includes(",") && t.split(/\s+/).length > 2) continue;
 		out.tagList.push(...splitTags(t));
+		firstTag = false;
 	}
 
 	const setField = (key, val) => {
-		if (key === "hp") { const n = parseInt(val, 10); out.hp = { value: Number.isNaN(n) ? 0 : n, max: Number.isNaN(n) ? 0 : n }; }
+		// A bare "HP" (e.g. the "HP / Starts at N" sidebar) carries no number — don't clobber the real HP.
+		if (key === "hp") { const n = parseInt(val, 10); if (!Number.isNaN(n)) out.hp = { value: n, max: n }; }
 		else out[key] = val;
 	};
-	const extendField = (key, val) => { if (key !== "hp") out[key] = out[key] ? `${out[key]} ${val}` : val; };
+	const extendField = (key, val, sep = " ") => { if (key !== "hp") out[key] = out[key] ? `${out[key]}${sep}${val}` : val; };
 
 	let field = null;          // the field key currently being filled (so wrap lines extend it)
 	let mode = "fields";       // fields → moves
 	let movePer = "move";      // within moves: "move" (extend last) | "prose" (transition sentence)
+	let damageStart = -1;      // line index of the "Damage …" line + its wraps (for italic markdown)
+	const damageWrap = [];
 	for (; k < lines.length; k++) {
 		const t = text(lines[k]);
 		if (!t) continue;
+		// A bare page-number line or a "front"/"back" side-label is card furniture (not stat content);
+		// skip it so it can't bleed into the last field (e.g. cost "… (Loyalty) 34 back").
+		if (/^\d+$/.test(t) || /^(front|back)$/i.test(t)) continue;
 
 		if (isMoveBullet(lines[k])) { mode = "moves"; movePer = "move"; field = null; out.moves.push({ text: t.replace(/^ä\s*/, ""), prose: false }); continue; }
 
 		if (isFieldText(t)) {
 			mode = "fields"; field = null;
-			// One printed line can carry several fields ("HP 26; Armor 3 (…)").
+			// One printed line can carry several fields ("HP 26; Armor 3 (…)"). A ";" segment that is not
+			// itself a new field belongs to the current field's value (keep the "; ", e.g. "Special
+			// qualities fireproof; holds …").
 			for (const seg of t.split(/\s*;\s*/)) {
 				const m = FIELDS.find(([re]) => re.test(seg));
-				if (m) { setField(m[1], seg.replace(m[0], "").trim()); field = m[1]; }
-				else if (field) extendField(field, seg);
+				if (m) { setField(m[1], seg.replace(m[0], "").trim()); field = m[1]; if (m[1] === "damage") damageStart = k; }
+				else if (field) extendField(field, seg, "; ");
 			}
 			continue;
 		}
@@ -89,13 +129,28 @@ export function parseStatBlock(lines) {
 			else { out.moves.push({ text: t, prose: true }); movePer = "prose"; }                           // a transition sentence between move groups
 		} else if (field) {
 			extendField(field, t);
+			if (field === "damage") damageWrap.push(k);
 		} else {
 			out.description.push(t);
 		}
 	}
+	// Rebuild the damage value from spans so the book's italic weapon tags (hand, close, reach) survive
+	// as markdown. Drop everything up to the "Damage" label, then append wrap lines.
+	if (damageStart >= 0) {
+		let md = spansItalicMd(lines[damageStart].spans).replace(/^.*?\bdamage\b[:\s]*/i, "");
+		for (const wi of damageWrap) md += " " + spansItalicMd(lines[wi].spans);
+		out.damage = md;
+	}
 	out.description = out.description.join(" ").trim();
+	// Collapse column-gap whitespace artifacts and straighten curly double-quotes in every string field.
+	for (const key of ["armor", "damage", "specialQuality", "instinct", "cost", "description"])
+		out[key] = out[key].replace(/[“”]/g, '"').replace(/\s{2,}/g, " ").trim();
+	for (const m of out.moves) m.text = m.text.replace(/[“”]/g, '"').replace(/\s{2,}/g, " ").trim();
 	return out;
 }
+
+// Make a follower's damage dice rollable on the sheet: "d6", "1d8", "d12+7" → "[[/r d6]]" etc.
+const rollableDice = (s) => (s || "").replace(/\b(\d*d\d+(?:\s*[+-]\s*\d+)?)\b/gi, (m) => `[[/r ${m.replace(/\s+/g, "")}]]`);
 
 // A pick-list (Selection) field's stored raw shape — see src/data/creature.js selectionField().
 const selection = (selected, multi) => ({ selected, options: [], multi, allowCustom: true });
@@ -140,9 +195,14 @@ export function toNpcDoc(creature, { article } = {}) {
 /** Build an arcanum-follower Item doc (src/data/creature.js schema) from a parsed stat block. Cost is
  *  the key follower field; its "(Loyalty ◯◯◯)" is dropped (loyalty is always max 3). `_id`/`_key`/
  *  `img`/`folder` come from the existing follower (preserved by build-arcana) when present. */
-export function toFollowerDoc(creature, { arcanaSlug = null, id, key, img = "icons/svg/item-bag.svg", folder = null } = {}) {
-	const followerSlug = toSlug(creature.name);
+export function toFollowerDoc(creature, { arcanaSlug = null, slug, id, key, img = "icons/svg/item-bag.svg", folder = null } = {}) {
+	// The canonical slug (filename + arcana back-ref) is passed in; it can differ from toSlug(name)
+	// when the book name carries a leading "The" the slug drops (e.g. "The Andalau of the Flute").
+	const followerSlug = slug ?? toSlug(creature.name);
 	const cost = stripLoyalty(creature.cost || "");
+	// A follower stores current HP 0 (the sheet fills it); only the book max matters. parseStatBlock
+	// sets value === max (the printed number), so take the max explicitly.
+	const hp = { value: 0, max: creature.hp?.max || creature.hp?.value || 0 };
 	return {
 		_id: id ?? deterministicId("followers", followerSlug),
 		_key: key ?? documentKey("Item", id ?? deterministicId("followers", followerSlug)),
@@ -154,15 +214,15 @@ export function toFollowerDoc(creature, { arcanaSlug = null, id, key, img = "ico
 			reference: null,
 			arcanaSlug,
 			tagList: selection(creature.tagList, true),
-			hp: creature.hp,
+			hp,
 			armor: creature.armor,
-			damage: creature.damage,
-			specialQuality: creature.specialQuality,
+			damage: rollableDice(creature.damage),
+			specialQuality: creature.specialQuality ?? "",
 			instinct: selection(creature.instinct ? [creature.instinct] : [], false),
 			cost: selection(cost ? [cost] : [], false),
 			loyalty: { value: 0, max: 3 },
 			choices: [{ slug: "choices", list: [] }],
-			moves: creature.moves.map((m) => (m.prose ? `\n${m.text}\n` : `- ${m.text}`)).join("\n").replace(/\n{3,}/g, "\n\n").trim(),
+			moves: (creature.moves || []).map((m) => (m.prose ? `\n${m.text}\n` : `- ${m.text}`)).join("\n").replace(/\n{3,}/g, "\n\n").trim(),
 			description: creature.description,
 			notes: "",
 		},

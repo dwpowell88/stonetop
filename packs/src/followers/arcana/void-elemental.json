@@ -1,21 +1,41 @@
 {
+	"_id": "QiGKZZSbO176nkOO",
+	"_key": "!items!QiGKZZSbO176nkOO",
 	"name": "Void elemental",
 	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
 	"system": {
 		"slug": "void-elemental",
+		"reference": null,
 		"arcanaSlug": "oversized-crown",
+		"tagList": {
+			"selected": [
+				"Spirit",
+				"primordial",
+				"confused",
+				"angry"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
 		"hp": {
 			"value": 0,
 			"max": 15
 		},
-		"armor": "1",
-		"damage": "d10",
-		"specialQuality": "",
+		"armor": "1 (lacks organs)",
+		"damage": "void touch [[/r 1d10]] w/advantage (_hand_, _grabby_, ignores armor)",
+		"specialQuality": "immune to most harm",
 		"instinct": {
 			"selected": [
 				"to rage at all the noise and chaos"
 			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"cost": {
+			"selected": [],
 			"options": [],
 			"multi": false,
 			"allowCustom": true
@@ -30,32 +50,10 @@
 				"list": []
 			}
 		],
+		"moves": "- Manifest as a black hole in reality\n- Snuff out a source of energy\n- Become confused, unsure what to do",
 		"description": "",
-		"moves": "- immune to most harm\n- Manifest as a black hole in reality\n- Snuff out a source of energy\n- Become confused, unsure what to do",
-		"cost": {
-			"selected": [
-				"Loyalty ◯◯◯"
-			],
-			"options": [],
-			"multi": false,
-			"allowCustom": true
-		},
-		"notes": "",
-		"reference": null,
-		"tagList": {
-			"selected": [
-				"Spirit",
-				"primordial",
-				"confused",
-				"angry"
-			],
-			"options": [],
-			"multi": true,
-			"allowCustom": true
-		}
+		"notes": ""
 	},
 	"flags": {},
-	"folder": "BNaYX2Y4eMe7EOPK",
-	"_id": "QiGKZZSbO176nkOO",
-	"_key": "!items!QiGKZZSbO176nkOO"
+	"folder": "BNaYX2Y4eMe7EOPK"
 }

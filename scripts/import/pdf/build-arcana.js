@@ -1,22 +1,32 @@
 // Build the arcana pack source from Book II Appendix C (Minor) + D (Major).
-//   node scripts/import/pdf/build-arcana.js          # report only -> helper/arcanum-manual-review.md
-//   node scripts/import/pdf/build-arcana.js --write   # also overwrite packs/src/arcana/**.json
+//   node scripts/import/pdf/build-arcana.js            # report only -> helper/arcanum-manual-review.md
+//   node scripts/import/pdf/build-arcana.js --write    # regenerate the 9 minor follower files
+//   node scripts/import/pdf/build-arcana.js --write-arcana  # ALSO overwrite packs/src/arcana/**.json
 //
 // The book lays each arcanum out as a two-sided card: a FRONT (name, item, description, unlock) that
 // ends with a "front" side-label, and a BACK (spell / mysteries) that ends with a "back" side-label.
 // We split the flattened block stream on those labels, match fronts to arcana by name and backs by
 // their existing `back.title` (we regenerate a known set), preserve each `_id`/`folder` by slug, and
 // report divergences from the hand-authored JSON.
+//
+// The follower regeneration (--write) is finished + isolated: it rewrites only the minor follower
+// items (matched to the existing roster by name) and their icons; the existing arcana backs already
+// wire the followers, so it touches no arcanum JSON. The front/back parser still diverges widely
+// (see the review report — ~29 backs unparsed, unlock rows off), so the arcanum overwrite is held
+// behind the separate --write-arcana flag until that parser is finished.
 import os from "os"; import path from "path";
-import { mkdtempSync, rmSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { mkdtempSync, rmSync, readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "fs";
+import { createHash } from "crypto";
 import { execFileSync } from "child_process";
 import { loadOutline, arcanaAppendixRanges } from "./outline.js";
 import { loadArticlePages } from "./load.js";
 import { extractArticle } from "./layout.js";
-import { parseFront, parseBack } from "./arcana-parse.js";
+import { parseFront, parseBack, isArcanaFollower, followerChoiceEntry } from "./arcana-parse.js";
+import { parseStatBlock, toFollowerDoc } from "./creatures.js";
 
 const PDF = process.env.BOOK_PDF ?? "helper/Book_II_-_The_Wider_World_and_Other_Wonders.pdf";
-const WRITE = process.argv.includes("--write");
+const WRITE_ARCANA = process.argv.includes("--write-arcana"); // overwrite arcanum JSON (parser WIP)
+const WRITE = process.argv.includes("--write") || WRITE_ARCANA; // regenerate follower files + icons
 const REVIEW = "helper/arcanum-manual-review.md";
 const norm = (s) => (s ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 const totalPages = () => Number((execFileSync("mutool", ["info", PDF], { encoding: "utf8" }).match(/Pages:\s*(\d+)/) || [])[1] || 302);
@@ -82,16 +92,44 @@ function diverge(parsed, doc) {
 }
 
 // ── run ───────────────────────────────────────────────────────────────────────
+const FOLLOWER_DIR = "packs/src/followers/arcana";
+const NPC_DEFAULT_IMG = "systems/stonetop/assets/content/icons/npc.png";
+// A follower's stat-block icon is its arcanum marker symbol — already shipped as trade dress under
+// assets/content/wonders/markers/. Reference that file (deduped by sha256 via trade-dress.json) rather
+// than committing a duplicate; an icon that doesn't match a known marker falls back to the npc default.
+const markerMap = JSON.parse(readFileSync("scripts/import/pdf/trade-dress.json", "utf8")).markers; // sha256 -> marker name
+const markerImg = (file) => {
+	if (!file) return null;
+	const name = markerMap[createHash("sha256").update(readFileSync(file)).digest("hex")];
+	return name ? `systems/stonetop/assets/content/wonders/markers/${name}.png` : null;
+};
+
+// Existing follower roster — authoritative for slug/_id/arcanaSlug (segmentation can misattribute a
+// stat block, and canonical slugs drop a leading "The"). Minor followers are regenerated from the PDF
+// (matched by normalized name); the 3 major followers are inlined + hand-authored, so preserved.
+const followerRoster = new Map(); // normName -> { slug, name, arcanaSlug, id, key, folder, minor }
+if (existsSync(FOLLOWER_DIR)) for (const f of readdirSync(FOLLOWER_DIR).filter((n) => n.endsWith(".json"))) {
+	const d = JSON.parse(readFileSync(path.join(FOLLOWER_DIR, f), "utf8"));
+	const arcanaSlug = d.system?.arcanaSlug ?? null;
+	// The filename is the canonical slug (it matches the arcana back-ref and can drop a leading "The"
+	// that toSlug(name) would keep).
+	followerRoster.set(norm(d.name), { slug: f.replace(/\.json$/, ""), name: d.name, arcanaSlug,
+		id: d._id, key: d._key, folder: d.folder, minor: bySlug.get(arcanaSlug)?.tier === "minor" });
+}
+
 const ranges = arcanaAppendixRanges(loadOutline(PDF), totalPages());
 const parsedFront = new Map(); // slug -> front
 const parsedBack = new Map();  // slug -> back
+const parsedByName = new Map(); // normName -> { creature, staged }  (parsed follower stat blocks)
 const review = [`# Arcanum parse — manual review`, ``];
 
+const iconStage = mkdtempSync(path.join(os.tmpdir(), "arc-icons-"));
 for (const range of ranges) {
+	// Only the minor appendix lays followers out as clean stat blocks.
+	const isMinor = /minor/i.test(range.title);
 	const tmp = mkdtempSync(path.join(os.tmpdir(), "arc-"));
 	const { pages, pageRules, pageImages } = loadArticlePages(PDF, range, { imgDir: tmp, imgPrefix: "arc" });
 	const art = extractArticle(pages, { title: range.title, pageRules, pageImages });
-	rmSync(tmp, { recursive: true, force: true });
 	const blocks = [];
 	for (const s of art.sections) for (const c of [...s.left, ...s.right]) blocks.push(...c.blocks);
 
@@ -101,7 +139,42 @@ for (const range of ranges) {
 	// Backs: anchored on the existing back.title (the spell / "Mysteries of X"), bounded at "back".
 	for (const { rec, blocks: bl } of segmentBy(blocks, byBackTitle, /^back$/i))
 		if (!parsedBack.has(rec.slug)) parsedBack.set(rec.slug, parseBack(bl, { slug: rec.slug }));
+
+	// Follower stat blocks (matched to the roster by name later). Copy each icon out of the per-range
+	// tmp into the staging dir before it's removed.
+	if (isMinor) for (const b of blocks) {
+		if (b.type !== "statblock" || !isArcanaFollower(b)) continue;
+		const creature = parseStatBlock(b.lines);
+		if (!creature.name) continue;
+		const key = norm(creature.name);
+		if (parsedByName.has(key)) continue;
+		let staged = null;
+		if (b.icon?.file) { staged = path.join(iconStage, `${key}.png`); copyFileSync(b.icon.file, staged); }
+		parsedByName.set(key, { creature, staged });
+	}
+	rmSync(tmp, { recursive: true, force: true });
 }
+
+// Match parsed stat blocks to the roster, regenerate the minor follower files, and collect the
+// arcanum→follower wiring used by the arcana write loop below. The follower icon references its
+// arcanum's existing marker file (deduped) — or the npc default when it isn't a known marker.
+let followersWritten = 0, followersMatched = 0;
+const followerLines = [];
+const arcanaFollowers = new Map(); // arcanaSlug -> [followerSlug]
+for (const r of followerRoster.values()) {
+	if (!r.minor) continue; // majors preserved (inlined, hand-authored)
+	const hit = parsedByName.get(norm(r.name));
+	if (!hit) { followerLines.push(`- \`${r.slug}\` ← ${r.arcanaSlug}  (NO STAT BLOCK FOUND)`); continue; }
+	followersMatched++;
+	const marker = markerImg(hit.staged);
+	const img = marker || NPC_DEFAULT_IMG;
+	const doc = toFollowerDoc(hit.creature, { slug: r.slug, arcanaSlug: r.arcanaSlug, id: r.id, key: r.key, img, folder: r.folder });
+	if (WRITE) { writeFileSync(path.join(FOLLOWER_DIR, `${r.slug}.json`), JSON.stringify(doc, null, "\t") + "\n"); followersWritten++; }
+	if (r.arcanaSlug) { if (!arcanaFollowers.has(r.arcanaSlug)) arcanaFollowers.set(r.arcanaSlug, []); arcanaFollowers.get(r.arcanaSlug).push(r.slug); }
+	followerLines.push(`- \`${r.slug}\` ← ${r.arcanaSlug}  (img: ${img.split("/").pop()})`);
+}
+rmSync(iconStage, { recursive: true, force: true });
+const preserved = [...followerRoster.values()].filter((r) => !r.minor).map((r) => r.slug);
 
 const reviewBody = [];
 let parsedCount = 0, flagged = 0;
@@ -113,8 +186,16 @@ for (const rec of bySlug.values()) {
 	const fl = diverge(parsed, rec.doc);
 	if (fl.length) { flagged++; reviewBody.push(`## ${rec.doc.name} \`${rec.slug}\` (${rec.tier})`, ...fl.map((f) => `- ${f}`), ``); }
 
-	if (WRITE) {
-		const sys = { slug: rec.slug, front, back: parsed.back };
+	if (WRITE_ARCANA) {
+		// Decision: overwrite fronts everywhere + minor backs only. Major backs carry hand-authored
+		// choices/consequences/unlockAt that parseBack does not yet emit, so they're preserved.
+		const isMinor = rec.tier === "minor";
+		const back = isMinor ? (parsed.back ?? rec.doc.system.back ?? null) : (rec.doc.system.back ?? null);
+		// Link the arcanum to its follower(s): a single-pick choice row per follower in the back.
+		const fols = arcanaFollowers.get(rec.slug);
+		if (isMinor && back && fols?.length)
+			back.choices = { slug: rec.doc.system.back?.choices?.slug || rec.slug, list: fols.map(followerChoiceEntry) };
+		const sys = { slug: rec.slug, front, back };
 		if (parsed.major) sys.major = true;
 		const out = { _id: rec.doc._id, _key: rec.doc._key, name: rec.doc.name, type: "arcanum",
 			...(rec.doc.img ? { img: rec.doc.img } : {}), system: sys, flags: {}, folder: rec.doc.folder };
@@ -123,7 +204,11 @@ for (const rec of bySlug.values()) {
 }
 
 const missing = [...bySlug.keys()].filter((s) => !parsedFront.has(s));
-review.push(`Parsed ${parsedCount}/${bySlug.size} fronts, ${parsedBack.size} backs; ${flagged} flagged${missing.length ? `; NO FRONT: ${missing.join(", ")}` : ""}.`, ``, ...reviewBody);
+review.push(`Parsed ${parsedCount}/${bySlug.size} fronts, ${parsedBack.size} backs; ${flagged} flagged${missing.length ? `; NO FRONT: ${missing.join(", ")}` : ""}.`, ``);
+review.push(`## Followers`, `Matched ${followersMatched} minor follower(s) to stat blocks:`, ...followerLines,
+	``, `Preserved hand-authored (major appendix, inlined format — not regenerated): ${preserved.length ? preserved.map((s) => `\`${s}\``).join(", ") : "none"}`, ``);
+review.push(...reviewBody);
 mkdirSync(path.dirname(REVIEW), { recursive: true });
 writeFileSync(REVIEW, review.join("\n"));
-console.log(`fronts ${parsedCount}/${bySlug.size}, backs ${parsedBack.size}; ${flagged} flagged${missing.length ? `; ${missing.length} missing front` : ""}. -> ${REVIEW}${WRITE ? "  (WROTE JSON)" : "  (report only)"}`);
+const mode = WRITE_ARCANA ? "WROTE followers + arcana JSON" : WRITE ? "WROTE followers" : "report only";
+console.log(`fronts ${parsedCount}/${bySlug.size}, backs ${parsedBack.size}; ${flagged} flagged${missing.length ? `; ${missing.length} missing front` : ""}. followers ${followersMatched} matched${WRITE ? `, ${followersWritten} written` : ""}, ${preserved.length} preserved. -> ${REVIEW}  (${mode})`);

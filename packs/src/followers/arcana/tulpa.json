@@ -1,20 +1,43 @@
 {
+	"_id": "U1SAvkDiUzITqaNe",
+	"_key": "!items!U1SAvkDiUzITqaNe",
 	"name": "Tulpa",
 	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-triskele.png",
 	"system": {
 		"slug": "tulpa",
+		"reference": null,
 		"arcanaSlug": "beautiful-scroll",
+		"tagList": {
+			"selected": [
+				"Spirit",
+				"construct",
+				"tiny",
+				"naive",
+				"eager"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
 		"hp": {
 			"value": 0,
 			"max": 8
 		},
 		"armor": "0",
-		"damage": "d4",
+		"damage": "[[/r 1d4]] (if that)",
 		"specialQuality": "",
 		"instinct": {
 			"selected": [
-				"to play / to learn / to flaunt"
+				"to play to learn to flaunt"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"cost": {
+			"selected": [
+				"respect given new experiences comfort/compassion"
 			],
 			"options": [],
 			"multi": false,
@@ -30,33 +53,10 @@
 				"list": []
 			}
 		],
+		"moves": "- Manifest a form of dust/snow/vapor\n- Produce light (area, reach)\n- Carry/manipulate a item\n- Deliver a message\n- Spy on someone/something",
 		"description": "",
-		"moves": "- Manifest a form of dust/snow/vapor\n- Produce light (area, reach)\n- Carry/manipulate a ◇ item\n- Deliver a message\n- Spy on someone/something",
-		"cost": {
-			"selected": [
-				"respect given / new experiences / comfort/compassion (Loyalty ◯◯◯)"
-			],
-			"options": [],
-			"multi": false,
-			"allowCustom": true
-		},
-		"notes": "",
-		"reference": null,
-		"tagList": {
-			"selected": [
-				"spirit",
-				"construct",
-				"tiny",
-				"naive",
-				"eager"
-			],
-			"options": [],
-			"multi": true,
-			"allowCustom": true
-		}
+		"notes": ""
 	},
 	"flags": {},
-	"folder": "BNaYX2Y4eMe7EOPK",
-	"_id": "U1SAvkDiUzITqaNe",
-	"_key": "!items!U1SAvkDiUzITqaNe"
+	"folder": "BNaYX2Y4eMe7EOPK"
 }

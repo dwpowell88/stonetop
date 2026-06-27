@@ -63,10 +63,35 @@ export function parseTrack(raw) {
 	return { max: boxes + lRun, text: lRun ? "" : stripped.replace(/\s{2,}/g, " ").trim() };
 }
 
-/** Strip a trailing "(Loyalty ◯◯◯)" from a follower cost line. Loyalty is always max 3 (the schema
- *  default), so the marker count is discarded — we only want the clean cost text. */
+/** Strip the "(Loyalty ◯◯◯)" annotation from a follower cost line. Loyalty is always max 3 (the
+ *  schema default), so the marker count is discarded — we only want the clean cost text. Handles the
+ *  book's noise: a "Loyalty:" colon, stray ○/l markers trailing the paren, and a loyalty-only line
+ *  (no real cost) → "". */
 export function stripLoyalty(costRaw) {
-	return costRaw.replace(/\s*\(\s*loyalty[\s○◯l]*\)\s*$/i, "").trim();
+	return (costRaw || "")
+		.replace(/\(\s*loyalty[:\s○◯l]*\)/ig, " ")   // a parenthesized "(Loyalty …)" anywhere
+		.replace(/\bloyalty[:\s○◯l]*$/i, " ")         // a bare trailing "Loyalty ◯◯◯" (loyalty-only cost)
+		.replace(/[○◯]/g, " ")                         // any leftover stray circle markers
+		.replace(/\s{2,}/g, " ")
+		.trim()
+		.replace(/[,\s]+$/, "");
+}
+
+// ─── follower wiring / detection ────────────────────────────────────────────────
+/** The single-pick choice row that links an arcanum back to one of its followers — the follower IS
+ *  the row (empty content, `inlineDisplay`). Mirrors the hand-authored `beautiful-scroll` back. */
+export function followerChoiceEntry(followerSlug) {
+	return { type: "entry", slug: followerSlug, content: { title: null, text: "" }, track: { max: 1 }, inlineDisplay: true, followers: [followerSlug] };
+}
+
+/** A real arcanum follower stat block carries a small creature marker icon (~15–18px); the card's
+ *  border decoration (~42px) and icon-less fragments are false positives, as are numeric page-number
+ *  "names". Used to filter `statblock` blocks before parsing followers. */
+export function isArcanaFollower(block) {
+	const w = block?.icon?.w;
+	if (!(typeof w === "number" && w < 25)) return false;
+	const first = (block.lines || []).find((l) => (l.text || "").trim());
+	return !!first && !/^\d+$/.test(first.text.trim());
 }
 
 /** The item tags line under a title → an outfit-item-shaped object (name = arcanum name, weight from
