@@ -37,6 +37,30 @@ const totalPages = () => Number((execFileSync("mutool", ["info", PDF], { encodin
 const lineText = (b) => b.type === "heading" || b.type === "title" ? b.line.text : (b.lines?.[0]?.text ?? "");
 const isLabel = (b, re) => (b.type === "heading" || b.type === "title") && re.test(b.line.text.trim());
 
+// Major-arcana mystery moves are real `move` items, owned by the arcanum via `back.moveSlugs` (the
+// container-owned moves model — moves carry no `moveType`/back-reference). Promote a parsed back's
+// inline `moves` into standalone move pack files and replace them with `moveSlugs`. No-op if the back
+// already uses `moveSlugs` (e.g. a preserved hand-authored back). Move `_id` is derived from the slug
+// so re-runs are stable.
+const ARCANA_MOVES_DIR = "packs/src/moves/arcana";
+const ARCANA_MOVES_FOLDER = "ArcanaMoves00001"; // packs/src/moves/_folders/arcana.json
+const arcanaMoveId = (slug) => createHash("sha1").update("arcana-move:" + slug).digest("hex").slice(0, 16);
+function emitArcanaMoves(back) {
+	if (!back || !Array.isArray(back.moves)) return back;
+	mkdirSync(ARCANA_MOVES_DIR, { recursive: true });
+	const slugs = [];
+	for (const m of back.moves) {
+		const slug = m.id; slugs.push(slug);
+		const id = arcanaMoveId(slug);
+		const doc = { _id: id, _key: `!items!${id}`, name: m.name, type: "move",
+			system: { slug, moveType: null, description: m.text ?? "" }, folder: ARCANA_MOVES_FOLDER };
+		writeFileSync(path.join(ARCANA_MOVES_DIR, `${slug}.json`), JSON.stringify(doc, null, "\t") + "\n");
+	}
+	const out = {};
+	for (const [k, v] of Object.entries(back)) { if (k === "moves") out.moveSlugs = slugs; else out[k] = v; }
+	return out;
+}
+
 // Index existing arcana: slug -> record; name -> rec; backTitle -> rec.
 const bySlug = new Map(), byName = new Map(), byBackTitle = new Map();
 for (const tier of ["minor", "major"]) {
@@ -93,12 +117,15 @@ function diverge(parsed, doc) {
 	if ((pf.item ? 1 : 0) !== (ef.item ? 1 : 0)) fl.push(`front.item ${!!pf.item} vs ${!!ef.item}`);
 	if (!!parsed.back !== !!doc.system.back) fl.push(`back present ${!!parsed.back} vs ${!!doc.system.back}`);
 	if (doc.system.back) {
+		// Backs reference moves by slug (`back.moveSlugs`); the parsed back still carries inline moves
+		// whose `.id` IS the slug, so compare slug-to-slug. Fall back to legacy inline `eb.moves`.
+		const pbSlugs = (pb.moves || []).map((m) => m.id);
+		const ebSlugs = eb.moveSlugs ?? (eb.moves || []).map((m) => m.id ?? m.name);
 		if (sim(pb.title, eb.title) < 0.6) fl.push(`back.title "${pb.title}" vs "${eb.title}"`);
-		if ((pb.moves?.length ?? 0) !== (eb.moves?.length ?? 0)) fl.push(`back.moves ${pb.moves?.length ?? 0} vs ${eb.moves?.length ?? 0}`);
+		if (pbSlugs.length !== ebSlugs.length) fl.push(`back.moves ${pbSlugs.length} vs ${ebSlugs.length}`);
 		if (rows(pb.consequences) !== rows(eb.consequences)) fl.push(`back.consequences ${rows(pb.consequences)} vs ${rows(eb.consequences)}`);
 		if (parsed.major) {
-			const pn = (pb.moves || []).map((m) => m.name).join("|"), en = (eb.moves || []).map((m) => m.name).join("|");
-			if (pn !== en) fl.push(`back.move names [${pn}] vs [${en}]`);
+			if (pbSlugs.join("|") !== ebSlugs.join("|")) fl.push(`back.move slugs [${pbSlugs.join("|")}] vs [${ebSlugs.join("|")}]`);
 			if (tracks(pb.consequences) !== tracks(eb.consequences)) fl.push(`back.consequence tracks [${tracks(pb.consequences)}] vs [${tracks(eb.consequences)}]`);
 			if ((pb.unlockAt ?? null) !== (eb.unlockAt ?? null)) fl.push(`back.unlockAt ${pb.unlockAt ?? null} vs ${eb.unlockAt ?? null}`);
 		}
@@ -209,9 +236,11 @@ for (const rec of bySlug.values()) {
 		// Preserve the hand-authored back when the parse came up empty (unsegmented or no moves/
 		// consequences) — e.g. ineffable-words / redwood-effigy / staff-of-the-lidless-orb / norubas.
 		const parsedGood = parsed.back && ((parsed.back.moves?.length ?? 0) > 0 || parsed.back.consequences);
-		const back = parsedGood ? parsed.back : (rec.doc.system.back ?? null);
+		let back = parsedGood ? parsed.back : (rec.doc.system.back ?? null);
 		// Major follower cards (mindgem/blackwood) inline their followers — preserve that hand-authored choice group.
 		if (parsedGood && back && rec.doc.system.back?.choices) back.choices = rec.doc.system.back.choices;
+		// Promote parsed inline moves → move pack files + `back.moveSlugs` (no-op if already moveSlugs).
+		back = emitArcanaMoves(back);
 		const sys = { slug: rec.slug, front, back, major: true };
 		const out = { _id: rec.doc._id, _key: rec.doc._key, name: rec.doc.name, type: "arcanum",
 			...(rec.doc.img ? { img: rec.doc.img } : {}), system: sys, flags: {}, folder: rec.doc.folder };

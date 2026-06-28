@@ -1,0 +1,12 @@
+{
+	"_id": "1f20a1a909de8b48",
+	"_key": "!items!1f20a1a909de8b48",
+	"name": "Purify",
+	"type": "move",
+	"system": {
+		"slug": "purify",
+		"moveType": null,
+		"description": "Name an instance of corruption, infection, or taint in your presence. If you speak this Word forward, the target is cleansed. If you speak backward, the corruption grows and spreads aggressively."
+	},
+	"folder": "ArcanaMoves00001"
+}

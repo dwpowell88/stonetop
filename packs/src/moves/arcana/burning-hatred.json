@@ -1,0 +1,12 @@
+{
+	"_id": "9c185b72a705b616",
+	"_key": "!items!9c185b72a705b616",
+	"name": "Burning Hatred",
+	"type": "move",
+	"system": {
+		"slug": "burning-hatred",
+		"moveType": null,
+		"description": "(near, magical, reload) When you **_point the Red Scepter at an object of your hatred and erase 1 charge_**, roll +CHA: **on a 10+**, the Scepter deals 2d4 damage (*messy*, ignores armor), manifested as blistering burns; **on a 7-9**, as a 10+ but pick 1:\n- Mark a consequence\n- Spend a few seconds chanting and muttering before dealing damage\n- Cause any exposed, combustible items in range to burst into flames\n\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence).\n\nWhen you **_mark 3 Consequences_**, you gain Fanning the Flames."
+	},
+	"folder": "ArcanaMoves00001"
+}

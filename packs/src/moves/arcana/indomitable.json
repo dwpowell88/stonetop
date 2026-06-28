@@ -1,0 +1,12 @@
+{
+	"_id": "4b74d5c556dd2065",
+	"_key": "!items!4b74d5c556dd2065",
+	"name": "Indomitable",
+	"type": "move",
+	"system": {
+		"slug": "indomitable",
+		"moveType": null,
+		"description": "When you **_wear the Scales and stand fast against a magical attack_**, you can mark a consequence after you roll to add 3 to the result."
+	},
+	"folder": "ArcanaMoves00001"
+}

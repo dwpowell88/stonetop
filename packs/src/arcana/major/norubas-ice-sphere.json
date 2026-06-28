@@ -59,17 +59,8 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "mindwalking",
-					"name": "Mindwalking",
-					"subtitle": "use the Ice Sphere as a psychic anchor",
-					"tracker": {
-						"label": "Power",
-						"max": 3
-					},
-					"text": "Your consciousness leaves your body and walks the world as a spirit, invisible and insubstantial. Roll +INT: **on a 10+**, hold 3 Power; **on a 7-9**, hold 2 Power; **on a 6-**, hold 2 Power and mark a Consequence. While mindwalking, you may spend your Power, 1-for-1 to:\n\n- Manifest as a ghostly voice and/or presence\n- Manipulate an unattended item (small or ◇, no bigger)\n- Return instantly to the Ice Sphere from any distance\nFor every 2 Consequences you mark, gain one of the following moves:\n\n**A Mighty Will** — When you *mindwalk*, hold +1 Power.\n\n**Farwalker** — When you *mindwalk*, you may spend 1 Power to instantly send your mind to any place you have ever visited, physically or mentally.\n\n**Telepathy** — When you *mindwalk*, you may spend 1 Power to become able to communicate mentally with someone nearby, as long as you remain in their presence. They can choose whether to respond, and can attempt to ignore you, but cannot shut you out completely without magic of their own.\n\n**Thoughtcrafter** — When you *mindwalk*, you may spend 1 Power to animate a mass of loose material (gravel, snow, leaves, etc.) into a body no larger than your own. When you would roll STR, DEX, or CON in this form, use INT instead. This form has 10 HP. When reduced to 0 HP, it dissipates and you return to your physical body."
-				}
+			"moveSlugs": [
+				"mindwalking"
 			],
 			"consequences": {
 				"slug": "consequences",

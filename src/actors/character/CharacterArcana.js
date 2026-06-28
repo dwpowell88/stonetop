@@ -5,13 +5,14 @@ import { EmbeddedOutfitItemBuilder } from "../../model/data/character/EmbeddedOu
 import { Arcanum } from "../../model/data/character/Arcanum.js";
 import { buildArcanumSnapshot } from "./arcanumSnapshot.js";
 export class CharacterArcana {
-	constructor(actor, arcanaRepo, stats = null, outfitItems = null, followers = null, factory = null) {
+	constructor(actor, arcanaRepo, stats = null, outfitItems = null, followers = null, factory = null, moves = null) {
 		this._actor      = actor;
 		this._arcanaRepo = arcanaRepo;
 		this._stats      = stats;
 		this._outfitItems = outfitItems;
 		this._followers  = followers;
 		this._factory    = factory;
+		this._moves      = moves;
 	}
 
 	get ownedSlugs() {
@@ -41,7 +42,7 @@ export class CharacterArcana {
 			: [];
 		const followersBySlug = Object.fromEntries(followerSnapshots.map(f => [f.slug, f]));
 
-		const snapshots = fetchedItems.map(item => buildArcanumSnapshot(item, {
+		const snapshots = await Promise.all(fetchedItems.map(async item => buildArcanumSnapshot(item, {
 			flipped:          flippedBySlug.get(item.slug)    ?? false,
 			unlockValues:     unlockBySlug.get(item.slug)     ?? new ChoiceValues({}),
 			backChoiceValues: backChoiceBySlug.get(item.slug) ?? new ChoiceValues({}),
@@ -50,11 +51,21 @@ export class CharacterArcana {
 			current:          resourceController?.getCurrent("inventory", item.slug) ?? 0,
 			checked:          checkedMap[item.slug] ?? false,
 			owned:            true,
-		}));
+			moveSnapshots:    await this._mysteryMoveSnapshots(item),
+		})));
 
 		const minor = new ArcanaSectionSnapshot("Minor Arcana", snapshots.filter(s => !s.major));
 		const major = new ArcanaSectionSnapshot("Major Arcana", snapshots.filter(s =>  s.major));
 		return new ArcanaSnapshot(minor, major);
+	}
+
+	// Major arcana own their mystery moves as real `move` items in an `arcana-<slug>` category (seeded
+	// un-acquired — the player ticks each to unlock). Resolve them through CharacterMoves so the card
+	// renders the same move snapshots as the moves tab. Minor/custom arcana (no moveSlugs) fall back to
+	// the inline back.moves shape in buildArcanumSnapshot, so return null for them.
+	async _mysteryMoveSnapshots(item) {
+		if (!this._moves || !(item.back?.moveSlugs?.length)) return null;
+		return this._moves.getMoveSnapshotsForCategory(`arcana-${item.slug}`);
 	}
 
 	async addArcanum(slug) {
@@ -79,12 +90,15 @@ export class CharacterArcana {
 		const linkedSlugs = this._followerSlugsFor(raw);
 		await this._followers?.embedLinkedFollowers(linkedSlugs);
 		await this._syncEmbeddedItemWith(slug, raw);
+		const moveSlugs = raw.back?.moveSlugs ?? [];
+		if (moveSlugs.length) await this._moves?.addCategory(`arcana-${slug}`, item.name ?? slug, moveSlugs, []);
 	}
 
 	async removeArcanum(slug) {
 		const embeddedItem = _findArcanumItem(this._actor, slug);
 		const arcanum = embeddedItem ? _itemToArcanum(embeddedItem) : null;
 		if (embeddedItem) await this._actor.deleteEmbeddedDocuments("Item", [embeddedItem._id]);
+		await this._moves?.removeCategory(`arcana-${slug}`);
 		await this._outfitItems?.deleteBySource("arcana:" + slug);
 		for (const followerSlug of this._followerSlugsFor(arcanum)) {
 			await this._followers?.removeLinkedFollower(followerSlug);

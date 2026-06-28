@@ -25,7 +25,9 @@
 		<ol class="items-list stonetop-arcanum-moves">
 			{{#each back.moves}}
 			<li class="stonetop-item">
-				{{> "stonetop.move-item" showCheck=false}}
+				{{!-- Major arcana: real move items the player ticks to unlock (categoryKey = source.type =
+				      arcana-<slug>). Minor/custom arcana render inline, always-active, no checkbox. --}}
+				{{> "stonetop.move-item" showCheck=../major categoryKey=source.type}}
 			</li>
 			{{/each}}
 		</ol>

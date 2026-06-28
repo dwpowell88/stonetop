@@ -1,0 +1,12 @@
+{
+	"_id": "7db89e910e4c9ad4",
+	"_key": "!items!7db89e910e4c9ad4",
+	"name": "Empower",
+	"type": "move",
+	"system": {
+		"slug": "empower",
+		"moveType": null,
+		"description": "Name a living thing or vessel for power in your presence. If you speak this Word forward, the target surges with power. A creature heals 1d8 HP or gains advantage on its next roll. If you speak backward, the target is drained of energy. A creature takes 1d8 damage (ignores armor) or takes disadvantage on its next roll."
+	},
+	"folder": "ArcanaMoves00001"
+}

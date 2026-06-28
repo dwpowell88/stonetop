@@ -53,22 +53,10 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "battery",
-					"name": "Battery",
-					"text": "When you **_gather elemental power about the Azure Hand_**, you can choose to store the energy in the staff itself. It no longer requires your touch or focus to maintain. You cannot do this again until you use up the energy contained within (see reverse)."
-				},
-				{
-					"id": "eye-of-the-storm",
-					"name": "Eye of the Storm",
-					"text": "When you **_grasp the Azure Hand and impose your will on the elements around you_**, roll +CON: **on a** **10+**, the elements calm or diminish in their power, and choose 2 from the list below; **on a 7-9**, the elements calm or diminish, and choose 1.\n- You suffer no consequence (otherwise, mark one)\n- The effect is far reaching, up to a mile around you (otherwise, it extends just a few paces) You can maintain the effect easily (otherwise, it takes all of your concentration)"
-				},
-				{
-					"id": "resonance",
-					"name": "Resonance",
-					"text": "(Requires: Battery, Eye of the Storm) When you **_have captured a tremendous elemental force_** (like that from a storm or wildfire) and **_then_** **_channel it into the eddies of air or earth_**, pick 1 from the list below and roll +INT: **on a 10+**, it comes to pass; **on a 7-9**, it will come to pass if you choose to mark a consequence; **on a 6-**, mark a consequence and prepare for the worst.\n- A potent storm or earthquake builds, unleashing itself within the next few hours.\n- The weather for the next few weeks is abnormal, hotter or colder, wetter or dryer, windier or more still, per your desires (though nothing too extreme).\n- The weather for the next few months is generally favorable; any steading in the area gains advantage to its next Seasons Change roll."
-				}
+			"moveSlugs": [
+				"battery",
+				"eye-of-the-storm",
+				"resonance"
 			],
 			"consequences": {
 				"slug": "consequences",

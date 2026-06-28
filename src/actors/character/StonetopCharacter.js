@@ -36,7 +36,7 @@ export class StonetopCharacter {
 		this._inventory   = new CharacterInventory(actor, repos.inventory, outfitItems, this._resourceController);
 		this._vitals      = new CharacterVitals(actor);
 		this._debilities  = new CharacterDebilities(actor);
-		this._arcana      = new CharacterArcana(actor, repos.arcana, this._stats, outfitItems, this._followers, factory);
+		this._arcana      = new CharacterArcana(actor, repos.arcana, this._stats, outfitItems, this._followers, factory, this._moves);
 		this._inserts     = new CharacterInserts(actor, factory, this._moves, repos.inserts);
 		this._playbook.setVitals(this._vitals);
 		this._playbook.setMoves(this._moves);

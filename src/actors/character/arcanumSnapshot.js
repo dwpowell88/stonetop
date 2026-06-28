@@ -62,6 +62,7 @@ export function buildArcanumSnapshot(arcanum, {
 	current          = 0,
 	checked          = false,
 	owned            = true,
+	moveSnapshots    = null,        // major arcana: real `move`-item snapshots resolved by the caller
 } = {}) {
 	const item = arcanum;
 
@@ -110,7 +111,9 @@ export function buildArcanumSnapshot(arcanum, {
 		.withDescription(item.back.description)
 		.withResource(backResource)
 		.withChoices(backChoices)
-		.withMoves((item.back.moves ?? []).map(buildArcanumMoveSnapshot))
+		// Major arcana render their mystery moves as real `move` items (passed in as moveSnapshots);
+		// minor/custom arcana fall back to the inline back.moves shape.
+		.withMoves(moveSnapshots ?? (item.back.moves ?? []).map(buildArcanumMoveSnapshot))
 		.withConsequences(consequences)
 		.withUnlockAt(item.back.unlockAt)
 		.build();

@@ -166,8 +166,12 @@ export class CharacterMoves {
 		const acquiredSlugs      = _acquiredSlugs(allMoveItems);
 		const resourceController = this._resourceController;
 
+		// Arcana mystery moves live in `arcana-<slug>` categories; they render on their arcanum card, not
+		// the moves tab. They still count toward acquiredSlugs above (for other moves' requirements).
+		const tabMoveItems = allMoveItems.filter(i => !(i.system?.categoryKey ?? "").startsWith("arcana-"));
+
 		const byCatKey = new Map();
-		for (const item of allMoveItems) {
+		for (const item of tabMoveItems) {
 			const key = item.system?.categoryKey ?? "other";
 			if (!byCatKey.has(key)) byCatKey.set(key, []);
 			byCatKey.get(key).push(item);

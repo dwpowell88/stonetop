@@ -1,0 +1,12 @@
+{
+	"_id": "d64b4c4da6838c23",
+	"_key": "!items!d64b4c4da6838c23",
+	"name": "Speak the Unutterable",
+	"type": "move",
+	"system": {
+		"slug": "speak-the-unutterable",
+		"moveType": null,
+		"description": "When you **speak an Ineffable Word that you have mastered**, roll +CON: **on a 10+**, the Word's power manifests as described; **on a 7-9**, the Word's power manifests, but choose 1 from the list below; **on a 6-**, the GM says what happens (which may or may not involve marking a consequence).\n\n- You collapse in a full-body seizure\n- Mark a consequence"
+	},
+	"folder": "ArcanaMoves00001"
+}

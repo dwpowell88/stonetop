@@ -7,6 +7,7 @@ import { ResourceController } from "../../../src/actors/character/ResourceContro
 import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
 import { FakeArcanaRepository } from "../../fakes/FakeArcanaRepository.js";
 import { FakeFollowerRepository } from "../../fakes/FakeFollowerRepository.js";
+import { FakeMoves } from "../../fakes/FakeMoves.js";
 import { Stats } from "../../../src/model/data/character/Stats.js";
 import {
 	ArcanaSnapshot, ArcanaSectionSnapshot,
@@ -804,5 +805,62 @@ describe("CharacterArcana.onArcanumCreated", () => {
 		await charArcana.onArcanumCreated({ system: { slug: null, front: null, back: null } });
 		expect(outfitItems.sync).not.toHaveBeenCalled();
 		expect(outfitItems.deleteBySource).not.toHaveBeenCalled();
+	});
+});
+
+// -- Tests: mystery moves (major arcana) ---------------------------------------
+
+const AZURE_HAND = {
+	slug: "azure-hand", major: true, name: "Azure Hand",
+	front: { title: "Azure Hand", item: null, description: "<p>A staff.</p>", unlock: { slug: "azure-hand", list: [] } },
+	back:  { title: "Mysteries", item: null, description: "<p>The back.</p>", moveSlugs: ["battery", "resonance"] },
+};
+
+function makeArcanaWithMoves(items = [], moves = new FakeMoves(), arcana = [AZURE_HAND]) {
+	const actor = makeActor(items);
+	const charArcana = new CharacterArcana(
+		actor, new FakeArcanaRepository(arcana), makeFakeStats(), makeActorOutfitItems(), null, null, moves,
+	);
+	return { actor, charArcana, moves };
+}
+
+describe("CharacterArcana — mystery moves", () => {
+	it("onArcanumCreated registers an arcana-<slug> move category from back.moveSlugs, seeded un-acquired", async () => {
+		const { charArcana, moves } = makeArcanaWithMoves();
+		await charArcana.onArcanumCreated(makeArcanumItem(AZURE_HAND));
+		expect(moves.addedCategories).toEqual([
+			{ type: "arcana-azure-hand", name: "Azure Hand", moveSlugs: ["battery", "resonance"] },
+		]);
+	});
+
+	it("onArcanumCreated registers nothing for an arcanum without moveSlugs (minor/custom)", async () => {
+		const { charArcana, moves } = makeArcanaWithMoves();
+		await charArcana.onArcanumCreated(makeArcanumItem(FFYRNIG_SPHERE));
+		expect(moves.addedCategories).toEqual([]);
+	});
+
+	it("removeArcanum removes the arcana-<slug> move category", async () => {
+		const { charArcana, moves } = makeArcanaWithMoves([makeArcanumItem(AZURE_HAND)]);
+		await charArcana.removeArcanum("azure-hand");
+		expect(moves.removedCategories).toContain("arcana-azure-hand");
+	});
+
+	it("buildSnapshot renders the resolved real-move snapshots on the major card", async () => {
+		const moves = new FakeMoves();
+		const resolved = [{ name: "Battery" }, { name: "Resonance" }];
+		moves.setSnapshotsForCategory("arcana-azure-hand", resolved);
+		const { charArcana } = makeArcanaWithMoves([makeArcanumItem(AZURE_HAND)], moves);
+
+		const snap = await charArcana.buildSnapshot();
+		const card = snap.major.items.find(c => c.slug === "azure-hand");
+		expect(card.back.moves).toEqual(resolved);
+	});
+
+	it("buildSnapshot keeps the inline back.moves fallback for arcana without moveSlugs", async () => {
+		const { charArcana } = makeArcanaWithMoves([makeArcanumItem(FFYRNIG_SPHERE)], new FakeMoves(), [FFYRNIG_SPHERE]);
+		const snap = await charArcana.buildSnapshot();
+		const card = snap.minor.items.find(c => c.slug === "huge-wooden-sphere");
+		expect(card.back.moves).toHaveLength(1);
+		expect(card.back.moves[0].name).toBe("When you take a draught of ffyrnig tonic");
 	});
 });

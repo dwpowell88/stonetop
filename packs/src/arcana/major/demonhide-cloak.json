@@ -74,17 +74,9 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "the-flesh-remembers",
-					"name": "The Flesh Remembers",
-					"text": "When you **_first encounter a demon and search the Cloak’s memories for its like_**, roll +nothing: **on a 10+**, the flesh of such a creature is present in the Cloak—you receive a vision of how it was defeated; **on a** **7-9**, choose 1 from the list below.\n- The flesh of such a creature is present in the Cloak—you receive a vision of how it was defeated, but mark a Consequence\n- The flesh of such a creature is not present in the cloak; you learn nothing\n\nWhen you **_have marked 3 Consequences_**, you gain the following move:"
-				},
-				{
-					"id": "unholy-visage",
-					"name": "Unholy Visage",
-					"text": "When you **_take the appearance of a demon_**, roll +CON: **on a 10+**, hold 3 Guise; **on a 7-9**, hold 1 Guise; **on a 6-**, hold 1 Guise and mark a Consequence. While you hold Guise, all perceive you as a demon, and magic that affects demons affects you, too. Spend Guise, 1-for-1 to:\n- Maintain your appearance in the face of divination or revealing light\n- Understand any language you hear, and reply in kind\n- Shrug off harm that your demonic form could ignore\n- Maneuver in a way consistent with your demonic form: flying, leaping, oozing, flitting as a shadow, etc."
-				}
+			"moveSlugs": [
+				"the-flesh-remembers",
+				"unholy-visage"
 			],
 			"consequences": {
 				"slug": "consequences",

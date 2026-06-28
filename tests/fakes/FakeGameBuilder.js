@@ -14,6 +14,7 @@ export class FakeGameBuilder {
 				contents: worldItems,
 				get: (id) => worldItems.find(i => i._id === id) ?? null,
 			},
+			i18n: { localize: (key) => key },
 		});
 	}
 

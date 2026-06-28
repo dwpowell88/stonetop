@@ -1,0 +1,12 @@
+{
+	"_id": "8f079ba47801f1ab",
+	"_key": "!items!8f079ba47801f1ab",
+	"name": "Inescapable Pull",
+	"type": "move",
+	"system": {
+		"slug": "inescapable-pull",
+		"moveType": null,
+		"description": "You can use Siphon at up to *near* range, and on a 10+ you can can choose to drag the victim closer."
+	},
+	"folder": "ArcanaMoves00001"
+}

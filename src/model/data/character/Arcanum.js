@@ -42,6 +42,10 @@ export class ArcanumBack {
 		this.description  = data.description  ?? null;
 		this.resource     = data.resource ? new Resource(data.resource) : null;
 		this.options      = data.options      ?? [];
+		// Major arcana reference their mystery moves by slug (back.moveSlugs) — resolved to real `move`
+		// items on the character. `moves` is the legacy inline shape, still used by minor arcana and
+		// custom-authored arcana (and as a render fallback when moveSlugs is empty).
+		this.moveSlugs    = data.moveSlugs    ?? [];
 		this.moves        = (data.moves ?? []).map(m => new ArcanumMysteryMove(m));
 		this.consequences = data.consequences ?? null;
 		this.unlockAt     = data.unlockAt     ?? null;

@@ -135,6 +135,15 @@ describe("ArcanumBack", () => {
 		expect(new ArcanumBack({ ...BACK_DATA, moves: undefined }).moves).toEqual([]);
 	});
 
+	it("keeps moveSlugs (major arcana reference real moves by slug)", () => {
+		expect(new ArcanumBack({ ...BACK_DATA, moveSlugs: ["battery", "resonance"] }).moveSlugs)
+			.toEqual(["battery", "resonance"]);
+	});
+
+	it("moveSlugs defaults to [] when absent", () => {
+		expect(new ArcanumBack(BACK_DATA).moveSlugs).toEqual([]);
+	});
+
 	it("consequences defaults to null when absent", () => {
 		expect(new ArcanumBack(BACK_DATA).consequences).toBeNull();
 	});

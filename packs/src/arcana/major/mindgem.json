@@ -98,7 +98,7 @@
 					}
 				]
 			},
-			"moves": [],
+			"moveSlugs": [],
 			"consequences": {
 				"slug": "consequences",
 				"list": [

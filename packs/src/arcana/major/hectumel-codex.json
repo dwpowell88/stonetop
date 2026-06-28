@@ -46,12 +46,8 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "darksome-vessel",
-					"name": "Darksome Vessel",
-					"text": "When you **_cast a Codex spell_**, on a 12+ you can choose the Empowered effect. When you **_choose to_** **_mark a consequence before casting a spell_**, don’t roll; you get a 12+."
-				}
+			"moveSlugs": [
+				"darksome-vessel"
 			],
 			"consequences": null,
 			"unlockAt": 4

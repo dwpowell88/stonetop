@@ -14,7 +14,8 @@ import * as CG from "../utils/choiceGroupEdit.js";
 import * as AME from "../utils/arcanumMoveEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
 import { Arcanum } from "../model/data/character/Arcanum.js";
-import { buildArcanumSnapshot } from "../actors/character/arcanumSnapshot.js";
+import { buildArcanumSnapshot, buildArcanumMoveSnapshot } from "../actors/character/arcanumSnapshot.js";
+import { FoundryMoveRepository } from "../actors/character/repositories/FoundryMoveRepository.js";
 import { enrichRichTokens } from "../utils/enrichGameText.js";
 
 const BLANK_ITEM     = () => ({ name: "", weight: 1, tags: null, note: null, inventoryColumn: null, twoCol: false, resource: null });
@@ -92,7 +93,14 @@ export function createStonetopArcanumSheetClass(Base) {
 			const arcanum = new Arcanum({
 				slug: sys.slug, major: sys.major, name: this.item.name, img: this.item.img, front, back,
 			});
-			context.preview        = [buildArcanumSnapshot(arcanum, { flipped: this._previewFlipped })];
+			// Major arcana reference mystery moves by slug; resolve them read-only so a locked canonical
+			// arcanum still previews its moves (custom arcana author inline back.moves → moveSnapshots null).
+			const moveSlugs = back.moveSlugs ?? [];
+			const resolved  = moveSlugs.length ? await new FoundryMoveRepository().getMovesBySlugs(moveSlugs) : [];
+			const moveSnapshots = resolved.length
+				? resolved.map(m => buildArcanumMoveSnapshot({ id: m.slug, name: m.name, text: m.description }))
+				: null;
+			context.preview        = [buildArcanumSnapshot(arcanum, { flipped: this._previewFlipped, moveSnapshots })];
 			context.previewFlipped = this._previewFlipped;
 
 			// View-first: an existing arcanum opens as a rendered card with an Edit button; a blank one

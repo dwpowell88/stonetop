@@ -42,6 +42,8 @@ export async function migrateCharacter(actor, repos, insertRepo = null) {
 	_logArcanumFlipped(actor, "after migrateArcana");
 	await migrateArcanumPackData(actor, repos.arcana);
 	_logArcanumFlipped(actor, "after migrateArcanumPackData");
+	await migrateArcanaMoves(actor, repos.arcana, repos.moves);
+	_logArcanumFlipped(actor, "after migrateArcanaMoves");
 	await migrateFollowers(actor, repos.followers, resourceController);
 	_logArcanumFlipped(actor, "after migrateFollowers");
 
@@ -284,6 +286,34 @@ export async function migrateArcana(actor, arcanaRepo, followerRepo) {
 		await actor.updateEmbeddedDocuments("Item", [update]);
 		const after = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === slug);
 		info(`migrateArcana [${slug}]: after update flipped=${after?.system?.flipped} unlockValues=${JSON.stringify(after?.system?.unlockValues)}`);
+	}
+}
+
+// ── F2. Arcana mystery moves → real move items ────────────────────────────────
+// Major arcana now own their mystery moves as real `move` items in an `arcana-<slug>` category
+// (mystery-moves-as-real-moves). Existing embedded major arcana carry the legacy inline back.moves and
+// no category; refresh their `back` from the repo so they gain back.moveSlugs, then register the
+// category. addCategory is idempotent (skips if the category already exists), so this is re-run safe.
+export async function migrateArcanaMoves(actor, arcanaRepo, moveRepo) {
+	const arcana = [...actor.items].filter(i => i.type === "arcanum");
+	if (!arcana.length) return;
+
+	const moves = new CharacterMoves(moveRepo, actor, null, null);
+	for (const item of arcana) {
+		const slug = item.system?.slug;
+		if (!slug) continue;
+
+		let back = item.system?.back ?? {};
+		if (!(back.moveSlugs?.length)) {
+			const raw = await arcanaRepo.findBySlug(slug);
+			if (raw?.back?.moveSlugs?.length) {
+				back = raw.back;
+				await actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { back } }]);
+			}
+		}
+
+		const moveSlugs = back.moveSlugs ?? [];
+		if (moveSlugs.length) await moves.addCategory(`arcana-${slug}`, item.name ?? slug, moveSlugs, []);
 	}
 }
 

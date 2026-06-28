@@ -55,27 +55,11 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "siphon",
-					"name": "Siphon",
-					"text": "When you **_raise your ringed hand and will the ring to consume someone’s life-force_** (at up to *reach* range), roll +CON: **on a 10+**, deal 1d10 damage (*grabby*, ignores armor); **on a 7-9**, deal 1d10 damage (ignores armor) but choose one:\n- The ring eats at your life-force, too—lose 1d10 HP and mark a debility\n- Mark a consequence\n\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence)."
-				},
-				{
-					"id": "inescapable-pull",
-					"name": "Inescapable Pull",
-					"text": "You can use Siphon at up to *near* range, and on a 10+ you can can choose to drag the victim closer."
-				},
-				{
-					"id": "maelstrom",
-					"name": "Maelstrom",
-					"text": "When you **_use Siphon_**, you can mark a consequence before rolling to affect a number of victims within range. Roll +CON once, but roll damage separately for each target."
-				},
-				{
-					"id": "dust-to-dust",
-					"name": "Dust to Dust",
-					"text": "When you **_wear the ring and press it firmly against a work of mortal artifice_**, mark a debility and then roll +CON: **on a 10+**, the artifice fails or is ruined (say how); **on a 7-9**, it is ruined (as per a 10+) but also mark a consequence; **on a 6-**, the GM says what happens (which may or may not involve marking a consequence.)"
-				}
+			"moveSlugs": [
+				"siphon",
+				"inescapable-pull",
+				"maelstrom",
+				"dust-to-dust"
 			],
 			"consequences": {
 				"slug": "consequences",

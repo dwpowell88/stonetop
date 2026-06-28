@@ -1,0 +1,12 @@
+{
+	"_id": "6aeabfddf716f01e",
+	"_key": "!items!6aeabfddf716f01e",
+	"name": "Seal",
+	"type": "move",
+	"system": {
+		"slug": "seal",
+		"moveType": null,
+		"description": "Name a portal, clasp, or seam in your presence. If you speak this Word forward, the target seals shut and holds against any mundane attempt to open it. If you speak backward, the target is pried open or apart."
+	},
+	"folder": "ArcanaMoves00001"
+}

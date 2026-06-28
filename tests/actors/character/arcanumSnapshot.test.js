@@ -33,6 +33,12 @@ describe("buildArcanumSnapshot", () => {
 		expect(s.back.unlockAt).toBe("after 4 marks");
 	});
 
+	it("uses caller-supplied moveSnapshots (major arcana real moves) over inline back.moves", () => {
+		const real = [{ name: "Real Battery" }, { name: "Real Resonance" }];
+		const s = buildArcanumSnapshot(richArcanum(), { moveSnapshots: real });
+		expect(s.back.moves).toBe(real);
+	});
+
 	it("defaults (preview): not flipped/owned, empty groups → null, no stats crash", () => {
 		const s = buildArcanumSnapshot(new Arcanum({ slug: "x", front: {}, back: {} }));
 		expect(s.flipped).toBe(false);

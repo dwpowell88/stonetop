@@ -67,17 +67,9 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "storm-s-fury",
-					"name": "Storm’s Fury",
-					"text": "When you **_begin to roil with anger_**, your markings crackle with electricity and the air thrums with pressure. Roll +CON: **on a 10+**, hold 3 Fury; **on a 7-9**, hold 2 Fury; **on a 6-**, hold 2 Fury but also mark a consequence.\n\nYou may spend Fury 1-for-1 to manifest one of the following:\n- Imbue your next strike with the force of thunder (+1d6 damage, *forceful*, *loud*)\n- Move like lightning, closing the distance between you and a nearby foe before they can react\n- Bellow like the storm itself, drawing no small amount of attention and making craven foes cringe in fear\n\nWhen you **_have marked 3 consequences_**, you gain Chosen of the Storm-bringer."
-				},
-				{
-					"id": "chosen-of-the-storm-bringer",
-					"name": "Chosen of the Storm-bringer",
-					"text": "Add these to the list of potential manifestations granted by Storm’s Fury:\n- Roll +CON to Let Fly with a bolt of lightning (2d6 damage, *thrown*, *forceful*, *loud*, *dangerous*, ignores armor)\n- Make a prodigious leap, buoyed by the wind\n- Summon a powerful gale with you at its center—dirt and debris swirl about, the wind is deafening, people must brace themselves to keep from getting bowled over, projectiles careen off course—and take disadvantage on all rolls as long as you sustain it"
-				}
+			"moveSlugs": [
+				"storms-fury",
+				"chosen-of-the-storm-bringer"
 			],
 			"consequences": {
 				"slug": "consequences",

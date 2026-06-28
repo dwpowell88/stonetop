@@ -80,17 +80,9 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "burning-hatred",
-					"name": "Burning Hatred",
-					"text": "(near, magical, reload) When you **_point the Red Scepter at an object of your hatred and erase 1 charge_**, roll +CHA: **on a 10+**, the Scepter deals 2d4 damage (*messy*, ignores armor), manifested as blistering burns; **on a 7-9**, as a 10+ but pick 1:\n- Mark a consequence\n- Spend a few seconds chanting and muttering before dealing damage\n- Cause any exposed, combustible items in range to burst into flames\n\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence).\n\nWhen you **_mark 3 Consequences_**, you gain Fanning the Flames."
-				},
-				{
-					"id": "fanning-the-flames",
-					"name": "Fanning the Flames",
-					"text": "When you **_use Inflame_**, you can incite everyone who can hear you into violent action, not just an individual. If you do, roll once for the entire crowd, but each target makes their own choices. **On a 7-9**, you must also choose a Consequence; **on a 6-**, the GM chooses a Consequence for you in addition to whatever else happens.\n\nWhen you **_use Burning Hatred_**, you can mark a consequence to target not just the person or thing you hate but also everything near them. Roll +CHA once but roll damage for each victim. Any combustibles on your targets also erupt into flame."
-				}
+			"moveSlugs": [
+				"burning-hatred",
+				"fanning-the-flames"
 			],
 			"consequences": {
 				"slug": "consequences",

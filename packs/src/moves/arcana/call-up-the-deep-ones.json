@@ -1,0 +1,12 @@
+{
+	"_id": "2765e1c8cdba3cfe",
+	"_key": "!items!2765e1c8cdba3cfe",
+	"name": "Call Up the Deep Ones",
+	"type": "move",
+	"system": {
+		"slug": "call-up-the-deep-ones",
+		"moveType": null,
+		"description": "When you **_stand in heavy fog or before deep water and call on the servants of Daagon to serve you_**, spend 1 Loyalty or mark a consequence and they appear. Treat them as followers, sharing a pool of Loyalty with the Ring itself. You can always choose to mark a consequence in lieu of spending their Loyalty."
+	},
+	"folder": "ArcanaMoves00001"
+}

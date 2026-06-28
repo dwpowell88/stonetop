@@ -92,27 +92,11 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "whispers",
-					"name": "Whispers",
-					"text": "When you **_grip the shaft of the Twisted Spear_**, you can ask the GM, \"What spirits are active here?\" and get an honest answer."
-				},
-				{
-					"id": "promise-of-doom",
-					"name": "Promise of Doom",
-					"text": "When you **_hold the Twisted Spear and speak aloud an oath to destroy a spirit or demon_**, you do +2d4 damage against them and -4 damage to everything else. This lasts until you destroy them or forsake your oath. If you forsake your oath, mark a consequence."
-				},
-				{
-					"id": "roots-of-the-elder-tree",
-					"name": "Roots of the Elder Tree",
-					"text": "When you **_stand with your feet firmly on the ground and strike a spirit, ghost, or demon_**, you can mark a consequence to send your target coursing through you and into the depths of the earth, where it is bound fast."
-				},
-				{
-					"id": "darkness-lingers",
-					"name": "Darkness Lingers",
-					"text": "When you **_strike down a spirit or demon_**, ask the GM for one of its moves and write it down; it is held in the Twisted Spear. When you **_use the stolen move_**, roll +CON: **on a 10+**, you do it, just like that; **on a 7-9**, you do it, but choose 1:\n- The move is lost, bleeding away from the Spear\n- Mark a consequence"
-				}
+			"moveSlugs": [
+				"whispers",
+				"promise-of-doom",
+				"roots-of-the-elder-tree",
+				"darkness-lingers"
 			],
 			"consequences": {
 				"slug": "consequences",

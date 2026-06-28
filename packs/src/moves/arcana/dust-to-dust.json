@@ -1,0 +1,12 @@
+{
+	"_id": "a686f68d8ae5de2e",
+	"_key": "!items!a686f68d8ae5de2e",
+	"name": "Dust to Dust",
+	"type": "move",
+	"system": {
+		"slug": "dust-to-dust",
+		"moveType": null,
+		"description": "When you **_wear the ring and press it firmly against a work of mortal artifice_**, mark a debility and then roll +CON: **on a 10+**, the artifice fails or is ruined (say how); **on a 7-9**, it is ruined (as per a 10+) but also mark a consequence; **on a 6-**, the GM says what happens (which may or may not involve marking a consequence.)"
+	},
+	"folder": "ArcanaMoves00001"
+}

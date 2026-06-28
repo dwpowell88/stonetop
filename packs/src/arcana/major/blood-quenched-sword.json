@@ -67,17 +67,9 @@
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "unquenched",
-					"name": "Unquenched",
-					"text": "When you **_Clash with a living, bleeding foe with the Blood-quenched Sword_**, you may mark a Consequence to shift the result up one step (a 6- becomes a 7-9; a 7-9 becomes a 10-11; a 10-11 becomes 12+). You can do this only once per roll.\n\nWhen you **_have marked 3 consequences_**, you gain A Flickering Flame."
-				},
-				{
-					"id": "a-flickering-flame",
-					"name": "A Flickering Flame",
-					"text": "When you **_wield the Blood-quenched Blade and leap headlong into battle against multiple foes_**, roll +CON: **on a 10+**, hold 3 Speed; **on a 7-9**, hold 2 Speed; **on a 6-**, hold 2 Speed, and mark a consequence. During this battle, you may spend Speed, 1-for-1 to do the following:\n- Attack any number of foes within your reach; roll Clash once and apply the result to all of them, but roll damage separately for each foe\n- Strike a weak point, ignoring your foe’s armor\n- Disengage from a foe you are fighting\n- Name a foe on the scene but out of your reach; you cross the distance to them before any can react When you stop fighting, lose all Speed."
-				}
+			"moveSlugs": [
+				"unquenched",
+				"a-flickering-flame"
 			],
 			"consequences": {
 				"slug": "consequences",
