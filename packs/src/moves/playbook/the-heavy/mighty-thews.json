@@ -4,8 +4,7 @@
 	"name": "Mighty Thews",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_perform a feat of extraordinary strength (bursting chains, smashing through a wall, heaving a boulder, etc.)_**, you do it (OH YEAH!) but pick 1:\n\n- It takes a while\n- You cause unwanted damage or harm\n- It takes a toll (mark a debility)",
 		"requirement": {
 			"level": 6,

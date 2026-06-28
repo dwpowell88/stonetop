@@ -20,7 +20,7 @@
 	       data-move-slug="{{slug}}"
 	       data-owned-id="{{ownedId}}"
 	       {{#if (gt selection.value 0)}}checked{{/if}}
-	       {{#if (or isStarting (and (not (gt selection.value 0)) (not selectable)))}}disabled{{/if}}>
+	       {{#if (or locked (and (not (gt selection.value 0)) (not selectable)))}}disabled{{/if}}>
 	{{/if}}
 	{{/if}}
 	<strong class="stonetop-item-name">{{name}}</strong>

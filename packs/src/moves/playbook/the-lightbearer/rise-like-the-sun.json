@@ -4,8 +4,7 @@
   "name": "Rise Like the Sun",
   "type": "move",
   "system": {
-    "playbook": "The Lightbearer",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_draw attention to yourself by word or deed_**, roll +CHA: **on a 10+**, everyone turns and looks, and you hold their gaze as long as you keep giving them reason to look; **_on a 7-9_**, everyone turns and looks.",
     "moveResults": {
       "success": {

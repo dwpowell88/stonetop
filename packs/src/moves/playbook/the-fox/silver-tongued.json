@@ -4,8 +4,7 @@
   "name": "Silver Tongued",
   "type": "move",
   "system": {
-    "playbook": "The Fox",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_use words to avoid suspicion or trouble_**, roll +CHA: **on a 10+**, hold 3 Nerve; **_on a 7-9_**, hold 1 Nerve. You may spend Nerve, 1-for-1, to:\n\n- Move about or maneuver unchallenged\n- Withstand direct scrutiny or questioning\n- Direct suspicion or attention elsewhere",
     "resource": {
       "max": 3,

@@ -4,8 +4,7 @@
 	"name": "Quick Study",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_study something magical that should take months to understand_**, it instead takes mere weeks. If it should take weeks, it takes days. If it should take days, it takes only a few hours.",
 		"slug": "quick-study"
 	},

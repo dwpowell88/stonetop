@@ -4,8 +4,7 @@
 	"name": "Situational Awareness",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Seek Insight_**, add the following to the list of questions you can ask:\n\n- Who or what here is the biggest threat?\n- What is my enemy's true position?\n- What here can I use as a weapon?\nWhen **_a fight breaks out_**, ask the GM 1 question that you could ask when Seeking Insight.",
 		"slug": "situational-awareness"
 	},

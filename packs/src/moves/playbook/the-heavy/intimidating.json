@@ -4,8 +4,7 @@
 	"name": "Intimidating",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Persuade using violence or threats_**, you have advantage.",
 		"slug": "intimidating"
 	},

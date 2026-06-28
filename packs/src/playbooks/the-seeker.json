@@ -492,6 +492,37 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "arcane-adept",
+      "attuned",
+      "conduit-of-power",
+      "countermeasures",
+      "cryptologist",
+      "deep-insight",
+      "everything-bleeds",
+      "everything-burns",
+      "improved-stat",
+      "improvise",
+      "initiate-of-the-secret-arts",
+      "lets-make-a-deal",
+      "logbook",
+      "magpie",
+      "mind-over-magic",
+      "never-at-a-loss",
+      "overchannel",
+      "polyglot",
+      "proof-against-detection",
+      "quick-study",
+      "safety-first",
+      "sage-advice",
+      "superior-stat",
+      "well-versed",
+      "work-with-what-youve-got"
+    ],
+    "startingMoves": [
+      "well-versed",
+      "work-with-what-youve-got"
+    ]
   }
 }

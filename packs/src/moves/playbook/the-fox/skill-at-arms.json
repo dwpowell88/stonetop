@@ -4,9 +4,7 @@
 	"name": "Skill at Arms",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
-		"isStartingMove": false,
+		"moveType": null,
 		"description": "When you **_wield a weapon with speed and grace_**, roll +DEX to Clash (instead of +STR).",
 		"slug": "skill-at-arms"
 	},

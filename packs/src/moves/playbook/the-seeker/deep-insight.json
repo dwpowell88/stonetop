@@ -4,8 +4,7 @@
 	"name": "Deep Insight",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Seek Insight about something magical_**, you may ask one additional question, not limited to the list. Even **on a 6-**, you get to ask this question.",
 		"requirement": {
 			"level": 6,

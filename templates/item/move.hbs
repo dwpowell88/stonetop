@@ -169,29 +169,11 @@
 		{{/if}}
 
 		<section class="move-sheet-details">
-			{{#if isPlaybook}}
-			<label class="move-sheet-detail">
-				<span class="move-sheet-detail-label">{{localize "stonetop.item.move.details.playbook"}}</span>
-				<select name="system.playbook" {{#unless editable}}disabled{{/unless}}>
-					{{#each playbookChoices}}
-					<option value="{{@key}}" {{#if (eq @key ../system.playbook)}}selected{{/if}}>{{this}}</option>
-					{{/each}}
-				</select>
-			</label>
-			{{/if}}
 			<label class="move-sheet-detail move-sheet-detail--narrow">
 				<span class="move-sheet-detail-label">{{localize "stonetop.item.move.details.repeatMax"}}</span>
 				<input type="number" name="system.repeatMax" value="{{system.repeatMax}}" min="0"
 				       {{#unless editable}}disabled{{/unless}}>
 			</label>
-			{{#if isPlaybook}}
-			<label class="move-sheet-detail move-sheet-detail--checkbox">
-				<input type="checkbox" name="system.isStartingMove"
-				       {{#if system.isStartingMove}}checked{{/if}}
-				       {{#unless editable}}disabled{{/unless}}>
-				<span class="move-sheet-detail-label">{{localize "stonetop.item.move.details.isStartingMove"}}</span>
-			</label>
-			{{/if}}
 		</section>
 
 	</div>

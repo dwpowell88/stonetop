@@ -151,7 +151,7 @@ export async function migrateCharacterMoves(actor, moveRepo, insertRepo = null) 
 	for (const cat of categories.filter(c => c.key.startsWith("post-death-"))) {
 		const insertSlug = cat.key.replace("post-death-", "");
 		const insertDoc  = insertRepo ? await insertRepo.findBySlug(insertSlug) : null;
-		await moves.addCategory(`insert-${insertSlug}`, cat.label ?? insertSlug, insertDoc?.system?.moves ?? []);
+		await moves.addCategory(`insert-${insertSlug}`, cat.label ?? insertSlug, insertDoc?.system?.moves ?? [], insertDoc?.system?.startingMoves ?? []);
 	}
 }
 
@@ -346,7 +346,7 @@ export async function migrateInsert(actor, insertRepo, moves) {
 	if (!doc) return;
 
 	await actor.createEmbeddedDocuments("Item", [doc.toObject()]);
-	await moves.addCategory(`insert-${slug}`, doc.name ?? slug, doc.system?.moves ?? []);
+	await moves.addCategory(`insert-${slug}`, doc.name ?? slug, doc.system?.moves ?? [], doc.system?.startingMoves ?? []);
 }
 
 // ── I. Equipment → arcanum ────────────────────────────────────────────────────

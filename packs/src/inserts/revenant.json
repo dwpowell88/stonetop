@@ -4,7 +4,11 @@
 	"img": "systems/stonetop/assets/content/inserts/revenant.png",
 	"system": {
 		"slug": "revenant",
-		"moves": ["implacable", "undying", "unliving"],
+		"moves": [
+			"implacable",
+			"undying",
+			"unliving"
+		],
 		"description": "When you *die but cling stubbornly to your body*, refusing to pass through the Last Door, you gain this insert, and choose 1 Consequence.",
 		"actorType": "character",
 		"attributes": {},
@@ -202,7 +206,12 @@
 					]
 				}
 			]
-		}
+		},
+		"startingMoves": [
+			"implacable",
+			"undying",
+			"unliving"
+		]
 	},
 	"flags": {},
 	"_id": "7Dfeu35drOu1VYyA",

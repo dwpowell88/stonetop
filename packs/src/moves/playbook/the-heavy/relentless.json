@@ -4,8 +4,7 @@
 	"name": "Relentless",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Clash and your foe survives_**, you gain advantage the next time you Clash with them.",
 		"slug": "relentless"
 	},

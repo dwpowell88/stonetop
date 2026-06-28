@@ -4,8 +4,7 @@
 	"name": "Attuned",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Seek Insight_**, you can always ask, \"What here is infused with magic?\" for free, even **on a 6-**.",
 		"slug": "attuned"
 	},

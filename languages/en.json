@@ -97,6 +97,7 @@
 			"description": "Description",
 			"moves": "Moves",
 			"addMove": "Add move",
+			"startingMove": "Starts acquired (active when the insert is granted)",
 			"namePlaceholder": "Insert name",
 			"instinct": "Instinct",
 			"addInstinct": "Add instinct",
@@ -307,10 +308,8 @@
 				"moveType": {
 					"none":      "— Type —",
 					"basic":     "Basic",
-					"playbook":  "Playbook",
 					"homefront": "Homefront",
 					"special":   "Special",
-					"postDeath": "Post-Death",
 					"follower":  "Follower",
 					"other":     "Other"
 				},
@@ -320,9 +319,7 @@
 					"failurePlaceholder": "What happens on a 6-…"
 				},
 				"details": {
-					"playbook":           "Playbook",
-					"repeatMax":          "Checkboxes",
-					"isStartingMove":     "Starting Move"
+					"repeatMax":          "Checkboxes"
 				}
 			}
 		}

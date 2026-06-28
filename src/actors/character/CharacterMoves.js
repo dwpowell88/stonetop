@@ -33,7 +33,7 @@ export class CharacterMoves {
 		const existingSlugs = new Set(existing.map(i => toSlug(i.name)));
 		const newEntries = entries.filter(m => !existingSlugs.has(m.slug));
 		if (!newEntries.length) return;
-		const docs = await Promise.all(newEntries.map(m => this._moveRepo.getBasicMoveDocument(m.id)));
+		const docs = await Promise.all(newEntries.map(m => this._moveRepo.getReferencedMoveDocument(m.id)));
 		await this._actor.createEmbeddedDocuments("Item",
 			docs.filter(Boolean).map((d, i) =>
 				_withCategoryFields(d.toObject(), moveType, true, { sortOrder: existing.length + i, compendiumId: d._id ?? null })
@@ -41,21 +41,26 @@ export class CharacterMoves {
 		);
 	}
 
+	// A playbook owns its moves by slug (playbookData.moves) and marks a subset as starting
+	// (playbookData.startingMoves) — those seed acquired at character creation. Resolution + sort
+	// (by level + dependency) live here; the move items themselves carry no playbook back-reference.
 	async initPlaybookCategory(playbookData) {
 		const existingPlaybook = [...this._actor.items]
 			.filter(i => i.type === "move" && i.system?.categoryKey?.startsWith("playbook-"));
 		if (existingPlaybook.length) {
 			await this._actor.deleteEmbeddedDocuments("Item", existingPlaybook.map(i => i._id));
 		}
-		const playbookMoves = await this._moveRepo.getPlaybookMoves(playbookData.name);
+		const resolved = await this._moveRepo.getMovesBySlugs(playbookData.moves ?? []);
+		const playbookMoves = this.sortPlaybookMoves(resolved);
+		const starting = new Set(playbookData.startingMoves ?? []);
 		const catKey = `playbook-${playbookData.slug}`;
 		const pairs = await Promise.all(
-			playbookMoves.map(async (m, i) => ({ move: m, doc: await this._moveRepo.getPlaybookMoveDocument(m.id), index: i }))
+			playbookMoves.map(async (m, i) => ({ move: m, doc: await this._moveRepo.getReferencedMoveDocument(m.id), index: i }))
 		);
 		await this._actor.createEmbeddedDocuments("Item",
 			pairs
 				.filter(({ doc }) => doc !== null)
-				.map(({ move, doc, index }) => _withCategoryFields(doc.toObject(), catKey, move.isStarting, {
+				.map(({ move, doc, index }) => _withCategoryFields(doc.toObject(), catKey, starting.has(move.slug), {
 					sortOrder:     index,
 					compendiumId:  doc._id ?? null,
 					categoryLabel: playbookData.name,
@@ -65,19 +70,20 @@ export class CharacterMoves {
 	}
 
 	// Register a move category (insert or arcanum) from a list of move slugs. Inserts pass their
-	// `system.moves`, arcana their `back.moveSlugs`; both resolve across compendium + world. Each
-	// move seeds its acquired/instanceCount from its own `isStartingMove` — built-in insert moves
-	// are authored starting (active on grant), arcana mystery moves are not (player ticks to unlock).
-	async addCategory(key, label, moveSlugs = []) {
+	// `system.moves`, arcana their `back.moveSlugs`; both resolve across compendium + world. A move
+	// seeds acquired iff its slug is in `startingSlugs` — built-in inserts pass all their moves
+	// (active on grant), arcana pass none (player ticks each mystery to unlock).
+	async addCategory(key, label, moveSlugs = [], startingSlugs = []) {
 		const exists = [...this._actor.items].some(i => i.type === "move" && i.system?.categoryKey === key);
 		if (exists) return;
+		const starting = new Set(startingSlugs);
 		const entries = await this._moveRepo.getMovesBySlugs(moveSlugs);
 		const pairs = await Promise.all(
-			entries.map(async move => ({ move, doc: await this._moveRepo.getInsertMoveDocument(move.id) }))
+			entries.map(async move => ({ move, doc: await this._moveRepo.getReferencedMoveDocument(move.id) }))
 		);
 		await this._actor.createEmbeddedDocuments("Item",
 			pairs.filter(({ doc }) => doc).map(({ move, doc }, i) =>
-				_withCategoryFields(doc.toObject(), key, move.isStarting, {
+				_withCategoryFields(doc.toObject(), key, starting.has(move.slug), {
 					sortOrder:     i,
 					compendiumId:  doc._id ?? null,
 					categoryLabel: label,
@@ -106,7 +112,6 @@ export class CharacterMoves {
 		if (!item) return;
 		const count = item.system?.instanceCount ?? 0;
 		if (count === 0) return;
-		if ((item.system?.isStartingMove ?? false) && count <= 1) return;
 		const newCount = count - 1;
 		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { acquired: newCount > 0, instanceCount: newCount } }]);
 	}
@@ -122,7 +127,7 @@ export class CharacterMoves {
 			system: {
 				...moveData.system,
 				moveType: "other", categoryKey: "other", categoryLabel: null, categoryNote: null,
-				acquired: true, instanceCount: 1, isStartingMove: false,
+				acquired: true, instanceCount: 1,
 				sortOrder: existing.length, compendiumId: moveData._id ?? null,
 			},
 		}]);
@@ -337,7 +342,6 @@ async function _buildMoveSnapshot(item, categoryKey, selectable, requirementsMet
 		.withName(item?.name ?? slug)
 		.withDescription(sys?.description ?? "")
 		.withRollStat(sys?.rollStat ?? null)
-		.withIsStarting(sys?.isStartingMove ?? false)
 		.withSource({ type: categoryKey })
 		.withSourceLabel(null)
 		.withSelection(new ValueMax(sys?.instanceCount ?? 0, sys?.repeatMax ?? 1))

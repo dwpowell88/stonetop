@@ -4,8 +4,7 @@
 	"name": "Cheap Shot",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Ambush with a hand weapon_**, you have advantage on your damage roll.",
 		"requirement": {
 			"level": 6,

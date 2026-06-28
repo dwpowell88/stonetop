@@ -4,9 +4,7 @@
 	"name": "Perceptive",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
-		"isStartingMove": false,
+		"moveType": null,
 		"description": "When you **_Seek Insight_**, you may ask 1 additional question. Even **on a 6-**, you can ask 1 question (though you might not like how you learn the answer).",
 		"slug": "perceptive"
 	},

@@ -3,9 +3,9 @@
 	<ol class="items-list">
 	{{#each moves}}
 		{{#if (and (gt selection.value 0) rollStat)}}
-		<li class="item stonetop-item{{#if isStarting}} move-starting{{/if}}" data-item-id="{{ownedId}}">
+		<li class="item stonetop-item" data-item-id="{{ownedId}}">
 		{{else}}
-		<li class="stonetop-item{{#if isStarting}} move-starting{{/if}}">
+		<li class="stonetop-item">
 		{{/if}}
 			{{> "stonetop.move-item" showCheck=true categoryKey=../categoryKey allowAdditional=../allowAdditional}}
 		</li>

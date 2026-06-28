@@ -4,8 +4,7 @@
 	"name": "Naturalist",
 	"type": "move",
 	"system": {
-		"playbook": "The Ranger",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Know Things about beasts, natural environs, or spirits of the wild_**, you have advantage.",
 		"slug": "naturalist"
 	},

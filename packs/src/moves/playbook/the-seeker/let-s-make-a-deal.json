@@ -4,8 +4,7 @@
 	"name": "Let's Make a Deal",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Seek Insight_**, add \"What do they really want or need?\" to the list of questions. When you **_Persuade by offering them something that you know they want or need_**, treat a 7-9 as a 10+.",
 		"slug": "lets-make-a-deal"
 	},

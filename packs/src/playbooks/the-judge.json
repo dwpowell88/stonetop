@@ -646,6 +646,39 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "a-bundle-of-sticks-unbroken",
+      "a-mighty-rampart",
+      "aegis-of-faith",
+      "armistice",
+      "armored",
+      "bear-witness",
+      "binding-arbitration",
+      "break-bread",
+      "bulwark",
+      "castigate",
+      "censure",
+      "chronicler-of-stonetop",
+      "condemn",
+      "for-the-greater-good",
+      "hound-of-aratis",
+      "improved-stat",
+      "knowledge-is-power",
+      "like-a-dog-with-a-bone",
+      "many-hands-make-light-work",
+      "mirrorshield",
+      "proclamation",
+      "superior-stat",
+      "the-hammer-and-the-book",
+      "the-tower-eternal",
+      "truth-or-consequences",
+      "vision-unclouded",
+      "well-read"
+    ],
+    "startingMoves": [
+      "censure",
+      "chronicler-of-stonetop"
+    ]
   }
 }

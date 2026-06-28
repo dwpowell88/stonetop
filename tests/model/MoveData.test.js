@@ -2,11 +2,10 @@ import { describe, it, expect } from "vitest";
 import { MoveData } from "../../src/data/MoveData.js";
 
 describe("MoveData defaults", () => {
-	it("defaults rollStat, moveType, playbook, slug to null", () => {
+	it("defaults rollStat, moveType, slug to null", () => {
 		const d = new MoveData();
 		expect(d.rollStat).toBeNull();
 		expect(d.moveType).toBeNull();
-		expect(d.playbook).toBeNull();
 		expect(d.slug).toBeNull();
 	});
 
@@ -29,10 +28,8 @@ describe("MoveData defaults", () => {
 		expect(requirement.playbook).toBeNull();
 	});
 
-	it("defaults repeatMax to 1 and isStartingMove to false", () => {
-		const d = new MoveData();
-		expect(d.repeatMax).toBe(1);
-		expect(d.isStartingMove).toBe(false);
+	it("defaults repeatMax to 1", () => {
+		expect(new MoveData().repeatMax).toBe(1);
 	});
 
 	it("defaults resource, choices, sortOrder to null", () => {

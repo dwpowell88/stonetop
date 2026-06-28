@@ -675,6 +675,33 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "all-in-the-wrist",
+      "ambush",
+      "battle-dancer",
+      "burgle",
+      "catlike",
+      "cheap-shot",
+      "dabbler",
+      "danger-sense",
+      "eye-on-the-door",
+      "free-running",
+      "improved-stat",
+      "irresistible",
+      "laugh-at-danger",
+      "light-fingers",
+      "pants-on-fire",
+      "parry-riposte",
+      "perceptive",
+      "rapier-wit",
+      "second-intent",
+      "silver-tongued",
+      "skill-at-arms",
+      "slippery",
+      "superior-stat",
+      "under-your-skin"
+    ],
+    "startingMoves": []
   }
 }

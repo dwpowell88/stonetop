@@ -4,8 +4,7 @@
 	"name": "Animal Companion",
 	"type": "move",
 	"system": {
-		"playbook": "The Ranger",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "You are accompanied by a beast of uncommon loyalty and cleverness. See the Animal Companion insert for details.",
 		"slug": "animal-companion"
 	},

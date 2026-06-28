@@ -4,8 +4,7 @@
   "name": "Helior's Unblinking Eye",
   "type": "move",
   "system": {
-    "playbook": "The Lightbearer",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_stare into the sun long enough to lose your vision_**, name a person or place that you know and roll +WIS: **on a 10+**, you briefly glimpse your subject as if from a great height, and choose 2 from the list below; **_on a 7-9_**, you briefly glimpse your subject as if from a great height, and choose 1.\n\n- The glimpse lasts as long as you wish\n- Your point of view shifts to very close range\n- You recover your vision quickly",
     "moveResults": {
       "success": {

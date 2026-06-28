@@ -4,8 +4,7 @@
   "name": "Shake It Off",
   "type": "move",
   "system": {
-    "playbook": "The Marshal",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_order an ally to overcome fear, pain_**, doubt, or delusion, roll +CHA: **on a 10+**, they do it; **_on a 7-9_**, a PC gets advantage to do it; an NPC will do it, but they'll need time, they'll resent you, or they'll feel humiliated (GM decides).",
     "moveResults": {
       "success": {

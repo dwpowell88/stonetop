@@ -4,8 +4,7 @@
 	"name": "Payback",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_deal damage to a foe that has harmed you or one of your allies_**, deal +1d4 damage.",
 		"slug": "payback"
 	},

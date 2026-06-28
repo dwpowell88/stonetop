@@ -13,13 +13,13 @@ const ROLL_STAT_CHOICES = {
 	prompt:   "stonetop.item.move.rollStat.prompt",
 };
 
+// moveType is the resolution key for reference moves seeded by type (no container owns them).
+// Container-owned moves (playbook/insert/arcana) are referenced by slug and leave this null.
 const MOVE_TYPE_CHOICES = {
 	"":           "stonetop.item.move.moveType.none",
 	basic:        "stonetop.item.move.moveType.basic",
-	playbook:     "stonetop.item.move.moveType.playbook",
 	homefront:    "stonetop.item.move.moveType.homefront",
 	special:      "stonetop.item.move.moveType.special",
-	"post-death": "stonetop.item.move.moveType.postDeath",
 	follower:     "stonetop.item.move.moveType.follower",
 	other:        "stonetop.item.move.moveType.other",
 };
@@ -34,20 +34,6 @@ const BLANK_PICK_OPTION  = { slug: "", content: { title: null, text: null }, fol
 
 function _blankOption(n) {
 	return { ...BLANK_PICK_OPTION, slug: "option-" + n, content: { title: "Option " + n, text: null }, outfitItems: [], followers: [] };
-}
-
-async function _buildPlaybookChoices() {
-	const names = new Set();
-	const pack = game.packs.get("stonetop.playbooks");
-	if (pack) {
-		await pack.getIndex();
-		for (const entry of pack.index) names.add(entry.name);
-	}
-	for (const item of game.items?.contents ?? []) {
-		if (item.type === "playbook") names.add(item.name);
-	}
-	const sorted = [...names].sort((a, b) => a.localeCompare(b));
-	return Object.fromEntries([["", "—"], ...sorted.map(n => [n, n])]);
 }
 
 export function createStonetopMoveSheetClass(Base) {
@@ -75,8 +61,6 @@ export function createStonetopMoveSheetClass(Base) {
 			context.system          = this.item.system;
 			context.rollStatChoices = ROLL_STAT_CHOICES;
 			context.moveTypeChoices = MOVE_TYPE_CHOICES;
-			context.playbookChoices  = await _buildPlaybookChoices();
-			context.isPlaybook       = this.item.system.moveType === "playbook";
 			context.isRollable       = !!this.item.system.rollStat;
 			context.showResults      = context.isRollable;
 			if (context.system.choices) {

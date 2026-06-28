@@ -4,8 +4,7 @@
   "name": "Borrow Power",
   "type": "move",
   "system": {
-    "playbook": "The Blessed",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When **_a spirit or beast loans you power_**, ask the GM for one of its tags or moves. Store it in your pouch in place of 1 Stock. When you **_use the borrowed tag or move_**, roll +WIS.",
     "requirement": {
       "moves": [

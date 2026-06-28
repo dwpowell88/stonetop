@@ -4,8 +4,7 @@
   "name": "Battle Joy",
   "type": "move",
   "system": {
-    "playbook": "The Heavy",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_spill blood—yours or another's—and lose yourself in battle_**, you ignore fear, pain, mind-control, and the effects of debilities as long as you keep fighting.\n\nWhen **_the action stops_**, roll +CON: **on a 10+**, that was a rush, regain 1d4 HP; **_on a 7-9_**, you're winded and out of it, but you'll be fine with a few minutes' rest; **on a 6-**, mark a debility but don't mark XP.",
     "moveResults": {
       "success": {

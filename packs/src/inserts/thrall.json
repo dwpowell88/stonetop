@@ -4,7 +4,12 @@
 	"img": "systems/stonetop/assets/content/inserts/Thrall.png",
 	"system": {
 		"slug": "thrall",
-		"moves": ["favor", "urges", "dark-succor", "unholy-vessel"],
+		"moves": [
+			"favor",
+			"urges",
+			"dark-succor",
+			"unholy-vessel"
+		],
 		"description": "When you *die but call one of the Things Below by name and beseech them to intercede*, they do. Death is averted, but you gain this insert and 1 Mark.",
 		"actorType": "character",
 		"attributes": {},
@@ -425,7 +430,13 @@
 					]
 				}
 			]
-		}
+		},
+		"startingMoves": [
+			"favor",
+			"urges",
+			"dark-succor",
+			"unholy-vessel"
+		]
 	},
 	"flags": {},
 	"_id": "19UwDQOGthndDunk",

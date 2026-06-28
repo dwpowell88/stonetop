@@ -32,7 +32,7 @@ export class SteadingMoves {
 			name:          entry.name,
 			description,
 			rollStat:      entry.rollStat || null,
-			isStarting:    true,
+			locked:        true,
 			selectable:    false,
 			selection:     { value: 1, max: 1 },
 			requirement:   null,

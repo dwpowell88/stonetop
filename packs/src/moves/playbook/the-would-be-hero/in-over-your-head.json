@@ -4,8 +4,7 @@
 	"name": "In Over Your Head",
 	"type": "move",
 	"system": {
-		"playbook": "The Would-Be Hero",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When **_another PC rescues you from danger_**, mark XP.",
 		"slug": "in-over-your-head"
 	},

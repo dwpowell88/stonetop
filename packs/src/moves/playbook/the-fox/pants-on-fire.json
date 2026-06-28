@@ -4,8 +4,7 @@
 	"name": "Pants on Fire",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Defy Danger, Persuade, or Interfere by being deceitful_**, you have advantage.\n\nWhen **_another move (like Seek Insight) allows a player to ask you a question_**, you can opt not to answer.",
 		"requirement": {
 			"level": 6

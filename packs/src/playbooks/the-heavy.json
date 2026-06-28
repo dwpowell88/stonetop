@@ -619,6 +619,39 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "armored",
+      "battle-joy",
+      "berserker",
+      "bringer-of-ruin",
+      "carved-out-of-wood",
+      "cut-from-granite",
+      "dangerous",
+      "formidable",
+      "frosty",
+      "guardian",
+      "hard-to-kill",
+      "improved-stat",
+      "intimidating",
+      "mighty-thews",
+      "musclebound",
+      "nemesis",
+      "payback",
+      "relentless",
+      "seasoned-warrior",
+      "situational-awareness",
+      "steadfast-guardian",
+      "stone-cold",
+      "superior-stat",
+      "terror-on-the-field",
+      "uncanny-reflexes",
+      "unfettered",
+      "unstoppable"
+    ],
+    "startingMoves": [
+      "dangerous",
+      "hard-to-kill"
+    ]
   }
 }

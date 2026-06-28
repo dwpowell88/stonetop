@@ -22,7 +22,6 @@ export function buildArcanumMoveSnapshot(move) {
 		.withName(move.name ?? "")
 		.withDescription(move.text ?? "")
 		.withRollStat(null)
-		.withIsStarting(false)
 		.withSource({ type: "arcanum" })
 		.withSourceLabel(move.subtitle || null)
 		.withSelection(new ValueMax(1, 1))

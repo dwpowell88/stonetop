@@ -4,8 +4,7 @@
   "name": "Formidable",
   "type": "move",
   "system": {
-    "playbook": "The Heavy",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_wade into battle_**, you can choose to roll +CHA: **on a 10+**, both; **_on a 7-9_**, pick 1:\n\n- Lesser foes will quail, hesitate, or flee before you.\n- Doughty foes will focus on you, seeing you as the greatest threat.\nOn a 6-, pick 1 but ask the GM what you've missed.",
     "moveResults": {
       "success": {

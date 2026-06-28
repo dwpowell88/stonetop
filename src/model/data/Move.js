@@ -8,10 +8,8 @@ export class Move {
 		// Prefer the stored, stable slug (survives renames); fall back to the name-derived one for
 		// moves authored before slugs were stamped (packs + worlds get backfilled by migration).
 		this.slug        = data.system?.slug || toSlug(data.name);
-		this.playbook    = data.system?.playbook        ?? null;
 		this.rollStat    = data.system?.rollStat        ?? null;
 		this.description = data.system?.description     ?? null;
-		this.isStarting  = data.system?.isStartingMove  ?? false;
 		this.requirement = data.system?.requirement     ?? null;
 		this.repeatMax   = data.system?.repeatMax       ?? null;
 		this.resource    = data.system?.resource    ? new Resource(data.system.resource) : null;

@@ -4,8 +4,7 @@
 	"name": "Fire Within",
 	"type": "move",
 	"system": {
-		"playbook": "The Lightbearer",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_are in darkness_**, you are able to see by the light of your inner fire. When you **_take damage from cold or fire_**, reduce that damage by 2.",
 		"slug": "fire-within"
 	},

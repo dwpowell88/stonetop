@@ -4,8 +4,7 @@
 	"name": "Unstoppable",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_are reduced to 0 HP in battle_**, you can keep fighting. Each time you take damage while at 0 HP, mark 1. If you would regain HP while fighting, clear one mark instead.\n\nWhen you **_stop fighting_**, roll for Death's Door with a -1 penalty for each circle marked. If you survive, clear all your circles.",
 		"resource": {
 			"max": 5

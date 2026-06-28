@@ -4,9 +4,7 @@
   "name": "Hard to Kill",
   "type": "move",
   "system": {
-    "playbook": "The Heavy",
-    "moveType": "playbook",
-    "isStartingMove": true,
+    "moveType": null,
     "description": "When you **_are at Death's Door_**, you can roll +CON or +nothing (your choice). **_On a 7-9_**, you can mark a debility of your choice to regain 1 HP.",
     "moveResults": {
       "success": {

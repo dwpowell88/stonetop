@@ -4,9 +4,7 @@
 	"name": "Call the Spirits",
 	"type": "move",
 	"system": {
-		"playbook": "The Blessed",
-		"moveType": "playbook",
-		"isStartingMove": true,
+		"moveType": null,
 		"description": "When you **_spend 1 Stock and perform a short rite_**, the spirit(s) of a place or object manifest and hear you out. What they do next is up to them.",
 		"requirement": {
 			"moves": [
