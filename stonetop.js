@@ -16,6 +16,7 @@ import { onPreCreateActor } from "./src/hooks/PreCreateActor.js";
 import { installBrokenImageHider } from "./src/hooks/HideBrokenImages.js";
 import { info } from "./src/utils/logger.js";
 import { renderMarkdown } from "./src/utils/enrichGameText.js";
+import { rich } from "./src/model/snapshot/RichText.js";
 import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
 import { CharacterData } from "./src/data/CharacterData.js";
 import { NpcData } from "./src/data/NpcData.js";
@@ -93,6 +94,10 @@ Hooks.once("init", () => {
 	// enrichRichTokens(). Use on .stonetop-rich containers: {{{md description}}}
 	Handlebars.registerHelper("md", text => new Handlebars.SafeString(renderMarkdown(text ?? "")));
 
+	// The single render path for game text. Accepts a RichText (enriched by enrichRichTextTree in
+	// getData) or a bare string (rendered as markdown). One way to render text: {{rich field}}.
+	Handlebars.registerHelper("rich", value => new Handlebars.SafeString(rich(value).render()));
+
 	Handlebars.registerHelper("repeatChecks", move => {
 		const sel = move?.selection;
 		if (!sel || sel.max <= 1) return [];
@@ -155,6 +160,7 @@ Hooks.once("init", () => {
 	});
 
 	foundry.applications.handlebars.loadTemplates({
+		"stonetop.chat-move-roll":   "systems/stonetop/templates/chat/move-roll.hbs",
 		"stonetop.actor-header":     "systems/stonetop/templates/actor/partials/actor-header.hbs",
 		"stonetop.actor-stats":      "systems/stonetop/templates/actor/partials/actor-stats.hbs",
 		"stonetop.actor-attributes": "systems/stonetop/templates/actor/partials/actor-attributes.hbs",

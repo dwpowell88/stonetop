@@ -8,6 +8,7 @@ import {
 	ChoiceGroup, ChoiceValues,
 } from "../../model/snapshot/character/CharacterSnapshot.js";
 import { MoveSnapshotBuilder, ValueMax } from "../../model/snapshot/character/MoveSnapshot.js";
+import { rich } from "../../model/snapshot/RichText.js";
 import { ResourceController } from "./ResourceController.js";
 
 // Shape a major-arcanum back "mystery move" ({id, name, text, subtitle?}) as a MoveSnapshot so it
@@ -43,7 +44,7 @@ export function buildArcanumOutfitItem(slug, itemData, resolvedResource = undefi
 		name:            itemData.name,
 		weight:          itemData.weight ?? null,
 		tags:            itemData.tags ?? null,
-		note:            itemData.note ?? null,
+		note:            rich(itemData.note ?? null),
 		inventoryColumn: itemData.inventoryColumn ?? null,
 		twoCol:          itemData.twoCol ?? false,
 		resource:        resolvedResource !== undefined ? resolvedResource : (itemData.resource ?? null),

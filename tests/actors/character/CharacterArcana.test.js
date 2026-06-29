@@ -199,7 +199,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			const { front } = await getItem();
 			expect(front.title).toBe("A Huge Wooden Sphere");
 			expect(front.item?.weight).toBeNull();
-			expect(front.item?.note).toBe("immobile");
+			expect(front.item?.note.raw).toBe("immobile");
 			expect(front.description).toContain("Half-buried");
 		});
 
@@ -266,7 +266,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			const { back } = await getItem();
 			expect(back.title).toBe("Ffyrnig Tonic");
 			expect(back.item?.weight).toBe(1);
-			expect(back.item?.note).toBe("magical");
+			expect(back.item?.note.raw).toBe("magical");
 			expect(back.description).toContain("pickle fresh ffyrnig root");
 		});
 

@@ -100,7 +100,7 @@
 				       data-slug="{{slug}}"
 				       {{#if checked}}checked{{/if}}>
 				<span class="stonetop-inv-label">{{name}}
-					{{#if note}}<span class="stonetop-inv-note">({{{note}}})</span>{{/if}}
+					{{#if note.raw}}<span class="stonetop-inv-note">({{rich note}})</span>{{/if}}
 				</span>
 				{{#if resource}}
 				<span class="stonetop-inv-resources">

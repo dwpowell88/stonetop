@@ -7,6 +7,7 @@ import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
 import {FakeCompendiumMoveBuilder} from "../../fakes/FakeCompendiumMoveBuilder.js";
 import {TestChoiceGroupBuilder} from "../../fakes/TestChoiceGroupBuilder.js";
 import {TestChoiceRowBuilder} from "../../fakes/TestChoiceRowBuilder.js";
+import {enrichRichTextTree} from "../../../src/utils/enrichRichText.js";
 import {
 	ChoiceGroup,
 	MoveCategorySnapshot,
@@ -176,7 +177,7 @@ describe("CharacterMoves.buildSnapshot — repo enrichment", () => {
 		await initPlaybook(m, repo);
 		const snap = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(snap.name).toBe("Potential for Greatness");
-		expect(snap.description).toBe("<p>Once per level…</p>");
+		expect(snap.description.raw).toBe("<p>Once per level…</p>");
 	});
 
 	it("choices from repo renders as ChoiceGroup", async () => {
@@ -210,7 +211,7 @@ describe("CharacterMoves.buildSnapshot — repo enrichment", () => {
 		m._moveRepo = new FakeMoveRepository();
 		const snap  = (await m.buildSnapshot()).categories[0].moves[0];
 		expect(snap.name).toBe("Bulwark");
-		expect(snap.description).toBe("Sturdy.");
+		expect(snap.description.raw).toBe("Sturdy.");
 	});
 });
 
@@ -960,7 +961,7 @@ describe("CharacterMoves.buildSnapshot — world move enrichment", () => {
 		const other = (await m.buildSnapshot()).categories.find(c => c.key === "other");
 		const snap  = other.moves[0];
 		expect(snap.name).toBe("Iron Wall");
-		expect(snap.description).toBe("Block it.");
+		expect(snap.description.raw).toBe("Block it.");
 		expect(snap.rollStat).toBe("str");
 	});
 });
@@ -1035,5 +1036,29 @@ describe("CharacterMoves.sortPlaybookMoves", () => {
 
 	it("cross-level dependency ignored: level-6 move stays in level-6 group", () => {
 		expect(names(sort([mv("Root"), mv("Lv6-Child", {minLevel: 6, requires: "Root"}), mv("Alpha")]))).toEqual(["Alpha", "Root", "Lv6-Child"]);
+	});
+});
+
+// Integration: a move description is a RichText, and the single enrich pass (as run in the sheet's
+// getData) turns an @UUID link into a real anchor end-to-end. Only the Foundry enrichHTML boundary
+// is mocked — real CharacterMoves + RichText + enrichRichTextTree.
+describe("CharacterMoves — rich-text enrichment (integration)", () => {
+	it("renders a move description's @UUID as a link through the one pass", async () => {
+		const m = makeMoves();
+		await m.addMoveToOther({name: "Linked", system: {description: "see @UUID[JournalEntry.x]{the Barrow}", rollStat: null}});
+		const snap = await m.buildSnapshot();
+		const move = snap.categories.find(c => c.key === "other").moves[0];
+		expect(move.description.raw).toContain("@UUID");   // stored as RichText, not enriched yet
+
+		const orig = foundry.applications.ux.TextEditor.implementation.enrichHTML;
+		foundry.applications.ux.TextEditor.implementation.enrichHTML =
+			async html => html.replace(/@UUID\[[^\]]+\]\{([^}]+)\}/g, '<a class="content-link">$1</a>');
+		try {
+			await enrichRichTextTree(snap, {});
+		} finally {
+			foundry.applications.ux.TextEditor.implementation.enrichHTML = orig;
+		}
+
+		expect(move.description.render()).toContain('<a class="content-link">the Barrow</a>');
 	});
 });

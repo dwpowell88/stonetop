@@ -7,6 +7,7 @@ import {
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
 import { ResourceController } from "./ResourceController.js";
 import { ValueMax } from "../../model/snapshot/character/VitalsSnapshot.js";
+import { rich } from "../../model/snapshot/RichText.js";
 import { toSlug } from "../../utils/slug.js";
 
 export class CharacterMoves {
@@ -344,7 +345,7 @@ async function _buildMoveSnapshot(item, categoryKey, selectable, requirementsMet
 		.withOwnedId(item?._id ?? null)
 		.withSlug(slug)
 		.withName(item?.name ?? slug)
-		.withDescription(sys?.description ?? "")
+		.withDescription(rich(sys?.description ?? ""))
 		.withRollStat(sys?.rollStat ?? null)
 		.withSource({ type: categoryKey })
 		.withSourceLabel(null)

@@ -1,5 +1,19 @@
 import { toSlug } from "../utils/slug.js";
 import { ChoiceGroup, ChoiceValues } from "../model/snapshot/character/ChoiceGroup.js";
+import { rich } from "../model/snapshot/RichText.js";
+import { enrichRichTextTree } from "../utils/enrichRichText.js";
+
+// The move sheet's display fields as RichText (un-enriched). getData runs the one enrich pass over
+// these; the template renders them with {{rich}}. Pure so it's unit-testable without the sheet.
+export function moveSheetRichText(system) {
+	const r = system?.moveResults ?? {};
+	return {
+		description: rich(system?.description ?? ""),
+		success:     rich(r.success?.value ?? ""),
+		partial:     rich(r.partial?.value ?? ""),
+		failure:     rich(r.failure?.value ?? ""),
+	};
+}
 
 const ROLL_STAT_CHOICES = {
 	"":       "stonetop.item.move.rollStat.none",
@@ -63,6 +77,8 @@ export function createStonetopMoveSheetClass(Base) {
 			context.moveTypeChoices = MOVE_TYPE_CHOICES;
 			context.isRollable       = !!this.item.system.rollStat;
 			context.showResults      = context.isRollable;
+			context.rich             = moveSheetRichText(this.item.system);
+			await enrichRichTextTree(context.rich, this.item?.getRollData?.() ?? {});
 			if (context.system.choices) {
 				context.choiceSnapshot = ChoiceGroup.fromPackData(context.system.choices, new ChoiceValues(), {});
 				context.choiceRows = context.system.choices.list.map((row, ri) => ({

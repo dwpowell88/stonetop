@@ -1,5 +1,6 @@
 import {PossessionUseButton} from "./elements/possession-use-button.js";
 import { FoundryPlaybookRepository } from "./repositories/FoundryPlaybookRepository.js";
+import { enrichRichTextTree } from "../../utils/enrichRichText.js";
 
 export function createStonetopCharacterSheetClass(Base) {
 	return class StonetopCharacterSheet extends Base {
@@ -30,6 +31,9 @@ export function createStonetopCharacterSheetClass(Base) {
 			this._openFollowerInventories ??= new Set();
 			this._stonetopCharacter.setOpenFollowerInventories(this._openFollowerInventories);
 			context.stonetop = await this._stonetopCharacter.buildSnapshot();
+			// Single rich-text pass: enrich every RichText in the snapshot in one go (no-op until
+			// fields are converted). See helper/rich-text-tdd.md.
+			await enrichRichTextTree(context.stonetop, this.actor?.getRollData?.() ?? {});
 			context.availablePlaybooks = await this._playbookRepository.getAllPlaybooks();
 			return context;
 		}

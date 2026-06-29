@@ -32,9 +32,20 @@ beforeEach(() => {
 	vi.stubGlobal("ChatMessage", FakeChatMessage);
 	vi.stubGlobal("Dialog", FakeDialog);
 	vi.stubGlobal("game", {i18n: {localize: k => k}});
+	// Card-aware renderTemplate stub: flatten the card's text + dice so content assertions hold
+	// without a real Handlebars render. The template itself is exercised by Foundry.
+	foundry.applications.handlebars.renderTemplate = async (_path, d) => [
+		d.name ?? "",
+		d.description ? d.description.render() : "",
+		d.resultText ? d.resultText.render() : "",
+		d.dice ? d.dice.diceGroups.flatMap(g => g.values).join(",") : "",
+	].join(" | ");
 });
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+	vi.unstubAllGlobals();
+	foundry.applications.handlebars.renderTemplate = async () => "";
+});
 
 // -- execute — damage ----------------------------------------------------------
 
@@ -121,6 +132,29 @@ describe("ActorRolling.execute — description only", () => {
 		expect(FakeRoll.lastInstance).toBeNull();
 		expect(FakeChatMessage.lastCreated.content).toContain("Charm Someone");
 		expect(FakeChatMessage.lastCreated.content).toContain("Roll to persuade.");
+	});
+});
+
+// -- rich-text chat card (integration) -----------------------------------------
+
+describe("ActorRolling.execute — rich-text chat card", () => {
+	it("renders a description's markdown and @UUID link through the one pipeline", async () => {
+		const rolling = makeRolling({bonuses: {wis: 1}});
+		const item = {name: "Charm", system: {rollStat: "wis", description: "**charm** see @UUID[JournalEntry.x]{Barrow}", moveResults: null}};
+		const request = RollRequest.fromItem(item, "wis", "normal");
+
+		const orig = foundry.applications.ux.TextEditor.implementation.enrichHTML;
+		foundry.applications.ux.TextEditor.implementation.enrichHTML =
+			async html => html.replace(/@UUID\[[^\]]+\]\{([^}]+)\}/g, '<a class="content-link">$1</a>');
+		try {
+			await rolling.execute(request, {descriptionOnly: true});
+		} finally {
+			foundry.applications.ux.TextEditor.implementation.enrichHTML = orig;
+		}
+
+		const content = FakeChatMessage.lastCreated.content;
+		expect(content).toContain("<strong>charm</strong>");
+		expect(content).toContain('<a class="content-link">Barrow</a>');
 	});
 });
 

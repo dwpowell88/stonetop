@@ -48,6 +48,11 @@ global.foundry = {
 				},
 			},
 		},
+		// Stub template renderer; tests that assert chat-card content override this with a card-aware
+		// stub. Default returns "" so non-asserting paths don't crash.
+		handlebars: {
+			renderTemplate: async () => "",
+		},
 	},
 };
 

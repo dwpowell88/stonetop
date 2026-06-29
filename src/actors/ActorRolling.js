@@ -1,4 +1,6 @@
 import {RollDisplay} from "../utils/rollDisplay.js";
+import {renderRollCard} from "../utils/rollCard.js";
+import {rich} from "../model/snapshot/RichText.js";
 
 export class ActorRolling {
 	constructor(actor) {
@@ -9,11 +11,15 @@ export class ActorRolling {
 		return this.__display ??= new RollDisplay(k => game.i18n.localize(k));
 	}
 
+	get _rollData() {
+		return this._actor.getRollData?.() ?? {};
+	}
+
 	async execute(request, {descriptionOnly = false} = {}) {
 		const speaker = ChatMessage.getSpeaker({actor: this._actor});
 
 		if (descriptionOnly || !request.stat) {
-			return ChatMessage.create({speaker, content: `<h3>${request.label}</h3>${request.description}`});
+			return this._postDescription(speaker, request);
 		}
 
 		if (request.stat === "damage") return this._rollDamage(speaker);
@@ -31,7 +37,7 @@ export class ActorRolling {
 		if (request.stat !== "prompt") {
 			bonus = this._actor.typedActor.resolveBonus(statKey);
 			if (bonus === null) {
-				return ChatMessage.create({speaker, content: `<h3>${request.label}</h3>${request.description}`});
+				return this._postDescription(speaker, request);
 			}
 		}
 
@@ -46,19 +52,23 @@ export class ActorRolling {
 					"stonetop.rollResults.miss"
 		);
 
-		return ChatMessage.create({
-			speaker,
-			content: this._display.build(roll, {
-				name:        request.buildDisplayName(statKey, resultLabel, request.stat === "prompt"),
-				rollMode:    effectiveMode,
-				bonus:       request.stat !== "prompt" ? bonus : null,
-				statKey:     request.stat !== "prompt" ? statKey : null,
-				resultKey,
-				description: request.description,
-				resultText:  request.resultText(resultKey),
+		const card = {
+			name: request.buildDisplayName(statKey, resultLabel, request.stat === "prompt"),
+			dice: this._display.build(roll, {
+				rollMode: effectiveMode,
+				bonus:    request.stat !== "prompt" ? bonus : null,
+				statKey:  request.stat !== "prompt" ? statKey : null,
 			}),
-			rolls: [roll],
-		});
+			resultKey,
+			description: rich(request.description),
+			resultText:  rich(request.resultText(resultKey)),
+		};
+		return ChatMessage.create({speaker, content: await renderRollCard(card, this._rollData), rolls: [roll]});
+	}
+
+	async _postDescription(speaker, request) {
+		const card = {name: request.label, description: rich(request.description)};
+		return ChatMessage.create({speaker, content: await renderRollCard(card, this._rollData)});
 	}
 
 	async _rollDamage(speaker) {
@@ -66,13 +76,11 @@ export class ActorRolling {
 		if (!die) return;
 		const formula = /^\d/.test(die) ? die : `1${die}`;
 		const roll = await new Roll(formula).evaluate();
-		return ChatMessage.create({
-			speaker,
-			content: this._display.build(roll, {
-				name: game.i18n.localize("stonetop.character.attributes.damage"),
-			}),
-			rolls: [roll],
-		});
+		const card = {
+			name: game.i18n.localize("stonetop.character.attributes.damage"),
+			dice: this._display.build(roll, {}),
+		};
+		return ChatMessage.create({speaker, content: await renderRollCard(card, this._rollData), rolls: [roll]});
 	}
 
 	_rollingFormula(rollMode, bonus) {
