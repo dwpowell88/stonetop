@@ -10,7 +10,7 @@
 	{{!-- Back side --}}
 	<div class="stonetop-arcanum-header">
 		<div class="stonetop-arcanum-header-left">
-			<span class="stonetop-arcanum-title">{{back.title}}</span>
+			<span class="stonetop-arcanum-title">{{rich back.title}}</span>
 			{{#if back.item}}{{> "stonetop.outfit-item-row" back.item}}{{/if}}
 		</div>
 		{{#if back.resource}}
@@ -20,7 +20,7 @@
 		{{/if}}
 	</div>
 	<div class="stonetop-arcanum-body">
-		<div class="stonetop-rich">{{{md back.description}}}</div>
+		<div>{{rich back.description}}</div>
 		{{#if back.moves.length}}
 		<ol class="items-list stonetop-arcanum-moves">
 			{{#each back.moves}}
@@ -53,12 +53,12 @@
 	{{!-- Front side --}}
 	<div class="stonetop-arcanum-header">
 		<div class="stonetop-arcanum-header-left">
-			<span class="stonetop-arcanum-title">{{front.title}}</span>
+			<span class="stonetop-arcanum-title">{{rich front.title}}</span>
 			{{#if front.item}}{{> "stonetop.outfit-item-row" front.item}}{{/if}}
 		</div>
 	</div>
 	<div class="stonetop-arcanum-body">
-		<div class="stonetop-rich">{{{md front.description}}}</div>
+		<div>{{rich front.description}}</div>
 		<div class="stonetop-arcanum-unlock">
 			{{#each front.unlock.list}}
 			{{> "stonetop.choice-row" cgContext="arcana-unlock" cgGroup=../slug}}

@@ -21,7 +21,7 @@ export function buildArcanumMoveSnapshot(move) {
 		.withOwnedId(null)
 		.withSlug(move.id ?? null)
 		.withName(move.name ?? "")
-		.withDescription(move.text ?? "")
+		.withDescription(rich(move.text ?? ""))
 		.withRollStat(null)
 		.withSource({ type: "arcanum" })
 		.withSourceLabel(move.subtitle || null)
@@ -76,9 +76,9 @@ export function buildArcanumSnapshot(arcanum, {
 		: null;
 
 	const front = new ArcanumFrontSnapshotBuilder()
-		.withTitle(item.front.title)
+		.withTitle(rich(item.front.title))
 		.withItem(buildArcanumOutfitItem(item.slug, item.front.item, undefined, checked))
-		.withDescription(item.front.description)
+		.withDescription(rich(item.front.description))
 		.withUnlock(unlock)
 		.build();
 
@@ -107,9 +107,9 @@ export function buildArcanumSnapshot(arcanum, {
 		: null;
 
 	const back = new ArcanumBackSnapshotBuilder()
-		.withTitle(item.back.title)
+		.withTitle(rich(item.back.title))
 		.withItem(buildArcanumOutfitItem(item.slug, item.back.item, backItemResource, checked))
-		.withDescription(item.back.description)
+		.withDescription(rich(item.back.description))
 		.withResource(backResource)
 		.withChoices(backChoices)
 		// Major arcana render their mystery moves as real `move` items (passed in as moveSnapshots);

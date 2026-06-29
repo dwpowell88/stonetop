@@ -197,10 +197,10 @@ describe("CharacterArcana.buildSnapshot()", () => {
 
 		it("front has correct title, item, description", async () => {
 			const { front } = await getItem();
-			expect(front.title).toBe("A Huge Wooden Sphere");
+			expect(front.title.raw).toBe("A Huge Wooden Sphere");
 			expect(front.item?.weight).toBeNull();
 			expect(front.item?.note.raw).toBe("immobile");
-			expect(front.description).toContain("Half-buried");
+			expect(front.description.raw).toContain("Half-buried");
 		});
 
 		it("front.unlock is a ChoiceGroup", async () => {
@@ -264,10 +264,10 @@ describe("CharacterArcana.buildSnapshot()", () => {
 
 		it("back has correct title, item, description", async () => {
 			const { back } = await getItem();
-			expect(back.title).toBe("Ffyrnig Tonic");
+			expect(back.title.raw).toBe("Ffyrnig Tonic");
 			expect(back.item?.weight).toBe(1);
 			expect(back.item?.note.raw).toBe("magical");
-			expect(back.description).toContain("pickle fresh ffyrnig root");
+			expect(back.description.raw).toContain("pickle fresh ffyrnig root");
 		});
 
 		it("back.resource is populated and defaults current to 0", async () => {
@@ -295,8 +295,8 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			const item = await getItem();
 			expect(item.back.moves[0]).toMatchObject({
 				name: "When you take a draught of ffyrnig tonic",
-				description: "<p>pick 1: regain HP or clear a debility.</p>",
 			});
+			expect(item.back.moves[0].description.raw).toBe("<p>pick 1: regain HP or clear a debility.</p>");
 		});
 
 		it("back.moves is empty when absent in JSON", async () => {

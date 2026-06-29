@@ -17,6 +17,7 @@ import { Arcanum } from "../model/data/character/Arcanum.js";
 import { buildArcanumSnapshot, buildArcanumMoveSnapshot } from "../actors/character/arcanumSnapshot.js";
 import { FoundryMoveRepository } from "../actors/character/repositories/FoundryMoveRepository.js";
 import { enrichRichTokens } from "../utils/enrichGameText.js";
+import { enrichRichTextTree } from "../utils/enrichRichText.js";
 
 const BLANK_ITEM     = () => ({ name: "", weight: 1, tags: null, note: null, inventoryColumn: null, twoCol: false, resource: null });
 const BLANK_RESOURCE = () => ({ max: 1, maxStat: null, title: null, labels: [] });
@@ -101,6 +102,7 @@ export function createStonetopArcanumSheetClass(Base) {
 				? resolved.map(m => buildArcanumMoveSnapshot({ id: m.slug, name: m.name, text: m.description }))
 				: null;
 			context.preview        = [buildArcanumSnapshot(arcanum, { flipped: this._previewFlipped, moveSnapshots })];
+			await enrichRichTextTree(context.preview, this.item?.getRollData?.() ?? {});
 			context.previewFlipped = this._previewFlipped;
 
 			// View-first: an existing arcanum opens as a rendered card with an Edit button; a blank one

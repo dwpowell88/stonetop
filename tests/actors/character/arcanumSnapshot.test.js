@@ -22,13 +22,14 @@ describe("buildArcanumSnapshot", () => {
 	it("maps a full arcanum to front/back snapshots", () => {
 		const s = buildArcanumSnapshot(richArcanum(), { flipped: true });
 		expect(s).toMatchObject({ slug: "azure", major: true, name: "Azure Hand", owned: true, flipped: true });
-		expect(s.front.title).toBe("Azure Hand");
+		expect(s.front.title.raw).toBe("Azure Hand");
 		expect(s.front.item.name).toBe("Azure Hand");
 		expect(s.front.unlock).toBeTruthy();            // ChoiceGroup
 		expect(s.back.resource).toBeTruthy();           // ResourceSnapshot
 		expect(s.back.moves).toHaveLength(1);
 		expect(s.back.moves[0]).toBeInstanceOf(MoveSnapshot);
-		expect(s.back.moves[0]).toMatchObject({ name: "Battery", description: "store energy" });
+		expect(s.back.moves[0]).toMatchObject({ name: "Battery" });
+		expect(s.back.moves[0].description.raw).toBe("store energy");
 		expect(s.back.consequences).toBeTruthy();
 		expect(s.back.unlockAt).toBe("after 4 marks");
 	});
@@ -60,9 +61,10 @@ describe("buildArcanumMoveSnapshot", () => {
 		const m = buildArcanumMoveSnapshot({ id: "battery", name: "Battery", text: "store energy" });
 		expect(m).toBeInstanceOf(MoveSnapshot);
 		expect(m).toMatchObject({
-			id: "battery", slug: "battery", name: "Battery", description: "store energy",
+			id: "battery", slug: "battery", name: "Battery",
 			rollStat: null, selectable: false, resource: null, requirement: null, choices: null,
 		});
+		expect(m.description.raw).toBe("store energy");
 		expect(m.selection).toEqual({ value: 1, max: 1 });
 	});
 
