@@ -96,12 +96,16 @@ export function isArcanaFollower(block) {
 }
 
 /** The item tags line under a title → an outfit-item-shaped object (name = arcanum name, weight from
- *  ◇ pips, note = the comma tags). null when there's nothing. */
+ *  ◇ pips). The book italicizes tags (`*close*`) and leaves stats/notes plain (`+1 damage`), so the
+ *  italic runs become `tags` and the remaining plain text becomes `note`. null when there's nothing. */
 export function parseItemLine(text, { name, pips = 0 } = {}) {
-	const note = text.replace(/^[◇○□◻\s,]+/, "").replace(/\s{2,}/g, " ").trim();
 	const diamonds = (text.match(/◇/g) || []).length;
-	if (!note && !pips && !diamonds) return null;
-	return { name, weight: pips || diamonds || 1, note: note || null, inventoryColumn: "regular" };
+	const body = text.replace(/[◇○□◻◯]/g, "").replace(/\s{2,}/g, " ").trim();
+	const clean = (parts) => parts.flatMap((p) => p.split(",")).map((s) => s.trim()).filter(Boolean).join(", ") || null;
+	const tags = clean([...body.matchAll(/\*([^*]+)\*/g)].map((m) => m[1]));       // italic runs → tags
+	const note = clean([body.replace(/\*[^*]+\*/g, " ")]);                          // plain remainder → note
+	if (!tags && !note && !pips && !diamonds) return null;
+	return { name, weight: pips || diamonds || 1, tags, note, inventoryColumn: "regular" };
 }
 
 const STOP = new Set("a an the to of and or you your must can will would it its is are be with for from while into on at".split(" "));
@@ -119,6 +123,16 @@ const MINOR_WORDS = new Set("a an the and or but for nor to in on at by with fro
 export function titleCase(s) {
 	const words = (s || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
 	return words.map((w, i) => (i > 0 && MINOR_WORDS.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+/** A mystery move whose text begins "(Requires: A, B)" gates on those moves — pull the comma-listed
+ *  move names into `requirement.moves` (display names, mirroring `call-the-spirits`) and strip the
+ *  parenthetical from the text. Returns { moves: string[]|null, text }. */
+export function parseRequires(text) {
+	const m = (text || "").match(/^\(Requires?:\s*([^)]+)\)\s*/i);
+	if (!m) return { moves: null, text };
+	const moves = m[1].split(",").map((s) => s.trim()).filter(Boolean);
+	return { moves: moves.length ? moves : null, text: text.slice(m[0].length) };
 }
 
 /** Split a major move header line's leading ALL-CAPS run (the move name) from any inline remainder
@@ -166,7 +180,10 @@ export function parseFront(blocks, { name, slug }) {
 		if (!item && !seq.length) {
 			const oneLine = b.type === "para" ? joinMd(b.lines) : b.items.length === 1 ? joinMd(b.items[0]) : null;
 			if (oneLine != null && (b.tags || /^,/.test(oneLine.replace(/^[◇○□◻\s]+/, "")))) {
-				item = parseItemLine(oneLine, { name, pips });
+				// Load pips (◇) can sit inline on the item line, where joinMd strips only the first marker
+				// glyph — count them from the raw text so a 2-pip item (rune-laden-scales) weighs 2.
+				const inlinePips = ((b.type === "para" ? rawOf(b.lines) : rawOf(b.items[0])).match(/◇/g) || []).length;
+				item = parseItemLine(oneLine, { name, pips: pips + inlinePips });
 				continue;
 			}
 		}
@@ -254,7 +271,10 @@ function parseMajorBack(blocks, { slug, name, unlockAt }) {
 		const text = cur.text.replace(/\n{3,}/g, "\n\n").trim();
 		if (cur.kind === "move") {
 			const nm = titleCase(cur.name);
-			back.moves.push({ id: toSlug(nm), name: nm, text });
+			const { moves: reqMoves, text: body } = parseRequires(text);
+			const move = { id: toSlug(nm), name: nm, text: body };
+			if (reqMoves) move.requirement = { moves: reqMoves };
+			back.moves.push(move);
 		} else {
 			(back.consequences ??= { slug: "consequences", list: [] });
 			const row = { type: "entry", slug: `${abbr}-c${back.consequences.list.length + 1}`, content: { title: null, text } };
@@ -278,22 +298,36 @@ function parseMajorBack(blocks, { slug, name, unlockAt }) {
 		if (section === "moves") {
 			if (b.type === "list") for (const it of b.items) {
 				const head = majorMoveName(it[0]?.text || "");
+				const isWord = /^[A-Z][a-z]+\./.test(stripMarkers(it[0]?.text || "")); // a "□ Seal." option
 				if (markerKind(it[0]) === "square" && head.name) {        // a "□ ALL-CAPS NAME" move header
 					flush();
 					const tail = stripMarkers(joinMd(it.slice(1)));
 					cur = { kind: "move", name: head.name, text: [head.rest, tail].filter(Boolean).join(" ") };
+				} else if (markerKind(it[0]) === "square" && isWord) {
+					// A "□ Word." option (ineffable-words' Seal/Purify/Gather/Empower) folds into the move as
+					// an option — a rule separates it from the header, so re-attach to the last move once flushed.
+					const line = "\n- " + stripMarkers(joinMd(it));
+					if (cur) cur.text += line; else if (back.moves.length) back.moves[back.moves.length - 1].text += line;
 				} else if (cur) cur.text += bullet(it);                   // a sub-bullet of the current move
 			} else if (b.type === "para" && cur) cur.text += "\n\n" + stripMarkers(joinMd(b.lines));
 		} else if (section === "consequences") {
 			if (b.type === "list") for (const it of b.items) {
-				if (markerKind(it[0]) === "square") {                     // each consequence is a "□"-marked item
+				// A consequence is a "□"-marked item; the box may follow stray leading circle/diamond glyphs
+				// (layout noise, e.g. norubas' "○ ○ □ …"). Its track is the box count only — circles there
+				// aren't a consequence track (those are resource/loyalty markers elsewhere).
+				if (/^[○◯◇\s]*[□◻]/.test((it[0]?.text || "").trim())) {
 					flush();
-					cur = { kind: "consequence", max: parseTrack(rawOf(it)).max, text: stripMarkers(joinMd(it)) };
+					cur = { kind: "consequence", max: (rawOf(it).match(/[□◻]/g) || []).length, text: stripMarkers(joinMd(it)) };
 				} else if (cur) cur.text += bullet(it);
 			} else if (b.type === "para" && cur) cur.text += "\n\n" + stripMarkers(joinMd(b.lines));
 		}
 	}
 	flush();
+	// The book titles every major back "Mysteries of the X", but the heading isn't reliably tagged as a
+	// heading for a few cards (staff / redwood / ineffable extract without it) — derive it when the title
+	// heading wasn't captured. Cards whose heading IS captured keep it verbatim (e.g. the possessive
+	// "Mysteries of Noruba's Ice Sphere", which drops the "the").
+	if (!back.title && name) back.title = `Mysteries of the ${name}`;
 	return back;
 }
 

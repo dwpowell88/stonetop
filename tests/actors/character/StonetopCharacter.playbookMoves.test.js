@@ -3,13 +3,13 @@ import {StonetopCharacter} from "../../../src/actors/character/StonetopCharacter
 import {FoundryRepositoryFactory} from "../../../src/actors/character/repositories/FoundryRepositoryFactory.js";
 import {StonetopPlaybook} from "../../../src/item/StonetopPlaybook.js";
 import {FakeGameBuilder} from "../../fakes/FakeGameBuilder.js";
-import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 import {FakePackBuilder} from "../../fakes/foundry/FakePackBuilder.js";
 import {FakeCompendiumMoveBuilder} from "../../fakes/FakeCompendiumMoveBuilder.js";
 
 // Integration test: real StonetopCharacter + real FoundryRepositoryFactory/repositories +
 // real StonetopPlaybook. Only the Foundry boundary is faked (game.packs via FakeGameBuilder,
-// the actor via FakeActorBuilder). This exercises the full drop→select→buildSnapshot wiring that
+// the actor via FakeCharacterActorBuilder). This exercises the full drop→select→buildSnapshot wiring that
 // unit tests (which mock the move repo) miss — e.g. StonetopPlaybook failing to surface `moves`.
 
 // A dropped playbook item exposes asPlaybook() → StonetopPlaybook (the real domain wrapper).
@@ -38,7 +38,7 @@ describe("StonetopCharacter — playbook moves auto-populate on the moves tab (i
 
 	it("playbook moves appear in the moves tab after selecting a playbook", async () => {
 		withMovesPack(move("Serenity"), move("Invoke the Gods"));
-		const character = new StonetopCharacter(new FakeActorBuilder().build(), new FoundryRepositoryFactory());
+		const character = new StonetopCharacter(new FakeCharacterActorBuilder().build(), new FoundryRepositoryFactory());
 
 		await character._onCreateDescendantDocuments([
 			playbookItem({ moves: ["serenity", "invoke-the-gods"], startingMoves: ["serenity"] }),
@@ -51,7 +51,7 @@ describe("StonetopCharacter — playbook moves auto-populate on the moves tab (i
 
 	it("startingMoves seed acquired; the rest seed un-acquired", async () => {
 		withMovesPack(move("Serenity"), move("Invoke the Gods"));
-		const character = new StonetopCharacter(new FakeActorBuilder().build(), new FoundryRepositoryFactory());
+		const character = new StonetopCharacter(new FakeCharacterActorBuilder().build(), new FoundryRepositoryFactory());
 
 		await character._onCreateDescendantDocuments([
 			playbookItem({ moves: ["serenity", "invoke-the-gods"], startingMoves: ["serenity"] }),
@@ -64,7 +64,7 @@ describe("StonetopCharacter — playbook moves auto-populate on the moves tab (i
 
 	it("inserts still add their moves to the moves tab", async () => {
 		withMovesPack(move("Haunt"));
-		const character = new StonetopCharacter(new FakeActorBuilder().build(), new FoundryRepositoryFactory());
+		const character = new StonetopCharacter(new FakeCharacterActorBuilder().build(), new FoundryRepositoryFactory());
 
 		await character._onCreateDescendantDocuments([
 			{ _id: "in1", type: "insert", name: "Revenant",

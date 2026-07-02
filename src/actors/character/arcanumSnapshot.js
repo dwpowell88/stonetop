@@ -43,7 +43,7 @@ export function buildArcanumOutfitItem(slug, itemData, resolvedResource = undefi
 		slug,
 		name:            itemData.name,
 		weight:          itemData.weight ?? null,
-		tags:            itemData.tags ?? null,
+		tags:            rich(itemData.tags ?? null),
 		note:            rich(itemData.note ?? null),
 		inventoryColumn: itemData.inventoryColumn ?? null,
 		twoCol:          itemData.twoCol ?? false,

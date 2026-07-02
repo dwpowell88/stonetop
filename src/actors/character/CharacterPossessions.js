@@ -6,6 +6,7 @@ import { ResourceController } from "./ResourceController.js";
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
 import { EmbeddedOutfitItemBuilder } from "../../model/data/character/EmbeddedOutfitItem.js";
 import { Possession } from "../../model/data/character/Possession.js";
+import { rich } from "../../model/snapshot/RichText.js";
 
 export class CharacterPossessions {
 	constructor(actor, moves, outfitItems = null, possessionRepo = null) {
@@ -218,8 +219,8 @@ export class CharacterPossessions {
 			const pickValues = new ChoiceValues(item.system?.pickValues ?? {});
 			return new PossessionItemSnapshotBuilder()
 				.withSlug(p.slug)
-				.withLabel(item.name)
-				.withDescription(p.description ?? "")
+				.withLabel(rich(item.name))
+				.withDescription(rich(p.description ?? ""))
 				.withSelected(isSelected)
 				.withChecked(isSelected)
 				.withDisabled(isPre)
@@ -242,8 +243,8 @@ export class CharacterPossessions {
 			const pickValues = new ChoiceValues(item.system?.pickValues ?? {});
 			items.push(new PossessionItemSnapshotBuilder()
 				.withSlug(p.slug)
-				.withLabel(item.name)
-				.withDescription(p.description ?? "")
+				.withLabel(rich(item.name))
+				.withDescription(rich(p.description ?? ""))
 				.withSelected(isSelected)
 				.withChecked(isSelected)
 				.withDisabled(false)

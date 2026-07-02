@@ -5,7 +5,7 @@ export class RollDisplay {
 
 	// Build the dice view model for the chat card (data, not HTML — the template renders it).
 	// `move-roll.hbs` turns this into the dice row; game text (name/description/resultText) is added
-	// by the caller as RichText. See helper/rich-text-tdd.md and [[no-js-built-html]].
+	// by the caller as RichText.
 	build(roll, {rollMode, bonus, statKey} = {}) {
 		const allResults = roll.dice.flatMap(d => d.results);
 		const hasDropped = allResults.some(r => !r.active);

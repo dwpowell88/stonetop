@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { RichText, rich } from "../../../src/model/snapshot/RichText.js";
+import { RichText, rich, hasText } from "../../../src/model/snapshot/RichText.js";
 
 describe("rich() — the single entry point", () => {
 	it("wraps a string as a RichText (raw set, autoRoll off, html unset)", () => {
@@ -26,6 +26,22 @@ describe("rich() — the single entry point", () => {
 
 	it("coerces a non-string (number) to its string form", () => {
 		expect(rich(7).raw).toBe("7");
+	});
+});
+
+describe("hasText() — string-or-RichText truthiness for shared partials", () => {
+	it("is true for a non-empty string and a non-empty RichText", () => {
+		expect(hasText("note")).toBe(true);
+		expect(hasText(rich("note"))).toBe(true);
+	});
+
+	it("is false for empty/whitespace strings, empty RichText, and null/undefined", () => {
+		expect(hasText("")).toBe(false);
+		expect(hasText("   ")).toBe(false);
+		expect(hasText(rich(""))).toBe(false);
+		expect(hasText(rich(null))).toBe(false);
+		expect(hasText(null)).toBe(false);
+		expect(hasText(undefined)).toBe(false);
 	});
 });
 

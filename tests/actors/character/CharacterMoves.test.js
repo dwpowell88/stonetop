@@ -3,7 +3,7 @@ import {CharacterMoves} from "../../../src/actors/character/CharacterMoves.js";
 import {ChoiceGroupFactory} from "../../../src/actors/character/ChoiceGroupFactory.js";
 import {ResourceController} from "../../../src/actors/character/ResourceController.js";
 import {FakeMoveRepository} from "../../fakes/FakeMoveRepository.js";
-import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 import {FakeCompendiumMoveBuilder} from "../../fakes/FakeCompendiumMoveBuilder.js";
 import {TestChoiceGroupBuilder} from "../../fakes/TestChoiceGroupBuilder.js";
 import {TestChoiceRowBuilder} from "../../fakes/TestChoiceRowBuilder.js";
@@ -29,7 +29,7 @@ const CHOICES_DATA = new TestChoiceGroupBuilder()
 	)
 	.build();
 
-function makeActor() { return new FakeActorBuilder().build(); }
+function makeActor() { return new FakeCharacterActorBuilder().build(); }
 
 function makeMoves({
 	repo   = new FakeMoveRepository(),
@@ -157,7 +157,7 @@ describe("CharacterMoves.buildSnapshot — category structure", () => {
 	});
 
 	it("buildSnapshot derives categories from actor.items when system.moves is empty", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		actor.items.push({ _id: "m1", name: "Defy Danger", type: "move",
 			system: { categoryKey: "basic", acquired: true, instanceCount: 1, repeatMax: 1, sortOrder: 0, isStartingMove: true } });
 		const m = makeMoves({ actor });

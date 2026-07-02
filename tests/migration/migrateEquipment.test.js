@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { migrateEmbeddedEquipment } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 const FRONT = { title: "Front", unlock: null, item: null, description: "desc" };

@@ -4,7 +4,7 @@ import { CharacterFollowers } from "../../../src/actors/character/CharacterFollo
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
 import { FollowerSideEffectHandler } from "../../../src/actors/character/SideEffectHandler.js";
 import { ResourceController } from "../../../src/actors/character/ResourceController.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeArcanaRepository } from "../../fakes/FakeArcanaRepository.js";
 import { FakeFollowerRepository } from "../../fakes/FakeFollowerRepository.js";
 import { FakeMoves } from "../../fakes/FakeMoves.js";
@@ -51,7 +51,7 @@ function makeNpcItem(slug, overrides = {}) {
 }
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 // -- Fixtures ------------------------------------------------------------------
@@ -96,7 +96,7 @@ function makeActorOutfitItems() {
 }
 
 function makeResourceController() {
-	return new ResourceController(new FakeActorBuilder().build());
+	return new ResourceController(new FakeCharacterActorBuilder().build());
 }
 
 function makeArcana(items = [], arcana = [FFYRNIG_SPHERE], fakeStats = null, outfitItems = null) {
@@ -214,7 +214,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 		it("front.unlock.list first item is an EntryRow with the unlock description", async () => {
 			const row = (await getItem()).front.unlock.list[0];
 			expect(row).toBeInstanceOf(EntryRow);
-			expect(row.content.text).toBe("The pictograms depict some sort of recipe, which you can learn but you must…");
+			expect(row.content.text.raw).toBe("The pictograms depict some sort of recipe, which you can learn but you must…");
 		});
 
 		it("front.unlock.list has all entry nodes", async () => {
@@ -234,7 +234,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect(row).toBeInstanceOf(EntryRow);
 			expect(row.track).not.toBeNull();
 			expect(row.track.slug).toBe("dig-sphere");
-			expect(row.content.text).toBe("… first dig up and clean the sphere.");
+			expect(row.content.text.raw).toBe("… first dig up and clean the sphere.");
 		});
 
 		it("heading+track defaults checks to all false when no count saved", async () => {
@@ -275,7 +275,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 		});
 
 		it("back.resource.current reflects resourceController", async () => {
-			const ctrl = new ResourceController(new FakeActorBuilder().build());
+			const ctrl = new ResourceController(new FakeCharacterActorBuilder().build());
 			await ctrl.set("inventory", "huge-wooden-sphere", 2);
 			const item = (await makeArcana([makeArcanumItem(FFYRNIG_SPHERE)])
 				.buildSnapshot({}, ctrl)).minor.items[0];
@@ -413,7 +413,7 @@ const BOW_WITH_NO_STRING = {
 
 describe("CharacterArcana.buildSnapshot() — resourceController", () => {
 	it("back.resource uses resourceController current for back.resource arcana", async () => {
-		const ctrl = new ResourceController(new FakeActorBuilder().build());
+		const ctrl = new ResourceController(new FakeCharacterActorBuilder().build());
 		await ctrl.set("inventory", "huge-wooden-sphere", 2);
 		const item = (await makeArcana([makeArcanumItem(FFYRNIG_SPHERE)])
 			.buildSnapshot({}, ctrl)).minor.items[0];
@@ -426,7 +426,7 @@ describe("CharacterArcana.buildSnapshot() — resourceController", () => {
 	});
 
 	it("back.item.resource is a resolved Resource on the OutfitItem snapshot", async () => {
-		const ctrl = new ResourceController(new FakeActorBuilder().build());
+		const ctrl = new ResourceController(new FakeCharacterActorBuilder().build());
 		await ctrl.set("inventory", "bow-with-no-string", 1);
 		const item = (await makeArcana([makeArcanumItem(BOW_WITH_NO_STRING)], [BOW_WITH_NO_STRING])
 			.buildSnapshot({}, ctrl)).minor.items[0];

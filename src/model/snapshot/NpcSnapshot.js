@@ -1,19 +1,22 @@
 import { Selection } from "../data/Selection.js";
+import { rich } from "./RichText.js";
 
 export class NpcSnapshot {
 	constructor(b) {
 		this.hp               = b._hp;
 		this.hpMax            = b._hpMax;
-		this.armor            = b._armor;
-		this.damage           = b._damage;
+		// Rendered game text → RichText (enriched by the sheet's enrichRichTextTree pass). damage and
+		// specialQuality carry stat dice, so roll:true turns a bare `d6` into a roll button.
+		this.armor            = rich(b._armor);
+		this.damage           = rich(b._damage, { roll: true });
 		this.tagSelection     = Selection.fromStored(b._tags);
 		this.tags             = this.tagSelection.text;
 		this.isGroup          = this.tagSelection.has("group");
-		this.specialQuality   = b._specialQuality   ?? "";
+		this.specialQuality   = rich(b._specialQuality ?? "", { roll: true });
 		this.instinctSelection = Selection.fromStored(b._instinct);
 		this.instinct         = this.instinctSelection.text;
-		this.moves            = b._moves            ?? [];
-		this.description      = b._description      ?? "";
+		this.moves            = rich(b._moves ?? "");
+		this.description      = rich(b._description ?? "");
 		this.cost             = b._cost             ?? "";
 		this.loyalty          = b._loyalty          ?? 0;
 		this.isFollower       = b._isFollower       ?? false;

@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Blood-quenched Sword",
 				"weight": 1,
-				"note": "*, close*, +1 damage, 1 piercing, *messy*, *magical*",
+				"tags": "close, messy, magical",
+				"note": "+1 damage, 1 piercing",
 				"inventoryColumn": "regular"
 			},
 			"description": "An ancient blade of deep red bronze, its pommel etched with symbols like those that the Hillfolk use to decorate their drinking horns. It thrums in its scabbard, wanting nothing more than to be drawn and to burn like a fire, quenching itself in the blood of foes.",
@@ -126,7 +127,7 @@
 							"text": "You no longer gain sustenance from food. When you **_slay a living, bleeding creature with the_** **_Sword_**, hold 1 Sustenance (max 3). When you would consume a ration, lose 1 Sustenance instead."
 						},
 						"track": {
-							"max": 4
+							"max": 1
 						}
 					},
 					{

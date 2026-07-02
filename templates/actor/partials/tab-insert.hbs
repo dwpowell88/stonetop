@@ -10,8 +10,8 @@
 				<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="{{localize 'stonetop.insert.remove'}}">
 			</button>
 		</div>
-		{{#if insert.description}}
-		<div class="stonetop-insert-description stonetop-rich">{{{md insert.description}}}</div>
+		{{#if insert.description.raw}}
+		<div class="stonetop-insert-description">{{rich insert.description}}</div>
 		{{/if}}
 		<div class="stonetop-playbook-columns">
 			{{#if insert.instinctGroup}}

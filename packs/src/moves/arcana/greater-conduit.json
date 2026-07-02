@@ -1,0 +1,12 @@
+{
+	"_id": "49bcf842451ec700",
+	"_key": "!items!49bcf842451ec700",
+	"name": "Greater Conduit",
+	"type": "move",
+	"system": {
+		"slug": "greater-conduit",
+		"moveType": null,
+		"description": "When you **_perform the secret rite_**, hold 3 Conduit instead of 1 (and increase your max Conduit to 3). You no longer need the effigy on your person to use Surrogate Suffering. However, any magic that divines your location or spies on you also targets the effigy."
+	},
+	"folder": "ArcanaMoves00001"
+}

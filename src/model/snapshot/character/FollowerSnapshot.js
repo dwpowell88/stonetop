@@ -15,6 +15,7 @@
  * @property {ChoiceGroup|null}         choices
  */
 import { Selection } from "../../data/Selection.js";
+import { rich } from "../RichText.js";
 
 export class FollowerSnapshot {
 	constructor(b) {
@@ -25,24 +26,26 @@ export class FollowerSnapshot {
 		this.isGroup        = this.tagSelection.has("group");
 		this.hp             = b._hp;
 		this.hpMax          = b._hpMax;
-		this.armor          = b._armor;
-		this.damage         = b._damage;
+		// Rendered game text → RichText (enriched by the character sheet's enrichRichTextTree pass).
+		// damage carries dice → roll:true. instinct/cost render as pills (Selection), not rich text.
+		this.armor          = rich(b._armor);
+		this.damage         = rich(b._damage, { roll: true });
 		this.instinctSelection = Selection.fromStored(b._instinct);
 		this.instinct       = this.instinctSelection.text;  // display string (back-compat)
-		this.moves          = b._moves ?? "";
+		this.moves          = rich(b._moves ?? "");
 		this.specialQuality = b._specialQuality;
 		this.costSelection  = Selection.fromStored(b._cost);
 		this.cost           = this.costSelection.text;
 		this.loyalty        = b._loyalty;
 		this.description    = b._description;
-		this.notes          = b._notes ?? "";
+		this.notes          = rich(b._notes ?? "");
 		this.choices        = b._choices;
 		this.arcanaSlug     = b._arcanaSlug ?? null;
 		// Group members (only meaningful when isGroup): each owns its HP + name/tags/traits.
 		// Member tags/traits store only `selected`; options come from the group's suggestions.
 		const sugg = b._memberSuggestions ?? { names: [], tags: [], traits: [] };
 		this.memberSuggestions = { names: sugg.names ?? [], tags: sugg.tags ?? [], traits: sugg.traits ?? [] };
-		this.membersNote    = b._membersNote ?? "";
+		this.membersNote    = rich(b._membersNote ?? "");
 		const memberSel = (stored, options) =>
 			Selection.multi(Selection.fromStored(stored, { multi: true }).values, { options });
 		this.members        = (b._members ?? []).map((m, index) => ({

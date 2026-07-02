@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { migrateArcana } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakeArcanaRepository } from "../fakes/FakeArcanaRepository.js";
 import { FakeFollowerRepository } from "../fakes/FakeFollowerRepository.js";
 
@@ -10,8 +10,8 @@ const FRONT = { title: "Front", unlock: null, item: null, description: "desc" };
 const BACK  = { title: "Back",  choices: null, moves: [], consequences: null, unlockAt: null, item: null, description: "" };
 
 function makeActor(flags = {}, items = []) {
-	const builder = new FakeActorBuilder().withItems(items);
-	builder._flagsBuilder.withFlags(flags);
+	const builder = new FakeCharacterActorBuilder().withItems(items);
+	builder.withFlags(flags);
 	return builder.build();
 }
 

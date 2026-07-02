@@ -8,26 +8,18 @@ export class FakeActor {
 	_nextId = 0;
 
 	constructor(builder) {
-		this.system = {
-			playbookSlug: builder._playbookSlug ?? "",
-			stats: builder.buildStats(),
-			attributes: {
-				level: builder._level,
-				hp: builder._hp,
-				armor: builder._armor,
-				xp: builder._xp,
-				damage: builder._damage ?? {die: null},
-				debilities: {options: {...builder._debilities}},
-			},
-		};
+		this.system = builder.buildSystem();
 
 		this.name = builder._name;
-		this.type = "character";
+		this.type = builder._type ?? "character";
 
 		this.items = builder.buildItems();
 		this._fakeFlags = builder.buildFlags();
 		this.flags = this._fakeFlags.toRaw();
 
+		// Optional: let a builder wire the typed-actor wrapper without the caller mutating the actor
+		// after build() (see [[no-direct-mutation-after-builder]]).
+		if (builder._typedActorFactory) this.typedActor = builder._typedActorFactory(this);
 	}
 
 	get createdDocs()  { return this._createdDocs; }

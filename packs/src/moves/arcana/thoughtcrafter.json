@@ -1,0 +1,12 @@
+{
+	"_id": "f926c45b9b6f390c",
+	"_key": "!items!f926c45b9b6f390c",
+	"name": "Thoughtcrafter",
+	"type": "move",
+	"system": {
+		"slug": "thoughtcrafter",
+		"moveType": null,
+		"description": "When you **_mindwalk_**, you may spend 1 Power to animate a mass of loose material (gravel, snow, leaves, etc.) into a body no larger than your own. When you would roll STR, DEX, or CON in this form, use INT instead. This form has 10 HP. When reduced to 0 HP, it dissipates and you return to your physical body."
+	},
+	"folder": "ArcanaMoves00001"
+}

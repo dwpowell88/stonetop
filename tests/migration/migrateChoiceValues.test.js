@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { migrateChoiceValues, migratePlaybookChoiceValues, migrateInsertMoveCategories, migrateInsertChoiceValues } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 
 function makeActor({ choicesValues = {}, pbSystem = {}, moveItems = [] } = {}) {
 	const items = [];
@@ -8,7 +8,7 @@ function makeActor({ choicesValues = {}, pbSystem = {}, moveItems = [] } = {}) {
 		items.push({ _id: "pb-1", type: "playbook", name: "The Blessed", system: { backgrounds: [], ...pbSystem } });
 	}
 	items.push(...moveItems);
-	const actor = new FakeActorBuilder().withItems(items).build();
+	const actor = new FakeCharacterActorBuilder().withItems(items).build();
 	actor.update({ "system.choices.values": choicesValues });
 	return actor;
 }
@@ -126,7 +126,7 @@ describe("migrateChoiceValues — move values", () => {
 
 describe("migrateInsertMoveCategories", () => {
 	it("renames post-death-{slug} categoryKey to insert-{slug}", async () => {
-		const actor = new FakeActorBuilder().withItems([
+		const actor = new FakeCharacterActorBuilder().withItems([
 			{ _id: "m-1", type: "move", name: "Haunt", system: { categoryKey: "post-death-revenant" } },
 		]).build();
 		await migrateInsertMoveCategories(actor);
@@ -134,7 +134,7 @@ describe("migrateInsertMoveCategories", () => {
 	});
 
 	it("renames all post-death move items in one batch", async () => {
-		const actor = new FakeActorBuilder().withItems([
+		const actor = new FakeCharacterActorBuilder().withItems([
 			{ _id: "m-1", type: "move", name: "Haunt", system: { categoryKey: "post-death-ghost" } },
 			{ _id: "m-2", type: "move", name: "Wail",  system: { categoryKey: "post-death-ghost" } },
 		]).build();
@@ -145,7 +145,7 @@ describe("migrateInsertMoveCategories", () => {
 	});
 
 	it("does nothing when no post-death move categories exist", async () => {
-		const actor = new FakeActorBuilder().withItems([
+		const actor = new FakeCharacterActorBuilder().withItems([
 			{ _id: "m-1", type: "move", name: "Defy Danger", system: { categoryKey: "basic" } },
 		]).build();
 		await migrateInsertMoveCategories(actor);
@@ -153,7 +153,7 @@ describe("migrateInsertMoveCategories", () => {
 	});
 
 	it("leaves non-post-death categories unchanged", async () => {
-		const actor = new FakeActorBuilder().withItems([
+		const actor = new FakeCharacterActorBuilder().withItems([
 			{ _id: "m-1", type: "move", name: "Defy Danger",  system: { categoryKey: "basic" } },
 			{ _id: "m-2", type: "move", name: "Post-Death M", system: { categoryKey: "post-death-revenant" } },
 		]).build();
@@ -166,16 +166,16 @@ describe("migrateInsertMoveCategories", () => {
 // ── migrateInsertChoiceValues ─────────────────────────────────────────────────
 
 function makeActorWithInsert({ insertSystem = {}, flags = {} } = {}) {
-	const builder = new FakeActorBuilder().withItems([
+	const builder = new FakeCharacterActorBuilder().withItems([
 		{ _id: "ins-1", type: "insert", name: "Revenant", system: { slug: "revenant", choiceValues: {}, ...insertSystem } },
 	]);
-	builder._flagsBuilder.withFlags(flags);
+	builder.withFlags(flags);
 	return builder.build();
 }
 
 describe("migrateInsertChoiceValues", () => {
 	it("skips when no insert item is present", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await migrateInsertChoiceValues(actor);
 		expect(actor.updatedDocs).toHaveLength(0);
 	});
@@ -226,7 +226,7 @@ describe("migrateInsertChoiceValues", () => {
 // ── migratePlaybookChoiceValues ───────────────────────────────────────────────
 
 function makeActorWithPlaybook({ pbSystem = {}, actorSystem = {} } = {}) {
-	const actor = new FakeActorBuilder().withItems([
+	const actor = new FakeCharacterActorBuilder().withItems([
 		{ _id: "pb-1", type: "playbook", name: "The Blessed", system: { choiceValues: {}, ...pbSystem } },
 	]).build();
 	Object.assign(actor.system, actorSystem);
@@ -235,7 +235,7 @@ function makeActorWithPlaybook({ pbSystem = {}, actorSystem = {} } = {}) {
 
 describe("migratePlaybookChoiceValues — gate", () => {
 	it("skips when no playbook item is present", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await migratePlaybookChoiceValues(actor);
 		expect(actor.updatedDocs).toHaveLength(0);
 	});

@@ -1,6 +1,8 @@
+import { rich } from "../RichText.js";
+
 export class SelectOptionSnapshot {
 	constructor(label, index, selected) {
-		this.label    = label;
+		this.label    = rich(label);
 		this.index    = index;
 		this.selected = selected;
 	}
@@ -9,7 +11,7 @@ export class SelectOptionSnapshot {
 export class FortunesSnapshot {
 	constructor(title, note, current, options) {
 		this.title = title;
-		this.note = note;
+		this.note = rich(note);
 		this.current = current;
 		this.options = options.map((label, i) => new SelectOptionSnapshot(label, i, i === current));
 	}
@@ -18,7 +20,7 @@ export class FortunesSnapshot {
 export class SurplusSnapshot {
 	constructor(title, note, current) {
 		this.title = title;
-		this.note = note;
+		this.note = rich(note);
 		this.current = current;
 	}
 }
@@ -27,7 +29,7 @@ export class AttributeSnapshot {
 	constructor(slug, title, note, current, options, items = []) {
 		this.slug = slug;
 		this.title = title;
-		this.note = note;
+		this.note = rich(note);
 
 		// Current selection
 		this.current = current;
@@ -41,8 +43,8 @@ export class AttributeSnapshot {
 export class DebilitySnapshot {
 	constructor(slug, description, note, active) {
 		this.slug = slug;
-		this.description = description;
-		this.note = note;
+		this.description = rich(description);
+		this.note = rich(note);
 		this.active = active;
 	}
 }
@@ -50,9 +52,9 @@ export class DebilitySnapshot {
 export class ContentSection {
 	constructor(slug, label, note, text, items = []) {
 		this.slug = slug;
-		this.label = label;
-		this.note = note;
-		this.text = text;
+		this.label = rich(label);
+		this.note = rich(note);
+		this.text = text;          // edit-only (rendered into a textarea) — stays a raw string
 		this.items = items;
 	}
 }

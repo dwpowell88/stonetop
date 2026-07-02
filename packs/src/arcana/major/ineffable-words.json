@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Ineffable Words",
 				"weight": 1,
-				"note": "*implanted*, *magical*",
+				"tags": "implanted, magical",
+				"note": null,
 				"inventoryColumn": "regular"
 			},
 			"description": "Syllables of the first language, words of pure thought and will, emblazoned on your soul and tongue by some angelic force or being. A gift, perhaps. Or a terrible, terrible affliction.\n\nTheir power thrums inside you, pulsing against the crude vessel of your flesh and blood. Sometimes, under stress or simply out of the blue, you are struck with shakes and seizures. And when the tremors pass and your senses return, you find that you have scratched strange symbols in the dirt or on the walls. Sometimes in your own blood.",
@@ -54,17 +55,14 @@
 			}
 		},
 		"back": {
-			"title": "Mastered Words",
+			"title": "Mysteries of the Ineffable Words",
+			"item": null,
 			"description": null,
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
 			"moveSlugs": [
-				"speak-the-unutterable",
-				"seal",
-				"purify",
-				"gather",
-				"empower"
+				"speak-the-unutterable"
 			],
 			"consequences": {
 				"slug": "consequences",
@@ -74,7 +72,10 @@
 						"slug": "words-c1",
 						"content": {
 							"title": null,
-							"text": "◻◻◻ The Word's power draws the attention of every magical being for miles around. They will recognize you on sight as the bearer of the Word."
+							"text": "The Word’s power draws the attention of every magical being for miles around. They will recognize you on sight as the bearer of the Word."
+						},
+						"track": {
+							"max": 3
 						}
 					},
 					{
@@ -82,7 +83,10 @@
 						"slug": "words-c2",
 						"content": {
 							"title": null,
-							"text": "◻◻ The power of the Word overflows, affecting every possible target within *far* range to violent effect."
+							"text": "The power of the Word overflows, affecting every possible target within *far* range to violent effect."
+						},
+						"track": {
+							"max": 2
 						}
 					},
 					{
@@ -91,6 +95,9 @@
 						"content": {
 							"title": null,
 							"text": "Your voice takes on a metallic, inhuman edge. Henceforth, all creatures understand you as though you spoke their native tongue, but you can never again use language to lie or deceive."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -99,6 +106,9 @@
 						"content": {
 							"title": null,
 							"text": "The Word tears reality, leaving a rift from which primordial power pours into the world. Expect all manner of strange and chaotic effects."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -107,11 +117,14 @@
 						"content": {
 							"title": null,
 							"text": "You rouse an eternal, ancient being of Order. It seeks you out, implacably, to reprimand you for your reckless use of such primordial power."
+						},
+						"track": {
+							"max": 1
 						}
 					}
 				]
 			},
-			"unlockAt": null
+			"unlockAt": 3
 		},
 		"major": true
 	},

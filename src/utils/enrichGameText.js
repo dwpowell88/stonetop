@@ -1,6 +1,5 @@
 // Single pipeline for rendering game text (markdown stored): bold/italic via markdown,
 // bare dice -> Foundry inline rolls, plus @UUID links - all through Foundry's enrichHTML.
-// See helper/text-rendering.md.
 import snarkdown from "../../lib/snarkdown.es.js";
 
 const DIE       = "\\d*d\\d+(?:\\s*[+-]\\s*\\d+)?";
@@ -61,21 +60,4 @@ export async function enrichGameText(raw, { rollData = {}, autoRoll = true } = {
 		_enrichCache.set(key, out);
 	}
 	return out;
-}
-
-/**
- * Post-render pass: upgrade explicit Foundry tokens ([[ ]] rolls, @UUID links) inside
- * already-rendered `.stonetop-rich` elements into clickable HTML. The markdown was rendered
- * synchronously by the `{{md}}` helper, so this only runs enrichHTML \u2014 and only on elements
- * that actually contain a token, so it's a no-op when there are none.
- */
-export async function enrichRichTokens(root, { rollData = {} } = {}) {
-	if (!root) return;
-	const els = root.querySelectorAll(".stonetop-rich");
-	await Promise.all([...els].map(async el => {
-		if (el.dataset.tokensEnriched || !/\[\[|@\w+\[/.test(el.innerHTML)) return;
-		el.innerHTML = await foundry.applications.ux.TextEditor.implementation
-			.enrichHTML(el.innerHTML, { async: true, rollData });
-		el.dataset.tokensEnriched = "1";
-	}));
 }

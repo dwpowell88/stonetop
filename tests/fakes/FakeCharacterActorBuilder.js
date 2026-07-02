@@ -1,6 +1,4 @@
-import {FakeFlags} from "./foundry/FakeFlags.js";
-import {FakeActor} from "./foundry/FakeActor.js";
-import {StonetopFakeFlagsBuilder} from "./StonetopFakeFlagsBuilder.js";
+import {FakeActorScaffold} from "./FakeActorScaffold.js";
 
 export class FakeStatBuilder {
 	_str = 0;
@@ -49,12 +47,12 @@ export class FakeStatBuilder {
 	}
 }
 
-export class FakeActorBuilder {
-	_flagsBuilder = new StonetopFakeFlagsBuilder();
+// Builds a fake `character`-type actor. Owns the character system shape (stats, debilities, xp,
+// level, playbook); composes a FakeActorScaffold for the shared name/items/flags/handoff plumbing.
+export class FakeCharacterActorBuilder {
+	_scaffold = new FakeActorScaffold("Brakken");
 	_rollMode = null;
 	_playbookSlug = null;
-	_name = "Brakken";
-	_items = [];
 	_level = 1;
 	_armor = 0;
 	_damage = null;
@@ -66,6 +64,14 @@ export class FakeActorBuilder {
 		dazed: {value: false},
 		miserable: {value: false},
 	};
+
+	// Shared plumbing — delegated to the scaffold (no direct mutation after build()).
+	withName(name)  { this._scaffold.setName(name); return this; }
+	withItems(items) { this._scaffold.setItems(items); return this; }
+	addItem(item)   { this._scaffold.addItem(item); return this; }
+	withTypedActor(factory) { this._scaffold.setTypedActor(factory); return this; }
+	withFlag(key, value) { this._scaffold.flagsBuilder.withFlag(key, value); return this; }
+	withFlags(flags) { this._scaffold.flagsBuilder.withFlags(flags); return this; }
 
 	withStats(statBuilder) {
 		this._statBuilder = statBuilder;
@@ -79,11 +85,6 @@ export class FakeActorBuilder {
 
 	withDamage(die) {
 		this._damage = die ? {value: die} : null;
-		return this;
-	}
-
-	withName(name) {
-		this._name = name;
 		return this;
 	}
 
@@ -107,18 +108,8 @@ export class FakeActorBuilder {
 		return this;
 	}
 
-	withItems(items) {
-		this._items = items;
-		return this;
-	}
-
 	withRollMode(rollMode) {
 		this._rollMode = rollMode;
-		return this;
-	}
-
-	addItem(item) {
-		this._items.push(item);
 		return this;
 	}
 
@@ -130,24 +121,23 @@ export class FakeActorBuilder {
 		return this;
 	}
 
+	buildSystem() {
+		return {
+			playbookSlug: this._playbookSlug ?? "",
+			stats: this._statBuilder.build(),
+			attributes: {
+				level: this._level,
+				hp: this._hp,
+				armor: this._armor,
+				xp: this._xp,
+				damage: this._damage ?? {die: null},
+				debilities: {options: {...this._debilities}},
+			},
+		};
+	}
+
 	build() {
-		this.buildFlags();
-
-		return new FakeActor(this);
-	}
-
-	buildFlags() {
-		return this._flagsBuilder.withFlag("rollMode", this._rollMode)
-			.build();
-	}
-
-	buildItems() {
-		const items = this._items;
-		items.get = (id) => items.find(i => i._id === id) ?? null;
-		return items;
-	}
-
-	buildStats() {
-		return this._statBuilder.build();
+		this._scaffold.flagsBuilder.withFlag("rollMode", this._rollMode);
+		return this._scaffold.build("character", this.buildSystem());
 	}
 }

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { CharacterPossessions } from "../../../src/actors/character/CharacterPossessions.js";
 import { PossessionsSnapshot } from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 import { FakeMoves } from "../../fakes/FakeMoves.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeOutfitItems } from "../../fakes/FakeOutfitItems.js";
 import { FakePossessionRepository } from "../../fakes/FakePossessionRepository.js";
 import { TestPossessionBuilder } from "../../fakes/TestPossessionBuilder.js";
@@ -12,7 +12,7 @@ import { TestChoiceRowBuilder } from "../../fakes/TestChoiceRowBuilder.js";
 // -- Helpers ------------------------------------------------------------------
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 function makeMoves()       { return new FakeMoves(); }
@@ -429,8 +429,8 @@ describe("CharacterPossessions — buildSnapshot — choices", () => {
 		const snap = await cp.buildSnapshot(1);
 		const heading = snap.items.find(i => i.slug === "weapons-of-war").choices.list[0];
 		expect(heading.type).toBe("entry");
-		expect(heading.content.title).toBe("Choose your weapon");
-		expect(heading.content.titleNote).toBe("pick 1");
+		expect(heading.content.title.raw).toBe("Choose your weapon");
+		expect(heading.content.titleNote.raw).toBe("pick 1");
 	});
 
 	it("pick row with pickCount 1 has radio=true", async () => {

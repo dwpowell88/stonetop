@@ -10,8 +10,9 @@
 			"title": "Shield of the Wisent Witch",
 			"item": {
 				"name": "Shield of the Wisent Witch",
-				"weight": 1,
-				"note": "*,* +1 armor, *close*, *forceful*, *magical*,",
+				"weight": 2,
+				"tags": "close, forceful, magical",
+				"note": "+1 armor",
 				"inventoryColumn": "regular"
 			},
 			"description": "+1 Readiness on a 7+ to Defend\n\nA shield of horn-oak, glossy from long use, shod in bronze and adorned with a stylized wisent skull. It’s heavier than it looks, but its heft gives you a feeling of confidence, like anyone would be a fool to mess with a titan such as you.",

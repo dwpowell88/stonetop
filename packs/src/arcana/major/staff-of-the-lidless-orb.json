@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Staff of the Lidless Orb",
 				"weight": 1,
-				"note": "*, close*, *magical*, *awkward*",
+				"tags": "close, magical, awkward",
+				"note": null,
 				"inventoryColumn": "regular"
 			},
 			"description": "A sphere of greenish glass, etched with a cat’s-eye design and set atop a staff of rough, pitted black iron. The orb catches the light and seems to glow, and the pupil seems to widen in the dark and narrow to a slit in daylight.\n\nAnd sometimes, you could swear, it seems to look about on its own.\n\nBut that’s preposterous.",
@@ -55,6 +56,7 @@
 		},
 		"back": {
 			"title": "Mysteries of the Staff of the Lidless Orb",
+			"item": null,
 			"description": null,
 			"resource": null,
 			"itemSameAsFront": true,
@@ -67,63 +69,84 @@
 				"list": [
 					{
 						"type": "entry",
-						"slug": "orb-eye-1",
+						"slug": "orb-c1",
 						"content": {
 							"title": null,
 							"text": "One of your eyes becomes strange, bulging, painful, and discolored. Your vision is more-or-less unaffected."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
 						"type": "entry",
-						"slug": "orb-eye-1a",
+						"slug": "orb-c2",
 						"content": {
 							"title": null,
 							"text": "Your other eye withers, atrophies, and goes pale and empty. Painful warts sprout all around the socket. Permanently mark the *miserable* debility."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
 						"type": "entry",
-						"slug": "orb-scales",
+						"slug": "orb-c3",
 						"content": {
 							"title": null,
 							"text": "You begin to sprout warty, scale-like protrusions all over. These continue to grow until you gain +1 armor, but mortals who see these growths tend to be repulsed."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
 						"type": "entry",
-						"slug": "orb-beauty",
+						"slug": "orb-c4",
 						"content": {
 							"title": null,
-							"text": "You become incapable of seeing beauty. Your senses are unaltered, but nothing strikes you as beautiful. Grotesque and horrific sights still move you and you hold a strange fascination."
+							"text": "You become incapable of seeing beauty. Your senses are unaltered, but nothing strikes you as beautiful. Grotesque and horrific sights still move you and hold a strange fascination."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
 						"type": "entry",
-						"slug": "orb-beauty-a",
+						"slug": "orb-c5",
 						"content": {
 							"title": null,
 							"text": "Replace your instinct with \"Disgust: To marvel at things horrific and grotesque.\""
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
 						"type": "entry",
-						"slug": "orb-beauty-b",
+						"slug": "orb-c6",
 						"content": {
 							"title": null,
 							"text": "You can clearly see the ugliness in other people. When you first meet an NPC, you can ask the GM \"What secret shame or guilt do they bear?\" and get an honest answer."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
 						"type": "entry",
-						"slug": "orb-elrash",
+						"slug": "orb-c7",
 						"content": {
 							"title": null,
-							"text": "◻◻◻ You become aware of El'rash-Orra, the Many Eyes, gazing up at you from Below. It whispers to you a task; refuse it—now or later—and the Lidless Orb goes dark, useless to you."
+							"text": "You become aware of El’rash-Orra, the Many Eyes, gazing up at you from Below. It whispers to you a task; refuse it—now or later—and the Lidless Orb goes dark, useless to you."
+						},
+						"track": {
+							"max": 3
 						}
 					}
 				]
 			},
-			"unlockAt": null
+			"unlockAt": 3
 		},
 		"major": true
 	},

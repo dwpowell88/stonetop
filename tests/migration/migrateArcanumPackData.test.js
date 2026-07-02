@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { migrateArcanumPackData } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakeArcanaRepository } from "../fakes/FakeArcanaRepository.js";
 
 const FRONT = { title: "Front", item: null, description: "desc", unlock: null };
@@ -24,7 +24,7 @@ function makeArcanumItem(slug, overrides = {}) {
 }
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 function makeRepo(arcana = []) {

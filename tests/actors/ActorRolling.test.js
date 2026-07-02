@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ActorRolling } from "../../src/actors/ActorRolling.js";
 import { RollRequest } from "../../src/actors/RollRequest.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakeStonetopCharacter } from "../fakes/FakeStonetopCharacter.js";
 import { FakeRoll } from "../fakes/foundry/FakeRoll.js";
 import { FakeChatMessage } from "../fakes/foundry/FakeChatMessage.js";
@@ -10,7 +10,7 @@ import { FakeDialog } from "../fakes/foundry/FakeDialog.js";
 // -- helpers -------------------------------------------------------------------
 
 function makeRolling({ die, bonuses = {} } = {}) {
-	const actor = new FakeActorBuilder().withDamage(die).build();
+	const actor = new FakeCharacterActorBuilder().withDamage(die).build();
 	actor.typedActor = new FakeStonetopCharacter();
 	for (const [stat, bonus] of Object.entries(bonuses)) {
 		actor.typedActor.withBonus(stat, bonus);

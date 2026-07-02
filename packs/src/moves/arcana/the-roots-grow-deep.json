@@ -1,0 +1,12 @@
+{
+	"_id": "390ceac953d890d4",
+	"_key": "!items!390ceac953d890d4",
+	"name": "The Roots Grow Deep",
+	"type": "move",
+	"system": {
+		"slug": "the-roots-grow-deep",
+		"moveType": null,
+		"description": "When you **_use Suffering Unleashed and roll a 12+_**, clear a mark from the reverse."
+	},
+	"folder": "ArcanaMoves00001"
+}

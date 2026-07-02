@@ -1,5 +1,4 @@
 import { FollowerSnapshotBuilder } from "../../model/snapshot/character/FollowerSnapshot.js";
-import { enrichGameText } from "../../utils/enrichGameText.js";
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
 import { ResourceController } from "./ResourceController.js";
 import { Selection } from "../../model/data/Selection.js";
@@ -360,15 +359,8 @@ export class CharacterFollowers {
 		const result = ownedItems.map(item => this._buildFollowerSnapshotFromItem(item, repoItems));
 		for (const item of staticItems) result.push(this._buildFollowerSnapshotFromItem(item, repoItems));
 
-		const rollData = this._actor.getRollData?.() ?? {};
-		await Promise.all(result.map(async snap => {
-			snap.damageHtml   = await enrichGameText(snap.damage, { rollData });
-			snap.armorHtml    = await enrichGameText(snap.armor, { rollData });
-			snap.instinctHtml = await enrichGameText(snap.instinct, { rollData });
-			snap.movesHtml    = await enrichGameText(snap.moves, { rollData });
-			snap.costHtml     = await enrichGameText(snap.cost, { rollData });
-			snap.notesHtml    = await enrichGameText(snap.notes, { rollData });
-		}));
+		// Game-text fields are RichText on the snapshot; the character sheet's enrichRichTextTree pass
+		// enriches the whole tree (these followers included) — one render path, no bespoke enrichHTML.
 		return result;
 	}
 

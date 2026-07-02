@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Demonhide Cloak",
 				"weight": 1,
-				"note": "1 armor, *warm*, *magical*",
+				"tags": "warm, magical",
+				"note": "1 armor",
 				"inventoryColumn": "regular"
 			},
 			"description": "A tattered cloak, stitched from a motley patchwork of unfamiliar hides and leather. Shifting odors waft from it: damp earth, ozone, musk, sulfur, rust, rot.\n\nIt is not a glamorous garment. Anything but.",

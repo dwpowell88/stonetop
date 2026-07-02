@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createStonetopCharacterSheetClass } from "../../../src/actors/character/StonetopCharacterSheet.js";
-import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 
 // -- Helpers ------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ function makeCharacterMock(actor) {
 }
 
 function makeActor() {
-	const actor = new FakeActorBuilder().build();
+	const actor = new FakeCharacterActorBuilder().build();
 	actor.typedActor = makeCharacterMock(actor);
 	return actor;
 }

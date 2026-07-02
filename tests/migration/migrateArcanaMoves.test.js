@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { migrateArcanaMoves } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakeArcanaRepository } from "../fakes/FakeArcanaRepository.js";
 import { FakeMoveRepository } from "../fakes/FakeMoveRepository.js";
 import { FakeCompendiumMoveBuilder } from "../fakes/FakeCompendiumMoveBuilder.js";
@@ -12,7 +12,7 @@ import { FakeCompendiumMoveBuilder } from "../fakes/FakeCompendiumMoveBuilder.js
 const FRONT = { title: "Front", unlock: null, item: null, description: "desc" };
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 function mkMove(name) { return new FakeCompendiumMoveBuilder().withName(name).build(); }

@@ -8,6 +8,8 @@
 import * as CG from "../utils/choiceGroupEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
 import { FoundryMoveRepository } from "../actors/character/repositories/FoundryMoveRepository.js";
+import { itemDescriptionRich } from "./itemDescriptionRich.js";
+import { enrichRichTextTree } from "../utils/enrichRichText.js";
 
 export function createStonetopInsertSheetClass(Base) {
 	return class StonetopInsertSheet extends Base {
@@ -46,6 +48,8 @@ export function createStonetopInsertSheetClass(Base) {
 				const m = index.get(s);
 				return { slug: s, name: m?.name ?? s, missing: !m, starting: starting.has(s) };
 			});
+			context.rich = itemDescriptionRich(sys);
+			await enrichRichTextTree(context.rich, this.item?.getRollData?.() ?? {});
 			return context;
 		}
 

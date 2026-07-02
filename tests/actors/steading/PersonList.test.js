@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { PersonList } from "../../../src/actors/steading/PersonList.js";
 import { Person } from "../../../src/actors/steading/Person.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 
 function make() {
-	return new PersonList(new FakeActorBuilder().build(), "people");
+	return new PersonList(new FakeCharacterActorBuilder().build(), "people");
 }
 
 describe("PersonList.buildSnapshot", () => {

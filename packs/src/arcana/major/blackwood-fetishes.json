@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Blackwood Fetishes",
 				"weight": 1,
-				"note": "*, magical*, *indestructible*",
+				"tags": "magical, indestructible",
+				"note": null,
 				"inventoryColumn": "regular"
 			},
 			"description": "A pair of wooden figurines, carved from blackwood and worn smooth with age and use. A whitish shaft has been driven into the top of each figurine’s head, and the eyes and forehead of each are stained a rusty, reddish color.\n\nThe figurines resist all mundane attempts to damage them. Such attempts might mar them slightly, but their forms hold fast.",

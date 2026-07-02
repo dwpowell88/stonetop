@@ -2,18 +2,18 @@ import { describe, it, expect } from "vitest";
 import { CharacterFollowers } from "../../../src/actors/character/CharacterFollowers.js";
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
 import { ResourceController } from "../../../src/actors/character/ResourceController.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeFollowerRepository } from "../../fakes/FakeFollowerRepository.js";
 import { Follower } from "../../../src/model/data/character/Follower.js";
 
 // -- Helpers ------------------------------------------------------------------
 
 function makeActor() {
-	return new FakeActorBuilder().build();
+	return new FakeCharacterActorBuilder().build();
 }
 
 function makeResourceController() {
-	return new ResourceController(new FakeActorBuilder().build());
+	return new ResourceController(new FakeCharacterActorBuilder().build());
 }
 
 function makeCf(repo = null, resourceCtrl = null) {
@@ -227,28 +227,29 @@ describe("CharacterFollowers — state mutations", () => {
 		await cf.addFollower("enfys");
 		await cf.setArmor("enfys", "2 (resilience), 0 vs. bronze");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.armor).toBe("2 (resilience), 0 vs. bronze");
+		expect(snap.armor.raw).toBe("2 (resilience), 0 vs. bronze");
 	});
 
-	it("exposes enriched instinct and a moves list rendered as a <ul>", async () => {
+	it("exposes instinct as selection text and moves as RichText (raw markdown)", async () => {
 		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
 		await cf.addFollower("enfys");
 		await cf.setInstinct("enfys", "to **protect**");
 		await cf.setMoves("enfys", "- Bite d6\n- Lash out (d8+1)");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.instinctHtml).toBe("to <strong>protect</strong>");
-		expect(snap.movesHtml).toBe("<ul><li>Bite [[/r d6]]</li><li>Lash out ([[/r d8+1]])</li></ul>");
+		expect(snap.instinct).toBe("to **protect**");   // rendered as a pill (Selection), not rich text
+		expect(snap.moves.raw).toBe("- Bite d6\n- Lash out (d8+1)");
 	});
 
-	it("exposes enriched damage and armor HTML alongside the raw strings", async () => {
+	it("exposes damage and armor as RichText carrying raw markdown (damage rolls dice)", async () => {
 		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
 		await cf.addFollower("enfys");
 		await cf.setDamage("enfys", "**bronze knife** d4 (hand)");
 		await cf.setArmor("enfys", "*tough* hide");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.damage).toBe("**bronze knife** d4 (hand)");
-		expect(snap.damageHtml).toBe("<strong>bronze knife</strong> [[/r d4]] (hand)");
-		expect(snap.armorHtml).toBe("<em>tough</em> hide");
+		expect(snap.damage.raw).toBe("**bronze knife** d4 (hand)");
+		expect(snap.damage.autoRoll).toBe(true);
+		expect(snap.armor.raw).toBe("*tough* hide");
+		expect(snap.armor.autoRoll).toBe(false);
 	});
 
 	it("setDamage is reflected in buildSnapshot", async () => {
@@ -256,7 +257,7 @@ describe("CharacterFollowers — state mutations", () => {
 		await cf.addFollower("enfys");
 		await cf.setDamage("enfys", "d6");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.damage).toBe("d6");
+		expect(snap.damage.raw).toBe("d6");
 	});
 });
 
@@ -421,14 +422,14 @@ describe("CharacterFollowers.buildSnapshot", () => {
 		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
 		await cf.addFollower("enfys");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.armor).toBe("");
+		expect(snap.armor.raw).toBe("");
 	});
 
 	it("damage defaults to pack die when no state", async () => {
 		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
 		await cf.addFollower("enfys");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.damage).toBe("bronze knife d4 (hand)");
+		expect(snap.damage.raw).toBe("bronze knife d4 (hand)");
 	});
 
 	it("instinct comes from pack data", async () => {
@@ -442,7 +443,7 @@ describe("CharacterFollowers.buildSnapshot", () => {
 		const cf = makeCf(new FakeFollowerRepository([PICKER]));
 		await cf.addFollower("test-picker");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.damage).toBe("");
+		expect(snap.damage.raw).toBe("");
 	});
 });
 
@@ -506,8 +507,8 @@ describe("CharacterFollowers — choices snapshot", () => {
 		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
 		await cf.addFollower("enfys");
 		const [snap] = await cf.buildSnapshot();
-		const heading = snap.choices.list.find(r => r.type === "entry" && r.content.title);
-		expect(heading.content.title).toBe("Pick 1 on each line");
+		const heading = snap.choices.list.find(r => r.type === "entry" && r.content.title.raw);
+		expect(heading.content.title.raw).toBe("Pick 1 on each line");
 	});
 
 	it("filters promoted entries (weapon/damage/cost/notes) out of the pick rows", async () => {
@@ -605,7 +606,7 @@ describe("CharacterFollowers — addCustomFollower", () => {
 		expect(snap.name).toBe("New Follower");
 		expect(snap.hp).toBe(6);
 		expect(snap.hpMax).toBe(6);
-		expect(snap.armor).toBe("");
+		expect(snap.armor.raw).toBe("");
 	});
 });
 
@@ -656,7 +657,7 @@ describe("CharacterFollowers — custom follower snapshot", () => {
 		const slug = cf.ownedSlugs[0];
 		await cf.setArmor(slug, "2 (shield)");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.armor).toBe("2 (shield)");
+		expect(snap.armor.raw).toBe("2 (shield)");
 	});
 
 	it("custom damage snapshot is the prose string", async () => {
@@ -665,7 +666,7 @@ describe("CharacterFollowers — custom follower snapshot", () => {
 		const slug = cf.ownedSlugs[0];
 		await cf.setDamage(slug, "bronze knife d8 (hand)");
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.damage).toBe("bronze knife d8 (hand)");
+		expect(snap.damage.raw).toBe("bronze knife d8 (hand)");
 	});
 });
 
@@ -762,14 +763,14 @@ describe("CharacterFollowers — addFromNpcActor", () => {
 		const { cf } = makeCfWithActor();
 		await cf.addFromNpcActor(makeNpcActor());
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.armor).toBe("2 (resilience)");
+		expect(snap.armor.raw).toBe("2 (resilience)");
 	});
 
 	it("copies the NPC damage prose string", async () => {
 		const { cf } = makeCfWithActor();
 		await cf.addFromNpcActor(makeNpcActor());
 		const [snap] = await cf.buildSnapshot();
-		expect(snap.damage).toBe("claws d8 (hand)");
+		expect(snap.damage.raw).toBe("claws d8 (hand)");
 	});
 
 	it("maps instinct", async () => {

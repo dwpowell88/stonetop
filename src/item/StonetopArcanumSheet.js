@@ -16,7 +16,6 @@ import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
 import { Arcanum } from "../model/data/character/Arcanum.js";
 import { buildArcanumSnapshot, buildArcanumMoveSnapshot } from "../actors/character/arcanumSnapshot.js";
 import { FoundryMoveRepository } from "../actors/character/repositories/FoundryMoveRepository.js";
-import { enrichRichTokens } from "../utils/enrichGameText.js";
 import { enrichRichTextTree } from "../utils/enrichRichText.js";
 
 const BLANK_ITEM     = () => ({ name: "", weight: 1, tags: null, note: null, inventoryColumn: null, twoCol: false, resource: null });
@@ -56,9 +55,6 @@ export function createStonetopArcanumSheetClass(Base) {
 			this.element?.[0]
 				?.querySelectorAll(".arcanum-preview-flip, .arcanum-edit-toggle")
 				.forEach(btn => { btn.disabled = false; });
-			// The preview card renders descriptions through {{md}}; upgrade explicit [[ ]] rolls /
-			// @UUID links the same way the character sheet does.
-			await enrichRichTokens(this.element?.[0], { rollData: this.item?.getRollData?.() ?? {} });
 		}
 
 		async getData() {
@@ -103,6 +99,9 @@ export function createStonetopArcanumSheetClass(Base) {
 				: null;
 			context.preview        = [buildArcanumSnapshot(arcanum, { flipped: this._previewFlipped, moveSnapshots })];
 			await enrichRichTextTree(context.preview, this.item?.getRollData?.() ?? {});
+			// The non-editable description view ({{else}} branch) renders the SAME enriched front/back
+			// RichText the preview card uses — no separate {{md}} render path.
+			context.previewCard    = context.preview[0];
 			context.previewFlipped = this._previewFlipped;
 
 			// View-first: an existing arcanum opens as a rendered card with an Edit button; a blank one

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { migrateEmbeddedMoveSlugs } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 const move = (id, name, system = {}) => ({ _id: id, type: "move", name, system });

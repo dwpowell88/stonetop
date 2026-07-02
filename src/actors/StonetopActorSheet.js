@@ -1,6 +1,5 @@
 import { buildFocusSelector } from "./buildFocusSelector.js";
 import { activateEditToggles } from "../utils/editToggle.js";
-import { enrichRichTokens } from "../utils/enrichGameText.js";
 import { activateSteppers } from "../utils/stepper.js";
 import { activateComboBoxes } from "../utils/comboBox.js";
 
@@ -25,10 +24,8 @@ export class StonetopActorSheet extends foundry.appv1.sheets.ActorSheet {
 		await super._render(force, options);
 
 		const el = this.element?.[0];
-		// Markdown is already rendered by the {{md}} helper; upgrade explicit rolls/@UUID links.
-		await enrichRichTokens(el, { rollData: this.actor?.getRollData?.() ?? {} });
 		if (selector) el?.querySelector(selector)?.focus();
-		// Restore scroll last, after enrichment may have changed element heights.
+		// Restore scroll last.
 		for (const [sel, top] of Object.entries(scroll)) {
 			const target = el?.querySelector(sel);
 			if (target) target.scrollTop = top;

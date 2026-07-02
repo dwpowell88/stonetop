@@ -2411,9 +2411,20 @@ body,
 
 /* Major-arcana mystery moves reuse the moves-tab move-item partial, but single-column. */
 .stonetop-arcanum-moves {
-	column-count: 1;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 	margin: 6px 0 0;
 	padding: 0;
+}
+
+/* PDF-style section titles on the arcanum card ("Moves" / "Consequences"). */
+.stonetop-arcanum-section-label {
+	font-weight: bold;
+	font-variant: small-caps;
+	letter-spacing: 0.03em;
+	margin: 8px 0 2px;
 }
 
 .stonetop-arcanum-follower {
@@ -4734,7 +4745,7 @@ form.stonetop.sheet.steading {
 .stonetop-arcanum-field--narrow input { flex: 0 0 auto; width: 4.5em; }
 .stonetop-arcanum-field--check { flex: 0 0 auto; }
 .stonetop-arcanum-field--check input { flex: 0 0 auto; width: auto; }
-.stonetop-arcanum-moves { display: flex; flex-direction: column; gap: 6px; }
+.stonetop-arcanum-move-editor-list { display: flex; flex-direction: column; gap: 6px; }
 .stonetop-arcanum-move {
 	border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px;
 	display: flex; flex-direction: column; gap: 4px;

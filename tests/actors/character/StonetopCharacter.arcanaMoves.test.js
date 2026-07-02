@@ -2,7 +2,7 @@ import {describe, it, expect, afterEach, vi} from "vitest";
 import {StonetopCharacter} from "../../../src/actors/character/StonetopCharacter.js";
 import {FoundryRepositoryFactory} from "../../../src/actors/character/repositories/FoundryRepositoryFactory.js";
 import {FakeGameBuilder} from "../../fakes/FakeGameBuilder.js";
-import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 import {FakePackBuilder} from "../../fakes/foundry/FakePackBuilder.js";
 import {FakeCompendiumMoveBuilder} from "../../fakes/FakeCompendiumMoveBuilder.js";
 
@@ -37,7 +37,7 @@ function majorArcanumItem(moveSlugs) {
 // the hook against the same object.
 function characterWithArcanum(arcanumItem) {
 	return new StonetopCharacter(
-		new FakeActorBuilder().addItem(arcanumItem).build(), new FoundryRepositoryFactory(),
+		new FakeCharacterActorBuilder().addItem(arcanumItem).build(), new FoundryRepositoryFactory(),
 	);
 }
 

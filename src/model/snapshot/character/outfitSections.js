@@ -35,7 +35,7 @@ export function buildOutfitColumn(repoItems, customItems, checkedMap, column, re
 	const mapItem = (oi) => new OutfitItemSnapshotBuilder()
 		.withSlug(oi.slug)
 		.withName(oi.name)
-		.withTags(oi.tags)
+		.withTags(rich(oi.tags))
 		.withNote(rich(oi.note))
 		.withWeight(oi.weight)
 		.withChecked(checkedMap[oi.slug] ?? false)

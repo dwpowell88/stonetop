@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Noruba's Ice Sphere",
 				"weight": 1,
-				"note": "*, magical*, *awkward*",
+				"tags": "magical, awkward",
+				"note": null,
 				"inventoryColumn": "regular"
 			},
 			"description": "A perfect sphere of dark ice, the size of a fist, never melting, hard as stone, and set like a gaudy gem at the end of a finely wrought torc. Or not a torc, perhaps, but maybe a ring that once sat upon some giant’s finger?\n\nStaring into the icy sphere brings a sense of calm, serenity, and detachment. Indeed, a lesser mind might find itself staring into its depths for hours on end.",
@@ -54,13 +55,18 @@
 			}
 		},
 		"back": {
-			"title": "Mysteries of the Noruba's Ice Sphere",
+			"title": "Mysteries of Noruba’s Ice Sphere",
+			"item": null,
 			"description": null,
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
 			"moveSlugs": [
-				"mindwalking"
+				"mindwalking",
+				"a-mighty-will",
+				"farwalker",
+				"telepathy",
+				"thoughtcrafter"
 			],
 			"consequences": {
 				"slug": "consequences",
@@ -71,6 +77,9 @@
 						"content": {
 							"title": null,
 							"text": "You draw the attention of some powerful, hungry entity of the spirit world. It has your scent."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -78,7 +87,10 @@
 						"slug": "sphere-c2",
 						"content": {
 							"title": null,
-							"text": "Your physical body withers and fades—permanently mark the *weakened* debility."
+							"text": "Your physical body withers and fades—permanently mark the *weakened* debility"
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -87,14 +99,9 @@
 						"content": {
 							"title": null,
 							"text": "Your emotions dull. You can no longer be affected by fear, hate, passion, or other powerful emotions (for good or ill)."
-						}
-					},
-					{
-						"type": "entry",
-						"slug": "sphere-c3a",
-						"content": {
-							"title": null,
-							"text": "Replace your instinct with \"Detachment: To distance yourself from human connections and emotions.\""
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -102,15 +109,10 @@
 						"slug": "sphere-c4",
 						"content": {
 							"title": null,
-							"text": "Your skin tinges bluish; your body becomes cold to the touch. You are unaffected by even the bitterest cold, but find heat and warmth unbearable."
-						}
-					},
-					{
-						"type": "entry",
-						"slug": "sphere-c4a",
-						"content": {
-							"title": null,
-							"text": "When you take damage from fire, roll twice and take the higher result."
+							"text": "Replace your instinct with \"Detachment: To distance yourself from human connections and emotions.\""
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -118,12 +120,37 @@
 						"slug": "sphere-c5",
 						"content": {
 							"title": null,
-							"text": "When you **roll 6- at Death's Door**, you have no choice: gain the Ghost insert (with the Ice Sphere as your tether)."
+							"text": "Your skin tinges bluish; your body becomes cold to the touch. You are unaffected by even the bitterest cold, but find heat and warmth unbearable."
+						},
+						"track": {
+							"max": 1
+						}
+					},
+					{
+						"type": "entry",
+						"slug": "sphere-c6",
+						"content": {
+							"title": null,
+							"text": "When you take damage from fire, roll twice and take the higher result."
+						},
+						"track": {
+							"max": 1
+						}
+					},
+					{
+						"type": "entry",
+						"slug": "sphere-c7",
+						"content": {
+							"title": null,
+							"text": "When you **_roll 6- at Death’s Door_**, you have no choice: gain the Ghost insert (with the Ice Sphere as your tether)."
+						},
+						"track": {
+							"max": 1
 						}
 					}
 				]
 			},
-			"unlockAt": null
+			"unlockAt": 3
 		},
 		"major": true
 	},

@@ -19,13 +19,13 @@
 				<h2>
 					<button class="steading-stat-roll rollable" type="button" data-roll="fortunes">Fortunes</button>
 				</h2>
-				<div class="steading-start-line">{{{stonetop.fortunes.note}}}</div>
+				<div class="steading-start-line">{{rich stonetop.fortunes.note}}</div>
 				<div class="steading-rating-options">
 					{{#each stonetop.fortunes.options}}
 						<label class="steading-rating-option">
 							<input class="steading-box-input" type="radio" name="stonetop-fortunes" value="{{index}}" {{#if selected}}checked{{/if}}>
 							<span class="steading-box" aria-hidden="true"></span>
-							<span class="steading-option-text"><span>{{{label}}}</span></span>
+							<span class="steading-option-text"><span>{{rich label}}</span></span>
 						</label>
 					{{/each}}
 				</div>
@@ -44,7 +44,7 @@
 				<h2>
 					<button class="steading-stat-roll rollable" type="button" data-roll="surplus">Surplus</button>
 				</h2>
-				<div class="steading-start-line">{{{stonetop.surplus.note}}}</div>
+				<div class="steading-start-line">{{rich stonetop.surplus.note}}</div>
 				<input class="steading-surplus-input stonetop-step" type="number" value="{{stonetop.surplus.current}}" min="0" step="1">
 			</div>
 
@@ -61,13 +61,13 @@
 				<h2>
 					Size
 				</h2>
-				<div class="steading-start-line">{{{stonetop.attributes.size.note}}}</div>
+				<div class="steading-start-line">{{rich stonetop.attributes.size.note}}</div>
 				<div class="steading-rating-options">
 					{{#each stonetop.attributes.size.options}}
 						<label class="steading-rating-option">
 							<input class="steading-box-input" type="radio" name="stonetop-attr-size" data-attr="size" value="{{index}}" {{#if selected}}checked{{/if}}>
 							<span class="steading-box" aria-hidden="true"></span>
-							<span class="steading-option-text"><span>{{{label}}}</span></span>
+							<span class="steading-option-text"><span>{{rich label}}</span></span>
 						</label>
 					{{/each}}
 				</div>
@@ -86,13 +86,13 @@
 				<h2>
 					<button class="steading-stat-roll rollable" type="button" data-roll="population">Population</button>
 				</h2>
-				<div class="steading-start-line">{{{stonetop.attributes.population.note}}}</div>
+				<div class="steading-start-line">{{rich stonetop.attributes.population.note}}</div>
 				<div class="steading-rating-options">
 					{{#each stonetop.attributes.population.options}}
 						<label class="steading-rating-option">
 							<input class="steading-box-input" type="radio" name="stonetop-attr-population" data-attr="population" value="{{index}}" {{#if selected}}checked{{/if}}>
 							<span class="steading-box" aria-hidden="true"></span>
-							<span class="steading-option-text"><span>{{{label}}}</span></span>
+							<span class="steading-option-text"><span>{{rich label}}</span></span>
 						</label>
 					{{/each}}
 				</div>
@@ -111,13 +111,13 @@
 				<h2>
 					<button class="steading-stat-roll rollable" type="button" data-roll="prosperity">Prosperity</button>
 				</h2>
-				<div class="steading-start-line">{{{stonetop.attributes.prosperity.note}}}</div>
+				<div class="steading-start-line">{{rich stonetop.attributes.prosperity.note}}</div>
 				<div class="steading-rating-options">
 					{{#each stonetop.attributes.prosperity.options}}
 						<label class="steading-rating-option">
 							<input class="steading-box-input" type="radio" name="stonetop-attr-prosperity" data-attr="prosperity" value="{{index}}" {{#if selected}}checked{{/if}}>
 							<span class="steading-box" aria-hidden="true"></span>
-							<span class="steading-option-text"><span>{{{label}}}</span></span>
+							<span class="steading-option-text"><span>{{rich label}}</span></span>
 						</label>
 					{{/each}}
 				</div>
@@ -136,13 +136,13 @@
 				<h2>
 					<button class="steading-stat-roll rollable" type="button" data-roll="defenses">Defenses</button>
 				</h2>
-				<div class="steading-start-line">{{{stonetop.attributes.defenses.note}}}</div>
+				<div class="steading-start-line">{{rich stonetop.attributes.defenses.note}}</div>
 				<div class="steading-rating-options steading-rating-options--wide">
 					{{#each stonetop.attributes.defenses.options}}
 						<label class="steading-rating-option">
 							<input class="steading-box-input" type="radio" name="stonetop-attr-defenses" data-attr="defenses" value="{{index}}" {{#if selected}}checked{{/if}}>
 							<span class="steading-box" aria-hidden="true"></span>
-							<span class="steading-option-text"><span>{{{label}}}</span></span>
+							<span class="steading-option-text"><span>{{rich label}}</span></span>
 						</label>
 					{{/each}}
 				</div>
@@ -164,7 +164,7 @@
 						<label class="steading-debility-option">
 							<input class="steading-circle-input" type="checkbox" data-slug="{{slug}}" {{#if active}}checked{{/if}}>
 							<span class="steading-circle" aria-hidden="true"></span>
-							<span class="stonetop-rich">{{{md description}}} <small>{{note}}</small></span>
+							<span>{{rich description}} <small>{{rich note}}</small></span>
 						</label>
 					{{/each}}
 				</div>
@@ -619,7 +619,7 @@
 							<span class="panel-edge panel-edge-right"></span>
 							<span class="panel-edge panel-edge-bottom"></span>
 							<span class="panel-edge panel-edge-left"></span>
-							<h2>{{label}}{{#if note}} <small>{{note}}</small>{{/if}}</h2>
+							<h2>{{rich label}}{{#if note.raw}} <small>{{rich note}}</small>{{/if}}</h2>
 							<textarea class="stonetop-content-textarea" data-type="{{slug}}">{{text}}</textarea>
 						</div>
 					{{/each}}

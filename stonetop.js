@@ -15,8 +15,7 @@ import { onRenderPause } from "./src/hooks/RenderPause.js";
 import { onPreCreateActor } from "./src/hooks/PreCreateActor.js";
 import { installBrokenImageHider } from "./src/hooks/HideBrokenImages.js";
 import { info } from "./src/utils/logger.js";
-import { renderMarkdown } from "./src/utils/enrichGameText.js";
-import { rich } from "./src/model/snapshot/RichText.js";
+import { rich, hasText } from "./src/model/snapshot/RichText.js";
 import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
 import { CharacterData } from "./src/data/CharacterData.js";
 import { NpcData } from "./src/data/NpcData.js";
@@ -89,14 +88,13 @@ Hooks.once("init", () => {
 	Handlebars.registerHelper("join", (arr, sep) => (Array.isArray(arr) ? arr.join(typeof sep === "string" ? sep : ", ") : ""));
 	Handlebars.registerHelper("concat", (...args) => args.slice(0, -1).join(""));
 
-	// Render stored markdown -> HTML synchronously (no auto-roll for prose). Explicit
-	// [[ ]] rolls / @UUID links survive as text and are made clickable post-render by
-	// enrichRichTokens(). Use on .stonetop-rich containers: {{{md description}}}
-	Handlebars.registerHelper("md", text => new Handlebars.SafeString(renderMarkdown(text ?? "")));
-
 	// The single render path for game text. Accepts a RichText (enriched by enrichRichTextTree in
 	// getData) or a bare string (rendered as markdown). One way to render text: {{rich field}}.
 	Handlebars.registerHelper("rich", value => new Handlebars.SafeString(rich(value).render()));
+
+	// Truthiness for an optional text field that may arrive as a bare string OR a RichText — used to
+	// guard optional notes/subtitles in the shared heading partials: {{#if (hasText note)}}.
+	Handlebars.registerHelper("hasText", hasText);
 
 	Handlebars.registerHelper("repeatChecks", move => {
 		const sel = move?.selection;

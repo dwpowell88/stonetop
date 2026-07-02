@@ -139,7 +139,7 @@
 					       data-slug="{{slug}}"
 					       {{#if checked}}checked{{/if}}
 					       {{#if disabled}}disabled{{/if}}>
-					<strong class="stonetop-item-name stonetop-rich">{{{md label}}}</strong>
+					<strong class="stonetop-item-name">{{rich label}}</strong>
 					{{#if preselectedSource}}<span class="stonetop-item-source">{{preselectedSource}}</span>{{/if}}
 					{{#if resource}}
 					<span class="stonetop-item-resources">
@@ -149,7 +149,7 @@
 					{{#if removable}}<a class="stonetop-possession-delete" data-slug="{{slug}}" title="{{localize 'stonetop.inventory.removeItem'}}"><i class="fas fa-trash"></i></a>{{/if}}
 				</div>
 				{{#if description}}
-				<div class="stonetop-item-description stonetop-rich">{{{md description}}}</div>
+				<div class="stonetop-item-description">{{rich description}}</div>
 				{{/if}}
 				{{#if choices}}
 				<div class="stonetop-choice-rows" data-possession-slug="{{slug}}">

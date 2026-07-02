@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { NeighborPeople } from "../../../src/actors/steading/NeighborPeople.js";
 import { Person } from "../../../src/actors/steading/Person.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 
 function make() {
-	return new NeighborPeople(new FakeActorBuilder().build());
+	return new NeighborPeople(new FakeCharacterActorBuilder().build());
 }
 
 describe("NeighborPeople.add", () => {

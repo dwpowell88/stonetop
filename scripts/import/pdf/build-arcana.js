@@ -53,7 +53,7 @@ function emitArcanaMoves(back) {
 		const slug = m.id; slugs.push(slug);
 		const id = arcanaMoveId(slug);
 		const doc = { _id: id, _key: `!items!${id}`, name: m.name, type: "move",
-			system: { slug, moveType: null, description: m.text ?? "" }, folder: ARCANA_MOVES_FOLDER };
+			system: { slug, moveType: null, description: m.text ?? "", ...(m.requirement ? { requirement: m.requirement } : {}) }, folder: ARCANA_MOVES_FOLDER };
 		writeFileSync(path.join(ARCANA_MOVES_DIR, `${slug}.json`), JSON.stringify(doc, null, "\t") + "\n");
 	}
 	const out = {};
@@ -100,6 +100,24 @@ function segmentBy(blocks, map, endRe) {
 		if (isLabel(blocks[i], endRe)) cur.done = true;
 	}
 	if (cur) out.push(cur);
+	return out;
+}
+
+// A major card's back is the block span BETWEEN its "front" and "back" side-labels (the physical back
+// of the card). Anchoring on the arcanum NAME (every card has one) is robust; the "Mysteries of X"
+// title heading is not — it may sit before Moves, after Consequences, or be absent entirely (staff /
+// ineffable / redwood have none), so byBackTitle misses those backs or segments an empty tail.
+function segmentMajorBacks(blocks, map) {
+	const out = []; let rec = null, cur = null;
+	for (let i = 0; i < blocks.length; i++) {
+		const hit = matchHeading(blocks, i, map);
+		if (hit && (!rec || rec.slug !== hit.slug)) { rec = hit; cur = null; }
+		if (!rec) continue;
+		if (isLabel(blocks[i], /^front$/i)) { cur = { rec, blocks: [] }; continue; } // back starts after the front label
+		if (isLabel(blocks[i], /^back$/i)) { if (cur) { out.push(cur); cur = null; } continue; }
+		if (cur) cur.blocks.push(blocks[i]);
+	}
+	if (cur) out.push(cur); // a final card with no trailing back label
 	return out;
 }
 
@@ -182,8 +200,10 @@ for (const range of ranges) {
 			parsedFront.set(rec.slug, parseFront(bl, { name: rec.doc.name, slug: rec.slug }));
 			if (rec.tier === "major") arcanaUnlockAt.set(rec.slug, detectUnlockAt(bl)); // mark-gate lives on the front, stored on back
 		}
-	// Backs: anchored on the existing back.title (the spell / "Mysteries of X"), bounded at "back".
-	for (const { rec, blocks: bl } of segmentBy(blocks, byBackTitle, /^back$/i))
+	// Backs: majors are segmented by the front→back label span (robust to a missing/mis-placed
+	// "Mysteries of X" title); minors still anchor on the existing back.title, bounded at "back".
+	const backSegs = isMinor ? segmentBy(blocks, byBackTitle, /^back$/i) : segmentMajorBacks(blocks, byName);
+	for (const { rec, blocks: bl } of backSegs)
 		if (!parsedBack.has(rec.slug)) parsedBack.set(rec.slug, parseBack(bl, { slug: rec.slug, name: rec.doc.name, major: rec.tier === "major", unlockAt: arcanaUnlockAt.get(rec.slug) }));
 
 	// Follower stat blocks (matched to the roster by name later). Copy each icon out of the per-range
@@ -230,15 +250,15 @@ for (const rec of bySlug.values()) {
 	const fl = diverge(parsed, rec.doc);
 	if (fl.length) { flagged++; reviewBody.push(`## ${rec.doc.name} \`${rec.slug}\` (${rec.tier})`, ...fl.map((f) => `- ${f}`), ``); }
 
-	// --write-arcana currently overwrites MAJOR arcana only (front + back); minor fronts are still
-	// divergent (WIP), so they're left untouched (their hand-authored follower wiring stays intact).
+	// --write-arcana overwrites MAJOR arcana only (front + back); minor fronts are still divergent
+	// (WIP), so they're left untouched (their hand-authored follower wiring stays intact).
 	if (WRITE_ARCANA && rec.tier === "major") {
-		// Preserve the hand-authored back when the parse came up empty (unsegmented or no moves/
-		// consequences) — e.g. ineffable-words / redwood-effigy / staff-of-the-lidless-orb / norubas.
-		const parsedGood = parsed.back && ((parsed.back.moves?.length ?? 0) > 0 || parsed.back.consequences);
-		let back = parsedGood ? parsed.back : (rec.doc.system.back ?? null);
-		// Major follower cards (mindgem/blackwood) inline their followers — preserve that hand-authored choice group.
-		if (parsedGood && back && rec.doc.system.back?.choices) back.choices = rec.doc.system.back.choices;
+		// The parser is now authoritative for every major back (front→back span segmentation handles the
+		// cards that used to come up empty), so no hand-authored back fallback.
+		let back = parsed.back;
+		// Carve-out: the major follower cards (mindgem/blackwood) inline their followers via a hand-authored
+		// choice group — preserve it (the 3 major followers stay hand-authored, per the roster).
+		if (back && rec.doc.system.back?.choices) back.choices = rec.doc.system.back.choices;
 		// Promote parsed inline moves → move pack files + `back.moveSlugs` (no-op if already moveSlugs).
 		back = emitArcanaMoves(back);
 		const sys = { slug: rec.slug, front, back, major: true };

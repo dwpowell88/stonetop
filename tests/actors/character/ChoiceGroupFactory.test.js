@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeFollowers } from "../../fakes/FakeFollowers.js";
 import { FollowerSideEffectHandler, OutfitItemSideEffectHandler } from "../../../src/actors/character/SideEffectHandler.js";
 import { FakeOutfitItems } from "../../fakes/FakeOutfitItems.js";
@@ -16,7 +16,7 @@ function makeItem(overrides = {}) {
 }
 
 function makeFactory(items = []) {
-	const actor = new FakeActorBuilder().withItems(items).build();
+	const actor = new FakeCharacterActorBuilder().withItems(items).build();
 	return { factory: new ChoiceGroupFactory(actor), actor };
 }
 

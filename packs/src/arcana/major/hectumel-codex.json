@@ -11,7 +11,8 @@
 			"item": {
 				"name": "Hec'tumel Codex",
 				"weight": 1,
-				"note": "*, crude*, *slow*, *magical*",
+				"tags": "crude, slow, magical",
+				"note": null,
 				"inventoryColumn": "regular"
 			},
 			"description": "A dozen copper plates, green with age and bound with loops of reddish metal wire. The outer plates are embossed with strange images of man and beast while the inner plates are etched with arcane diagrams and annotated in some forgotten script.",

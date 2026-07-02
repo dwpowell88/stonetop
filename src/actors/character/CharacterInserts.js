@@ -1,6 +1,7 @@
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
 import { InsertSnapshotBuilder } from "../../model/snapshot/character/InsertSnapshot.js";
 import { InstinctController } from "./InstinctController.js";
+import { rich } from "../../model/snapshot/RichText.js";
 
 export class CharacterInserts {
 	constructor(actor, factory, moves, insertRepo = null) {
@@ -91,7 +92,7 @@ export class CharacterInserts {
 			.withSlug(slug)
 			.withName(item.name)
 			.withImg(item.img ?? null)
-			.withDescription(item.system?.description ?? null)
+			.withDescription(rich(item.system?.description ?? null))
 			.withInstinctGroup(instinctGroup)
 			.withInstinctSelected(instinctSelected)
 			.withChoices(choices)

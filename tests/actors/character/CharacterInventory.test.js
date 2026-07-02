@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { CharacterInventory } from "../../../src/actors/character/CharacterInventory.js";
 import { ResourceController } from "../../../src/actors/character/ResourceController.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { OutfitItemBuilder } from "../../../src/model/data/character/OutfitItem.js";
 import { FakeInventoryRepository } from "../../fakes/FakeInventoryRepository.js";
 import { OutfitSnapshot } from "../../../src/model/snapshot/character/CharacterSnapshot.js";
@@ -9,7 +9,7 @@ import { OutfitSnapshot } from "../../../src/model/snapshot/character/CharacterS
 // -- Fake helpers ---------------------------------------------------------------
 
 function makeActor(inventoryState = {}) {
-	const actor = new FakeActorBuilder().build();
+	const actor = new FakeCharacterActorBuilder().build();
 	actor.system.inventory = {
 		checked:     inventoryState.checked     ?? {},
 		loadLevel:   inventoryState.loadLevel   ?? null,
@@ -68,7 +68,7 @@ function makeActorOutfitItems(items = []) {
 }
 
 function makeResourceController() {
-	return new ResourceController(new FakeActorBuilder().build());
+	return new ResourceController(new FakeCharacterActorBuilder().build());
 }
 
 function makeCi(inventoryState = {}, repo = null, outfitItems = null, resourceCtrl = null) {

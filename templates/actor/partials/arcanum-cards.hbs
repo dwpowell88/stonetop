@@ -22,6 +22,7 @@
 	<div class="stonetop-arcanum-body">
 		<div>{{rich back.description}}</div>
 		{{#if back.moves.length}}
+		<p class="stonetop-arcanum-section-label">{{localize "stonetop.arcana.moves"}}</p>
 		<ol class="items-list stonetop-arcanum-moves">
 			{{#each back.moves}}
 			<li class="stonetop-item">
@@ -41,7 +42,7 @@
 		{{/if}}
 		{{#if back.consequences}}
 		<div class="stonetop-arcanum-consequences">
-			<p class="stonetop-arcanum-consequences-label">{{localize "stonetop.arcana.consequences"}}</p>
+			<p class="stonetop-arcanum-section-label">{{localize "stonetop.arcana.consequences"}}</p>
 			{{#each back.consequences.list}}
 			{{> "stonetop.choice-row"}}
 			{{/each}}

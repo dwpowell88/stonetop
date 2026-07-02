@@ -1,3 +1,5 @@
+import { enrichRichTextTree } from "../../utils/enrichRichText.js";
+
 export function createStonetopSteadingSheetClass(Base) {
 	return class StonetopSteadingSheet extends Base {
 		constructor(...args) {
@@ -23,6 +25,7 @@ export function createStonetopSteadingSheetClass(Base) {
 		async getData() {
 			const ctx = await super.getData();
 			ctx.stonetop = await this._stonetopSteading.buildSnapshot();
+			await enrichRichTextTree(ctx.stonetop, this.actor?.getRollData?.() ?? {});
 			return ctx;
 		}
 

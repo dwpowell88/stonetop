@@ -40,3 +40,13 @@ export function rich(value, { roll = false } = {}) {
 	if (value == null) return new RichText("", roll);
 	return new RichText(String(value), roll);
 }
+
+/**
+ * True when a value carries renderable text — works for a bare string OR a RichText, so shared
+ * partials can guard an optional note/subtitle with `{{#if (hasText note)}}` regardless of whether
+ * the caller passed a localized string or a wrapped RichText. Reuses `rich()` so the rule lives in
+ * one place.
+ */
+export function hasText(value) {
+	return rich(value).raw.trim().length > 0;
+}

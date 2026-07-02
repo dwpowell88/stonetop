@@ -172,6 +172,7 @@ export class CharacterArcana {
 				.withSlug(slug)
 				.withName(sideItem.name)
 				.withWeight(sideItem.weight ?? 0)
+				.withTags(sideItem.tags ?? "")
 				.withNote(sideItem.note ?? null)
 				.withInventoryColumn(sideItem.inventoryColumn)
 				.withResource(sideItem.resource ?? null)

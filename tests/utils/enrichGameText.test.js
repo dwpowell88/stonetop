@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { autoRollDice, toRollableMarkup, enrichGameText, renderMarkdown, enrichRichTokens, clearEnrichCache } from "../../src/utils/enrichGameText.js";
-
-// Minimal stand-ins for DOM nodes (the suite runs in the node environment).
-function fakeEl(innerHTML) { return { innerHTML, dataset: {} }; }
-function fakeRoot(els) { return { querySelectorAll: () => els }; }
+import { autoRollDice, toRollableMarkup, enrichGameText, renderMarkdown, clearEnrichCache } from "../../src/utils/enrichGameText.js";
 
 describe("enrichGameText caching", () => {
 	it("serves a second identical call from cache (skips enrichHTML)", async () => {
@@ -125,26 +121,3 @@ describe("enrichGameText", () => {
 	});
 });
 
-describe("enrichRichTokens (post-render token pass)", () => {
-	it("enriches only .stonetop-rich elements that contain a [[ ]] roll or @UUID token", async () => {
-		const withRoll = fakeEl("deal [[/r d6]] now");
-		const withLink = fakeEl("see @UUID[Actor.x]{Garm}");
-		const plain    = fakeEl("just <strong>prose</strong>");
-		await enrichRichTokens(fakeRoot([withRoll, withLink, plain]));
-		expect(withRoll.dataset.tokensEnriched).toBe("1");
-		expect(withLink.dataset.tokensEnriched).toBe("1");
-		expect(plain.dataset.tokensEnriched).toBeUndefined();
-	});
-
-	it("skips elements already marked enriched", async () => {
-		const el = fakeEl("deal [[/r d6]]");
-		el.dataset.tokensEnriched = "1";
-		el.innerHTML = "SENTINEL";
-		await enrichRichTokens(fakeRoot([el]));
-		expect(el.innerHTML).toBe("SENTINEL");
-	});
-
-	it("does nothing for a null root", async () => {
-		await expect(enrichRichTokens(null)).resolves.toBeUndefined();
-	});
-});

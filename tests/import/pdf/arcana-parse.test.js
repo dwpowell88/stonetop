@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug, followerChoiceEntry, isArcanaFollower, titleCase, majorMoveName, detectUnlockAt, parseFront, parseBack } from "../../../scripts/import/pdf/arcana-parse.js";
+import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug, followerChoiceEntry, isArcanaFollower, titleCase, majorMoveName, parseRequires, detectUnlockAt, parseFront, parseBack } from "../../../scripts/import/pdf/arcana-parse.js";
 
 // Synthetic block factories (markers are literal glyphs in the line text, as the load pipeline injects).
 const _line = (text) => ({ text, bbox: [0, 0, 0, 0], spans: [{ font: "ACaslonPro-Regular", size: 9, text }] });
@@ -115,6 +115,60 @@ describe("parseBack — major mysteries (moves + consequence tracks)", () => {
 		expect(back.consequences.list[0].content.text).toBe("You lose yourself in a blood-rage.\n\nWhen you attack, advantage on damage.");
 		expect(back.consequences.list[1].track).toEqual({ max: 1 });
 	});
+	it("derives the 'Mysteries of the X' title when the back has no title heading", () => {
+		const b = parseBack([
+			_heading("Moves"),
+			_list(["□ POWER When you bear the staff, choose one:"]),
+			_heading("Consequences"),
+			_list(["□ One of your eyes becomes strange."]),
+		], { slug: "staff-of-the-lidless-orb", name: "Staff of the Lidless Orb", major: true, unlockAt: 3 });
+		expect(b.title).toBe("Mysteries of the Staff of the Lidless Orb");
+		expect(b.moves.map((m) => m.name)).toEqual(["Power"]);
+	});
+	it("folds '□ Word.' options (rule-separated, not ALL-CAPS) into the preceding move", () => {
+		const b = parseBack([
+			_heading("Moves"),
+			_list(["□ SPEAK THE UNUTTERABLE When you speak a Word, roll +CON."]),
+			_rule(),
+			_para("MASTERED WORDS"),
+			_rule(),
+			_list(["□ Seal. Name a portal; it seals shut."]),
+			_rule(),
+			_list(["□ Purify. Name a corruption; it is cleansed."]),
+		], { slug: "ineffable-words", name: "Ineffable Words", major: true });
+		expect(b.moves).toHaveLength(1);
+		expect(b.moves[0].name).toBe("Speak the Unutterable");
+		expect(b.moves[0].text).toContain("- Seal. Name a portal");
+		expect(b.moves[0].text).toContain("- Purify. Name a corruption");
+	});
+	it("starts a new consequence when a box follows stray leading circles, counting only boxes for the track", () => {
+		const b = parseBack([
+			_heading("Consequences"),
+			_list(["□ First consequence."], ["○ ○ □ Your body withers—mark the weakened debility."]),
+		], { slug: "norubas-ice-sphere", name: "Noruba's Ice Sphere", major: true });
+		expect(b.consequences.list).toHaveLength(2);
+		expect(b.consequences.list[1].content.text).toBe("Your body withers—mark the weakened debility.");
+		expect(b.consequences.list[1].track).toEqual({ max: 1 });
+	});
+	it("extracts a move's leading (Requires: …) into requirement and strips it from the move text", () => {
+		const b = parseBack([
+			_heading("Moves"),
+			_list(["□ RESONANCE (Requires: Battery, Eye of the Storm) When you unleash the storm, roll +CON."]),
+		], { slug: "azure-hand", name: "Azure Hand", major: true });
+		expect(b.moves[0].name).toBe("Resonance");
+		expect(b.moves[0].requirement).toEqual({ moves: ["Battery", "Eye of the Storm"] });
+		expect(b.moves[0].text).toBe("When you unleash the storm, roll +CON.");
+	});
+});
+
+describe("parseRequires", () => {
+	it("pulls a leading (Requires: A, B) into requirement moves and strips it from the text", () => {
+		expect(parseRequires("(Requires: Battery, Eye of the Storm) When you unleash the storm."))
+			.toEqual({ moves: ["Battery", "Eye of the Storm"], text: "When you unleash the storm." });
+	});
+	it("returns null moves and the unchanged text when there is no requires prefix", () => {
+		expect(parseRequires("When you grip the shaft, roll +CON.")).toEqual({ moves: null, text: "When you grip the shaft, roll +CON." });
+	});
 });
 
 describe("parseFront — major unlock (Marks track + trigger + trailing trim)", () => {
@@ -137,6 +191,14 @@ describe("parseFront — major unlock (Marks track + trigger + trailing trim)", 
 		expect(front.unlock.list.at(-1).slug).toBe("marks");
 		expect(front.unlock.list[0].content.text).toContain("bear the Azure Hand");
 		expect(front.description).toContain("thick staff");
+	});
+	it("counts inline ◇ pips on the item line so a 2-pip item weighs 2", () => {
+		const f = parseFront([
+			_heading("Rune-laden Scales"),
+			_list(["◇ ◇ , 2 armor, *magical*"]),
+			_para("An ancient vest of bluish steel."),
+		], { name: "Rune-laden Scales", slug: "rune-laden-scales" });
+		expect(f.item).toMatchObject({ name: "Rune-laden Scales", weight: 2, tags: "magical", note: "2 armor" });
 	});
 	it("folds a trigger's option bullets into that trigger entry (not separate rows)", () => {
 		const f = parseFront([
@@ -176,14 +238,20 @@ describe("isArcanaFollower", () => {
 });
 
 describe("parseItemLine", () => {
-	it("builds an item from a leading-comma tags line (name = arcanum name, weight from ◇ pips)", () => {
-		expect(parseItemLine(", close, +1 damage, messy, magical", { name: "Blood-quenched Sword", pips: 1 }))
-			.toEqual({ name: "Blood-quenched Sword", weight: 1, note: "close, +1 damage, messy, magical", inventoryColumn: "regular" });
+	it("splits italic *tags* from a plain note (book italicizes tags, leaves stats plain)", () => {
+		expect(parseItemLine(", *close*, +1 damage, 1 piercing, *messy*, *magical*", { name: "Blood-quenched Sword", pips: 1 }))
+			.toEqual({ name: "Blood-quenched Sword", weight: 1, tags: "close, messy, magical", note: "+1 damage, 1 piercing", inventoryColumn: "regular" });
+	});
+	it("collects a leading-comma italic run and multi-tag runs into tags (null note when all italic)", () => {
+		expect(parseItemLine("*, close*, *magical*, *awkward*", { name: "Azure Hand", pips: 1 }))
+			.toEqual({ name: "Azure Hand", weight: 1, tags: "close, magical, awkward", note: null, inventoryColumn: "regular" });
+		expect(parseItemLine(", *beautiful, fragile*", { name: "Scroll", pips: 1 }))
+			.toMatchObject({ tags: "beautiful, fragile", note: null });
 	});
 	it("uses ◇ pip count for weight and strips leading ◇", () => {
-		expect(parseItemLine("◇◇ , awkward", { name: "Mindgem", pips: 2 }).weight).toBe(2);
+		expect(parseItemLine("◇◇ , *awkward*", { name: "Mindgem", pips: 2 }).weight).toBe(2);
 	});
-	it("returns null when there is no tags text and no pips", () => {
+	it("returns null when there is no tags text, no note, and no pips", () => {
 		expect(parseItemLine("", { name: "X", pips: 0 })).toBeNull();
 	});
 });

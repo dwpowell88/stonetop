@@ -1,4 +1,5 @@
 import { FoundrySteadingMovesRepository } from "./repositories/FoundrySteadingMovesRepository.js";
+import { rich } from "../../model/snapshot/RichText.js";
 
 export class SteadingMoves {
 	constructor(actor, repo = new FoundrySteadingMovesRepository()) {
@@ -10,27 +11,25 @@ export class SteadingMoves {
 		const entries = await this._repo.getHomefrontMoves();
 		if (!entries.length) return null;
 
-		const moves = await Promise.all(entries.map(e => this._buildMoveSnapshot(e)));
-
 		return {
 			key:             "homefront",
 			label:           "Homefront Moves",
 			renderStyle:     "standard",
 			allowAdditional: false,
 			note:            null,
-			moves,
+			moves:           entries.map(e => this._buildMoveSnapshot(e)),
 		};
 	}
 
-	async _buildMoveSnapshot(entry) {
-		const description = await this._enrichDescription(entry.description);
-
+	// description is left as a RichText for the shared enrichRichTextTree pass (run in the sheet's
+	// getData) to enrich — no bespoke enrichHTML here.
+	_buildMoveSnapshot(entry) {
 		return {
 			id:            entry.id,
 			ownedId:       null,
 			slug:          entry.slug ?? entry.id,
 			name:          entry.name,
-			description,
+			description:   rich(entry.description ?? ""),
 			rollStat:      entry.rollStat || null,
 			locked:        true,
 			selectable:    false,
@@ -41,13 +40,5 @@ export class SteadingMoves {
 			resource:      entry.resource ?? null,
 			choices:       null,
 		};
-	}
-
-	async _enrichDescription(raw) {
-		if (!raw) return "";
-		return foundry.applications.ux.TextEditor.implementation.enrichHTML(raw, {
-			async:    true,
-			rollData: this._actor.getRollData?.() ?? {},
-		});
 	}
 }

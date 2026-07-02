@@ -1,7 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {CharacterSnapshot, PossessionsSnapshot} from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 import {TestCharacterBuilder} from "../../fakes/TestCharacterBuilder.js";
-import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 import {FakePossessionRepository} from "../../fakes/FakePossessionRepository.js";
 import {TestPossessionBuilder} from "../../fakes/TestPossessionBuilder.js";
 
@@ -9,7 +9,7 @@ import {TestPossessionBuilder} from "../../fakes/TestPossessionBuilder.js";
 
 describe("buildSnapshot — type", () => {
 	it("returns a CharacterSnapshot instance", async () => {
-		const snap = await new TestCharacterBuilder(new FakeActorBuilder().build())
+		const snap = await new TestCharacterBuilder(new FakeCharacterActorBuilder().build())
 			.build().buildSnapshot();
 		expect(snap).toBeInstanceOf(CharacterSnapshot);
 	});
@@ -19,7 +19,7 @@ describe("buildSnapshot — type", () => {
 
 describe("buildSnapshot — name", () => {
 	it("uses actor.name", async () => {
-		const actor = new FakeActorBuilder().withName("Jorvik").build();
+		const actor = new FakeCharacterActorBuilder().withName("Jorvik").build();
 		const snap = await new TestCharacterBuilder(actor).build().buildSnapshot();
 		expect(snap.name).toBe("Jorvik");
 	});
@@ -29,7 +29,7 @@ describe("buildSnapshot — name", () => {
 
 describe("buildSnapshot — playbook: null when no playbook selected", () => {
 	it("playbook is null", async () => {
-		const snap = await new TestCharacterBuilder(new FakeActorBuilder().build())
+		const snap = await new TestCharacterBuilder(new FakeCharacterActorBuilder().build())
 			.build().buildSnapshot();
 		expect(snap.playbook).toBeNull();
 	});
@@ -39,12 +39,12 @@ describe("buildSnapshot — playbook: null when no playbook selected", () => {
 
 describe("buildSnapshot — rollMode", () => {
 	it("defaults to 'normal' when no flag set", async () => {
-		const snap = await new TestCharacterBuilder(new FakeActorBuilder().build()).build().buildSnapshot();
+		const snap = await new TestCharacterBuilder(new FakeCharacterActorBuilder().build()).build().buildSnapshot();
 		expect(snap.rollMode).toBe("normal");
 	});
 
 	it("reflects stonetop rollMode flag", async () => {
-		const actor = new FakeActorBuilder().withRollMode("adv").build();
+		const actor = new FakeCharacterActorBuilder().withRollMode("adv").build();
 		const snap = await new TestCharacterBuilder(actor).build().buildSnapshot();
 		expect(snap.rollMode).toBe("adv");
 	});
@@ -54,7 +54,7 @@ describe("buildSnapshot — rollMode", () => {
 
 describe("buildSnapshot — possessions: null when no playbook", () => {
 	it("possessions is null", async () => {
-		const snap = await new TestCharacterBuilder(new FakeActorBuilder().build())
+		const snap = await new TestCharacterBuilder(new FakeCharacterActorBuilder().build())
 			.build().buildSnapshot();
 		expect(snap.possessions).toBeNull();
 	});
@@ -63,7 +63,7 @@ describe("buildSnapshot — possessions: null when no playbook", () => {
 describe("buildSnapshot — possessions: snapshot when playbook configured", () => {
 	it("possessions is a PossessionsSnapshot with items from actor.items", async () => {
 		const sp = { pickCount: 1, pickNote: "Pick 1", preselected: [], slugs: ["apiary"] };
-		const actor = new FakeActorBuilder().withItems([
+		const actor = new FakeCharacterActorBuilder().withItems([
 			{ _id: "pb", type: "playbook", name: "The Blessed", system: { slug: "blessed", specialPossessions: sp } },
 			{ _id: "ap", type: "possession", name: "Apiary",
 				system: { slug: "apiary", description: "", resource: null, outfitItems: [],
