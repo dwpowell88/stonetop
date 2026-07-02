@@ -22,7 +22,7 @@ import { execFileSync } from "child_process";
 import { loadOutline, arcanaAppendixRanges } from "./outline.js";
 import { loadArticlePages } from "./load.js";
 import { extractArticle } from "./layout.js";
-import { parseFront, parseBack, isArcanaFollower, detectUnlockAt } from "./arcana-parse.js";
+import { parseFront, parseBack, isArcanaFollower, detectUnlockAt, parseMoveRoll } from "./arcana-parse.js";
 import { parseStatBlock, toFollowerDoc } from "./creatures.js";
 
 const PDF = process.env.BOOK_PDF ?? "helper/Book_II_-_The_Wider_World_and_Other_Wonders.pdf";
@@ -52,8 +52,13 @@ function emitArcanaMoves(back) {
 	for (const m of back.moves) {
 		const slug = m.id; slugs.push(slug);
 		const id = arcanaMoveId(slug);
+		// A move whose text says "roll +X" is rollable: pull the stat and the 10+/7-9/6- outcomes so the
+		// sheet shows the dice button and the roll card shows the per-tier result (bug #43).
+		const { rollStat, moveResults } = parseMoveRoll(m.text ?? "");
 		const doc = { _id: id, _key: `!items!${id}`, name: m.name, type: "move",
-			system: { slug, moveType: null, description: m.text ?? "", ...(m.requirement ? { requirement: m.requirement } : {}) }, folder: ARCANA_MOVES_FOLDER };
+			system: { slug, moveType: null, description: m.text ?? "",
+				...(rollStat ? { rollStat } : {}), ...(moveResults ? { moveResults } : {}),
+				...(m.requirement ? { requirement: m.requirement } : {}) }, folder: ARCANA_MOVES_FOLDER };
 		writeFileSync(path.join(ARCANA_MOVES_DIR, `${slug}.json`), JSON.stringify(doc, null, "\t") + "\n");
 	}
 	const out = {};

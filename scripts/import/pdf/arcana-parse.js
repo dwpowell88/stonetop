@@ -135,6 +135,53 @@ export function parseRequires(text) {
 	return { moves: moves.length ? moves : null, text: text.slice(m[0].length) };
 }
 
+// The stat a "roll +X" gates on → the MoveData.rollStat key. Accepts the book's abbreviations and full
+// words; "+nothing" is a genuine 2d6+0 roll (the flesh-remembers), which the "prompt" key rolls (no
+// modifier). An unrecognized token means "no identifiable roll" → the move isn't made rollable.
+const ROLL_STAT = { str: "str", strength: "str", dex: "dex", dexterity: "dex", con: "con", constitution: "con",
+	int: "int", intelligence: "int", wis: "wis", wisdom: "wis", cha: "cha", charisma: "cha", nothing: "prompt" };
+
+// A PbtA result tier header inside move text: "on a 10+" / "on a 7-9" / "on a 6-", tolerant of the
+// book's markdown noise — the bold can wrap or split it ("**on a** **10+**"), and a comma/colon can sit
+// inside or after the bold ("**on a 7-9,**"). The `[*\s]*` separators swallow any mix of asterisks and
+// spaces on either side of the tier token. Global + case-insensitive so all three tiers are scanned.
+const TIER_RE = /[*\s]*on\s+a[*\s]*(10\s*\+|7\s*[-–]\s*9|6\s*[-–])[,:*\s]*/gi;
+const TIER_KEY = (tok) => (/10/.test(tok) ? "success" : /7/.test(tok) ? "partial" : "failure");
+const cleanTier = (s) => (s || "").replace(/^[\s,;:]+/, "").replace(/[\s,;]+$/, "").trim();
+
+/** Extract the three result-tier outcomes from a rollable move's text. Each tier's value runs from the
+ *  end of its header to the next tier header OR the next newline, whichever comes first — the tiers are
+ *  written inline on one "roll …:" sentence, so this captures the outcome and stops before the option
+ *  bullets / trailing paragraphs that follow. Absent tiers get "". Returns null with no 10+ header. */
+function extractMoveResults(text) {
+	const t = text || "";
+	const hits = [];
+	for (const m of t.matchAll(TIER_RE)) hits.push({ key: TIER_KEY(m[1]), start: m.index, end: m.index + m[0].length });
+	if (!hits.some((h) => h.key === "success")) return null;
+	const values = { success: "", partial: "", failure: "" };
+	for (let i = 0; i < hits.length; i++) {
+		const nextMarker = hits[i + 1] ? hits[i + 1].start : Infinity;
+		const nl = t.indexOf("\n", hits[i].end);
+		const stop = Math.min(nextMarker, nl < 0 ? Infinity : nl, t.length);
+		values[hits[i].key] = cleanTier(t.slice(hits[i].end, stop));
+	}
+	return {
+		success: { label: "10+", value: values.success },
+		partial: { label: "7-9", value: values.partial },
+		failure: { label: "6-",  value: values.failure },
+	};
+}
+
+/** Parse a move's text for its roll: the "+X" stat and the three result-tier outcomes. Gated on an
+ *  actual "roll +X" so passive moves that merely mention "on a 10+" (inescapable-pull) stay non-rollable.
+ *  Returns { rollStat, moveResults } — either may be null. */
+export function parseMoveRoll(text) {
+	const m = (text || "").match(/\broll\s*\+\s*([A-Za-z]+)/i);
+	const rollStat = m ? (ROLL_STAT[m[1].toLowerCase()] ?? null) : null;
+	if (!rollStat) return { rollStat: null, moveResults: null };
+	return { rollStat, moveResults: extractMoveResults(text) };
+}
+
 /** Split a major move header line's leading ALL-CAPS run (the move name) from any inline remainder
  *  ("WHISPERS When you grip the shaft" → {name:"WHISPERS", rest:"When you grip the shaft"}). */
 export function majorMoveName(text) {

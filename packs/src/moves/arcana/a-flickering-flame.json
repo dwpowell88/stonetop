@@ -6,7 +6,22 @@
 	"system": {
 		"slug": "a-flickering-flame",
 		"moveType": null,
-		"description": "When you **_wield the Blood-quenched Blade and leap headlong into battle against multiple foes_**, roll +CON: **on a 10+**, hold 3 Speed; **on a 7-9**, hold 2 Speed; **on a 6-**, hold 2 Speed, and mark a consequence. During this battle, you may spend Speed, 1-for-1 to do the following:\n- Attack any number of foes within your reach; roll Clash once and apply the result to all of them, but roll damage separately for each foe\n- Strike a weak point, ignoring your foe’s armor\n- Disengage from a foe you are fighting\n- Name a foe on the scene but out of your reach; you cross the distance to them before any can react When you stop fighting, lose all Speed."
+		"description": "When you **_wield the Blood-quenched Blade and leap headlong into battle against multiple foes_**, roll +CON: **on a 10+**, hold 3 Speed; **on a 7-9**, hold 2 Speed; **on a 6-**, hold 2 Speed, and mark a consequence. During this battle, you may spend Speed, 1-for-1 to do the following:\n- Attack any number of foes within your reach; roll Clash once and apply the result to all of them, but roll damage separately for each foe\n- Strike a weak point, ignoring your foe’s armor\n- Disengage from a foe you are fighting\n- Name a foe on the scene but out of your reach; you cross the distance to them before any can react When you stop fighting, lose all Speed.",
+		"rollStat": "con",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "hold 3 Speed"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "hold 2 Speed"
+			},
+			"failure": {
+				"label": "6-",
+				"value": "hold 2 Speed, and mark a consequence. During this battle, you may spend Speed, 1-for-1 to do the following:"
+			}
+		}
 	},
 	"folder": "ArcanaMoves00001"
 }

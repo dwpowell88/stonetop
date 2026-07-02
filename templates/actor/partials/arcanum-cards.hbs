@@ -24,12 +24,11 @@
 		{{#if back.moves.length}}
 		<p class="stonetop-arcanum-section-label">{{localize "stonetop.arcana.moves"}}</p>
 		<ol class="items-list stonetop-arcanum-moves">
+			{{!-- Major arcana: real move items the player ticks to unlock (categoryKey = source.type =
+			      arcana-<slug>), rollable via the shared move-row wrapper (so the roll resolves the owned
+			      move item, not a bare stat). Minor/custom arcana render inline, always-active, no checkbox. --}}
 			{{#each back.moves}}
-			<li class="stonetop-item">
-				{{!-- Major arcana: real move items the player ticks to unlock (categoryKey = source.type =
-				      arcana-<slug>). Minor/custom arcana render inline, always-active, no checkbox. --}}
-				{{> "stonetop.move-item" showCheck=../major categoryKey=source.type}}
-			</li>
+			{{> "stonetop.move-row" showCheck=../major categoryKey=source.type}}
 			{{/each}}
 		</ol>
 		{{/if}}

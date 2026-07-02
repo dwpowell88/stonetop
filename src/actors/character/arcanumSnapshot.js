@@ -12,9 +12,10 @@ import { rich } from "../../model/snapshot/RichText.js";
 import { ResourceController } from "./ResourceController.js";
 
 // Shape a major-arcanum back "mystery move" ({id, name, text, subtitle?}) as a MoveSnapshot so it
-// renders through the SAME move-item partial as the moves tab. It's always active (you've unlocked
-// the mysteries) so selection is {1,1} and the acquisition checkbox is suppressed by the card. roll/
-// requirement/resource stay null for now (#43/#42 will populate them from the move data).
+// renders through the SAME move-item partial as the moves tab. This is the fallback for minor/custom
+// arcana that carry inline back.moves (no owned move item), so it's always active ({1,1}, checkbox
+// suppressed) and non-rollable (no ownedId/rollStat). MAJOR arcana bypass this: their mystery moves are
+// real owned move items resolved via CharacterMoves (moveSnapshots), which carry ownedId + rollStat.
 export function buildArcanumMoveSnapshot(move) {
 	return new MoveSnapshotBuilder()
 		.withId(move.id ?? null)

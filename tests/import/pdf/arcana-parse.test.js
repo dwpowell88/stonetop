@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug, followerChoiceEntry, isArcanaFollower, titleCase, majorMoveName, parseRequires, detectUnlockAt, parseFront, parseBack } from "../../../scripts/import/pdf/arcana-parse.js";
+import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug, followerChoiceEntry, isArcanaFollower, titleCase, majorMoveName, parseRequires, parseMoveRoll, detectUnlockAt, parseFront, parseBack } from "../../../scripts/import/pdf/arcana-parse.js";
 
 // Synthetic block factories (markers are literal glyphs in the line text, as the load pipeline injects).
 const _line = (text) => ({ text, bbox: [0, 0, 0, 0], spans: [{ font: "ACaslonPro-Regular", size: 9, text }] });
@@ -168,6 +168,62 @@ describe("parseRequires", () => {
 	});
 	it("returns null moves and the unchanged text when there is no requires prefix", () => {
 		expect(parseRequires("When you grip the shaft, roll +CON.")).toEqual({ moves: null, text: "When you grip the shaft, roll +CON." });
+	});
+});
+
+describe("parseMoveRoll", () => {
+	const results = (s, p, f) => ({
+		success: { label: "10+", value: s }, partial: { label: "7-9", value: p }, failure: { label: "6-", value: f },
+	});
+
+	it("maps a 'roll +CON' stat and pulls all three inline tiers (dust-to-dust shape)", () => {
+		const text = "When you **_press the ring_**, mark a debility and then roll +CON: **on a 10+**, the artifice fails or is ruined (say how); **on a 7-9**, it is ruined but also mark a consequence; **on a 6-**, the GM says what happens.";
+		expect(parseMoveRoll(text)).toEqual({
+			rollStat: "con",
+			moveResults: results("the artifice fails or is ruined (say how)", "it is ruined but also mark a consequence", "the GM says what happens."),
+		});
+	});
+
+	it("tolerates split-bold headers and a missing 6- tier (eye-of-the-storm shape)", () => {
+		const text = "When you **_impose your will_**, roll +CON: **on a** **10+**, the elements calm, and choose 2 from the list below; **on a 7-9**, the elements calm, and choose 1.\n- You suffer no consequence";
+		expect(parseMoveRoll(text)).toEqual({
+			rollStat: "con",
+			moveResults: results("the elements calm, and choose 2 from the list below", "the elements calm, and choose 1.", ""),
+		});
+	});
+
+	it("bounds the last tier at the newline, excluding trailing paragraphs (storms-fury shape)", () => {
+		const text = "When you **_begin to roil_**, Roll +CON: **on a 10+**, hold 3 Fury; **on a 7-9**, hold 2 Fury; **on a 6-**, hold 2 Fury but also mark a consequence.\n\nYou may spend Fury 1-for-1 to manifest one of the following:";
+		expect(parseMoveRoll(text).moveResults.failure.value).toBe("hold 2 Fury but also mark a consequence.");
+	});
+
+	it("stops a tier at the newline before its option bullets (siphon shape, comma-in-bold 6-)", () => {
+		const text = "When you **_will the ring to consume_**, roll +CON: **on a 10+**, deal 1d10 damage (*grabby*, ignores armor); **on a 7-9**, deal 1d10 damage (ignores armor) but choose one:\n- The ring eats at your life-force\n- Mark a consequence\n\n**On a 6-**, the GM says what happens.";
+		expect(parseMoveRoll(text).moveResults).toEqual(
+			results("deal 1d10 damage (*grabby*, ignores armor)", "deal 1d10 damage (ignores armor) but choose one:", "the GM says what happens."),
+		);
+	});
+
+	it("handles a comma inside the tier bold (suffering-unleashed shape)", () => {
+		const text = "When you **_feed the effigy_**, pick one and roll +CON: **on a 10+**, your target suffers that harm fully; **on a 7-9,** your target suffers that harm but pick 1; **on a 6-**, they suffer that harm but all 3 are true:\n- half the harm";
+		expect(parseMoveRoll(text).moveResults.partial.value).toBe("your target suffers that harm but pick 1");
+	});
+
+	it("maps 'roll +nothing' to the prompt roll (the-flesh-remembers)", () => {
+		const text = "When you **_search the Cloak_**, roll +nothing: **on a 10+**, you receive a vision; **on a** **7-9**, choose 1 from the list below.";
+		expect(parseMoveRoll(text)).toEqual({ rollStat: "prompt", moveResults: results("you receive a vision", "choose 1 from the list below.", "") });
+	});
+
+	it("maps +INT case-insensitively", () => {
+		expect(parseMoveRoll("Roll +INT: **on a 10+**, hold 3 Power.").rollStat).toBe("int");
+	});
+
+	it("leaves a passive move that merely mentions 'on a 10+' non-rollable (inescapable-pull)", () => {
+		expect(parseMoveRoll("You can use Siphon at up to *near* range, and on a 10+ you can drag the victim closer.")).toEqual({ rollStat: null, moveResults: null });
+	});
+
+	it("returns nulls when there is no roll and no tiers", () => {
+		expect(parseMoveRoll("You gain +1 armor while you wear the cloak.")).toEqual({ rollStat: null, moveResults: null });
 	});
 });
 

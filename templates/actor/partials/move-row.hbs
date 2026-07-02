@@ -1,0 +1,12 @@
+{{!-- One move row: the rollable <li> wrapper + the shared move-item body. Shared by the moves tab
+      (move-group) and the major-arcana card (arcanum-cards) so the roll wiring stays identical — a
+      rollable, acquired move gets `.item[data-item-id]` so the sheet's roll handler resolves the OWNED
+      move item (full description + 10+/7-9/6- result tiers) instead of a bare stat roll. Context is a
+      MoveSnapshot; params: showCheck, categoryKey, allowAdditional (forwarded to move-item). --}}
+{{#if (and (gt selection.value 0) rollStat)}}
+<li class="item stonetop-item" data-item-id="{{ownedId}}">
+{{else}}
+<li class="stonetop-item">
+{{/if}}
+	{{> "stonetop.move-item" showCheck=showCheck categoryKey=categoryKey allowAdditional=allowAdditional}}
+</li>

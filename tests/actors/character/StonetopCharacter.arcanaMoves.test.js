@@ -76,6 +76,27 @@ describe("StonetopCharacter — major arcana mystery moves render as real moves 
 		expect(card.back.moves.find(m => m.name === "Resonance").selection.value).toBe(0);
 	});
 
+	it("an acquired rollable mystery move exposes its rollStat and owned move id", async () => {
+		// The shared move-row wrapper renders `.item[data-item-id]` only when an acquired move has a
+		// rollStat, so the sheet's roll handler resolves the OWNED move item (full description + result
+		// tiers) rather than falling back to a bare stat roll. Guard that the card snapshot carries both.
+		const resonance = new FakeCompendiumMoveBuilder().withName("Resonance").withRollStat("int")
+			.withMoveResults({ success: { label: "10+", value: "it comes to pass" },
+				partial: { label: "7-9", value: "mark a consequence" }, failure: { label: "6-", value: "" } }).build();
+		withMovesPack(resonance, move("Battery"));
+		const arcanum = majorArcanumItem(["battery", "resonance"]);
+		const character = characterWithArcanum(arcanum);
+
+		await character._onCreateDescendantDocuments([arcanum]);
+		await character.incrementMove("arcana-azure-hand", "resonance");
+
+		const card = await arcanaCard(character, "azure-hand");
+		const move_ = card.back.moves.find(m => m.name === "Resonance");
+		expect(move_.selection.value).toBe(1);
+		expect(move_.rollStat).toBe("int");
+		expect(move_.ownedId).toBeTruthy();
+	});
+
 	it("arcana mystery moves do not leak onto the moves tab", async () => {
 		withMovesPack(move("Battery"), move("Resonance"));
 		const arcanum = majorArcanumItem(["battery", "resonance"]);

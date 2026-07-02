@@ -6,7 +6,22 @@
 	"system": {
 		"slug": "darkness-lingers",
 		"moveType": null,
-		"description": "When you **_strike down a spirit or demon_**, ask the GM for one of its moves and write it down; it is held in the Twisted Spear. When you **_use the stolen move_**, roll +CON: **on a 10+**, you do it, just like that; **on a 7-9**, you do it, but choose 1:\n- The move is lost, bleeding away from the Spear\n- Mark a consequence"
+		"description": "When you **_strike down a spirit or demon_**, ask the GM for one of its moves and write it down; it is held in the Twisted Spear. When you **_use the stolen move_**, roll +CON: **on a 10+**, you do it, just like that; **on a 7-9**, you do it, but choose 1:\n- The move is lost, bleeding away from the Spear\n- Mark a consequence",
+		"rollStat": "con",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "you do it, just like that"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "you do it, but choose 1:"
+			},
+			"failure": {
+				"label": "6-",
+				"value": ""
+			}
+		}
 	},
 	"folder": "ArcanaMoves00001"
 }

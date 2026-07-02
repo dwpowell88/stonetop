@@ -6,7 +6,22 @@
 	"system": {
 		"slug": "burning-hatred",
 		"moveType": null,
-		"description": "(near, magical, reload) When you **_point the Red Scepter at an object of your hatred and erase 1 charge_**, roll +CHA: **on a 10+**, the Scepter deals 2d4 damage (*messy*, ignores armor), manifested as blistering burns; **on a 7-9**, as a 10+ but pick 1:\n- Mark a consequence\n- Spend a few seconds chanting and muttering before dealing damage\n- Cause any exposed, combustible items in range to burst into flames\n\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence).\n\nWhen you **_mark 3 Consequences_**, you gain Fanning the Flames."
+		"description": "(near, magical, reload) When you **_point the Red Scepter at an object of your hatred and erase 1 charge_**, roll +CHA: **on a 10+**, the Scepter deals 2d4 damage (*messy*, ignores armor), manifested as blistering burns; **on a 7-9**, as a 10+ but pick 1:\n- Mark a consequence\n- Spend a few seconds chanting and muttering before dealing damage\n- Cause any exposed, combustible items in range to burst into flames\n\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence).\n\nWhen you **_mark 3 Consequences_**, you gain Fanning the Flames.",
+		"rollStat": "cha",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "the Scepter deals 2d4 damage (*messy*, ignores armor), manifested as blistering burns"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "as a 10+ but pick 1:"
+			},
+			"failure": {
+				"label": "6-",
+				"value": "the GM says what happens (which may or may not involve marking a consequence)."
+			}
+		}
 	},
 	"folder": "ArcanaMoves00001"
 }

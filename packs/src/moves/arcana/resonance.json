@@ -7,6 +7,21 @@
 		"slug": "resonance",
 		"moveType": null,
 		"description": "When you **_have captured a tremendous elemental force_** (like that from a storm or wildfire) and **_then_** **_channel it into the eddies of air or earth_**, pick 1 from the list below and roll +INT: **on a 10+**, it comes to pass; **on a 7-9**, it will come to pass if you choose to mark a consequence; **on a 6-**, mark a consequence and prepare for the worst.\n- A potent storm or earthquake builds, unleashing itself within the next few hours.\n- The weather for the next few weeks is abnormal, hotter or colder, wetter or dryer, windier or more still, per your desires (though nothing too extreme).\n- The weather for the next few months is generally favorable; any steading in the area gains advantage to its next Seasons Change roll.",
+		"rollStat": "int",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "it comes to pass"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "it will come to pass if you choose to mark a consequence"
+			},
+			"failure": {
+				"label": "6-",
+				"value": "mark a consequence and prepare for the worst."
+			}
+		},
 		"requirement": {
 			"moves": [
 				"Battery",

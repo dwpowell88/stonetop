@@ -6,7 +6,22 @@
 	"system": {
 		"slug": "suffering-unleashed",
 		"moveType": null,
-		"description": "When you **_feed the effigy the blood of another_**, pick one of the harms recorded on the reverse and roll +CON: **on a 10+**, your target suffers that harm fully; **on a 7-9,** your target suffers that harm but pick 1; **on a 6-**, they suffer that harm but all 3 are true:\n- They suffer only half the harm’s effects/damage\n- You fully suffer the unleashed harm (you can’t divert it via Surrogate Suffering)\n- Mark a consequence **Regardless**, the harm is no longer stored in the effigy—erase it from the reverse.\n\nFor every 2 Consequences you mark, gain one of the following moves:"
+		"description": "When you **_feed the effigy the blood of another_**, pick one of the harms recorded on the reverse and roll +CON: **on a 10+**, your target suffers that harm fully; **on a 7-9,** your target suffers that harm but pick 1; **on a 6-**, they suffer that harm but all 3 are true:\n- They suffer only half the harm’s effects/damage\n- You fully suffer the unleashed harm (you can’t divert it via Surrogate Suffering)\n- Mark a consequence **Regardless**, the harm is no longer stored in the effigy—erase it from the reverse.\n\nFor every 2 Consequences you mark, gain one of the following moves:",
+		"rollStat": "con",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "your target suffers that harm fully"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "your target suffers that harm but pick 1"
+			},
+			"failure": {
+				"label": "6-",
+				"value": "they suffer that harm but all 3 are true:"
+			}
+		}
 	},
 	"folder": "ArcanaMoves00001"
 }

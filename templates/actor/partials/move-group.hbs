@@ -2,13 +2,7 @@
 	{{> "stonetop.section-heading" title=title note=note}}
 	<ol class="items-list">
 	{{#each moves}}
-		{{#if (and (gt selection.value 0) rollStat)}}
-		<li class="item stonetop-item" data-item-id="{{ownedId}}">
-		{{else}}
-		<li class="stonetop-item">
-		{{/if}}
-			{{> "stonetop.move-item" showCheck=true categoryKey=../categoryKey allowAdditional=../allowAdditional}}
-		</li>
+		{{> "stonetop.move-row" showCheck=true categoryKey=../categoryKey allowAdditional=../allowAdditional}}
 	{{/each}}
 	</ol>
 </div>
