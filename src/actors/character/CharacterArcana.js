@@ -87,8 +87,9 @@ export class CharacterArcana {
 		const slug = item.system?.slug;
 		if (!slug) return;
 		const raw = { front: item.system.front ?? {}, back: item.system.back ?? {} };
-		const linkedSlugs = this._followerSlugsFor(raw);
-		await this._followers?.embedLinkedFollowers(linkedSlugs);
+		// Followers are NOT embedded on add — they're added/removed only when their back-choice box is
+		// checked (the standard FollowerSideEffectHandler path). The card shows an inline preview sourced
+		// from the follower repo, so no embedded item is needed until the player checks the box.
 		await this._syncEmbeddedItemWith(slug, raw);
 		const moveSlugs = raw.back?.moveSlugs ?? [];
 		if (moveSlugs.length) await this._moves?.addCategory(`arcana-${slug}`, item.name ?? slug, moveSlugs, []);
@@ -155,7 +156,6 @@ export class CharacterArcana {
 		}
 		const item = _itemToArcanum(embeddedItem);
 		await this._syncEmbeddedItemWith(slug, item);
-		await this._syncFollowers(slug, item);
 	}
 
 	async _syncEmbeddedItemWith(slug, item) {
@@ -182,17 +182,6 @@ export class CharacterArcana {
 		]);
 	}
 
-	async _syncFollowers(slug, item) {
-		if (!this._followers) return;
-		const followerSlugs = this._followerSlugsFor(item);
-		if (!followerSlugs.length) return;
-		const embeddedItem = _findArcanumItem(this._actor, slug);
-		const flipped = embeddedItem?.system?.flipped ?? false;
-		for (const followerSlug of followerSlugs) {
-			if (flipped) await this._followers.addFollower(followerSlug);
-			else         await this._followers.removeFollower(followerSlug);
-		}
-	}
 }
 
 function _findArcanumItem(actor, slug) {

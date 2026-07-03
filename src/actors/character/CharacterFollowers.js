@@ -113,18 +113,6 @@ export class CharacterFollowers {
 		}
 	}
 
-	async embedLinkedFollowers(slugs) {
-		for (const slug of slugs) {
-			if (_findFollowerItem(this._actor, slug)) continue;
-			const [follower] = await this._followerRepo.findBySlugs([slug]);
-			if (!follower) continue;
-			await this._actor.createEmbeddedDocuments("Item", [{
-				name: follower.name, type: "npc",
-				system: { ..._followerToSystemFields(follower), owned: false },
-			}]);
-		}
-	}
-
 	async removeFollower(slug) {
 		const item = _findFollowerItem(this._actor, slug);
 		if (!item) return;
@@ -348,16 +336,28 @@ export class CharacterFollowers {
 		const npcItems      = [...this._actor.items].filter(i => i.type === "npc");
 		const ownedItems    = npcItems.filter(i => i.system?.owned === true);
 		const ownedSlugsSet = new Set(ownedItems.map(i => i.system?.slug).filter(Boolean));
+		const embeddedSlugs = new Set(npcItems.map(i => i.system?.slug).filter(Boolean));
 		const staticSlugs   = extraSlugs.filter(s => !ownedSlugsSet.has(s));
 		const staticItems   = npcItems.filter(i => staticSlugs.includes(i.system?.slug));
+		// A linked slug (extraSlugs) with no embedded item at all → a read-only card preview sourced from
+		// the follower repo. This lets an arcanum card show its follower stat block before the player
+		// checks the box (which is what actually embeds the follower as owned).
+		const previewSlugs  = staticSlugs.filter(s => !embeddedSlugs.has(s));
 
-		if (!ownedItems.length && !staticItems.length) return [];
+		if (!ownedItems.length && !staticItems.length && !previewSlugs.length) return [];
 
 		// Fetch the shared outfit-item catalog once (async) and pass it into each follower's snapshot.
 		const repoItems = this._inventoryRepo ? await this._inventoryRepo.getAll() : [];
 
 		const result = ownedItems.map(item => this._buildFollowerSnapshotFromItem(item, repoItems));
 		for (const item of staticItems) result.push(this._buildFollowerSnapshotFromItem(item, repoItems));
+		if (previewSlugs.length) {
+			const previews = await this._followerRepo.findBySlugs(previewSlugs);
+			for (const follower of previews) {
+				const item = { name: follower.name, system: { ..._followerToSystemFields(follower), owned: false } };
+				result.push(this._buildFollowerSnapshotFromItem(item, repoItems));
+			}
+		}
 
 		// Game-text fields are RichText on the snapshot; the character sheet's enrichRichTextTree pass
 		// enriches the whole tree (these followers included) — one render path, no bespoke enrichHTML.

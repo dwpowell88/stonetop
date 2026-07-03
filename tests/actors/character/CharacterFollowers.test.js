@@ -486,10 +486,20 @@ describe("CharacterFollowers.buildSnapshot with extraSlugs", () => {
 		expect(snaps[1].slug).toBe("enfys");
 	});
 
-	it("silently omits extra slug not pre-embedded in actor.items", async () => {
+	it("silently omits extra slug that is neither embedded nor in the repo", async () => {
 		const cf = makeCf(new FakeFollowerRepository());
 		const snaps = await cf.buildSnapshot(["nonexistent"]);
 		expect(snaps).toEqual([]);
+	});
+
+	it("returns a read-only repo preview for a linked slug that is not embedded", async () => {
+		const actor = makeActor();
+		const cf = new CharacterFollowers(actor, new FakeFollowerRepository([ENFYS]), makeResourceController());
+		const snaps = await cf.buildSnapshot(["enfys"]);
+		expect(snaps).toHaveLength(1);
+		expect(snaps[0].slug).toBe("enfys");
+		// Preview only — the follower is sourced from the repo, nothing is embedded on the actor.
+		expect([...actor.items].filter(i => i.type === "npc")).toHaveLength(0);
 	});
 });
 

@@ -616,23 +616,23 @@ function makeArcanaWithFollowers(items = [], arcana = [CRACKED_FLUTE]) {
 // -- Tests: follower sync ------------------------------------------------------
 
 describe("CharacterArcana — follower sync", () => {
-	it("flipArcanum embeds linked follower as owned=true", async () => {
+	it("flipArcanum does not change follower ownership", async () => {
 		const { actor, charArcana } = makeArcanaWithFollowers([makeArcanumItem(CRACKED_FLUTE)]);
-		// Pre-embed andalau as owned=false (simulates addArcanum having been called)
+		// A stale, un-owned follower item must be left untouched by a flip — only the checkbox adds it.
 		actor.items.push(makeNpcItem("andalau-of-the-flute", { owned: false }));
 		await charArcana.flipArcanum("cracked-flute");
 		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
-		expect(followerItem?.system?.owned).toBe(true);
+		expect(followerItem?.system?.owned).toBe(false);
 	});
 
-	it("unflipArcanum removes the owned follower", async () => {
+	it("unflipArcanum does not remove or alter the follower", async () => {
 		const { actor, charArcana } = makeArcanaWithFollowers([
 			makeArcanumItem(CRACKED_FLUTE, { flipped: true }),
 			makeNpcItem("andalau-of-the-flute", { owned: true }),
 		]);
 		await charArcana.unflipArcanum("cracked-flute");
 		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
-		expect(followerItem).toBeUndefined();
+		expect(followerItem?.system?.owned).toBe(true);
 	});
 
 	it("removeArcanum removes linked follower that is still owned=false", async () => {
@@ -655,7 +655,7 @@ describe("CharacterArcana — follower sync", () => {
 		expect(followerItem).toBeDefined();
 	});
 
-	it("addArcanum pre-embeds linked follower with owned=false", async () => {
+	it("addArcanum embeds no follower items", async () => {
 		const actor = makeActor();
 		const followerRepo = new FakeFollowerRepository([{
 			slug: "andalau-of-the-flute", name: "The Andalau", tags: null,
@@ -665,8 +665,7 @@ describe("CharacterArcana — follower sync", () => {
 		const followers = new CharacterFollowers(actor, followerRepo, makeResourceController());
 		const charArcana = new CharacterArcana(actor, new FakeArcanaRepository([CRACKED_FLUTE]), null, null, followers);
 		await charArcana.addArcanum("cracked-flute");
-		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
-		expect(followerItem?.system?.owned).toBe(false);
+		expect([...actor.items].filter(i => i.type === "npc")).toHaveLength(0);
 	});
 
 	it("does not embed follower when arcanum has no back.choices", async () => {
@@ -703,6 +702,33 @@ describe("CharacterArcana — follower sync", () => {
 		await charArcana.setBackChoiceValue("cracked-flute", "andalau-of-the-flute", 0);
 		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
 		expect(followerItem).toBeUndefined();
+	});
+
+	it("shows an unchecked linked follower on the card via a repo preview, then owns it when checked", async () => {
+		const actor = makeActor([makeArcanumItem(CRACKED_FLUTE)]);
+		const followerRepo = new FakeFollowerRepository([{
+			slug: "andalau-of-the-flute", name: "The Andalau", tags: null,
+			hp: { value: 6, max: 6 }, armor: "", damage: "",
+			instinct: "", loyalty: { value: 0, max: 3 }, choices: null,
+		}]);
+		const factory = new ChoiceGroupFactory(actor);
+		const followers = new CharacterFollowers(actor, followerRepo, makeResourceController(), factory);
+		factory.register(new FollowerSideEffectHandler(followers));
+		const charArcana = new CharacterArcana(actor, new FakeArcanaRepository([CRACKED_FLUTE]), null, null, followers, factory);
+
+		// Unchecked: nothing embedded, but the card row still shows the follower (repo-backed preview).
+		let snap = await charArcana.buildSnapshot();
+		let row = snap.minor.items[0].back.choices.list.find(r => r.slug === "andalau-of-the-flute");
+		expect([...actor.items].filter(i => i.type === "npc")).toHaveLength(0);
+		expect(row.followers.map(f => f.slug)).toEqual(["andalau-of-the-flute"]);
+
+		// Checking the box owns the follower (adds it to the tab); it still shows on the card.
+		await charArcana.setBackChoiceValue("cracked-flute", "andalau-of-the-flute", 1);
+		const owned = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
+		expect(owned?.system?.owned).toBe(true);
+		snap = await charArcana.buildSnapshot();
+		row = snap.minor.items[0].back.choices.list.find(r => r.slug === "andalau-of-the-flute");
+		expect(row.followers.map(f => f.slug)).toEqual(["andalau-of-the-flute"]);
 	});
 });
 
@@ -761,7 +787,7 @@ describe("CharacterArcana.buildSnapshot() — back.choices", () => {
 // ── onArcanumCreated ──────────────────────────────────────────────────────────
 
 describe("CharacterArcana.onArcanumCreated", () => {
-	it("pre-embeds linked follower with owned=false", async () => {
+	it("embeds no follower items (followers are added only when the box is checked)", async () => {
 		const actor = makeActor([makeArcanumItem(CRACKED_FLUTE)]);
 		const followerRepo = new FakeFollowerRepository([{
 			slug: "andalau-of-the-flute", name: "The Andalau", tags: null,
@@ -771,8 +797,7 @@ describe("CharacterArcana.onArcanumCreated", () => {
 		const followers = new CharacterFollowers(actor, followerRepo, makeResourceController());
 		const charArcana = new CharacterArcana(actor, new FakeArcanaRepository(), null, null, followers);
 		await charArcana.onArcanumCreated(makeArcanumItem(CRACKED_FLUTE));
-		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
-		expect(followerItem?.system?.owned).toBe(false);
+		expect([...actor.items].filter(i => i.type === "npc")).toHaveLength(0);
 	});
 
 	it("does not embed follower when arcanum has no back choices", async () => {
