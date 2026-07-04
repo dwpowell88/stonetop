@@ -21,6 +21,10 @@
 				"label": "6-",
 				"value": "mark 1 Consequence, and the effect occurs—but the GM will tell you what goes wrong."
 			}
+		},
+		"resource": {
+			"max": 3,
+			"title": null
 		}
 	},
 	"folder": "ArcanaMoves00001"

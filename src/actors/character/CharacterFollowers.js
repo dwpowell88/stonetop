@@ -119,10 +119,14 @@ export class CharacterFollowers {
 		await this._actor.deleteEmbeddedDocuments("Item", [item._id]);
 	}
 
-	async removeLinkedFollower(slug) {
-		const item = _findFollowerItem(this._actor, slug);
-		if (!item || item.system?.owned) return;
-		await this._actor.deleteEmbeddedDocuments("Item", [item._id]);
+	// Remove every follower an arcanum embedded. Arcana followers carry `system.arcanaSlug` (their
+	// source arcanum, from pack data); playbook/custom/independent followers have it null, so they
+	// never match. Mirrors the outfit-item `deleteBySource("arcana:" + slug)` provenance cleanup.
+	async removeByArcanum(arcanumSlug) {
+		const ids = [...this._actor.items]
+			.filter(i => i.type === "npc" && i.system?.arcanaSlug === arcanumSlug)
+			.map(i => i._id);
+		if (ids.length) await this._actor.deleteEmbeddedDocuments("Item", ids);
 	}
 
 	async addCustomFollower() {

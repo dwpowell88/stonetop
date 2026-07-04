@@ -156,6 +156,35 @@ describe("CharacterFollowers — ownership", () => {
 		const [snap] = await cf.buildSnapshot();
 		expect(snap.hp).toBe(6);
 	});
+
+	it("removeByArcanum removes an embedded follower whose arcanaSlug matches", async () => {
+		const bronze = new Follower({ slug: "bronze-protector", name: "Bronze protector", hp: { value: 13, max: 13 }, arcanaSlug: "metal-man" });
+		const cf = makeCf(new FakeFollowerRepository([bronze]));
+		await cf.addFollower("bronze-protector"); // arcanum checkbox path → owned:true, arcanaSlug copied
+		await cf.removeByArcanum("metal-man");
+		expect(cf.ownedSlugs).not.toContain("bronze-protector");
+	});
+
+	it("removeByArcanum leaves a follower with a different arcanaSlug", async () => {
+		const bronze = new Follower({ slug: "bronze-protector", name: "Bronze protector", hp: { value: 13, max: 13 }, arcanaSlug: "metal-man" });
+		const cf = makeCf(new FakeFollowerRepository([bronze]));
+		await cf.addFollower("bronze-protector");
+		await cf.removeByArcanum("some-other-arcanum");
+		expect(cf.ownedSlugs).toContain("bronze-protector");
+	});
+
+	it("removeByArcanum leaves a follower with a null arcanaSlug (playbook/custom)", async () => {
+		const cf = makeCf(new FakeFollowerRepository([ENFYS])); // ENFYS has arcanaSlug null
+		await cf.addFollower("enfys");
+		await cf.removeByArcanum("metal-man");
+		expect(cf.ownedSlugs).toContain("enfys");
+	});
+
+	it("removeByArcanum is a no-op when nothing matches", async () => {
+		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
+		await cf.removeByArcanum("metal-man"); // must not throw
+		expect(cf.ownedSlugs).toEqual([]);
+	});
 });
 
 // -- Tests: state mutations ---------------------------------------------------

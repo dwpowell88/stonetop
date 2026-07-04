@@ -182,6 +182,52 @@ export function parseMoveRoll(text) {
 	return { rollStat, moveResults: extractMoveResults(text) };
 }
 
+// A move header's right-aligned resource track is a run of ○ pips (Azure Hand's Battery, Ice Sphere's
+// Mindwalking, Storm Markings' Storm's Fury — "hold N Power/Fury"). load.js injects each pip as its own
+// far-right `marker` line, but the layout's column split strands them (they glom onto whatever text sits
+// mid-right), so read them straight from the raw page lines here. Pips live far right (excludes inline
+// "(○○○ uses)" / follower loyalty circles at ~x480); a move header's □ checkbox + name sit at the left.
+const RES_PIP_X = 600; // a resource pip's left edge — comfortably right of any body/loyalty circle
+const RES_HEAD_X = 470; // a move header / □ checkbox column's right bound
+
+/** Read the right-aligned resource tracks off ONE back page's raw lines. Each ○ run is matched to the
+ *  move whose □ header sits just above it; `hasBlank` marks the dotted fill-in line that trails a track
+ *  ending well short of the body's right edge (Battery's write-in). A trailing □ (the separate mark box
+ *  on Mindwalking / Storm's Fury) is ignored — only ○ pips count toward `max`. Returns
+ *  [{ slug, max, hasBlank }]. Call per page: run y-bands are unique within a page, not across the book. */
+export function resourceTracks(lines) {
+	// A follower stat block's "(Loyalty ○○○)" circles can land right of RES_PIP_X too (the Cost line sits
+	// in the block's right column, e.g. Blackwood Fetishes' Astor/Halix). They aren't a move resource —
+	// drop any pip run that shares a y-band with a "Loyalty" text line.
+	const loyaltyYs = lines.filter((l) => l.font !== "marker" && /loyalt/i.test(l.text)).map((l) => l.bbox[1]);
+	const pips  = lines.filter((l) => l.font === "marker" && l.text.includes("○") && l.bbox[0] > RES_PIP_X
+		&& !loyaltyYs.some((y) => Math.abs(y - l.bbox[1]) <= 5))
+		.sort((a, b) => a.bbox[1] - b.bbox[1]);
+	if (!pips.length) return [];
+	const boxes = lines.filter((l) => l.font === "marker" && l.text.includes("□") && l.bbox[0] < RES_HEAD_X)
+		.sort((a, b) => a.bbox[1] - b.bbox[1]);
+	const bodyRight = Math.max(0, ...lines.filter((l) => l.font !== "marker" && l.bbox[0] < RES_HEAD_X).map((l) => l.bbox[2]));
+	// Group pips into runs by y-band (each pip is its own line; a run's max is its pip count).
+	const runs = [];
+	for (const p of pips) {
+		const n = (p.text.match(/○/g) || []).length;
+		const last = runs[runs.length - 1];
+		if (last && Math.abs(p.bbox[1] - last.y) <= 4) { last.max += n; last.x1 = Math.max(last.x1, p.bbox[2]); }
+		else runs.push({ y: p.bbox[1], max: n, x1: p.bbox[2] });
+	}
+	const tracks = [];
+	for (const run of runs) {
+		const box = [...boxes].reverse().find((b) => b.bbox[1] <= run.y + 6); // nearest □ header at/above the run
+		if (!box) continue;
+		const head = lines.find((l) => l.font !== "marker" && Math.abs(l.bbox[1] - box.bbox[1]) <= 3
+			&& l.bbox[0] >= box.bbox[0] && l.bbox[0] < RES_HEAD_X + 40);
+		const name = head ? majorMoveName(head.text).name : "";
+		if (!name) continue;
+		tracks.push({ slug: toSlug(titleCase(name)), max: run.max, hasBlank: run.x1 < bodyRight - 40 });
+	}
+	return tracks;
+}
+
 /** Split a major move header line's leading ALL-CAPS run (the move name) from any inline remainder
  *  ("WHISPERS When you grip the shaft" → {name:"WHISPERS", rest:"When you grip the shaft"}). */
 export function majorMoveName(text) {

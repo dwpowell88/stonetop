@@ -21,6 +21,10 @@
 				"label": "6-",
 				"value": "hold 1 Guise and mark a Consequence. While you hold Guise, all perceive you as a demon, and magic that affects demons affects you, too. Spend Guise, 1-for-1 to:"
 			}
+		},
+		"resource": {
+			"max": 3,
+			"title": null
 		}
 	},
 	"folder": "ArcanaMoves00001"

@@ -19,11 +19,15 @@ export class FakeActorScaffold {
 	setItems(items)      { this.items = items; }
 	setTypedActor(factory) { this.typedActorFactory = factory; }
 
-	build(type, system) {
+	// `dataModel` (a TypeDataModel subclass) lets the fake actor enforce the real schema on update — a
+	// write to an undefined `system.*` path is stripped, just as Foundry does. Optional; omit to keep the
+	// permissive behaviour (e.g. actors whose schema isn't wired up in tests yet).
+	build(type, system, dataModel = null) {
 		return new FakeActor({
 			_name:              this.name,
 			_type:              type,
 			_typedActorFactory: this.typedActorFactory,
+			dataModel,
 			buildSystem: () => system,
 			buildItems:  () => this._buildItems(),
 			buildFlags:  () => this.flagsBuilder.build(),

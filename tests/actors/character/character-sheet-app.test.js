@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { createStonetopCharacterSheetClass } from "../../../src/actors/character/StonetopCharacterSheet.js";
 import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 
@@ -30,6 +30,12 @@ function makeCharacterMock(actor) {
 		onDropMove: vi.fn(async () => false),
 		moveResources: { add: vi.fn() },
 		buildSnapshot: vi.fn(async () => ({})),
+		removeArcanum: vi.fn(async () => {}),
+		removeFollower: vi.fn(async () => {}),
+		deleteMove: vi.fn(async () => {}),
+		deletePossession: vi.fn(async () => {}),
+		removeCustomInventoryItem: vi.fn(async () => {}),
+		removeFollowerInvCustomItem: vi.fn(async () => {}),
 	};
 }
 
@@ -110,5 +116,94 @@ describe("StonetopCharacterSheet._onDropItemCreate", () => {
 		actor.typedActor.onDropItems.mockResolvedValue({ anyAdded: true, others: [] });
 		await sheet._onDropItemCreate(makeArcanum("humble-broom"));
 		expect(sheet.render).not.toHaveBeenCalled();
+	});
+});
+
+// -- Delete confirmation ------------------------------------------------------
+
+describe("StonetopCharacterSheet delete confirmation", () => {
+	afterEach(() => vi.unstubAllGlobals());
+
+	function stubConfirm(result) {
+		const confirm = vi.fn(async () => result);
+		vi.stubGlobal("Dialog", { confirm });
+		vi.stubGlobal("game", { i18n: { localize: k => k, format: k => k } });
+		return confirm;
+	}
+
+	// Each row: the handler under test, the dataset it receives, and the typed-actor method it must
+	// (or must not) call. Covers all five destructive deletes on the character sheet.
+	const cases = [
+		["_onDeleteArcanum",   { slug: "azure-hand", name: "Azure Hand" }, "removeArcanum"],
+		["_onDeleteFollower",  { slug: "astor",      name: "Astor" },      "removeFollower"],
+		["_onDeleteOtherMove", { moveSlug: "cleave", name: "Cleave" },     "deleteMove"],
+	];
+
+	for (const [handler, dataset, method] of cases) {
+		it(`${handler} deletes when confirmed`, async () => {
+			stubConfirm(true);
+			const actor = makeActor();
+			const sheet = makeSheet(actor);
+			await sheet[handler](dataset);
+			expect(actor.typedActor[method]).toHaveBeenCalledTimes(1);
+		});
+
+		it(`${handler} does nothing when cancelled`, async () => {
+			stubConfirm(false);
+			const actor = makeActor();
+			const sheet = makeSheet(actor);
+			await sheet[handler](dataset);
+			expect(actor.typedActor[method]).not.toHaveBeenCalled();
+		});
+
+		it(`${handler} skips the confirm dialog on skipConfirm`, async () => {
+			const confirm = stubConfirm(false);
+			const actor = makeActor();
+			const sheet = makeSheet(actor);
+			await sheet[handler](dataset, { skipConfirm: true });
+			expect(confirm).not.toHaveBeenCalled();
+			expect(actor.typedActor[method]).toHaveBeenCalledTimes(1);
+		});
+	}
+
+	it("_onDeletePossession deletes when confirmed", async () => {
+		stubConfirm(true);
+		const actor = makeActor();
+		const sheet = makeSheet(actor);
+		await sheet._onDeletePossession({ currentTarget: { dataset: { slug: "map", name: "Map" } } });
+		expect(actor.typedActor.deletePossession).toHaveBeenCalledWith("map");
+	});
+
+	it("_onDeletePossession does nothing when cancelled", async () => {
+		stubConfirm(false);
+		const actor = makeActor();
+		const sheet = makeSheet(actor);
+		await sheet._onDeletePossession({ currentTarget: { dataset: { slug: "map", name: "Map" } } });
+		expect(actor.typedActor.deletePossession).not.toHaveBeenCalled();
+	});
+
+	it("_onDeleteCustomInventoryItem deletes when confirmed", async () => {
+		stubConfirm(true);
+		const actor = makeActor();
+		const sheet = makeSheet(actor);
+		await sheet._onDeleteCustomInventoryItem({ currentTarget: { dataset: { ownedId: "x1", name: "Rope" } } });
+		expect(actor.typedActor.removeCustomInventoryItem).toHaveBeenCalledWith("x1");
+	});
+
+	it("_onDeleteCustomInventoryItem does nothing when cancelled", async () => {
+		stubConfirm(false);
+		const actor = makeActor();
+		const sheet = makeSheet(actor);
+		await sheet._onDeleteCustomInventoryItem({ currentTarget: { dataset: { ownedId: "x1", name: "Rope" } } });
+		expect(actor.typedActor.removeCustomInventoryItem).not.toHaveBeenCalled();
+	});
+
+	it("_onDeleteCustomInventoryItem skips the confirm dialog on skipConfirm", async () => {
+		const confirm = stubConfirm(false);
+		const actor = makeActor();
+		const sheet = makeSheet(actor);
+		await sheet._onDeleteCustomInventoryItem({ currentTarget: { dataset: { ownedId: "x1", name: "Rope" } } }, { skipConfirm: true });
+		expect(confirm).not.toHaveBeenCalled();
+		expect(actor.typedActor.removeCustomInventoryItem).toHaveBeenCalledWith("x1");
 	});
 });

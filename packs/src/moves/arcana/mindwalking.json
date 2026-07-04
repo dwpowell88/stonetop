@@ -21,6 +21,10 @@
 				"label": "6-",
 				"value": "hold 2 Power and mark a Consequence. While mindwalking, you may spend your Power, 1-for-1 to:"
 			}
+		},
+		"resource": {
+			"max": 3,
+			"title": null
 		}
 	},
 	"folder": "ArcanaMoves00001"

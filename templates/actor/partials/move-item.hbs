@@ -30,7 +30,7 @@
 		<i class="fas fa-dice-d6"></i>
 	</span>
 	{{/if}}
-	{{#if (and (gt selection.value 0) resource)}}
+	{{#if (and (or alwaysShowResource (gt selection.value 0)) resource)}}
 	<span class="stonetop-item-resources">
 		{{#each (resourceChecks resource)}}
 		<span class="stonetop-item-resource-entry">
@@ -40,10 +40,11 @@
 			{{#if label}}<span class="stonetop-resource-label">{{label}}</span>{{/if}}
 		</span>
 		{{/each}}
+		{{> "stonetop.resource-input" input=resource.input moveSlug=slug}}
 	</span>
 	{{/if}}
 	{{#if allowAdditional}}
-	<a class="stonetop-other-move-delete" data-move-slug="{{slug}}" title="{{localize 'stonetop.character.moves.removeMove'}}">
+	<a class="stonetop-other-move-delete" data-move-slug="{{slug}}" data-name="{{name}}" title="{{localize 'stonetop.character.moves.removeMove'}} — {{localize 'stonetop.confirm.deleteHint'}}">
 		<i class="fas fa-trash"></i>
 	</a>
 	{{/if}}

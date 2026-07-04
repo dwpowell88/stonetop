@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug, followerChoiceEntry, isArcanaFollower, titleCase, majorMoveName, parseRequires, parseMoveRoll, detectUnlockAt, parseFront, parseBack } from "../../../scripts/import/pdf/arcana-parse.js";
+import { parseTrack, stripMarkers, stripLoyalty, parseItemLine, unlockSlug, followerChoiceEntry, isArcanaFollower, titleCase, majorMoveName, parseRequires, parseMoveRoll, resourceTracks, detectUnlockAt, parseFront, parseBack } from "../../../scripts/import/pdf/arcana-parse.js";
 
 // Synthetic block factories (markers are literal glyphs in the line text, as the load pipeline injects).
 const _line = (text) => ({ text, bbox: [0, 0, 0, 0], spans: [{ font: "ACaslonPro-Regular", size: 9, text }] });
@@ -224,6 +224,57 @@ describe("parseMoveRoll", () => {
 
 	it("returns nulls when there is no roll and no tiers", () => {
 		expect(parseMoveRoll("You gain +1 armor while you wear the cloak.")).toEqual({ rollStat: null, moveResults: null });
+	});
+});
+
+describe("resourceTracks — right-aligned ○ resource pips on a move header", () => {
+	// Marker / text line factories with real geometry (the load pipeline injects each ○/□ as its own
+	// far-right `marker` line; the body/header are ACaslon text lines).
+	const mk  = (glyph, x, y) => ({ text: glyph, font: "marker", bbox: [x, y, x + 6, y + 8], spans: [{ font: "marker", size: 7, text: glyph }] });
+	const txt = (text, x, y, x1 = 750) => ({ text, font: "ACaslonPro-Bold", bbox: [x, y, x1, y + 8], spans: [{ font: "ACaslonPro-Bold", size: 9, text }] });
+
+	it("reads a single ○ short of the right edge as a max-1 track with a fill-in blank (Battery)", () => {
+		expect(resourceTracks([
+			mk("□", 433, 116), txt("  BATTERY ", 438, 116, 486),
+			txt("When you gather elemental power about the Azure Hand, you can store it", 432, 126, 750),
+			mk("○", 662, 122),
+		])).toEqual([{ slug: "battery", max: 1, hasBlank: true }]);
+	});
+
+	it("reads a ○○○ run reaching the right edge as a max-3 pool with no blank (Mindwalking)", () => {
+		expect(resourceTracks([
+			mk("□", 433, 117), txt("  MINDWALKING ", 438, 117, 512),
+			txt("When you use the Ice Sphere as a psychic anchor, roll +INT: hold 3 Power", 432, 127, 748),
+			mk("○", 733, 123), mk("○", 740, 123), mk("○", 746, 123),
+		])).toEqual([{ slug: "mindwalking", max: 3, hasBlank: false }]);
+	});
+
+	it("ignores a trailing □ mark box — only ○ pips count toward max (Storm's Fury)", () => {
+		expect(resourceTracks([
+			mk("□", 433, 116), txt("  STORM’S FURY ", 438, 116, 508),
+			txt("your markings crackle with electricity and the air thrums with pressure", 432, 126, 745),
+			mk("○", 733, 122), mk("○", 740, 122), mk("○", 746, 122), mk("□", 756, 119),
+		])).toEqual([{ slug: "storms-fury", max: 3, hasBlank: false }]);
+	});
+
+	it("excludes a follower's (Loyalty ○○○) circles even when they land right of the pip threshold", () => {
+		expect(resourceTracks([
+			mk("□", 433, 116), txt("  CALL FORTH AND COMMAND", 438, 116, 560),
+			txt("their ghosts manifest before you. Treat them as followers.", 432, 126, 740),
+			txt("Cost proof of honor, nobility (Loyalty", 616, 150, 700),
+			mk("○", 700, 150), mk("○", 707, 150), mk("○", 714, 150),
+		])).toEqual([]);
+	});
+
+	it("returns nothing when a ○ run has no move header above it", () => {
+		expect(resourceTracks([mk("○", 662, 122)])).toEqual([]);
+	});
+
+	it("returns nothing for a page with no right-aligned pips", () => {
+		expect(resourceTracks([
+			mk("□", 433, 116), txt("  INDOMITABLE", 438, 116, 507),
+			txt("When you wear the Scales and stand fast, add 3 to the result.", 432, 126, 528),
+		])).toEqual([]);
 	});
 });
 

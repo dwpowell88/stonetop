@@ -1,4 +1,5 @@
 import {FakeActorScaffold} from "./FakeActorScaffold.js";
+import {CharacterData} from "../../src/data/CharacterData.js";
 
 export class FakeStatBuilder {
 	_str = 0;
@@ -138,6 +139,6 @@ export class FakeCharacterActorBuilder {
 
 	build() {
 		this._scaffold.flagsBuilder.withFlag("rollMode", this._rollMode);
-		return this._scaffold.build("character", this.buildSystem());
+		return this._scaffold.build("character", this.buildSystem(), CharacterData);
 	}
 }

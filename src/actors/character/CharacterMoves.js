@@ -161,6 +161,10 @@ export class CharacterMoves {
 		await this._resourceController.set("moves", moveSlug, current);
 	}
 
+	async setMoveResourceText(moveSlug, value) {
+		await this._resourceController.setText("moves", moveSlug, value);
+	}
+
 	async buildSnapshot() {
 		const allMoveItems = [...this._actor.items].filter(i => i.type === "move");
 		const level              = this._vitals?.level ?? 1;

@@ -22,7 +22,7 @@ import { execFileSync } from "child_process";
 import { loadOutline, arcanaAppendixRanges } from "./outline.js";
 import { loadArticlePages } from "./load.js";
 import { extractArticle } from "./layout.js";
-import { parseFront, parseBack, isArcanaFollower, detectUnlockAt, parseMoveRoll } from "./arcana-parse.js";
+import { parseFront, parseBack, isArcanaFollower, detectUnlockAt, parseMoveRoll, resourceTracks } from "./arcana-parse.js";
 import { parseStatBlock, toFollowerDoc } from "./creatures.js";
 
 const PDF = process.env.BOOK_PDF ?? "helper/Book_II_-_The_Wider_World_and_Other_Wonders.pdf";
@@ -45,7 +45,7 @@ const isLabel = (b, re) => (b.type === "heading" || b.type === "title") && re.te
 const ARCANA_MOVES_DIR = "packs/src/moves/arcana";
 const ARCANA_MOVES_FOLDER = "ArcanaMoves00001"; // packs/src/moves/_folders/arcana.json
 const arcanaMoveId = (slug) => createHash("sha1").update("arcana-move:" + slug).digest("hex").slice(0, 16);
-function emitArcanaMoves(back) {
+function emitArcanaMoves(back, resourceBySlug = new Map()) {
 	if (!back || !Array.isArray(back.moves)) return back;
 	mkdirSync(ARCANA_MOVES_DIR, { recursive: true });
 	const slugs = [];
@@ -55,9 +55,14 @@ function emitArcanaMoves(back) {
 		// A move whose text says "roll +X" is rollable: pull the stat and the 10+/7-9/6- outcomes so the
 		// sheet shows the dice button and the roll card shows the per-tier result (bug #43).
 		const { rollStat, moveResults } = parseMoveRoll(m.text ?? "");
+		// A move with a right-aligned ○ resource track (Battery, Mindwalking, Storm's Fury) carries a
+		// resource pool; a single ○ with a trailing dotted line is a write-in blank (bug #41).
+		const rt = resourceBySlug.get(slug);
+		const resource = rt ? { max: rt.max, title: null, ...(rt.hasBlank ? { input: { type: "inline" } } : {}) } : null;
 		const doc = { _id: id, _key: `!items!${id}`, name: m.name, type: "move",
 			system: { slug, moveType: null, description: m.text ?? "",
 				...(rollStat ? { rollStat } : {}), ...(moveResults ? { moveResults } : {}),
+				...(resource ? { resource } : {}),
 				...(m.requirement ? { requirement: m.requirement } : {}) }, folder: ARCANA_MOVES_FOLDER };
 		writeFileSync(path.join(ARCANA_MOVES_DIR, `${slug}.json`), JSON.stringify(doc, null, "\t") + "\n");
 	}
@@ -186,6 +191,7 @@ const ranges = arcanaAppendixRanges(loadOutline(PDF), totalPages());
 const parsedFront = new Map(); // slug -> front
 const parsedBack = new Map();  // slug -> back
 const arcanaUnlockAt = new Map(); // slug -> unlockAt (front-derived, for major backs)
+const resourceBySlug = new Map(); // move slug -> { max, hasBlank } (right-aligned ○ resource tracks)
 const parsedByName = new Map(); // normName -> { creature, staged }  (parsed follower stat blocks)
 const review = [`# Arcanum parse — manual review`, ``];
 
@@ -198,6 +204,10 @@ for (const range of ranges) {
 	const art = extractArticle(pages, { title: range.title, pageRules, pageImages });
 	const blocks = [];
 	for (const s of art.sections) for (const c of [...s.left, ...s.right]) blocks.push(...c.blocks);
+
+	// Move resource tracks read straight off each page's raw markers (the column split strands them, so
+	// they never survive into `blocks`). Move slugs are unique book-wide, so a flat slug→track map is safe.
+	for (const p of pages) for (const t of resourceTracks(p.lines)) resourceBySlug.set(t.slug, t);
 
 	// Fronts: anchored on arcanum names, bounded at the "front" label.
 	for (const { rec, blocks: bl } of segmentBy(blocks, byName, /^front$/i))
@@ -265,7 +275,7 @@ for (const rec of bySlug.values()) {
 		// choice group — preserve it (the 3 major followers stay hand-authored, per the roster).
 		if (back && rec.doc.system.back?.choices) back.choices = rec.doc.system.back.choices;
 		// Promote parsed inline moves → move pack files + `back.moveSlugs` (no-op if already moveSlugs).
-		back = emitArcanaMoves(back);
+		back = emitArcanaMoves(back, resourceBySlug);
 		const sys = { slug: rec.slug, front, back, major: true };
 		const out = { _id: rec.doc._id, _key: rec.doc._key, name: rec.doc.name, type: "arcanum",
 			...(rec.doc.img ? { img: rec.doc.img } : {}), system: sys, flags: {}, folder: rec.doc.folder };

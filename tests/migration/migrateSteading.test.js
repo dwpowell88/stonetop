@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { migrateSteading } from "../../src/migration/migrateSteading.js";
-import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
+import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
 
 function makeActor(flags = {}) {
-	const builder = new FakeCharacterActorBuilder();
+	const builder = new FakeActorBuilder();
 	builder.withFlags(flags);
 	return builder.build();
 }

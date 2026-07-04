@@ -10,6 +10,12 @@ export class FakeActor {
 	constructor(builder) {
 		this.system = builder.buildSystem();
 
+		// The actor's DataModel schema (when the builder supplies one). Foundry validates every
+		// `actor.update` against it and silently DROPS writes to keys the schema doesn't define — so the
+		// fake must too, or a write to a mistyped/undefined `system.*` path looks like it persisted here
+		// but vanishes in the real game (the bug this guards: `system.moveResources.texts`).
+		this._systemSchema = builder.dataModel?.defineSchema?.() ?? null;
+
 		this.name = builder._name;
 		this.type = builder._type ?? "character";
 
@@ -64,6 +70,9 @@ export class FakeActor {
 
 	update(data) {
 		for (const [path, value] of Object.entries(data)) {
+			// Mirror Foundry: a `system.*` write to a path the schema doesn't define is stripped.
+			if (this._systemSchema && path.startsWith("system.")
+				&& !_systemPathAllowed(this._systemSchema, path.slice("system.".length).split("."))) continue;
 			this._applyDotPath(this, path, value);
 		}
 	}
@@ -87,6 +96,17 @@ export class FakeActor {
 	setFlag(scope, key, value) {
 		return this._fakeFlags.setFlag(scope, key, value);
 	}
+}
+
+// Walk a DataModel schema by an update path's parts: true if the path targets a defined field. A
+// SchemaField (`_schema`) is descended into; an ObjectField / other leaf is a free-form bag, so any
+// deeper path under it is allowed. An unknown key at any level → false (Foundry strips the write).
+function _systemPathAllowed(schema, parts) {
+	const [head, ...rest] = parts;
+	const field = schema?.[head];
+	if (!field) return false;
+	if (rest.length === 0) return true;
+	return field._schema ? _systemPathAllowed(field._schema, rest) : true;
 }
 
 function _deepAssign(target, source) {

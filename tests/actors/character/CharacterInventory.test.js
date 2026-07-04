@@ -48,7 +48,7 @@ function makeRawEmbeddedItem(overrides = {}) {
 			slug:            overrides.slug            ?? null,
 			inventoryColumn: overrides.inventoryColumn ?? "regular",
 			weight:          overrides.weight          ?? 1,
-			tags:            overrides.tags            ?? "",
+			tagList:         overrides.tagList         ?? "",
 			note:            overrides.note            ?? null,
 			resource:        overrides.resource        ?? null,
 			twoCol:          overrides.twoCol          ?? false,
@@ -269,6 +269,13 @@ describe("CharacterInventory.buildSnapshot", () => {
 		const item = regularItems(snap).find(i => i.slug === "custom-1");
 		expect(item.isCustom).toBe(true);
 		expect(item.ownedId).toBe("custom-1");
+	});
+
+	it("embedded item surfaces system.tagList as the snapshot tags", async () => {
+		const embedded = makeRawEmbeddedItem({ _id: "custom-1", slug: "custom-1", tagList: "warm" });
+		const snap = await makeCi({}, null, makeActorOutfitItems([embedded])).buildSnapshot(1);
+		const item = regularItems(snap).find(i => i.slug === "custom-1");
+		expect(item.tags.raw).toBe("warm");
 	});
 
 	it("embedded item with source has isCustom=false and ownedId=null", async () => {

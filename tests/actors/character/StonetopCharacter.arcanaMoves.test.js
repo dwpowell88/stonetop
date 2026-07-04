@@ -97,6 +97,44 @@ describe("StonetopCharacter — major arcana mystery moves render as real moves 
 		expect(move_.ownedId).toBeTruthy();
 	});
 
+	it("an acquired mystery move with a ○ resource track exposes its resource, with a fill-in blank", async () => {
+		// Battery has a single-○ resource with a write-in blank; Mindwalking has a 3-○ pool with none.
+		const battery = new FakeCompendiumMoveBuilder().withName("Battery")
+			.withResource({ max: 1, title: null, input: { type: "inline" } }).build();
+		const mindwalking = new FakeCompendiumMoveBuilder().withName("Mindwalking")
+			.withResource({ max: 3, title: null }).build();
+		withMovesPack(battery, mindwalking);
+		const arcanum = majorArcanumItem(["battery", "mindwalking"]);
+		const character = characterWithArcanum(arcanum);
+
+		await character._onCreateDescendantDocuments([arcanum]);
+		await character.incrementMove("arcana-azure-hand", "battery");
+		await character.incrementMove("arcana-azure-hand", "mindwalking");
+
+		const card = await arcanaCard(character, "azure-hand");
+		const bat = card.back.moves.find(m => m.name === "Battery");
+		expect(bat.resource.max).toBe(1);
+		expect(bat.resource.input).toEqual({ value: "", placeholder: null, type: "inline" });
+		const mind = card.back.moves.find(m => m.name === "Mindwalking");
+		expect(mind.resource.max).toBe(3);
+		expect(mind.resource.input).toBeNull();
+	});
+
+	it("writing in a resource's fill-in blank persists and reappears on the card", async () => {
+		const battery = new FakeCompendiumMoveBuilder().withName("Battery")
+			.withResource({ max: 1, title: null, input: { type: "inline" } }).build();
+		withMovesPack(battery);
+		const arcanum = majorArcanumItem(["battery"]);
+		const character = characterWithArcanum(arcanum);
+
+		await character._onCreateDescendantDocuments([arcanum]);
+		await character.incrementMove("arcana-azure-hand", "battery");
+		await character.setMoveResourceText("battery", "a caged thunderclap");
+
+		const card = await arcanaCard(character, "azure-hand");
+		expect(card.back.moves.find(m => m.name === "Battery").resource.input.value).toBe("a caged thunderclap");
+	});
+
 	it("arcana mystery moves do not leak onto the moves tab", async () => {
 		withMovesPack(move("Battery"), move("Resonance"));
 		const arcanum = majorArcanumItem(["battery", "resonance"]);

@@ -15,9 +15,9 @@ describe("OutfitItemData defaults", () => {
 		expect(d.twoCol).toBe(false);
 	});
 
-	it("defaults tags and note to empty string", () => {
+	it("defaults tagList and note to empty string", () => {
 		const d = new OutfitItemData();
-		expect(d.tags).toBe("");
+		expect(d.tagList).toBe("");
 		expect(d.note).toBe("");
 	});
 

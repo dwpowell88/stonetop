@@ -45,7 +45,7 @@ function makeNpcItem(slug, overrides = {}) {
 			hp: { value: 6, max: 6 }, armor: "",
 			damage: "",
 			instinct: "", loyalty: { value: 0, max: 3 },
-			choices: null, arcanaSlug: null, specialQuality: "", choiceValues: {},
+			choices: null, arcanaSlug: overrides.arcanaSlug ?? null, specialQuality: "", choiceValues: {},
 		},
 	};
 }
@@ -635,23 +635,33 @@ describe("CharacterArcana — follower sync", () => {
 		expect(followerItem?.system?.owned).toBe(true);
 	});
 
-	it("removeArcanum removes linked follower that is still owned=false", async () => {
+	it("removeArcanum removes a follower the arcanum added, even when owned via its checkbox", async () => {
 		const { actor, charArcana } = makeArcanaWithFollowers([
 			makeArcanumItem(CRACKED_FLUTE),
-			makeNpcItem("andalau-of-the-flute", { owned: false }),
+			makeNpcItem("andalau-of-the-flute", { owned: true, arcanaSlug: "cracked-flute" }),
 		]);
 		await charArcana.removeArcanum("cracked-flute");
 		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
 		expect(followerItem).toBeUndefined();
 	});
 
-	it("removeArcanum does not remove independently owned follower", async () => {
+	it("removeArcanum preserves a follower belonging to a different arcanum", async () => {
 		const { actor, charArcana } = makeArcanaWithFollowers([
 			makeArcanumItem(CRACKED_FLUTE),
-			makeNpcItem("andalau-of-the-flute", { owned: true }),
+			makeNpcItem("all-mighty-thistlewisk", { owned: true, arcanaSlug: "stone-idol" }),
 		]);
 		await charArcana.removeArcanum("cracked-flute");
-		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
+		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "all-mighty-thistlewisk");
+		expect(followerItem).toBeDefined();
+	});
+
+	it("removeArcanum preserves an independent follower with no arcanaSlug (playbook/custom)", async () => {
+		const { actor, charArcana } = makeArcanaWithFollowers([
+			makeArcanumItem(CRACKED_FLUTE),
+			makeNpcItem("crew", { owned: true, arcanaSlug: null }),
+		]);
+		await charArcana.removeArcanum("cracked-flute");
+		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "crew");
 		expect(followerItem).toBeDefined();
 	});
 

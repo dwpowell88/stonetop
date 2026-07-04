@@ -15,6 +15,12 @@
 		"dialog": {
 			"roll": "Roll"
 		},
+		"confirm": {
+			"deleteTitle": "Delete",
+			"deleteNamed": "Delete \"{name}\"? This can't be undone.",
+			"deleteGeneric": "Delete this? This can't be undone.",
+			"deleteHint": "Right-click to delete without confirming"
+		},
 		"sheet": {
 			"tabs": {
 				"playbook": "Playbook",

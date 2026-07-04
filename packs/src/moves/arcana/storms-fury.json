@@ -21,6 +21,10 @@
 				"label": "6-",
 				"value": "hold 2 Fury but also mark a consequence."
 			}
+		},
+		"resource": {
+			"max": 3,
+			"title": null
 		}
 	},
 	"folder": "ArcanaMoves00001"

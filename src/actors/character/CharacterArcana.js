@@ -97,13 +97,10 @@ export class CharacterArcana {
 
 	async removeArcanum(slug) {
 		const embeddedItem = _findArcanumItem(this._actor, slug);
-		const arcanum = embeddedItem ? _itemToArcanum(embeddedItem) : null;
 		if (embeddedItem) await this._actor.deleteEmbeddedDocuments("Item", [embeddedItem._id]);
 		await this._moves?.removeCategory(`arcana-${slug}`);
 		await this._outfitItems?.deleteBySource("arcana:" + slug);
-		for (const followerSlug of this._followerSlugsFor(arcanum)) {
-			await this._followers?.removeLinkedFollower(followerSlug);
-		}
+		await this._followers?.removeByArcanum(slug);
 	}
 
 	async flipArcanum(slug) {

@@ -136,6 +136,10 @@ export class StonetopCharacter {
 		await this._moves.setMoveResourceCurrent(moveSlug, current);
 	}
 
+	async setMoveResourceText(moveSlug, value) {
+		await this._moves.setMoveResourceText(moveSlug, value);
+	}
+
 	async addCustomInventoryItem(name, weight) {
 		await this._inventory.addCustomItem(name, weight);
 	}

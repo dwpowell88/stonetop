@@ -21,6 +21,10 @@
 				"label": "6-",
 				"value": "hold 2 Speed, and mark a consequence. During this battle, you may spend Speed, 1-for-1 to do the following:"
 			}
+		},
+		"resource": {
+			"max": 3,
+			"title": null
 		}
 	},
 	"folder": "ArcanaMoves00001"

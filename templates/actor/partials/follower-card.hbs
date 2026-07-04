@@ -1,8 +1,8 @@
 <div class="stonetop-follower-card" data-slug="{{slug}}">
 
 	{{#unless arcanaSlug}}
-	<button type="button" class="stonetop-follower-delete" data-slug="{{slug}}"
-	        title="{{localize 'stonetop.followers.remove'}}">
+	<button type="button" class="stonetop-follower-delete" data-slug="{{slug}}" data-name="{{name}}"
+	        title="{{localize 'stonetop.followers.remove'}} — {{localize 'stonetop.confirm.deleteHint'}}">
 		<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="{{localize 'stonetop.followers.remove'}}">
 	</button>
 	{{/unless}}

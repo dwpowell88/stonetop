@@ -1591,6 +1591,30 @@ body,
 	background-color: var(--color-text-dark-primary) !important;
 }
 
+/* A resource's fill-in blank (the book's dotted write-in line beside a ○ track, e.g. Battery). */
+.stonetop-resource-input-wrap {
+	display: inline-flex;
+	flex: 1 1 60px;
+	min-width: 40px;
+}
+
+.stonetop-resource-input {
+	width: 100%;
+	height: 18px;
+	background: none;
+	border: none !important;
+	border-bottom: 1px dotted var(--color-text-dark-primary) !important;
+	border-radius: 0 !important;
+	padding: 0 2px;
+	font-style: italic;
+}
+
+.stonetop-resource-input--rich {
+	min-height: 3em;
+	resize: vertical;
+	border: 1px dotted var(--color-text-dark-primary) !important;
+}
+
 /* -- attrLeft header row ---------------------------------- */
 
 .sheet-attributes-left {

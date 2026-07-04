@@ -1,0 +1,18 @@
+{{!-- A resource's fill-in blank (the dotted write-in line beside a resource track, e.g. Azure Hand's
+      Battery). Params: input (the snapshot's {value, placeholder, type: "inline"|"rich"}) and the
+      caller's save-context data attribute (moveSlug). Renders nothing unless the resource has an input.
+      The save handler routes by whichever data-*-slug is present (see StonetopCharacterSheet). --}}
+{{#if input}}
+<span class="stonetop-resource-input-wrap">
+	{{#if (eq input.type "rich")}}
+	<textarea class="stonetop-resource-input stonetop-resource-input--rich"
+	          {{#if moveSlug}}data-move-slug="{{moveSlug}}"{{/if}}
+	          {{#if input.placeholder}}placeholder="{{input.placeholder}}"{{/if}}>{{input.value}}</textarea>
+	{{else}}
+	<input type="text" class="stonetop-resource-input"
+	       {{#if moveSlug}}data-move-slug="{{moveSlug}}"{{/if}}
+	       value="{{input.value}}"
+	       {{#if input.placeholder}}placeholder="{{input.placeholder}}"{{/if}}>
+	{{/if}}
+</span>
+{{/if}}
