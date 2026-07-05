@@ -235,7 +235,7 @@
 							{{#each stonetop.attributes.prosperity.items}}
 								<div class="steading-attr-row">
 									<input type="text" class="stonetop-attr-extra" data-attr="prosperity" data-index="{{@index}}" value="{{this}}">
-									<button class="stonetop-attr-extra-remove stonetop-icon-btn" type="button" data-attr="prosperity" data-index="{{@index}}" title="Remove" aria-label="Remove">
+									<button class="stonetop-attr-extra-remove stonetop-icon-btn" type="button" data-attr="prosperity" data-index="{{@index}}" data-name="{{this}}" title="Remove" aria-label="Remove">
 										<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="">
 									</button>
 								</div>
@@ -264,7 +264,7 @@
 							{{#each stonetop.attributes.defenses.items}}
 								<div class="steading-attr-row">
 									<input type="text" class="stonetop-attr-extra" data-attr="defenses" data-index="{{@index}}" value="{{this}}">
-									<button class="stonetop-attr-extra-remove stonetop-icon-btn" type="button" data-attr="defenses" data-index="{{@index}}" title="Remove" aria-label="Remove">
+									<button class="stonetop-attr-extra-remove stonetop-icon-btn" type="button" data-attr="defenses" data-index="{{@index}}" data-name="{{this}}" title="Remove" aria-label="Remove">
 										<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="">
 									</button>
 								</div>
@@ -293,7 +293,7 @@
 							{{#each stonetop.assets.items}}
 								<div class="steading-attr-row">
 									<input type="text" class="stonetop-asset-item" data-index="{{@index}}" value="{{this}}">
-									<button class="stonetop-asset-item-remove stonetop-icon-btn" type="button" data-index="{{@index}}" title="Remove" aria-label="Remove">
+									<button class="stonetop-asset-item-remove stonetop-icon-btn" type="button" data-index="{{@index}}" data-name="{{this}}" title="Remove" aria-label="Remove">
 										<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="">
 									</button>
 								</div>
@@ -356,7 +356,7 @@
 									<input type="text" class="stonetop-resident-name" data-id="{{id}}" value="{{name}}" placeholder="Name (Pronouns)">
 									<input type="text" class="stonetop-resident-occupation" data-id="{{id}}" value="{{occupation}}" placeholder="Occupation">
 									<input type="text" class="stonetop-resident-traits" data-id="{{id}}" value="{{traits}}" placeholder="Traits, Relations, Etc">
-									<button class="stonetop-resident-remove stonetop-icon-btn" type="button" data-id="{{id}}" title="Delete resident" aria-label="Delete resident">
+									<button class="stonetop-resident-remove stonetop-icon-btn" type="button" data-id="{{id}}" data-name="{{name}}" title="Delete resident" aria-label="Delete resident">
 										<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="">
 									</button>
 								</div>
@@ -443,7 +443,7 @@
 									<input type="text" class="stonetop-neighbor-person-occupation" data-id="{{id}}" value="{{occupation}}" placeholder="Occupation">
 									<input type="text" class="stonetop-neighbor-person-traits" data-id="{{id}}" value="{{traits}}" placeholder="Traits, Relations, Etc">
 									<input type="text" class="stonetop-neighbor-person-home" data-id="{{id}}" value="{{home}}" placeholder="Home">
-									<button class="stonetop-neighbor-person-remove stonetop-icon-btn" type="button" data-id="{{id}}" title="Delete neighbor" aria-label="Delete neighbor">
+									<button class="stonetop-neighbor-person-remove stonetop-icon-btn" type="button" data-id="{{id}}" data-name="{{name}}" title="Delete neighbor" aria-label="Delete neighbor">
 										<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="">
 									</button>
 								</div>

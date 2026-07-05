@@ -39,23 +39,24 @@ export class StonetopSteading {
 	}
 
 	getRollableStats() {
-		const attr = this._actor.system.attributes;
 		return [
-			{ key: "population", name: "Population", value: attr.population?.current ?? 0 },
-			{ key: "prosperity", name: "Prosperity", value: attr.prosperity?.current ?? 0 },
-			{ key: "defenses",   name: "Defenses",   value: attr.defenses?.current   ?? 0 },
-			{ key: "fortunes",   name: "Fortunes",   value: this._actor.system.fortunes ?? 0 },
+			{ key: "population", name: "Population", value: this.resolveBonus("population") ?? 0 },
+			{ key: "prosperity", name: "Prosperity", value: this.resolveBonus("prosperity") ?? 0 },
+			{ key: "defenses",   name: "Defenses",   value: this.resolveBonus("defenses")   ?? 0 },
+			{ key: "fortunes",   name: "Fortunes",   value: this.resolveBonus("fortunes")   ?? 0 },
 		];
 	}
 
+	// `current`/`fortunes` are stored as an INDEX into the bonuses array ([-1, 0, 1, 2, 3]); the roll
+	// bonus is the value that index points at, not the index itself. Surplus is a raw count, used as-is.
 	resolveBonus(rollStat) {
 		const sys  = this._actor.system;
 		const attr = sys.attributes;
-		if (rollStat === "fortunes")   return sys.fortunes                  ?? null;
-		if (rollStat === "surplus")    return sys.surplus                   ?? null;
-		if (rollStat === "population") return attr.population?.current ?? null;
-		if (rollStat === "prosperity") return attr.prosperity?.current ?? null;
-		if (rollStat === "defenses")   return attr.defenses?.current   ?? null;
+		if (rollStat === "fortunes") return SteadingDefaults.fortunes.bonuses[sys.fortunes] ?? null;
+		if (rollStat === "surplus")  return sys.surplus ?? null;
+		const bonuses = SteadingDefaults.attributes[rollStat]?.bonuses;
+		const current = attr?.[rollStat]?.current;
+		if (bonuses && current != null) return bonuses[current] ?? null;
 		return null;
 	}
 

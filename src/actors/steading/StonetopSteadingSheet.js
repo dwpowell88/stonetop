@@ -1,4 +1,5 @@
 import { enrichRichTextTree } from "../../utils/enrichRichText.js";
+import { confirmDelete } from "../../utils/confirmDelete.js";
 
 export function createStonetopSteadingSheetClass(Base) {
 	return class StonetopSteadingSheet extends Base {
@@ -33,6 +34,19 @@ export function createStonetopSteadingSheetClass(Base) {
 			super.activateListeners(html);
 			if (!this.isEditable) return;
 
+			// Destructive deletes route through the shared confirm gate: left-click asks first
+			// (showing the row's `data-name`), right-click skips — same convention as the character sheet.
+			const withConfirm = (selector, run) => {
+				html.find(selector)
+					.on("click", async ev => {
+						if (await confirmDelete(ev.currentTarget.dataset.name)) await run(ev);
+					})
+					.on("contextmenu", async ev => {
+						ev.preventDefault();
+						await run(ev);
+					});
+			};
+
 			// Roll mode
 			html.find("[name=stonetop-roll-mode]").on("change", ev => {
 				this._stonetopSteading.setRollMode(ev.currentTarget.value);
@@ -56,7 +70,7 @@ export function createStonetopSteadingSheetClass(Base) {
 			html.find(".stonetop-attr-extra-add").on("click", async ev => {
 				await this._stonetopSteading.attributes.addNewItemToAttribute(ev.currentTarget.dataset.attr);
 			});
-			html.find(".stonetop-attr-extra-remove").on("click", async ev => {
+			withConfirm(".stonetop-attr-extra-remove", async ev => {
 				const { attr, index } = ev.currentTarget.dataset;
 				await this._stonetopSteading.attributes.removeItemFromAttribute(attr, index);
 			});
@@ -85,7 +99,7 @@ export function createStonetopSteadingSheetClass(Base) {
 			html.find(".stonetop-asset-item-add").on("click", async () => {
 				await this._stonetopSteading.assets.addItem();
 			});
-			html.find(".stonetop-asset-item-remove").on("click", async ev => {
+			withConfirm(".stonetop-asset-item-remove", async ev => {
 				await this._stonetopSteading.assets.removeItem(parseInt(ev.currentTarget.dataset.index));
 			});
 			html.find(".stonetop-asset-item").on("change", async ev => {
@@ -102,7 +116,7 @@ export function createStonetopSteadingSheetClass(Base) {
 			html.find(".stonetop-resident-add").on("click", async () => {
 				await this._stonetopSteading.residents.add();
 			});
-			html.find(".stonetop-resident-remove").on("click", async ev => {
+			withConfirm(".stonetop-resident-remove", async ev => {
 				await this._stonetopSteading.residents.remove(ev.currentTarget.dataset.id);
 			});
 			html.find(".stonetop-resident-name").on("change", async ev => {
@@ -126,7 +140,7 @@ export function createStonetopSteadingSheetClass(Base) {
 			html.find(".stonetop-neighbor-person-add").on("click", async () => {
 				await this._stonetopSteading.neighborPeople.add();
 			});
-			html.find(".stonetop-neighbor-person-remove").on("click", async ev => {
+			withConfirm(".stonetop-neighbor-person-remove", async ev => {
 				await this._stonetopSteading.neighborPeople.remove(ev.currentTarget.dataset.id);
 			});
 			html.find(".stonetop-neighbor-person-name").on("change", async ev => {
