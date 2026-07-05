@@ -35,7 +35,7 @@
 		{{#if back.choices}}
 		<div class="stonetop-arcanum-back-choices">
 			{{#each back.choices.list}}
-			{{> "stonetop.choice-row" cgContext="arcana-back" cgGroup=../slug}}
+			{{> "stonetop.choice-row" cgContext="arcana" cgGroup=../back.choices.slug}}
 			{{/each}}
 		</div>
 		{{/if}}
@@ -43,7 +43,7 @@
 		<div class="stonetop-arcanum-consequences">
 			<p class="stonetop-arcanum-section-label">{{localize "stonetop.arcana.consequences"}}</p>
 			{{#each back.consequences.list}}
-			{{> "stonetop.choice-row"}}
+			{{> "stonetop.choice-row" cgContext="arcana" cgGroup=../back.consequences.slug}}
 			{{/each}}
 		</div>
 		{{/if}}
@@ -61,7 +61,7 @@
 		<div>{{rich front.description}}</div>
 		<div class="stonetop-arcanum-unlock">
 			{{#each front.unlock.list}}
-			{{> "stonetop.choice-row" cgContext="arcana-unlock" cgGroup=../slug}}
+			{{> "stonetop.choice-row" cgContext="arcana" cgGroup=../front.unlock.slug}}
 			{{/each}}
 		</div>
 	</div>

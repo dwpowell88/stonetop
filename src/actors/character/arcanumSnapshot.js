@@ -57,8 +57,7 @@ export function buildArcanumOutfitItem(slug, itemData, resolvedResource = undefi
 
 export function buildArcanumSnapshot(arcanum, {
 	flipped          = false,
-	unlockValues     = new ChoiceValues({}),
-	backChoiceValues = new ChoiceValues({}),
+	choiceValues     = new ChoiceValues({}),
 	followersBySlug  = {},
 	stats            = new Map(),   // empty Map is safe for both `.get(x)` and `[x]?.value` access
 	current          = 0,
@@ -68,12 +67,11 @@ export function buildArcanumSnapshot(arcanum, {
 } = {}) {
 	const item = arcanum;
 
-	// Unlock/back-choice VALUES are keyed by the ARCANUM slug (see migrateArcana + the card's
-	// cgGroup=slug writes). Canonical packs author the group slug == arcanum slug so it lines up,
-	// but a custom arcanum's group keeps its literal slug ("unlock"/"choices"); force the namespace
-	// to the arcanum slug so reads match the writer regardless of how the group was authored.
+	// Every choice group on the arcanum (front.unlock, back.choices, back.consequences) reads and
+	// writes the ONE `choiceValues` store by its OWN slug — the same generic path inserts use. No
+	// forced namespaces, no per-group stores.
 	const unlock = item.front.unlock
-		? ChoiceGroup.fromPackData({ ...item.front.unlock, slug: item.slug }, unlockValues)
+		? ChoiceGroup.fromPackData(item.front.unlock, choiceValues)
 		: null;
 
 	const front = new ArcanumFrontSnapshotBuilder()
@@ -100,11 +98,11 @@ export function buildArcanumSnapshot(arcanum, {
 		: null;
 
 	const backChoices = item.back.choices
-		? ChoiceGroup.fromPackData({ ...item.back.choices, slug: item.slug }, backChoiceValues, followersBySlug)
+		? ChoiceGroup.fromPackData(item.back.choices, choiceValues, followersBySlug)
 		: null;
 
 	const consequences = item.back.consequences
-		? ChoiceGroup.fromPackData(item.back.consequences, new ChoiceValues({}))
+		? ChoiceGroup.fromPackData(item.back.consequences, choiceValues)
 		: null;
 
 	const back = new ArcanumBackSnapshotBuilder()

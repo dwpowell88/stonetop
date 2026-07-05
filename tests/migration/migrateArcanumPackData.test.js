@@ -17,8 +17,7 @@ function makeArcanumItem(slug, overrides = {}) {
 			front:            overrides.front ?? {},
 			back:             overrides.back  ?? {},
 			flipped:          false,
-			unlockValues:     {},
-			backChoiceValues: {},
+			choiceValues:     {},
 		},
 	};
 }

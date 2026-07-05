@@ -44,6 +44,7 @@ export async function migrateCharacter(actor, repos, insertRepo = null) {
 	_logArcanumFlipped(actor, "after migrateArcanumPackData");
 	await migrateArcanaMoves(actor, repos.arcana, repos.moves);
 	_logArcanumFlipped(actor, "after migrateArcanaMoves");
+	await migrateArcanumChoiceGroupSlugs(actor);
 	await migrateFollowers(actor, repos.followers, resourceController);
 	_logArcanumFlipped(actor, "after migrateFollowers");
 
@@ -274,18 +275,19 @@ export async function migrateArcana(actor, arcanaRepo, followerRepo) {
 		const item = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === slug);
 		info(`migrateArcana [${slug}]: item found=${!!item} id=${item?._id} currentFlipped=${item?.system?.flipped}`);
 		if (!item) continue;
+		// Unlock + back-choice groups are both namespaced by the arcanum slug, so they share the arcanum
+		// slug as their key in the single `choiceValues` store.
 		const update = {
 			_id: item._id,
 			system: {
-				flipped:          flippedSet.has(slug),
-				unlockValues:     { [slug]: unlockMap[slug] ?? {} },
-				backChoiceValues: { [slug]: backMap[slug]   ?? {} },
+				flipped:      flippedSet.has(slug),
+				choiceValues: { [slug]: { ...(unlockMap[slug] ?? {}), ...(backMap[slug] ?? {}) } },
 			},
 		};
-		info(`migrateArcana [${slug}]: sending update flipped=${update.system.flipped} unlockValues=${JSON.stringify(update.system.unlockValues)}`);
+		info(`migrateArcana [${slug}]: sending update flipped=${update.system.flipped} choiceValues=${JSON.stringify(update.system.choiceValues)}`);
 		await actor.updateEmbeddedDocuments("Item", [update]);
 		const after = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === slug);
-		info(`migrateArcana [${slug}]: after update flipped=${after?.system?.flipped} unlockValues=${JSON.stringify(after?.system?.unlockValues)}`);
+		info(`migrateArcana [${slug}]: after update flipped=${after?.system?.flipped} choiceValues=${JSON.stringify(after?.system?.choiceValues)}`);
 	}
 }
 
@@ -315,6 +317,24 @@ export async function migrateArcanaMoves(actor, arcanaRepo, moveRepo) {
 		const moveSlugs = back.moveSlugs ?? [];
 		if (moveSlugs.length) await moves.addCategory(`arcana-${slug}`, item.name ?? slug, moveSlugs, []);
 	}
+}
+
+// Normalize each embedded arcanum's back-choices group slug to the arcanum's own slug. Two
+// hand-authored arcana (blackwood-fetishes, mindgem) shipped with `back.choices.slug: "followers"`,
+// but the group is namespaced by the arcanum slug everywhere else in the pipeline (write, read,
+// side-effect def lookup). The mismatch made the choice-group side effect silently no-op, so ticking
+// a follower box never embedded the follower. Idempotent; only touches items that actually differ.
+export async function migrateArcanumChoiceGroupSlugs(actor) {
+	const updates = [];
+	for (const item of actor.items) {
+		if (item.type !== "arcanum") continue;
+		const slug      = item.system?.slug;
+		const back      = item.system?.back;
+		const groupSlug = back?.choices?.slug;
+		if (!slug || groupSlug == null || groupSlug === slug) continue;
+		updates.push({ _id: item._id, system: { back: { ...back, choices: { ...back.choices, slug } } } });
+	}
+	if (updates.length) await actor.updateEmbeddedDocuments("Item", updates);
 }
 
 // ── G. Follower items ─────────────────────────────────────────────────────────
@@ -391,13 +411,12 @@ export async function migrateEmbeddedEquipment(actor) {
 			img:    item.img ?? null,
 			type:   "arcanum",
 			system: {
-				slug:             sys.slug   ?? null,
-				major:            sys.major  ?? false,
-				front:            sys.front,
-				back:             sys.back,
-				flipped:          false,
-				unlockValues:     {},
-				backChoiceValues: {},
+				slug:         sys.slug   ?? null,
+				major:        sys.major  ?? false,
+				front:        sys.front,
+				back:         sys.back,
+				flipped:      false,
+				choiceValues: {},
 			},
 		}]);
 		await actor.deleteEmbeddedDocuments("Item", [item._id]);

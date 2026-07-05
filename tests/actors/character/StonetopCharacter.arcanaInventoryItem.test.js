@@ -27,7 +27,7 @@ function arcanumWithFrontItem() {
 				item: { name: "Azure Hand", weight: 1, tags: "close, magical, awkward", note: null, inventoryColumn: "regular" },
 			},
 			back: { title: "Mysteries", description: "the back", moveSlugs: [] },
-			unlockValues: {}, backChoiceValues: {},
+			choiceValues: {},
 		},
 	};
 }

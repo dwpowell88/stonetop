@@ -29,8 +29,7 @@ function makeArcanumItem(data, overrides = {}) {
 			front:            data.front,
 			back:             data.back,
 			flipped:          overrides.flipped ?? false,
-			unlockValues:     overrides.unlockValues ?? {},
-			backChoiceValues: overrides.backChoices ?? {},
+			choiceValues:     overrides.choiceValues ?? {},
 		},
 	};
 }
@@ -248,7 +247,7 @@ describe("CharacterArcana.buildSnapshot()", () => {
 		});
 
 		it("heading+track checks reflect saved unlock values", async () => {
-			const row = (await getItem({ unlockValues: { "huge-wooden-sphere": { "dig-sphere": 1 } } })).front.unlock.list[2];
+			const row = (await getItem({ choiceValues: { "huge-wooden-sphere": { "dig-sphere": 1 } } })).front.unlock.list[2];
 			expect(row.track.checks).toEqual([true]);
 		});
 	});
@@ -350,19 +349,37 @@ describe("CharacterArcana.buildSnapshot()", () => {
 			expect(snap.minor.items[0].flipped).toBe(false);
 		});
 
-		it("setUnlockCount is reflected in buildSnapshot unlock check state", async () => {
+		it("setChoiceCount on the unlock group is reflected in buildSnapshot unlock check state", async () => {
 			const arcana = makeArcana([makeArcanumItem(FFYRNIG_SPHERE)]);
-			await arcana.setUnlockCount("huge-wooden-sphere", "dig-sphere", 1);
+			await arcana.setChoiceCount("huge-wooden-sphere", "huge-wooden-sphere", "dig-sphere", 1);
 			const snap = await arcana.buildSnapshot();
 			const row = snap.minor.items[0].front.unlock.list[2];
 			expect(row.track.checks).toEqual([true]);
 		});
 
-		it("setBackChoiceValue is reflected in buildSnapshot back choices track", async () => {
+		it("setChoiceCount on the back-choices group is reflected in buildSnapshot back choices track", async () => {
 			const arcana = makeArcana([makeArcanumItem(CRACKED_FLUTE)]);
-			await arcana.setBackChoiceValue("cracked-flute", "andalau-of-the-flute", 1);
+			await arcana.setChoiceCount("cracked-flute", "cracked-flute", "andalau-of-the-flute", 1);
 			const snap = await arcana.buildSnapshot();
 			expect(snap.minor.items[0].back.choices.list[0].track.checks).toEqual([true]);
+		});
+
+		it("selectChoice writes the picked option under the group slug and clears its siblings", async () => {
+			const item = makeArcanumItem({
+				slug: "picky",
+				front: { unlock: { slug: "picky", list: [{ type: "pick", options: [{ slug: "a" }, { slug: "b" }] }] } },
+				back: {},
+			});
+			const arcana = makeArcana([item], [{ slug: "picky" }]);
+			await arcana.selectChoice("picky", "picky", "a", "a,b");
+			expect(item.system.choiceValues).toEqual({ picky: { a: 1, b: 0 } });
+		});
+
+		it("setChoiceText writes the input text under the group slug", async () => {
+			const item = makeArcanumItem({ slug: "texty", front: { unlock: { slug: "texty", list: [] } }, back: {} });
+			const arcana = makeArcana([item], [{ slug: "texty" }]);
+			await arcana.setChoiceText("texty", "texty", "note-input", "hello");
+			expect(item.system.choiceValues).toEqual({ texty: { "note-input": "hello" } });
 		});
 	});
 });
@@ -689,7 +706,7 @@ describe("CharacterArcana — follower sync", () => {
 		await expect(arcana.flipArcanum("cracked-flute")).resolves.not.toThrow();
 	});
 
-	it("setBackChoiceValue with count>0 embeds follower as owned=true", async () => {
+	it("setChoiceCount>0 on back-choices embeds follower as owned=true", async () => {
 		const actor = makeActor();
 		const followerRepo = new FakeFollowerRepository([{
 			slug: "andalau-of-the-flute", name: "The Andalau", tags: null,
@@ -701,15 +718,15 @@ describe("CharacterArcana — follower sync", () => {
 		factory.register(new FollowerSideEffectHandler(followers));
 		const charArcana = new CharacterArcana(actor, new FakeArcanaRepository(), null, null, followers, factory);
 		actor.items.push(makeArcanumItem(CRACKED_FLUTE));
-		await charArcana.setBackChoiceValue("cracked-flute", "andalau-of-the-flute", 1);
+		await charArcana.setChoiceCount("cracked-flute", "cracked-flute", "andalau-of-the-flute", 1);
 		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
 		expect(followerItem?.system?.owned).toBe(true);
 	});
 
-	it("setBackChoiceValue with count=0 removes follower", async () => {
+	it("setChoiceCount=0 on back-choices removes follower", async () => {
 		const { actor, charArcana, followers } = makeArcanaWithFollowers([makeArcanumItem(CRACKED_FLUTE)]);
 		actor.items.push(makeNpcItem("andalau-of-the-flute", { owned: true }));
-		await charArcana.setBackChoiceValue("cracked-flute", "andalau-of-the-flute", 0);
+		await charArcana.setChoiceCount("cracked-flute", "cracked-flute", "andalau-of-the-flute", 0);
 		const followerItem = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
 		expect(followerItem).toBeUndefined();
 	});
@@ -733,7 +750,7 @@ describe("CharacterArcana — follower sync", () => {
 		expect(row.followers.map(f => f.slug)).toEqual(["andalau-of-the-flute"]);
 
 		// Checking the box owns the follower (adds it to the tab); it still shows on the card.
-		await charArcana.setBackChoiceValue("cracked-flute", "andalau-of-the-flute", 1);
+		await charArcana.setChoiceCount("cracked-flute", "cracked-flute", "andalau-of-the-flute", 1);
 		const owned = [...actor.items].find(i => i.type === "npc" && i.system?.slug === "andalau-of-the-flute");
 		expect(owned?.system?.owned).toBe(true);
 		snap = await charArcana.buildSnapshot();
@@ -787,7 +804,7 @@ describe("CharacterArcana.buildSnapshot() — back.choices", () => {
 
 	it("EntryRow.track.checks is [true] when backChoices count is 1", async () => {
 		const { charArcana } = makeArcanaWithFollowers([
-			makeArcanumItem(CRACKED_FLUTE, { backChoices: { "cracked-flute": { "andalau-of-the-flute": 1 } } }),
+			makeArcanumItem(CRACKED_FLUTE, { choiceValues: { "cracked-flute": { "andalau-of-the-flute": 1 } } }),
 		]);
 		const snap = await charArcana.buildSnapshot();
 		expect(snap.minor.items[0].back.choices.list[0].track.checks).toEqual([true]);

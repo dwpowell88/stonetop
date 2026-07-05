@@ -26,13 +26,12 @@ export async function migrateWorldItems() {
 			folder: item.folder?.id ?? null,
 			type:   "arcanum",
 			system: {
-				slug:             sys.slug  ?? null,
-				major:            sys.major ?? false,
-				front:            sys.front,
-				back:             sys.back,
-				flipped:          false,
-				unlockValues:     {},
-				backChoiceValues: {},
+				slug:         sys.slug  ?? null,
+				major:        sys.major ?? false,
+				front:        sys.front,
+				back:         sys.back,
+				flipped:      false,
+				choiceValues: {},
 			},
 		});
 		await item.delete();

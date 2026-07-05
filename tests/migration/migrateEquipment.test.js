@@ -56,8 +56,7 @@ describe("migrateEmbeddedEquipment — arcana conversion", () => {
 		await migrateEmbeddedEquipment(actor);
 		const created = actor.createdDocs[0];
 		expect(created.system.flipped).toBe(false);
-		expect(created.system.unlockValues).toEqual({});
-		expect(created.system.backChoiceValues).toEqual({});
+		expect(created.system.choiceValues).toEqual({});
 	});
 
 	it("deletes the old equipment item", async () => {

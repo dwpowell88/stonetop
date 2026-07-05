@@ -31,10 +31,9 @@ export class CharacterArcana {
 		const stats = this._stats?.getStats() ?? {};
 		const arcanumItems = [...this._actor.items].filter(i => i.type === "arcanum");
 
-		const fetchedItems    = arcanumItems.map(i => _itemToArcanum(i));
-		const flippedBySlug   = new Map(arcanumItems.map(i => [i.system?.slug, i.system?.flipped ?? false]));
-		const unlockBySlug    = new Map(arcanumItems.map(i => [i.system?.slug, new ChoiceValues(i.system?.unlockValues ?? {})]));
-		const backChoiceBySlug = new Map(arcanumItems.map(i => [i.system?.slug, new ChoiceValues(i.system?.backChoiceValues ?? {})]));
+		const fetchedItems     = arcanumItems.map(i => _itemToArcanum(i));
+		const flippedBySlug    = new Map(arcanumItems.map(i => [i.system?.slug, i.system?.flipped ?? false]));
+		const choiceValuesBySlug = new Map(arcanumItems.map(i => [i.system?.slug, new ChoiceValues(i.system?.choiceValues ?? {})]));
 
 		const allLinkedSlugs = fetchedItems.flatMap(item => this._followerSlugsFor(item));
 		const followerSnapshots = this._followers
@@ -43,9 +42,8 @@ export class CharacterArcana {
 		const followersBySlug = Object.fromEntries(followerSnapshots.map(f => [f.slug, f]));
 
 		const snapshots = await Promise.all(fetchedItems.map(async item => buildArcanumSnapshot(item, {
-			flipped:          flippedBySlug.get(item.slug)    ?? false,
-			unlockValues:     unlockBySlug.get(item.slug)     ?? new ChoiceValues({}),
-			backChoiceValues: backChoiceBySlug.get(item.slug) ?? new ChoiceValues({}),
+			flipped:          flippedBySlug.get(item.slug)      ?? false,
+			choiceValues:     choiceValuesBySlug.get(item.slug) ?? new ChoiceValues({}),
 			followersBySlug,
 			stats,
 			current:          resourceController?.getCurrent("inventory", item.slug) ?? 0,
@@ -77,7 +75,7 @@ export class CharacterArcana {
 			system: {
 				slug: arcanum.slug, major: arcanum.major,
 				front: arcanum.front, back: arcanum.back,
-				flipped: false, unlockValues: {}, backChoiceValues: {},
+				flipped: false, choiceValues: {},
 			},
 		}]);
 		await this.onArcanumCreated({ system: { slug, front: arcanum.front, back: arcanum.back } });
@@ -117,32 +115,29 @@ export class CharacterArcana {
 		await this._syncSideEffects(slug);
 	}
 
-	async setUnlockCount(arcanumSlug, optionSlug, count) {
+	// Every arcanum choice group (front.unlock, back.choices, back.consequences) persists through the
+	// ONE `choiceValues` store, namespaced by the group's OWN slug — the same generic path inserts use.
+	// `groupSlug` is the choice group's slug; side effects (followers/outfit items) fire via the shared
+	// handlers when the resolved group def carries them.
+	async setChoiceCount(arcanumSlug, groupSlug, optionSlug, count) {
 		const item = _findArcanumItem(this._actor, arcanumSlug);
 		if (!item) return;
-		await this._factory.forItem(item._id, "unlockValues")
-			.setCount(arcanumSlug, optionSlug, count);
+		await this._factory.forItem(item._id, "choiceValues")
+			.setCount(groupSlug, optionSlug, count);
 	}
 
-	async setUnlockPick(arcanumSlug, optionSlug, siblingsCsv) {
+	async selectChoice(arcanumSlug, groupSlug, optionSlug, siblingsCsv) {
 		const item = _findArcanumItem(this._actor, arcanumSlug);
 		if (!item) return;
-		await this._factory.forItem(item._id, "unlockValues")
-			.selectOption(arcanumSlug, optionSlug, siblingsCsv);
+		await this._factory.forItem(item._id, "choiceValues")
+			.selectOption(groupSlug, optionSlug, siblingsCsv);
 	}
 
-	async setUnlockText(arcanumSlug, optionSlug, text) {
+	async setChoiceText(arcanumSlug, groupSlug, optionSlug, text) {
 		const item = _findArcanumItem(this._actor, arcanumSlug);
 		if (!item) return;
-		await this._factory.forItem(item._id, "unlockValues")
-			.setText(arcanumSlug, optionSlug, text);
-	}
-
-	async setBackChoiceValue(arcanumSlug, optionSlug, count) {
-		const item = _findArcanumItem(this._actor, arcanumSlug);
-		if (!item) return;
-		await this._factory.forItem(item._id, "backChoiceValues")
-			.setCount(arcanumSlug, optionSlug, count);
+		await this._factory.forItem(item._id, "choiceValues")
+			.setText(groupSlug, optionSlug, text);
 	}
 
 	async _syncSideEffects(slug) {

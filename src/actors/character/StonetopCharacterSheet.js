@@ -232,6 +232,12 @@ export function createStonetopCharacterSheetClass(Base) {
 						insertEl.dataset.insertItemId, cgGroup, cgOption, count);
 					return;
 				}
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (arcEl) {
+					await this._stonetopCharacter.setArcanumChoiceCount(
+						arcEl.dataset.slug, cgGroup, cgOption, count);
+					return;
+				}
 				this._stonetopCharacter.setChoiceCount(cgContext, cgGroup, cgOption, count);
 			}, true);
 
@@ -244,6 +250,12 @@ export function createStonetopCharacterSheetClass(Base) {
 					insertEl.querySelector(".stonetop-instinct-custom").value = displayLabel ?? "";
 					await this._stonetopCharacter.setInsertChoicePick(
 						insertEl.dataset.insertItemId, cgGroup, cgOption, cgSiblings ?? null);
+					return;
+				}
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (arcEl) {
+					await this._stonetopCharacter.selectArcanumChoice(
+						arcEl.dataset.slug, cgGroup, cgOption, cgSiblings ?? null);
 					return;
 				}
 				if (cgContext === "instinct") {
@@ -277,6 +289,12 @@ export function createStonetopCharacterSheetClass(Base) {
 						insertEl.dataset.insertItemId, cgGroup, cgOption, el.value);
 					return;
 				}
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (arcEl) {
+					await this._stonetopCharacter.setArcanumChoiceText(
+						arcEl.dataset.slug, cgGroup, cgOption, el.value);
+					return;
+				}
 				this._stonetopCharacter.setChoiceText(cgContext, cgGroup, cgOption, el.value);
 			}, true);
 
@@ -285,8 +303,9 @@ export function createStonetopCharacterSheetClass(Base) {
 				if (!el) return;
 				const { cgContext, slug: groupSlug, option: optionSlug, index } = el.dataset;
 				const count = el.checked ? Number(index) + 1 : Number(index);
-				if (cgContext === "arcana-back") {
-					await this._stonetopCharacter.setArcanumBackChoiceValue(groupSlug, optionSlug, count);
+				if (cgContext === "arcana") {
+					const arcEl = el.closest(".stonetop-arcanum-card");
+					await this._stonetopCharacter.setArcanumChoiceCount(arcEl.dataset.slug, groupSlug, optionSlug, count);
 				} else if (cgContext === "background") {
 					await this._stonetopCharacter.setChoiceCount(cgContext, groupSlug, optionSlug, count);
 				}

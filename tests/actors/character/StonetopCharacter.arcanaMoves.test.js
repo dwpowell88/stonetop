@@ -27,7 +27,7 @@ function majorArcanumItem(moveSlugs) {
 			slug: "azure-hand", major: true, flipped: true,
 			front: { title: "Azure Hand", description: null, item: null, unlock: null },
 			back:  { title: "Mysteries", description: "the back", moveSlugs },
-			unlockValues: {}, backChoiceValues: {},
+			choiceValues: {},
 		},
 	};
 }
