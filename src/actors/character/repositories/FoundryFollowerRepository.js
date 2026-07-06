@@ -14,13 +14,13 @@ export class FoundryFollowerRepository {
 		const entry = await this._store.findEntry(e => e.system?.slug === slug);
 		if (entry) {
 			const doc      = await this._store.getDocument(entry._id);
-			const follower = new Follower({ name: doc.name, ...doc.system });
+			const follower = new Follower({ name: doc.name, img: doc.img, ...doc.system });
 			this._cache.set(slug, follower);
 			return follower;
 		}
 		const worldEntry = await this._worldStore.findEntry(e => e.system?.slug === slug);
 		if (!worldEntry) return null;
-		const follower = new Follower({ name: worldEntry.name, ...worldEntry.system });
+		const follower = new Follower({ name: worldEntry.name, img: worldEntry.img, ...worldEntry.system });
 		this._cache.set(slug, follower);
 		return follower;
 	}

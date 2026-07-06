@@ -21,6 +21,7 @@ export class FollowerSnapshot {
 	constructor(b) {
 		this.slug           = b._slug;
 		this.name           = b._name;
+		this.img            = b._img ?? null;
 		this.tagSelection   = Selection.fromStored(b._tags);
 		this.tags           = this.tagSelection.text;   // display string (back-compat)
 		this.isGroup        = this.tagSelection.has("group");
@@ -40,7 +41,6 @@ export class FollowerSnapshot {
 		this.description    = b._description;
 		this.notes          = rich(b._notes ?? "");
 		this.choices        = b._choices;
-		this.arcanaSlug     = b._arcanaSlug ?? null;
 		// Group members (only meaningful when isGroup): each owns its HP + name/tags/traits.
 		// Member tags/traits store only `selected`; options come from the group's suggestions.
 		const sugg = b._memberSuggestions ?? { names: [], tags: [], traits: [] };
@@ -81,6 +81,7 @@ export class FollowerSnapshot {
 export class FollowerSnapshotBuilder {
 	withSlug(v)            { this._slug            = v; return this; }
 	withName(v)            { this._name            = v; return this; }
+	withImg(v)             { this._img             = v; return this; }
 	withTags(v)            { this._tags            = v; return this; }
 	withHp(v)              { this._hp              = v; return this; }
 	withHpMax(v)           { this._hpMax           = v; return this; }
@@ -94,7 +95,6 @@ export class FollowerSnapshotBuilder {
 	withDescription(v)     { this._description     = v; return this; }
 	withNotes(v)           { this._notes           = v; return this; }
 	withChoices(v)         { this._choices         = v; return this; }
-	withArcanaSlug(v)      { this._arcanaSlug      = v; return this; }
 	withMembers(v)         { this._members         = v; return this; }
 	withMemberSuggestions(v) { this._memberSuggestions = v; return this; }
 	withMembersNote(v)     { this._membersNote      = v; return this; }

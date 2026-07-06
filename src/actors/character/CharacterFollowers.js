@@ -83,6 +83,7 @@ export class CharacterFollowers {
 		if (!follower) return;
 		await this._actor.createEmbeddedDocuments("Item", [{
 			name: follower.name, type: "npc",
+			...(follower.img ? { img: follower.img } : {}),
 			system: { ..._followerToSystemFields(follower), owned: true },
 		}]);
 	}
@@ -107,6 +108,7 @@ export class CharacterFollowers {
 			if (_findFollowerItem(this._actor, follower.slug)) continue;
 			await this._actor.createEmbeddedDocuments("Item", [{
 				name: follower.name, type: "npc",
+				...(follower.img ? { img: follower.img } : {}),
 				system: { ..._followerToSystemFields(follower), owned: true },
 				flags: { stonetop: { grantedByPlaybook: playbookSlug } },
 			}]);
@@ -134,6 +136,7 @@ export class CharacterFollowers {
 		const [blank] = await this._followerRepo.findBySlugs(["blank"]);
 		await this._actor.createEmbeddedDocuments("Item", [{
 			name: blank?.name ?? "New Follower", type: "npc",
+			...(blank?.img ? { img: blank.img } : {}),
 			system: {
 				slug, arcanaSlug: null, tagList: Selection.fromStored(blank?.tags).toRaw(), owned: true, choiceValues: {},
 				hp:      { value: blank?.hp?.max ?? 6, max: blank?.hp?.max ?? 6 },
@@ -152,6 +155,7 @@ export class CharacterFollowers {
 		const [blank] = await this._followerRepo.findBySlugs(["blank"]);
 		await this._actor.createEmbeddedDocuments("Item", [{
 			name: npcActor.name, type: "npc",
+			...(npcActor.img ? { img: npcActor.img } : {}),
 			system: {
 				// creature core copied from the NPC (shared schema → direct copy)
 				tagList:   Selection.fromStored(sys.tagList).toRaw(),
@@ -358,7 +362,7 @@ export class CharacterFollowers {
 		if (previewSlugs.length) {
 			const previews = await this._followerRepo.findBySlugs(previewSlugs);
 			for (const follower of previews) {
-				const item = { name: follower.name, system: { ..._followerToSystemFields(follower), owned: false } };
+				const item = { name: follower.name, img: follower.img ?? null, system: { ..._followerToSystemFields(follower), owned: false } };
 				result.push(this._buildFollowerSnapshotFromItem(item, repoItems));
 			}
 		}
@@ -375,6 +379,7 @@ export class CharacterFollowers {
 		return new FollowerSnapshotBuilder()
 			.withSlug(sys.slug)
 			.withName(item.name)
+			.withImg(item.img ?? null)
 			.withTags(sys.tagList ?? null)
 			.withHp(sys.hp?.value ?? 0)
 			.withHpMax(sys.hp?.max ?? 0)
@@ -387,7 +392,6 @@ export class CharacterFollowers {
 			.withDescription(sys.description ?? "")
 			.withNotes(sys.notes ?? "")
 			.withChoices(sys.choices?.length ? ChoiceGroup.fromPackData(sys.choices[0], values) : null)
-			.withArcanaSlug(sys.arcanaSlug ?? null)
 			.withMembers(sys.members ?? [])
 			.withMemberSuggestions(sys.memberSuggestions ?? { names: [], tags: [], traits: [] })
 			.withMembersNote(sys.membersNote ?? "")

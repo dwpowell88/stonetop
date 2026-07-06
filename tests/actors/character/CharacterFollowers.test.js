@@ -423,6 +423,28 @@ describe("CharacterFollowers.buildSnapshot", () => {
 		expect(snap.tags).toBe("Bird-wise, innocent");
 	});
 
+	it("img reflects the follower's pack icon", async () => {
+		const withArt = new Follower({ slug: "art", name: "Arty", img: "systems/stonetop/assets/content/icons/npc.png" });
+		const cf = makeCf(new FakeFollowerRepository([withArt]));
+		await cf.addFollower("art");
+		const [snap] = await cf.buildSnapshot();
+		expect(snap.img).toBe("systems/stonetop/assets/content/icons/npc.png");
+	});
+
+	it("img is null when the follower has no icon", async () => {
+		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
+		await cf.addFollower("enfys");
+		const [snap] = await cf.buildSnapshot();
+		expect(snap.img).toBeNull();
+	});
+
+	it("a linked-but-unowned preview follower carries its pack img", async () => {
+		const withArt = new Follower({ slug: "preview-art", name: "Preview", img: "systems/stonetop/assets/content/icons/npc.png" });
+		const cf = makeCf(new FakeFollowerRepository([withArt]));
+		const [snap] = await cf.buildSnapshot(["preview-art"]);
+		expect(snap.img).toBe("systems/stonetop/assets/content/icons/npc.png");
+	});
+
 	it("hp defaults to hp.value when no state", async () => {
 		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
 		await cf.addFollower("enfys");
@@ -709,36 +731,6 @@ describe("CharacterFollowers — custom follower snapshot", () => {
 	});
 });
 
-// -- Tests: arcanaSlug propagation --------------------------------------------
-
-describe("CharacterFollowers — arcanaSlug", () => {
-	const BRONZE_PROTECTOR_DATA = {
-		slug:       "bronze-protector",
-		name:       "Bronze protector",
-		tags:       "Construct, spirit, durable",
-		hp:         { value: 13, max: 13 },
-		armor:      "3",
-		damage:     "pummel d8 (band)",
-		instinct:   "",
-		loyalty:    { value: 0, max: 3 },
-		arcanaSlug: "metal-man",
-	};
-	const BRONZE_PROTECTOR = new Follower(BRONZE_PROTECTOR_DATA);
-
-	it("arcanaSlug is null for regular followers", async () => {
-		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
-		await cf.addFollower("enfys");
-		const [snap] = await cf.buildSnapshot();
-		expect(snap.arcanaSlug).toBeNull();
-	});
-
-	it("arcanaSlug is propagated from pack data to snapshot", async () => {
-		const cf = makeCf(new FakeFollowerRepository([BRONZE_PROTECTOR]));
-		await cf.addFollower("bronze-protector");
-		const [snap] = await cf.buildSnapshot();
-		expect(snap.arcanaSlug).toBe("metal-man");
-	});
-});
 
 // -- Tests: addFromNpcActor (drag an NPC actor onto the sheet) -----------------
 
