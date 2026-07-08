@@ -9,6 +9,9 @@ import { createStonetopMoveSheetClass } from "./src/item/StonetopMoveSheet.js";
 import { createStonetopInsertSheetClass } from "./src/item/StonetopInsertSheet.js";
 import { createStonetopArcanumSheetClass } from "./src/item/StonetopArcanumSheet.js";
 import { createStonetopPossessionSheetClass } from "./src/item/StonetopPossessionSheet.js";
+import { createStonetopFollowerSheetClass } from "./src/item/StonetopFollowerSheet.js";
+import { createStonetopImprovementSheetClass } from "./src/item/StonetopImprovementSheet.js";
+import { withSheetSizeMemory } from "./src/utils/withSheetSizeMemory.js";
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
@@ -25,7 +28,7 @@ import { ArcanumData }     from "./src/data/ArcanumData.js";
 import { PlaybookData }    from "./src/data/PlaybookData.js";
 import { InsertData }      from "./src/data/InsertData.js";
 import { ImprovementData } from "./src/data/ImprovementData.js";
-import { NpcItemData }     from "./src/data/NpcItemData.js";
+import { FollowerData }    from "./src/data/FollowerData.js";
 import { OutfitItemData }  from "./src/data/OutfitItemData.js";
 import { PossessionData }  from "./src/data/PossessionData.js";
 import "./src/dev/quenchTests.js"; // registers in-Foundry integration tests (no-op unless Quench is installed)
@@ -45,7 +48,8 @@ Hooks.once("init", () => {
 		playbook:    PlaybookData,
 		insert:      InsertData,
 		improvement: ImprovementData,
-		npc:         NpcItemData,
+		follower:    FollowerData,
+		npc:         FollowerData, // legacy alias: pre-rename follower items still load, then migrate to `follower`
 		outfitItem:  OutfitItemData,
 		possession:  PossessionData,
 	});
@@ -129,32 +133,49 @@ Hooks.once("init", () => {
 		label: "Stonetop Steading Sheet",
 	});
 
-	const StonetopMoveSheet = createStonetopMoveSheetClass(foundry.appv1.sheets.ItemSheet);
+	// All item sheets share the size-memory mixin (actor sheets get it via StonetopActorSheet).
+	const ItemSheetBase = withSheetSizeMemory(foundry.appv1.sheets.ItemSheet);
+
+	const StonetopMoveSheet = createStonetopMoveSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopMoveSheet, {
 		types: ["move"],
 		makeDefault: true,
 		label: "Stonetop Move Sheet",
 	});
 
-	const StonetopInsertSheet = createStonetopInsertSheetClass(foundry.appv1.sheets.ItemSheet);
+	const StonetopInsertSheet = createStonetopInsertSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopInsertSheet, {
 		types: ["insert"],
 		makeDefault: true,
 		label: "Stonetop Insert Sheet",
 	});
 
-	const StonetopArcanumSheet = createStonetopArcanumSheetClass(foundry.appv1.sheets.ItemSheet);
+	const StonetopArcanumSheet = createStonetopArcanumSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopArcanumSheet, {
 		types: ["arcanum"],
 		makeDefault: true,
 		label: "Stonetop Arcanum Sheet",
 	});
 
-	const StonetopPossessionSheet = createStonetopPossessionSheetClass(foundry.appv1.sheets.ItemSheet);
+	const StonetopPossessionSheet = createStonetopPossessionSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopPossessionSheet, {
 		types: ["possession"],
 		makeDefault: true,
 		label: "Stonetop Possession Sheet",
+	});
+
+	const StonetopFollowerSheet = createStonetopFollowerSheetClass(ItemSheetBase);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopFollowerSheet, {
+		types: ["follower", "npc"], // "npc" = legacy items awaiting migration to "follower"
+		makeDefault: true,
+		label: "Stonetop Follower Sheet",
+	});
+
+	const StonetopImprovementSheet = createStonetopImprovementSheetClass(ItemSheetBase);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopImprovementSheet, {
+		types: ["improvement"],
+		makeDefault: true,
+		label: "Stonetop Steading Improvement Sheet",
 	});
 
 	foundry.applications.handlebars.loadTemplates({
@@ -173,6 +194,7 @@ Hooks.once("init", () => {
 		"stonetop.follower-inventory": "systems/stonetop/templates/actor/partials/follower-inventory.hbs",
 		"stonetop.outfit-items":       "systems/stonetop/templates/actor/partials/outfit-items.hbs",
 		"stonetop.editable-field":   "systems/stonetop/templates/actor/partials/editable-field.hbs",
+		"stonetop.editable-rich-block": "systems/stonetop/templates/actor/partials/editable-rich-block.hbs",
 		"stonetop.tab-insert":        "systems/stonetop/templates/actor/partials/tab-insert.hbs",
 		"stonetop.tab-notes":         "systems/stonetop/templates/actor/partials/tab-notes.hbs",
 		"stonetop.selection-chips":   "systems/stonetop/templates/actor/partials/selection-chips.hbs",
@@ -183,6 +205,7 @@ Hooks.once("init", () => {
 		"stonetop.move-item":        "systems/stonetop/templates/actor/partials/move-item.hbs",
 		"stonetop.choice-group":     "systems/stonetop/templates/actor/partials/choice-group.hbs",
 		"stonetop.choice-row":       "systems/stonetop/templates/actor/partials/choice-row.hbs",
+		"stonetop.improvement-group": "systems/stonetop/templates/actor/partials/improvement-group.hbs",
 		"stonetop.choice-section":   "systems/stonetop/templates/actor/partials/lore-section.hbs",
 		"stonetop.section-heading":  "systems/stonetop/templates/actor/partials/section-heading.hbs",
 		"stonetop.section-sub-heading":  "systems/stonetop/templates/actor/partials/section-sub-heading.hbs",
@@ -195,6 +218,10 @@ Hooks.once("init", () => {
 		"stonetop.arcanum-item-def":      "systems/stonetop/templates/item/partials/arcanum-item-def.hbs",
 		"stonetop.arcanum-resource":      "systems/stonetop/templates/item/partials/arcanum-resource.hbs",
 		"stonetop.arcanum-mystery-move":  "systems/stonetop/templates/item/partials/arcanum-mystery-move.hbs",
+		"stonetop.string-list-editor":         "systems/stonetop/templates/item/partials/string-list-editor.hbs",
+		"stonetop.follower-selection-field":   "systems/stonetop/templates/item/partials/follower-selection-field.hbs",
+		"stonetop.follower-member-editor":     "systems/stonetop/templates/item/partials/follower-member-editor.hbs",
+		"stonetop.follower-companion-type":    "systems/stonetop/templates/item/partials/follower-companion-type.hbs",
 	});
 });
 

@@ -11,7 +11,9 @@ import { migrateChoiceRow } from "./migrateChoices.js";
 const SCOPE = "stonetop";
 
 const VALID_ITEM_TYPES = new Set([
-	"move", "playbook", "possession", "arcanum", "npc", "insert", "outfitItem", "equipment",
+	// "npc" kept alongside "follower" so pre-rename follower items survive migrateStaleItemTypes long
+	// enough for migrateFollowerItemType to convert them.
+	"move", "playbook", "possession", "arcanum", "follower", "npc", "insert", "outfitItem", "equipment",
 ]);
 
 // ── Public exports ────────────────────────────────────────────────────────────
@@ -21,6 +23,21 @@ export async function migrateStaleItemTypes(actor) {
 	if (stale.length) await actor.deleteEmbeddedDocuments("Item", stale.map(i => i._id));
 }
 
+// The follower Item type was renamed `npc` → `follower`. Foundry can't change a document's `type` in
+// place, so recreate each legacy `npc` item as `follower` (preserving name/img/flags/system) and
+// delete the original. Followers match by slug (not _id) and loyalty is slug-keyed in flags, so the
+// new _ids are harmless. Same create-then-delete pattern as migrateWorldItems (equipment → arcanum).
+export async function migrateFollowerItemType(actor) {
+	const legacy = [...actor.items].filter(i => i.type === "npc");
+	if (!legacy.length) return;
+	const created = legacy.map(i => {
+		const o = i.toObject?.() ?? i;
+		return { name: o.name, img: o.img ?? null, type: "follower", system: o.system ?? {}, flags: o.flags ?? {} };
+	});
+	await actor.createEmbeddedDocuments("Item", created);
+	await actor.deleteEmbeddedDocuments("Item", legacy.map(i => i._id));
+}
+
 function _logArcanumFlipped(actor, label) {
 	const arcanums = [...actor.items].filter(i => i.type === "arcanum");
 	for (const a of arcanums) info(`  [${label}] ${a.system?.slug}: flipped=${a.system?.flipped}`);
@@ -28,6 +45,7 @@ function _logArcanumFlipped(actor, label) {
 
 export async function migrateCharacter(actor, repos, insertRepo = null) {
 	await migrateStaleItemTypes(actor);
+	await migrateFollowerItemType(actor);
 	await migrateCharacterFlags(actor);
 	await migrateEmbeddedMoveSlugs(actor);
 	await migrateCharacterMoves(actor, repos.moves, insertRepo);
@@ -340,7 +358,7 @@ export async function migrateArcanumChoiceGroupSlugs(actor) {
 // ── G. Follower items ─────────────────────────────────────────────────────────
 
 export async function migrateFollowers(actor, followerRepo, resourceController) {
-	if ([...actor.items].some(i => i.type === "npc" && i.system?.owned)) return;
+	if ([...actor.items].some(i => i.type === "follower" && i.system?.owned)) return;
 
 	const ownedSlugs = actor.getFlag(SCOPE, "followers.owned") ?? [];
 	const state      = actor.getFlag(SCOPE, "followers.state") ?? {};
@@ -352,7 +370,7 @@ export async function migrateFollowers(actor, followerRepo, resourceController) 
 		if (slug.startsWith("custom-")) {
 			const s = state[slug] ?? {};
 			await actor.createEmbeddedDocuments("Item", [{
-				name: s.name ?? "New Follower", type: "npc",
+				name: s.name ?? "New Follower", type: "follower",
 				system: {
 					slug, arcanaSlug: null, tagList: s.tags ?? "",
 					hp:     { value: s.hp ?? 0, max: s.hpMax ?? 0 },
@@ -371,7 +389,7 @@ export async function migrateFollowers(actor, followerRepo, resourceController) 
 
 	// Apply mutable state
 	for (const [slug, s] of Object.entries(state)) {
-		const item = [...actor.items].find(i => i.type === "npc" && i.system?.slug === slug);
+		const item = [...actor.items].find(i => i.type === "follower" && i.system?.slug === slug);
 		if (!item) continue;
 		const update = { _id: item._id, system: {} };
 		if (s.hp != null || s.hpMax != null)

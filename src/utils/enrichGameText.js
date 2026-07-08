@@ -29,15 +29,6 @@ export function toRollableMarkup(raw, { autoRoll = true } = {}) {
 	return snarkdown(shielded).replace(SENTINEL, (_, i) => tokens[Number(i)]);
 }
 
-/**
- * Prose markdown -> HTML for the `{{md}}` helper: renders markdown and preserves any
- * explicit [[ ]] rolls / @UUID links as text (a later enrichHTML pass makes them clickable),
- * but does NOT auto-roll bare dice. Synchronous, so the template renders without flicker.
- */
-export function renderMarkdown(raw) {
-	return toRollableMarkup(raw, { autoRoll: false });
-}
-
 // Cross-render memo cache. The followers tab re-runs ~6 enrichGameText calls per follower on every
 // re-render (each tag/item edit, each tab switch), and enrichHTML is the dominant cost. The same
 // prose enriches identically across renders, so cache it. Only cache text with NO `@` reference,

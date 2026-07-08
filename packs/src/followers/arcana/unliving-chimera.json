@@ -2,7 +2,7 @@
 	"_id": "fIh7TkvwIHduk4p5",
 	"_key": "!items!fIh7TkvwIHduk4p5",
 	"name": "Unliving chimera",
-	"type": "npc",
+	"type": "follower",
 	"img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
 	"system": {
 		"slug": "unliving-chimera",

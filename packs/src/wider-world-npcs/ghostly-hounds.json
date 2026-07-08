@@ -3,7 +3,7 @@
   "_key": "!actors!oBqFI4bQQXpFdh7R",
   "name": "Ghostly hounds",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "ghostly-hounds",
     "reference": "the-pale-hunter",
@@ -24,8 +24,8 @@
       "max": 10
     },
     "armor": "1 (lacks organs), harmed only by salt or as it bites",
-    "damage": "bite d6 w/advantage (hand, grabby)",
-    "specialQuality": "bound to the Hunter  can roam only ~1 mile from him",
+    "damage": "bite d6 w/advantage (_hand_, _grabby_)",
+    "specialQuality": "bound to the Hunter; can roam only ~1 mile from him",
     "instinct": {
       "selected": [
         "to give chase"

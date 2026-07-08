@@ -2,7 +2,7 @@
 	"_id": "gZuqGWcHx2WawdRw",
 	"_key": "!items!gZuqGWcHx2WawdRw",
 	"name": "Mantle wraiths",
-	"type": "npc",
+	"type": "follower",
 	"img": "systems/stonetop/assets/content/icons/npc.png",
 	"system": {
 		"slug": "mantle-wraiths",

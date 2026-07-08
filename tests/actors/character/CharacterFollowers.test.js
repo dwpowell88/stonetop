@@ -29,7 +29,7 @@ function makeCf(repo = null, resourceCtrl = null) {
 function makeFollowerItem(data, overrides = {}) {
 	return {
 		_id: (data.slug ?? "unknown") + "-item",
-		type: "npc",
+		type: "follower",
 		name: data.name ?? data.slug,
 		system: {
 			slug:             data.slug,
@@ -288,6 +288,16 @@ describe("CharacterFollowers — state mutations", () => {
 		const [snap] = await cf.buildSnapshot();
 		expect(snap.damage.raw).toBe("d6");
 	});
+
+	it("setSpecialQuality and setDescription are reflected in buildSnapshot as RichText", async () => {
+		const cf = makeCf(new FakeFollowerRepository([ENFYS]));
+		await cf.addFollower("enfys");
+		await cf.setSpecialQuality("enfys", "Immune to *fear*");
+		await cf.setDescription("enfys", "A loyal **hound**.");
+		const [snap] = await cf.buildSnapshot();
+		expect(snap.specialQuality.raw).toBe("Immune to *fear*");
+		expect(snap.description.raw).toBe("A loyal **hound**.");
+	});
 });
 
 // -- Tests: group members -----------------------------------------------------
@@ -325,6 +335,13 @@ describe("CharacterFollowers — group members", () => {
 		const [snap] = await cf.buildSnapshot();
 		expect(snap.members).toHaveLength(3);
 		expect(snap.members[2].hp).toEqual({ value: 6, max: 6 });
+	});
+
+	it("addMember stamps the group tag on a follower that lacks it", async () => {
+		const cf = makeCf(new FakeFollowerRepository([]));
+		cf._actor.items.push(makeFollowerItem({ slug: "lone", tags: "" }, { owned: true }));
+		await cf.addMember("lone");
+		expect(cf._actor.items.get("lone-item").system.tagList.selected).toEqual(["group"]);
 	});
 
 	it("removeMember drops the member at the given index", async () => {
@@ -550,7 +567,7 @@ describe("CharacterFollowers.buildSnapshot with extraSlugs", () => {
 		expect(snaps).toHaveLength(1);
 		expect(snaps[0].slug).toBe("enfys");
 		// Preview only — the follower is sourced from the repo, nothing is embedded on the actor.
-		expect([...actor.items].filter(i => i.type === "npc")).toHaveLength(0);
+		expect([...actor.items].filter(i => i.type === "follower")).toHaveLength(0);
 	});
 });
 
@@ -737,7 +754,7 @@ describe("CharacterFollowers — custom follower snapshot", () => {
 function makeNpcActor(overrides = {}) {
 	return {
 		name: overrides.name ?? "Garm the Guard",
-		type: "npc",
+		type: "follower",
 		system: {
 			hp:             overrides.hp             ?? { value: 8, max: 10 },
 			armor:          overrides.armor          ?? "2 (resilience)",

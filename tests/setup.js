@@ -37,6 +37,13 @@ global.foundry = {
 		deepClone: (obj) => JSON.parse(JSON.stringify(obj)),
 		setProperty: (obj, path, value) => setPath(obj, path, value),
 		randomID: (len = 16) => Array.from({ length: len }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join(""),
+		debounce: (fn, delay) => {
+			let timeout;
+			return (...args) => {
+				clearTimeout(timeout);
+				timeout = setTimeout(() => fn(...args), delay);
+			};
+		},
 	},
 	// Pass-through stub for Foundry text enrichment; real [[/r]] / @UUID rendering is
 	// Foundry's job and verified manually.

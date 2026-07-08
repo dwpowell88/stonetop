@@ -3,7 +3,7 @@
   "_key": "!actors!Ow2elNbxdgCxbbGo",
   "name": "Wolf",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "wolf",
     "reference": "the-great-wood",
@@ -22,7 +22,7 @@
       "max": 6
     },
     "armor": "0",
-    "damage": "bite d8 (hand, grabby) Qualities keen sense of smell",
+    "damage": "bite d8 (_hand_, _grabby_) Qualities keen sense of smell",
     "specialQuality": "",
     "instinct": {
       "selected": [

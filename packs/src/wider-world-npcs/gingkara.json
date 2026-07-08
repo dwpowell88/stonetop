@@ -3,7 +3,7 @@
   "_key": "!actors!YhyscRuKjr43cd4g",
   "name": "Gingkara",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-shell.png",
   "system": {
     "slug": "gingkara",
     "reference": "rime-lords",
@@ -23,7 +23,7 @@
       "max": 10
     },
     "armor": "1 (lacks organs) or 4 vs. stabbing (just bones)",
-    "damage": "bony fingers d4 (hand, grabby)",
+    "damage": "bony fingers d4 (_hand_, _grabby_)",
     "specialQuality": "tethered to one specific bone",
     "instinct": {
       "selected": [

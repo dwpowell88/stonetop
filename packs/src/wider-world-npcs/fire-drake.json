@@ -3,7 +3,7 @@
   "_key": "!actors!YgQngNAZpgDXV4l5",
   "name": "Fire drake",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "fire-drake",
     "reference": "huffel-peaks",
@@ -22,8 +22,8 @@
       "max": 10
     },
     "armor": "2 (scales)",
-    "damage": "bite d8 (hand, grabby)",
-    "specialQuality": "fireproof caustic, burning blood",
+    "damage": "bite d8 (_hand_, _grabby_)",
+    "specialQuality": "fireproof; caustic, burning blood",
     "instinct": {
       "selected": [
         "to get riled up easily"

@@ -3,7 +3,7 @@
   "_key": "!actors!88DpqNPBskXpUUdA",
   "name": "Swyn",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "swyn",
     "reference": "green-lords",
@@ -28,7 +28,7 @@
       "max": 20
     },
     "armor": "4 (resilience), 2 vs. bronze (scales)",
-    "damage": "bite & constriction d10+3 (hand, close, forceful, grabby)",
+    "damage": "bite & constriction d10+3 (_hand_, _close_, _forceful_, _grabby_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

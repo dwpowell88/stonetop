@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { autoRollDice, toRollableMarkup, enrichGameText, renderMarkdown, clearEnrichCache } from "../../src/utils/enrichGameText.js";
+import { autoRollDice, toRollableMarkup, enrichGameText, clearEnrichCache } from "../../src/utils/enrichGameText.js";
 
 describe("enrichGameText caching", () => {
 	it("serves a second identical call from cache (skips enrichHTML)", async () => {
@@ -89,23 +89,6 @@ describe("toRollableMarkup — autoRoll option", () => {
 	it("still protects and keeps explicit rolls/links when autoRoll is false", () => {
 		expect(toRollableMarkup("roll [[/r 2d6]] and see @UUID[Actor.x]{Garm}", { autoRoll: false }))
 			.toBe("roll [[/r 2d6]] and see @UUID[Actor.x]{Garm}");
-	});
-});
-
-describe("renderMarkdown (prose: markdown + tokens, no auto-roll)", () => {
-	it("renders markdown but does not auto-roll bare dice", () => {
-		expect(renderMarkdown("increase the die from **d6** to d8"))
-			.toBe("increase the die from <strong>d6</strong> to d8");
-	});
-
-	it("preserves explicit rolls and @UUID links for the async token pass", () => {
-		expect(renderMarkdown("deal [[/r d6]] — see @UUID[Item.x]{Sword}"))
-			.toBe("deal [[/r d6]] — see @UUID[Item.x]{Sword}");
-	});
-
-	it("returns empty string for empty input", () => {
-		expect(renderMarkdown("")).toBe("");
-		expect(renderMarkdown(null)).toBe("");
 	});
 });
 

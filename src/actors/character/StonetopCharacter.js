@@ -201,9 +201,10 @@ export class StonetopCharacter {
 			const existing = [...this._actor.items].find(i => i.type === "playbook");
 			if (existing) await this._actor.deleteEmbeddedDocuments("Item", [existing._id]);
 		}
-		const followers = items.filter(i => i.type === "npc");
+		// "npc" tolerated alongside "follower" for a dropped pre-migration follower item.
+		const followers = items.filter(i => i.type === "follower" || i.type === "npc");
 		const moves = items.filter(i => i.type === "move");
-		const others = items.filter(i => i.type !== "move" && i.type !== "npc");
+		const others = items.filter(i => i.type !== "move" && i.type !== "follower" && i.type !== "npc");
 		let anyAdded = false;
 		for (const item of followers) {
 			const slug = item.system?.slug;
@@ -485,6 +486,14 @@ export class StonetopCharacter {
 
 	async setFollowerNotes(slug, notes) {
 		await this._followers.setNotes(slug, notes);
+	}
+
+	async setFollowerSpecialQuality(slug, specialQuality) {
+		await this._followers.setSpecialQuality(slug, specialQuality);
+	}
+
+	async setFollowerDescription(slug, description) {
+		await this._followers.setDescription(slug, description);
 	}
 
 	async setFollowerDamage(slug, damage) {

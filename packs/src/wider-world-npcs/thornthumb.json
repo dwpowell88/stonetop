@@ -3,7 +3,7 @@
   "_key": "!actors!JOtCm58tXkA8Wadz",
   "name": "THORNTHUMB",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/icons/npc.png",
   "system": {
     "slug": "thornthumb",
     "reference": "fae",
@@ -25,18 +25,16 @@
       "max": 12
     },
     "armor": "5 (resilience, lacks vitals), 1 vs. iron",
-    "damage": "raking fingers d8 (hand, grabby)",
-    "specialQuality": ": Fae nature, hollow",
+    "damage": "raking fingers d8 (hand, grabby) SPECIAL QUALITIES: Fae nature, hollow INSTINCT: to acquire > Blend into the terrain > Filch something > Get help from nearby plants/ trees > Hide something in his body",
+    "specialQuality": "",
     "instinct": {
-      "selected": [
-        ": to acquire >  Blend into the terrain >  Filch something >  Get help from nearby plants/ trees >  Hide something in his body"
-      ],
+      "selected": [],
       "options": [],
       "multi": false,
       "allowCustom": true
     },
     "moves": "",
-    "description": "I call him “Thornthumb,” for the prickly gardener he is. I write him up like so:\n\nSource: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YMV8KIodnoZL71Jl]{Fae} (Book p.94-115)",
+    "description": "I call him \"Thornthumb,\" for the prickly gardener he is. I write him up like so:\n\nSource: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YMV8KIodnoZL71Jl]{Fae} (Book p.94-115)",
     "notes": ""
   },
   "ownership": {

@@ -3,7 +3,7 @@
   "_key": "!actors!KIQNP6NEfzwoNokv",
   "name": "Draventao",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-eye.png",
   "system": {
     "slug": "draventao",
     "reference": "forge-lords",
@@ -25,7 +25,7 @@
       "max": 22
     },
     "armor": "4 (scales, steel plates)",
-    "damage": "bite d12+3 w/ advantage (close, reach, forceful, messy, grabby, 1 piercing)",
+    "damage": "bite d12+3 w/ advantage (_close_, _reach_, _forceful_, _messy_, _grabby_, 1 piercing)",
     "specialQuality": "fireproof, bestial intellect, slumbers for years at a time",
     "instinct": {
       "selected": [

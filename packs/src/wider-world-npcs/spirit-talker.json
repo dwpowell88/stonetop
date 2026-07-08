@@ -3,7 +3,7 @@
   "_key": "!actors!hfAwargr55eBZ4y8",
   "name": "Spirit-talker",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "spirit-talker",
     "reference": "hillfolk",
@@ -24,7 +24,7 @@
       "max": 8
     },
     "armor": "0 to 2 (thick hides, shield)",
-    "damage": "flint-tipped spear d8 (close, thrown, crude), club or adz d8 (hand, crude), or bow d8 (near)",
+    "damage": "flint-tipped spear d8 (_close_, _thrown_, _crude_), club or adz d8 (_hand_, _crude_), or bow d8 (_near_)",
     "specialQuality": "sensitive to the presence of active spirits",
     "instinct": {
       "selected": [

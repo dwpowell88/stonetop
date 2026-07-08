@@ -3,7 +3,7 @@
   "_key": "!actors!aN6FXbh88sXdxBnk",
   "name": "Mkhalang",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-shell.png",
   "system": {
     "slug": "mkhalang",
     "reference": "rime-lords",
@@ -25,7 +25,7 @@
       "max": 27
     },
     "armor": "1 (lacks organs)",
-    "damage": "trample d8+3 with disadvantage (hand, close) or ice-tusks d8+7 with disadvantage (reach, forceful, messy, crude, 1 piercing)",
+    "damage": "trample d8+3 with disadvantage (_hand_, _close_) or ice-tusks d8+7 with disadvantage (_reach_, _forceful_, _messy_, _crude_, 1 piercing)",
     "specialQuality": "tethered to its dome but far-ranging; perfect memory; unable to lie",
     "instinct": {
       "selected": [

@@ -46,7 +46,7 @@
     {{#if track}}
     {{> follower-check}}
     {{/if}}
-    {{#each followers}}{{> "stonetop.follower-card" this inChoiceGroup=true}}{{/each}}
+    {{#each followers}}{{> "stonetop.follower-card" this}}{{/each}}
     {{else if (hasText content.text)}}
     <label class="stonetop-arcanum-follower-label">
         {{#if track}}

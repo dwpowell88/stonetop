@@ -3,7 +3,7 @@
   "_key": "!actors!TH4hSIcLcMCp21EY",
   "name": "Ceirwmawr",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "ceirwmawr",
     "reference": "the-great-wood",
@@ -23,7 +23,7 @@
       "max": 16
     },
     "armor": "0",
-    "damage": "hoof d10+1 (close) or antlers d10+3 (reach, forceful)",
+    "damage": "hoof d10+1 (_close_) or antlers d10+3 (_reach_, _forceful_)",
     "specialQuality": "awe-inspiring antlers",
     "instinct": {
       "selected": [

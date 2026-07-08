@@ -1,16 +1,16 @@
 import { describe, it, expect } from "vitest";
-import { NpcItemData } from "../../src/data/NpcItemData.js";
+import { FollowerData } from "../../src/data/FollowerData.js";
 
-describe("NpcItemData defaults (creature core + follower fields)", () => {
+describe("FollowerData defaults (creature core + follower fields)", () => {
 	it("defaults slug, arcanaSlug, reference to null", () => {
-		const d = new NpcItemData();
+		const d = new FollowerData();
 		expect(d.slug).toBeNull();
 		expect(d.arcanaSlug).toBeNull();
 		expect(d.reference).toBeNull();
 	});
 
 	it("defaults tags to an empty multi-selection and the rest to empty string", () => {
-		const d = new NpcItemData();
+		const d = new FollowerData();
 		expect(d.tagList.selected).toEqual([]);
 		expect(d.tagList.multi).toBe(true);
 		expect(d.instinct.selected).toEqual([]);
@@ -21,36 +21,36 @@ describe("NpcItemData defaults (creature core + follower fields)", () => {
 	});
 
 	it("defaults hp to { value: 0, max: 0 }", () => {
-		const d = new NpcItemData();
+		const d = new FollowerData();
 		expect(d.hp.value).toBe(0);
 		expect(d.hp.max).toBe(0);
 		expect(d.hp.min).toBeUndefined();
 	});
 
 	it("defaults armor to empty string", () => {
-		expect(new NpcItemData().armor).toBe("");
+		expect(new FollowerData().armor).toBe("");
 	});
 
 	it("defaults damage to empty prose string", () => {
-		expect(new NpcItemData().damage).toBe("");
+		expect(new FollowerData().damage).toBe("");
 	});
 
 	it("defaults loyalty to value=0, max=3", () => {
-		const d = new NpcItemData();
+		const d = new FollowerData();
 		expect(d.loyalty.value).toBe(0);
 		expect(d.loyalty.max).toBe(3);
 	});
 
 	it("defaults choices to empty array", () => {
-		expect(new NpcItemData().choices).toEqual([]);
+		expect(new FollowerData().choices).toEqual([]);
 	});
 
 	it("defaults members to an empty array (group followers track per-member HP)", () => {
-		expect(new NpcItemData().members).toEqual([]);
+		expect(new FollowerData().members).toEqual([]);
 	});
 
 	it("stores members as { name, hp: { value, max } } — each member owns its HP", () => {
-		const d = new NpcItemData({ members: [{ name: "Aedith", hp: { value: 4, max: 6 } }] });
+		const d = new FollowerData({ members: [{ name: "Aedith", hp: { value: 4, max: 6 } }] });
 		expect(d.members).toHaveLength(1);
 		expect(d.members[0].name).toBe("Aedith");
 		expect(d.members[0].hp.value).toBe(4);

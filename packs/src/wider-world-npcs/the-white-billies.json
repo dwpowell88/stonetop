@@ -3,7 +3,7 @@
   "_key": "!actors!S9QqebPpXKzVXbxn",
   "name": "The White Billies",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-rose.png",
   "system": {
     "slug": "the-white-billies",
     "reference": "fae",
@@ -23,7 +23,7 @@
       "max": 7
     },
     "armor": "4 (resilience), 0 vs. iron",
-    "damage": "headbutt d6+2 (hand, forceful)",
+    "damage": "headbutt d6+2 (_hand_, _forceful_)",
     "specialQuality": "Fae nature (page 98)",
     "instinct": {
       "selected": [

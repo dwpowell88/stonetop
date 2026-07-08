@@ -3,16 +3,19 @@
      data-insert-item-id="{{insert.id}}">
 	<section class="sheet-tab">
 		<div class="stonetop-insert-header">
-			<h3 class="stonetop-insert-name">{{insert.name}}</h3>
+			{{#if insert.img}}<img class="stonetop-insert-icon" src="{{insert.img}}" alt="{{insert.name}}">{{/if}}
+			<div class="stonetop-insert-heading">
+				<h3 class="stonetop-insert-name">{{insert.name}}</h3>
+				{{#if insert.description.raw}}
+				<div class="stonetop-insert-description">{{rich insert.description}}</div>
+				{{/if}}
+			</div>
 			<button type="button" class="stonetop-insert-remove"
 			        data-insert-item-id="{{insert.id}}"
 			        title="{{localize 'stonetop.insert.remove'}}">
 				<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="{{localize 'stonetop.insert.remove'}}">
 			</button>
 		</div>
-		{{#if insert.description.raw}}
-		<div class="stonetop-insert-description">{{rich insert.description}}</div>
-		{{/if}}
 		<div class="stonetop-playbook-columns">
 			{{#if insert.instinctGroup}}
 			{{> "stonetop.instinct-section"

@@ -1,0 +1,8 @@
+{{!-- Renders one steading improvement (a ChoiceGroup: .slug + .list) as its choice rows. Shared by
+      the steading sheet's improvements tab and the improvement item sheet's rendered view, so both
+      render an improvement identically. Context = the ChoiceGroup. --}}
+<div class="stonetop-choice-entry" data-slug="{{slug}}">
+	{{#each list}}
+		{{> "stonetop.choice-row" cgContext="improvement" cgGroup=../slug}}
+	{{/each}}
+</div>

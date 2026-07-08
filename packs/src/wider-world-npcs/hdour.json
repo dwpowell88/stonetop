@@ -3,7 +3,7 @@
   "_key": "!actors!mnwAkszVBgjHwJA7",
   "name": "Hdour",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "hdour",
     "reference": "hillfolk",
@@ -25,7 +25,7 @@
       "max": 14
     },
     "armor": "2 (thick hides, minor wards)",
-    "damage": "bronze knife d8 (hand)",
+    "damage": "bronze knife d8 (_hand_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

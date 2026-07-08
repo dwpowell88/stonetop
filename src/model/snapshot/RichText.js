@@ -1,4 +1,10 @@
-import { renderMarkdown, enrichGameText } from "../../utils/enrichGameText.js";
+import { toRollableMarkup, enrichGameText } from "../../utils/enrichGameText.js";
+
+// Sync markdown → HTML for the render() fallback: renders bold/italic but leaves [[roll]] / @UUID
+// tokens as source text (the async enrich pass makes them clickable) and does NOT auto-roll bare
+// dice. Private to RichText — it is the one and only sync render site; everything else renders a
+// RichText via {{rich}}.
+const renderMarkdown = raw => toRollableMarkup(raw, { autoRoll: false });
 
 /**
  * A render-layer value type for game text stored as markdown. It is the single shape that carries

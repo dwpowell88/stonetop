@@ -3,7 +3,7 @@
   "_key": "!actors!fMrTKVKyAZSd65UF",
   "name": "Barrow wight",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "barrow-wight",
     "reference": "barrow-builders",
@@ -25,7 +25,7 @@
       "max": 14
     },
     "armor": "4 (resilience), 2 vs. bronze or fire (mail)",
-    "damage": "rusty sword d8+2 (close, forceful) or crushing grip d8+2 (hand, grabby, forceful)",
+    "damage": "rusty sword d8+2 (_close_, _forceful_) or crushing grip d8+2 (_hand_, _grabby_, _forceful_)",
     "specialQuality": "bound to their barrow",
     "instinct": {
       "selected": [

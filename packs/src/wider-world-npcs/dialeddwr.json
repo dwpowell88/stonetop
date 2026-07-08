@@ -3,7 +3,7 @@
   "_key": "!actors!pRXbwtx5P0yWwnNV",
   "name": "Dialeddwr",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "dialeddwr",
     "reference": "death-and-the-undying",
@@ -23,7 +23,7 @@
       "max": 20
     },
     "armor": "4 (resilience), 0 vs. silver or fire",
-    "damage": "choking grip or powerful blows d8+2 w/advantage (hand, grabby, forceful)",
+    "damage": "choking grip or powerful blows d8+2 w/advantage (_hand_, _grabby_, _forceful_)",
     "specialQuality": "cannot open doors, eat, or drink",
     "instinct": {
       "selected": [

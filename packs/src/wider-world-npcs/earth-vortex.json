@@ -3,7 +3,7 @@
   "_key": "!actors!s8kbyO1XYiZhB1AT",
   "name": "Earth vortex",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "earth-vortex",
     "reference": "tempest-lords",

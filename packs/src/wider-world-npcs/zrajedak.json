@@ -3,7 +3,7 @@
   "_key": "!actors!t3BWWO1ip64wBV5O",
   "name": "Zrajedak",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "zrajedak",
     "reference": "green-lords",
@@ -26,7 +26,7 @@
       "max": 16
     },
     "armor": "4 (resilience), 1 vs. bronze (hide)",
-    "damage": "maw full of iron teeth d10+3 (hand, messy, grabby, 1 piercing, advantage), iron tail-quills d10+1 (near, area, reload)",
+    "damage": "maw full of iron teeth d10+3 (_hand_, _messy_, _grabby_, 1 piercing, advantage), iron tail-quills d10+1 (_near_, _area_, _reload_)",
     "specialQuality": "keen sense of smell",
     "instinct": {
       "selected": [

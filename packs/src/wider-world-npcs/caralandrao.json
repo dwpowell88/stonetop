@@ -3,7 +3,7 @@
   "_key": "!actors!0vyyMGiQc3mNolxj",
   "name": "Caralandrao",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "caralandrao",
     "reference": "huffel-peaks",
@@ -23,7 +23,7 @@
       "max": 3
     },
     "armor": "2 (shell)",
-    "damage": "pincers d4 with disadvantage (hand, grabby)",
+    "damage": "pincers d4 with disadvantage (_hand_, _grabby_)",
     "specialQuality": "spider-climb, camou- flaged shell",
     "instinct": {
       "selected": [

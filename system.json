@@ -59,6 +59,7 @@
 			"playbook":    {},
 			"insert":      {},
 			"improvement": {},
+			"follower":    {},
 			"npc":         {},
 			"outfitItem":  {},
 			"possession":  {}

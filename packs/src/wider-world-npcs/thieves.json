@@ -3,7 +3,7 @@
   "_key": "!actors!daKegD5PCk03vryp",
   "name": "Thieves",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "thieves",
     "reference": "marshedge",

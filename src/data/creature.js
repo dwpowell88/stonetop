@@ -1,5 +1,5 @@
 // Shared creature stat-block schema, composed (not inherited) by NpcData (Actor) and
-// NpcItemData (follower Item). See follower-npc-model.md.
+// FollowerData (the `follower` Item). See follower-npc-model.md.
 
 import { migrateChoicesField } from "../migration/migrateChoices.js";
 import { Selection } from "../model/data/Selection.js";

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { extractArticle } from "../../../scripts/import/pdf/layout.js";
-import { parseStatBlock, toFollowerDoc } from "../../../scripts/import/pdf/creatures.js";
+import { parseStatBlock, toFollowerDoc, toNpcDoc } from "../../../scripts/import/pdf/creatures.js";
 import { toSlug } from "../../../src/utils/slug.js";
 
 const L = (text, font = "ACaslonPro-Regular", size = 9) => ({ text, font, size, spans: [{ font, size, text }], bbox: [0, 0, 0, 0] });
@@ -110,8 +110,8 @@ describe("toFollowerDoc", () => {
 	const doc = toFollowerDoc(creature, { arcanaSlug: "mindgem", id: "abc", key: "!items!abc",
 		img: "systems/stonetop/assets/content/icons/the-mighty-servant.png", folder: "F" });
 
-	it("is an npc Item that preserves id/key/img/folder and links its arcanum", () => {
-		expect(doc.type).toBe("npc");
+	it("is a follower Item that preserves id/key/img/folder and links its arcanum", () => {
+		expect(doc.type).toBe("follower");
 		expect([doc._id, doc._key, doc.img, doc.folder]).toEqual(["abc", "!items!abc", "systems/stonetop/assets/content/icons/the-mighty-servant.png", "F"]);
 		expect(doc.system.arcanaSlug).toBe("mindgem");
 		expect(doc.system.slug).toBe("the-mighty-servant");
@@ -125,6 +125,25 @@ describe("toFollowerDoc", () => {
 		expect(doc.system.instinct.selected).toEqual(["to misunderstand"]);
 		expect(doc.system.moves).toBe("- living stone, tireless");
 		expect(doc.system.choices).toEqual([{ slug: "choices", list: [] }]);
+	});
+});
+
+describe("toNpcDoc", () => {
+	const creature = {
+		name: "Aurochs", tagList: ["large", "beast"], hp: { value: 12, max: 12 }, armor: "1",
+		damage: "d8", specialQuality: "", instinct: "to roam", moves: [{ text: "trample", prose: false }],
+		description: "A great shaggy ox.",
+	};
+
+	it("uses the marker icon passed by build-npcs", () => {
+		const doc = toNpcDoc(creature, { img: "systems/stonetop/assets/content/wonders/markers/marker-beast.png" });
+		expect(doc.type).toBe("npc");
+		expect(doc.img).toBe("systems/stonetop/assets/content/wonders/markers/marker-beast.png");
+	});
+
+	it("defaults to the npc icon when no img is given (not Foundry's mystery-man)", () => {
+		const doc = toNpcDoc(creature);
+		expect(doc.img).toBe("systems/stonetop/assets/content/icons/npc.png");
 	});
 });
 

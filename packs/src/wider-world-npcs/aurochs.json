@@ -3,7 +3,7 @@
   "_key": "!actors!DQC8s3w7GTgTKIgO",
   "name": "Aurochs",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "aurochs",
     "reference": "the-flats",
@@ -23,7 +23,7 @@
       "max": 14
     },
     "armor": "",
-    "damage": "gore d8+5 (close, forceful, messy, 1 piercing), kick/trample d8+3 (hand, forceful)",
+    "damage": "gore d8+5 (_close_, _forceful_, _messy_, 1 piercing), kick/trample d8+3 (_hand_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

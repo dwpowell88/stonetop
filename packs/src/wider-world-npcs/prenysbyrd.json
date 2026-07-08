@@ -3,7 +3,7 @@
   "_key": "!actors!TvOD4DP0o8EwpZX8",
   "name": "Prenysbyrd",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "prenysbyrd",
     "reference": "spirits-of-the-wild",
@@ -25,7 +25,7 @@
       "max": 23
     },
     "armor": "2 (woody, lacks organs)",
-    "damage": "club-like fists d10+3 (close, forceful)",
+    "damage": "club-like fists d10+3 (_close_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!kfXultjqKVstp9m7",
   "name": "Mammoth herder",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "mammoth-herder",
     "reference": "the-frozen-wastes",
@@ -24,7 +24,7 @@
       "max": 7
     },
     "armor": "1 (thick hides & furs)",
-    "damage": "long spears d6 (reach, crude) or javelins with atlatls d6 (far, reload, crude)",
+    "damage": "long spears d6 (_reach_, _crude_) or javelins with atlatls d6 (_far_, _reload_, _crude_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

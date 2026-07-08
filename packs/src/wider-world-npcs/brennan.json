@@ -3,7 +3,7 @@
   "_key": "!actors!PjvbyLz6QDUr3CTN",
   "name": "Brennan",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "brennan",
     "reference": "marshedge",
@@ -24,7 +24,7 @@
       "max": 12
     },
     "armor": "3 (brigandine, shield)",
-    "damage": "steel sword d8+1 (close, 3 piercing)",
+    "damage": "steel sword d8+1 (_close,_ 3 piercing)",
     "specialQuality": "",
     "instinct": {
       "selected": [

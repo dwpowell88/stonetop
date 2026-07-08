@@ -24,6 +24,7 @@ describe("migrateStaleItemTypes", () => {
 			makeItem("p1", "playbook"),
 			makeItem("pos1", "possession"),
 			makeItem("arc1", "arcanum"),
+			makeItem("fol1", "follower"),
 			makeItem("npc1", "npc"),
 			makeItem("ins1", "insert"),
 		]);

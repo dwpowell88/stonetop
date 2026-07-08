@@ -3,7 +3,7 @@
   "_key": "!actors!8KbAMQ6NhwN36qGm",
   "name": "Thunder drake",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "thunder-drake",
     "reference": "the-flats",
@@ -21,7 +21,7 @@
       "max": 20
     },
     "armor": "3 (scales, crest)",
-    "damage": "gore, trample, swat d10+3 (hand, close, forceful, messy, 1 piercing)",
+    "damage": "gore, trample, swat d10+3 (_hand_, _close_, _forceful_, _messy_, 1 piercing)",
     "specialQuality": "lightning-proof, hard of hearing",
     "instinct": {
       "selected": [

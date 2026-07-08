@@ -24,6 +24,7 @@ import { loadArticlePages } from "./load.js";
 import { extractArticle } from "./layout.js";
 import { parseFront, parseBack, isArcanaFollower, detectUnlockAt, parseMoveRoll, resourceTracks } from "./arcana-parse.js";
 import { parseStatBlock, toFollowerDoc } from "./creatures.js";
+import { markerImg, NPC_DEFAULT_IMG } from "./markers.js";
 
 const PDF = process.env.BOOK_PDF ?? "helper/Book_II_-_The_Wider_World_and_Other_Wonders.pdf";
 const WRITE_ARCANA = process.argv.includes("--write-arcana"); // overwrite arcanum JSON (parser WIP)
@@ -163,16 +164,6 @@ function diverge(parsed, doc) {
 
 // ── run ───────────────────────────────────────────────────────────────────────
 const FOLLOWER_DIR = "packs/src/followers/arcana";
-const NPC_DEFAULT_IMG = "systems/stonetop/assets/content/icons/npc.png";
-// A follower's stat-block icon is its arcanum marker symbol — already shipped as trade dress under
-// assets/content/wonders/markers/. Reference that file (deduped by sha256 via trade-dress.json) rather
-// than committing a duplicate; an icon that doesn't match a known marker falls back to the npc default.
-const markerMap = JSON.parse(readFileSync("scripts/import/pdf/trade-dress.json", "utf8")).markers; // sha256 -> marker name
-const markerImg = (file) => {
-	if (!file) return null;
-	const name = markerMap[createHash("sha256").update(readFileSync(file)).digest("hex")];
-	return name ? `systems/stonetop/assets/content/wonders/markers/${name}.png` : null;
-};
 
 // Existing follower roster — authoritative for slug/_id/arcanaSlug (segmentation can misattribute a
 // stat block, and canonical slugs drop a leading "The"). Minor followers are regenerated from the PDF

@@ -2,7 +2,7 @@
 	"_id": "GQFL5gcULAt4X74f",
 	"_key": "!items!GQFL5gcULAt4X74f",
 	"name": "All-mighty Thistlewisk",
-	"type": "npc",
+	"type": "follower",
 	"img": "systems/stonetop/assets/content/wonders/markers/marker-rose.png",
 	"system": {
 		"slug": "all-mighty-thistlewisk",

@@ -3,7 +3,7 @@
   "_key": "!actors!kGBWcqX95cl2vaT9",
   "name": "Cultist",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "cultist",
     "reference": "the-things-below",

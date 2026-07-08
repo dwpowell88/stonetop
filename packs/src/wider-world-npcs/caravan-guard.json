@@ -3,7 +3,7 @@
   "_key": "!actors!FANMtOsnkF2DXU2u",
   "name": "Caravan guard",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "caravan-guard",
     "reference": "lygos-and-the-south",

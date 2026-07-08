@@ -40,6 +40,29 @@ describe("Selection.multi", () => {
 	});
 });
 
+describe("Selection.select", () => {
+	it("appends the value to a multi selection, leaving the others", () => {
+		const s = Selection.multi(["archers"]);
+		expect(s.select("group").values).toEqual(["archers", "group"]);
+	});
+
+	it("replaces the value in a single selection", () => {
+		expect(Selection.single("to flee").select("to feed").values).toEqual(["to feed"]);
+	});
+
+	it("is a no-op (same instance) when the value is already selected", () => {
+		const s = Selection.multi(["group"]);
+		expect(s.select("group")).toBe(s);
+	});
+
+	it("returns a new instance and leaves the original unchanged", () => {
+		const s = Selection.multi(["archers"]);
+		const t = s.select("group");
+		expect(t).not.toBe(s);
+		expect(s.values).toEqual(["archers"]);
+	});
+});
+
 describe("Selection.fromStored + text", () => {
 	it("parses a legacy comma string into a multi selection", () => {
 		const s = Selection.fromStored("Bird-wise, innocent");

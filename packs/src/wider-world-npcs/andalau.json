@@ -3,7 +3,7 @@
   "_key": "!actors!8jW7EKTasBFFQTab",
   "name": "Andalau",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "andalau",
     "reference": "spirits-of-the-wild",

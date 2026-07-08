@@ -2,8 +2,9 @@ import { buildFocusSelector } from "./buildFocusSelector.js";
 import { activateEditToggles } from "../utils/editToggle.js";
 import { activateSteppers } from "../utils/stepper.js";
 import { activateComboBoxes } from "../utils/comboBox.js";
+import { withSheetSizeMemory } from "../utils/withSheetSizeMemory.js";
 
-export class StonetopActorSheet extends foundry.appv1.sheets.ActorSheet {
+export class StonetopActorSheet extends withSheetSizeMemory(foundry.appv1.sheets.ActorSheet) {
 	async getData() {
 		return super.getData();
 	}
@@ -36,7 +37,7 @@ export class StonetopActorSheet extends foundry.appv1.sheets.ActorSheet {
 		super.activateListeners(html);
 		activateEditToggles(html[0]);
 		activateSteppers(html[0]);
-		activateComboBoxes(html[0]);
+		activateComboBoxes();
 		if (!this.isEditable) return;
 		html[0].addEventListener("click", async ev => {
 			const rollable = ev.target.closest(".rollable[data-roll]");

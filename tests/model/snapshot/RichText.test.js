@@ -50,6 +50,11 @@ describe("RichText.render()", () => {
 		expect(rich("**bold**").render()).toBe("<strong>bold</strong>");
 	});
 
+	it("renders prose markdown without auto-rolling bare dice, keeping [[roll]]/@UUID tokens as source", () => {
+		expect(rich("from **d6** to d8 — see @UUID[Item.x]{Sword}").render())
+			.toBe("from <strong>d6</strong> to d8 — see @UUID[Item.x]{Sword}");
+	});
+
 	it("returns the enriched html verbatim once set", () => {
 		const r = rich("**bold**");
 		r.html = "<a>clickable</a>";

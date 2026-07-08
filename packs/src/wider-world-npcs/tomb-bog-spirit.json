@@ -3,7 +3,7 @@
   "_key": "!actors!r2Gho8OM2nzHGJNl",
   "name": "Tomb-bog spirit",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "tomb-bog-spirit",
     "reference": "death-and-the-undying",
@@ -23,7 +23,7 @@
       "max": 19
     },
     "armor": "1 (lacks organs)",
-    "damage": "smothering grip d10+2 (hand, forceful, grabby)",
+    "damage": "smothering grip d10+2 (_hand_, _forceful_, _grabby_)",
     "specialQuality": "harms only those whose life is forfeit",
     "instinct": {
       "selected": [

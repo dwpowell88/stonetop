@@ -3,7 +3,7 @@
   "_key": "!actors!XujKcVGpDe1CXsj7",
   "name": "Fen-troll",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "fen-troll",
     "reference": "ferriers-fen",
@@ -25,7 +25,7 @@
       "max": 16
     },
     "armor": "1 (thick hide)",
-    "damage": "bone-snapping grip d10+3 (hand, close, grabby, forceful), rending maw d10+3 (hand, messy, 1 piercing)",
+    "damage": "bone-snapping grip d10+3 (_hand_, _close_, _grabby_, _forceful_), rending maw d10+3 (_hand_, _messy_, 1 piercing)",
     "specialQuality": "sharp senses, horrid odor, ashamed of its visage",
     "instinct": {
       "selected": [

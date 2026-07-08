@@ -3,7 +3,7 @@
   "_key": "!actors!FDwnRzC4OseFLYWp",
   "name": "Legionary",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "legionary",
     "reference": "lygos-and-the-south",
@@ -23,7 +23,7 @@
       "max": 7
     },
     "armor": "3 (shield, iron scale)",
-    "damage": "iron short sword d6 (hand, close), or spear d6 (close, thrown)",
+    "damage": "iron short sword d6 (_hand_, _close_), or spear d6 (_close_, _thrown_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!6bMHreRbWtIZBKFb",
   "name": "Willow Witch",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "willow-witch",
     "reference": "ferriers-fen",
@@ -26,7 +26,7 @@
       "max": 16
     },
     "armor": "4 (wards, resilience), 0 vs. black iron",
-    "damage": "gnarled fists and fingers d10+2 w/ disadvantage (hand, forceful, grabby)",
+    "damage": "gnarled fists and fingers d10+2 w/ disadvantage (_hand_, _forceful_, _grabby_)",
     "specialQuality": "impossible to deceive or surprise; divide damage taken equally between the three witches (round down)",
     "instinct": {
       "selected": [

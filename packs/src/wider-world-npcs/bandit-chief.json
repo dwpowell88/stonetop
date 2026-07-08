@@ -3,7 +3,7 @@
   "_key": "!actors!KBGHUWJw4ju1lAIZ",
   "name": "Bandit chief",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "bandit-chief",
     "reference": "the-flats",
@@ -25,7 +25,7 @@
       "max": 8
     },
     "armor": "3 (hides, shield, skill)",
-    "damage": "spear d8 (close, thrown, 1 piercing) or bow d8 (near)",
+    "damage": "spear d8 (_close_, _thrown_, 1 piercing) or bow d8 (_near_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

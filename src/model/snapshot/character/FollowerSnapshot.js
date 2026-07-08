@@ -9,9 +9,9 @@
  * @property {string}                   armor       — prose; dice tokens rolled inline
  * @property {string}                   damage      — prose; dice tokens rolled inline
  * @property {string}                   instinct
- * @property {string}                   specialQuality
+ * @property {RichText}                  specialQuality
  * @property {ResourceSnapshot|null}    loyalty
- * @property {string}                   description
+ * @property {RichText}                  description
  * @property {ChoiceGroup|null}         choices
  */
 import { Selection } from "../../data/Selection.js";
@@ -34,11 +34,11 @@ export class FollowerSnapshot {
 		this.instinctSelection = Selection.fromStored(b._instinct);
 		this.instinct       = this.instinctSelection.text;  // display string (back-compat)
 		this.moves          = rich(b._moves ?? "");
-		this.specialQuality = b._specialQuality;
+		this.specialQuality = rich(b._specialQuality ?? "");
 		this.costSelection  = Selection.fromStored(b._cost);
 		this.cost           = this.costSelection.text;
 		this.loyalty        = b._loyalty;
-		this.description    = b._description;
+		this.description    = rich(b._description ?? "");
 		this.notes          = rich(b._notes ?? "");
 		this.choices        = b._choices;
 		// Group members (only meaningful when isGroup): each owns its HP + name/tags/traits.

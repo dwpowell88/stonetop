@@ -6,11 +6,10 @@
     "vendor": "node scripts/vendor-deps.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "pack": "node scripts/pack.js",
-    "unpack": "node scripts/unpack.js",
+    "pack": "node scripts/compendium-pack/pack.js",
+    "unpack": "node scripts/compendium-pack/unpack.js",
     "extract-art": "node scripts/import/pdf/extract-art.js",
-    "build-arcana": "node scripts/import/pdf/build-arcana.js",
-    "reorganize-packs": "node scripts/reorganize-playbook-moves.js"
+    "build-arcana": "node scripts/import/pdf/build-arcana.js"
   },
   "devDependencies": {
     "@foundryvtt/foundryvtt-cli": "^3.0.3",

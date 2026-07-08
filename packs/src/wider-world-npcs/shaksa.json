@@ -3,7 +3,7 @@
   "_key": "!actors!SxAFxS7m0auMBhLq",
   "name": "Shaksa",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-shell.png",
   "system": {
     "slug": "shaksa",
     "reference": "rime-lords",
@@ -25,7 +25,7 @@
       "max": 19
     },
     "armor": "1 (lacks organs)",
-    "damage": "antler of jagged bone d10+2 (close, messy, 1 piercing) or stone hooves d8 (hand)",
+    "damage": "antler of jagged bone d10+2 (_close_, _messy_, 1 piercing) or stone hooves d8 (_hand_)",
     "specialQuality": "tethered to its cemetery, can only leave to track looters/vandals",
     "instinct": {
       "selected": [

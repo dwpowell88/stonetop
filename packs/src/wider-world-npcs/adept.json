@@ -3,7 +3,7 @@
   "_key": "!actors!sLC4Yt6V0IW3q4v4",
   "name": "Adept",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "adept",
     "reference": "rime-lords",
@@ -23,8 +23,8 @@
       "max": 16
     },
     "armor": "2 (toughness, skill)",
-    "damage": "freezing touch or aura d8 (hand or reach, area, ignores armor)",
-    "specialQuality": "cold-proof spirit sight  no longer ages; needs little food/drink/ sleep; powerful will",
+    "damage": "freezing touch or aura d8 (_hand_ or _reach_, _area_, ignores armor)",
+    "specialQuality": "cold-proof; spirit sight; no longer ages; needs little food/drink/ sleep; powerful will",
     "instinct": {
       "selected": [
         "see below"

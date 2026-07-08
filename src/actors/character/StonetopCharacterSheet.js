@@ -441,6 +441,18 @@ export function createStonetopCharacterSheetClass(Base) {
 				this._stonetopCharacter.setFollowerNotes(input.dataset.slug, input.value);
 			}, true);
 
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-special-quality");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerSpecialQuality(input.dataset.slug, input.value);
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-description");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerDescription(input.dataset.slug, input.value);
+			}, true);
+
 			// Group members (per-member name + HP, add/remove)
 			html[0].addEventListener("change", ev => {
 				const name = ev.target.closest(".stonetop-member-name");

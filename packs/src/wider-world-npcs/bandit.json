@@ -3,7 +3,7 @@
   "_key": "!actors!Jliod814EowjgPLU",
   "name": "Bandit",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "bandit",
     "reference": "the-flats",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "up to 2 (hides, shields)",
-    "damage": "spears d8 (close, thrown) or slings d6 (near)",
+    "damage": "spears d8 (_close_, _thrown_) or slings d6 (_near_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

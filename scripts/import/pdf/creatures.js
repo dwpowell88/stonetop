@@ -159,8 +159,9 @@ const selection = (selected, multi) => ({ selected, options: [], multi, allowCus
  * Build a schema-correct `npc` Actor document (src/data/NpcData) from parsed creature data. GM-only
  * (`ownership.default: 0`), deterministic id, and a clickable back-link to its Book II journal entry
  * appended to the enriched `description`. `article` = { slug, title, page } of the source entry.
+ * `img` is the creature's marker icon (resolved by build-npcs via markers.js); defaults to the npc icon.
  */
-export function toNpcDoc(creature, { article } = {}) {
+export function toNpcDoc(creature, { article, img = "systems/stonetop/assets/content/icons/npc.png" } = {}) {
 	const slug = toSlug(creature.name);
 	const id = deterministicId(MONSTER_PACK, slug);
 	const backlink = article ? `Source: @UUID[${journalUuid(article.slug)}]{${article.title}}${article.page ? ` (Book p.${article.page})` : ""}` : "";
@@ -170,7 +171,7 @@ export function toNpcDoc(creature, { article } = {}) {
 		_key: documentKey("Actor", id),
 		name: creature.name,
 		type: "npc",
-		img: "icons/svg/mystery-man.svg",
+		img,
 		system: {
 			slug,
 			reference: article?.slug ?? null,
@@ -207,7 +208,7 @@ export function toFollowerDoc(creature, { arcanaSlug = null, slug, id, key, img 
 		_id: id ?? deterministicId("followers", followerSlug),
 		_key: key ?? documentKey("Item", id ?? deterministicId("followers", followerSlug)),
 		name: creature.name,
-		type: "npc",
+		type: "follower",
 		img,
 		system: {
 			slug: followerSlug,

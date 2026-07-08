@@ -2,7 +2,7 @@
 	"_id": "gxUFykyDSMMwcsxS",
 	"_key": "!items!gxUFykyDSMMwcsxS",
 	"name": "Seren the Eldest",
-	"type": "npc",
+	"type": "follower",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
 		"slug": "seren-the-eldest",

@@ -111,6 +111,38 @@
 			"choices": "Choices",
 			"addChoices": "Add choices group"
 		},
+		"improvement": {
+			"namePlaceholder": "Improvement name",
+			"sortOrder": "Sort order",
+			"sortOrderPlaceholder": "Position in the catalog",
+			"choices": "Choices",
+			"edit": "Edit",
+			"done": "Done"
+		},
+		"follower": {
+			"namePlaceholder": "Follower name",
+			"edit": "Edit",
+			"done": "Done",
+			"preview": "Preview",
+			"add": "Add",
+			"remove": "Remove",
+			"options": "Options",
+			"option": "option",
+			"default": "Default",
+			"defaultPlaceholder": "pre-selected, comma separated",
+			"choices": "Choices",
+			"membersNote": "Members note",
+			"suggestedTags": "Tag options",
+			"suggestedTraits": "Trait options",
+			"companion": "Animal companion",
+			"companionEnable": "This follower is an animal companion",
+			"companionAddType": "Add type",
+			"companionTypeName": "Type name (e.g. Bird)",
+			"companionPick": "Pick",
+			"companionVariants": "Variants",
+			"companionOptions": "Options",
+			"companionDefaults": "Starting options"
+		},
 		"possession": {
 			"namePlaceholder": "Special possession name",
 			"description": "Description",

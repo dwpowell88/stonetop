@@ -1,6 +1,6 @@
 {
 	"name": "Crew",
-	"type": "npc",
+	"type": "follower",
 	"img": "systems/stonetop/assets/content/playbooks/the-marshal.png",
 	"system": {
 		"slug": "crew",

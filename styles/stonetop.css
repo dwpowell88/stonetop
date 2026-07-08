@@ -2956,6 +2956,21 @@ body,
 /* Insert tab header: name on the left, delete icon pinned to the top-right (no button box). */
 .stonetop-insert-header {
 	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+.stonetop-insert-icon {
+	flex: none;
+	width: 48px;
+	height: 48px;
+	object-fit: cover;
+	border: none;
+}
+.stonetop-insert-heading {
+	flex: 1;
+	min-width: 0;
+	padding-right: 20px;
 }
 .stonetop-insert-remove {
 	position: absolute;
@@ -4287,8 +4302,7 @@ form.stonetop.sheet.steading {
 
 .choices-field input[type="text"],
 .choices-field input[type="number"],
-.choices-field select,
-.choices-field textarea {
+.choices-field select {
 	flex: 1;
 	background: rgba(255, 255, 255, 0.7);
 	border: 1px solid #bbb;
@@ -4300,15 +4314,23 @@ form.stonetop.sheet.steading {
 	min-width: 0;
 }
 
-.choices-field textarea {
-	resize: vertical;
-	min-height: 2.5rem;
+/* content.text rich editor: a <prose-mirror> seeded with HTML, saved back as HTML. Match the field
+   frame the plain inputs use and give the editor a sensible editing height. */
+.choices-field--rich { align-items: stretch; }
+.choices-field .choices-rich-text {
+	flex: 1;
+	min-width: 0;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	padding: 0.15rem 0.35rem;
 }
+.choices-field .choices-rich-text .editor-content { min-height: 4rem; }
+.choices-field .choices-rich-text:focus-within { border-color: #8b5c2a; }
 
 .choices-field input[type="text"]:focus,
 .choices-field input[type="number"]:focus,
-.choices-field select:focus,
-.choices-field textarea:focus {
+.choices-field select:focus {
 	outline: none;
 	border-color: #8b5c2a;
 }
@@ -4766,6 +4788,11 @@ form.stonetop.sheet.steading {
 .stonetop-insert-sheet-move .insert-move-open { flex: 1 1 auto; cursor: pointer; }
 .stonetop-insert-sheet-move .insert-move-open:hover { text-decoration: underline; }
 
+/* -- Improvement item sheet (StonetopImprovementSheet) — reuses .stonetop-insert-sheet-* layout. --
+   The rendered view shares improvement-group.hbs with the steading; its tracks are a read-only
+   preview of the improvement's structure (real track state lives on each steading), so disable them. */
+.stonetop-improvement-preview input { pointer-events: none; }
+
 /* -- Possession item sheet (StonetopPossessionSheet) — reuses .stonetop-insert-sheet-* layout -- */
 .stonetop-possession-outfit-list,
 .stonetop-possession-scaling-moves { display: flex; flex-direction: column; gap: 6px; }
@@ -4847,6 +4874,98 @@ form.stonetop.sheet.steading {
 .stonetop-arcanum-view { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .stonetop-arcanum-view-head { display: flex; align-self: flex-end; gap: 6px; }
 .stonetop-arcanum-view .stonetop-arcanum-preview { width: 100%; max-width: 420px; }
+
+/* ── Follower item sheet — same view/editor+preview pattern as the arcanum sheet ── */
+.stonetop.sheet.item.follower .window-content { overflow-y: auto; }
+
+.stonetop-follower-view { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.stonetop-follower-view-head { display: flex; align-self: flex-end; gap: 6px; }
+.stonetop-follower-view .stonetop-follower-preview { width: 100%; max-width: 460px; }
+
+.stonetop-follower-layout { display: flex; gap: 16px; align-items: flex-start; }
+.stonetop-follower-editor { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.stonetop-follower-preview-pane {
+	flex: 0 0 360px;
+	position: sticky;
+	top: 0;
+	align-self: flex-start;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.stonetop-follower-preview-head {
+	display: flex; align-items: center; justify-content: space-between; gap: 8px;
+	font-size: var(--fs-note); text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
+}
+
+.stonetop-follower-core { display: flex; flex-direction: column; gap: 6px; }
+.stonetop-follower-slug { font-size: var(--fs-note); opacity: 0.6; }
+.stonetop-follower-fields { display: flex; flex-wrap: wrap; gap: 8px; }
+.stonetop-follower-fields label { display: flex; flex-direction: column; font-size: var(--fs-note); gap: 2px; }
+.stonetop-follower-fields input[type="number"] { width: 5em; }
+.stonetop-follower-section { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--color-border-light-2, #c9c7b8); padding-top: 8px; }
+.stonetop-follower-subhead {
+	display: flex; align-items: center; justify-content: space-between; gap: 8px;
+	font-weight: 600; text-transform: uppercase; font-size: var(--fs-note); letter-spacing: 0.04em;
+}
+
+/* Selection field editor — a boxed, tinted panel (set off from the plain fields around it by its
+   own border, fill, and margin) so its Options + Default read as belonging to the field
+   (Tags / Instinct / Cost) named in the heading. */
+.stonetop-follower-core .follower-selection {
+	display: flex; flex-direction: column; gap: 4px;
+	border: 1px solid var(--color-border-light-2, #c9c7b8);
+	border-radius: 4px;
+	padding: 6px 8px;
+	margin: 4px 0;
+	background: rgba(0, 0, 0, 0.03);
+}
+.stonetop-follower-core .follower-selection-head { margin-bottom: 2px; }
+/* Indent the body under the heading so Options + Default sit visibly inside the field. */
+.stonetop-follower-core .follower-selection-body {
+	display: flex; flex-direction: column; gap: 4px;
+	padding-left: 8px;
+	border-left: 2px solid var(--color-border-light-2, #c9c7b8);
+}
+.stonetop-follower-core .follower-selection-default { display: flex; align-items: center; gap: 6px; font-size: var(--fs-note); }
+.stonetop-follower-core .follower-selection-default input { flex: 1 1 auto; }
+
+/* Members: one enclosing panel, styled like the boxed Selection fields above — the note, the
+   name/tag/trait pools, and the member cards all read as a single group under the MEMBERS heading. */
+.follower-members-panel {
+	border: 1px solid var(--color-border-light-2, #c9c7b8);
+	border-radius: 4px;
+	padding: 6px 8px;
+	background: rgba(0, 0, 0, 0.03);
+}
+.follower-members-body {
+	display: flex; flex-direction: column; gap: 6px;
+	padding-left: 8px;
+	border-left: 2px solid var(--color-border-light-2, #c9c7b8);
+}
+
+/* Shared string-list editor */
+.follower-string-list { display: flex; flex-direction: column; gap: 2px; }
+.follower-string-list-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.follower-string-list-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.follower-string-list-row { display: flex; align-items: center; gap: 4px; }
+.follower-string-list-row input { flex: 1 1 auto; }
+
+/* Member + companion-type editors */
+.follower-members-list, .follower-companion-catalog { display: flex; flex-direction: column; gap: 8px; }
+.follower-member-row, .follower-companion-type {
+	display: flex; flex-direction: column; gap: 4px;
+	border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px;
+}
+.follower-member-top, .follower-companion-type-head, .follower-companion-type-stats {
+	display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+}
+.follower-member-top input[type="number"], .follower-companion-type-stats input[type="number"] { width: 4.5em; }
+.follower-member-line { display: flex; align-items: center; gap: 6px; font-size: var(--fs-note); }
+.follower-member-line input { flex: 1 1 auto; }
+.follower-companion-type-stats label { display: flex; align-items: center; gap: 4px; font-size: var(--fs-note); }
+.follower-comp-strings { margin-top: 4px; }
+.follower-companion-enable-label { display: flex; align-items: center; gap: 4px; font-weight: 400; text-transform: none; }
 
 /* The preview reuses the real card render but is non-interactive; hide the card's own footer. */
 .stonetop-arcanum-preview { pointer-events: none; }

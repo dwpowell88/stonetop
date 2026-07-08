@@ -2,7 +2,7 @@
 	"_id": "Qr1HJzxWYqTYZkQc",
 	"_key": "!items!Qr1HJzxWYqTYZkQc",
 	"name": "The Andalau of the Flute",
-	"type": "npc",
+	"type": "follower",
 	"img": "systems/stonetop/assets/content/icons/npc.png",
 	"system": {
 		"slug": "andalau-of-the-flute",

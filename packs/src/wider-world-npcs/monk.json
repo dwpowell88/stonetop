@@ -3,7 +3,7 @@
   "_key": "!actors!KJMUWt5ZoCy0kpPb",
   "name": "Monk",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "monk",
     "reference": "barrier-pass",
@@ -23,8 +23,8 @@
       "max": 10
     },
     "armor": "0",
-    "damage": "staff d8 with disadvantage (close)",
-    "specialQuality": "spirit sight inured to hunger, cold, deprivation Empty Sky instinct to ignore the suffering or needs of others",
+    "damage": "staff d8 with disadvantage (_close_)",
+    "specialQuality": "spirit sight; inured to hunger, cold, deprivation Empty Sky instinct to ignore the suffering or needs of others",
     "instinct": {
       "selected": [],
       "options": [],

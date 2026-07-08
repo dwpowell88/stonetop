@@ -3,7 +3,7 @@
   "_key": "!actors!5ZJTpbYPvIEDMMce",
   "name": "Nailadd",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "nailadd",
     "reference": "the-great-wood",

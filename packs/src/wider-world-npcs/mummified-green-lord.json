@@ -3,7 +3,7 @@
   "_key": "!actors!GTKzYT003fEdpy7Z",
   "name": "Mummified Green Lord",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-eye.png",
   "system": {
     "slug": "mummified-green-lord",
     "reference": "green-lords",
@@ -28,7 +28,7 @@
       "max": 24
     },
     "armor": "4 (potent wards), 0 vs. fire",
-    "damage": "mighty blows d10+2 (hand, close, forceful)",
+    "damage": "mighty blows d10+2 (_hand_, _close_, _forceful_)",
     "specialQuality": "tethered to canopic jars, can sense all that happens in its tomb",
     "instinct": {
       "selected": [

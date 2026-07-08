@@ -1,11 +1,11 @@
 <div class="stonetop-follower-card" data-slug="{{slug}}">
 
-	{{#unless inChoiceGroup}}
+	{{#if showDelete}}
 	<button type="button" class="stonetop-follower-delete" data-slug="{{slug}}" data-name="{{name}}"
 	        title="{{localize 'stonetop.followers.remove'}} — {{localize 'stonetop.confirm.deleteHint'}}">
 		<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="{{localize 'stonetop.followers.remove'}}">
 	</button>
-	{{/unless}}
+	{{/if}}
 
 	<div class="stonetop-follower-head">
 		{{#if img}}<img class="stonetop-follower-img" src="{{img}}" alt="{{name}}">{{/if}}
@@ -59,6 +59,11 @@
 		{{/unless}}
 	</div>
 
+	<div class="stonetop-creature-line">
+		<span class="stonetop-follower-label">{{localize "stonetop.followers.specialQuality"}}</span>
+		{{> "stonetop.editable-field" field=specialQuality slug=slug inputClass="stonetop-follower-special-quality"}}
+	</div>
+
 	{{#if isGroup}}
 	<div class="stonetop-members">
 		<div class="stonetop-members-head">
@@ -107,14 +112,8 @@
 	</div>
 	{{/if}}
 
-	<div class="stonetop-creature-moves stonetop-editable">
-		<div class="stonetop-creature-moves-head">
-			<span class="stonetop-follower-label">{{localize "stonetop.followers.moves"}}</span>
-			<button type="button" class="stonetop-edit-toggle" title="Edit"><img src="systems/stonetop/assets/ui/controls/edit-icon.png" alt="edit"></button>
-		</div>
-		<div class="stonetop-editable__display">{{rich moves}}</div>
-		<textarea class="stonetop-editable__edit stonetop-follower-moves" data-slug="{{slug}}">{{moves.raw}}</textarea>
-	</div>
+	{{> "stonetop.editable-rich-block" label=(localize "stonetop.followers.moves")
+		field=moves textareaClass="stonetop-follower-moves" slug=slug}}
 
 	<div class="stonetop-creature-line stonetop-creature-line--split">
 		<span class="stonetop-follower-label">{{localize "stonetop.followers.cost"}}</span>
@@ -135,13 +134,10 @@
 
 	{{> "stonetop.follower-inventory"}}
 
-	<div class="stonetop-creature-moves stonetop-editable stonetop-follower-notes-block">
-		<div class="stonetop-creature-moves-head">
-			<span class="stonetop-follower-label">{{localize "stonetop.followers.notes"}}</span>
-			<button type="button" class="stonetop-edit-toggle" title="Edit"><img src="systems/stonetop/assets/ui/controls/edit-icon.png" alt="edit"></button>
-		</div>
-		<div class="stonetop-editable__display">{{rich notes}}</div>
-		<textarea class="stonetop-editable__edit stonetop-follower-notes" data-slug="{{slug}}">{{notes.raw}}</textarea>
-	</div>
+	{{> "stonetop.editable-rich-block" label=(localize "stonetop.followers.description")
+		field=description textareaClass="stonetop-follower-description" slug=slug}}
+
+	{{> "stonetop.editable-rich-block" label=(localize "stonetop.followers.notes")
+		field=notes textareaClass="stonetop-follower-notes" slug=slug blockClass="stonetop-follower-notes-block"}}
 
 </div>

@@ -3,7 +3,7 @@
   "_key": "!actors!hgrDqLX57mG9BfJN",
   "name": "Sorcerer",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "sorcerer",
     "reference": "the-things-below",
@@ -24,7 +24,7 @@
       "max": 14
     },
     "armor": "0 (or by worn armor)",
-    "damage": "iron blade d8 (hand)",
+    "damage": "iron blade d8 (_hand_)",
     "specialQuality": "marked by the Things Below (page 432)",
     "instinct": {
       "selected": [

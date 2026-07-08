@@ -3,7 +3,7 @@
   "_key": "!actors!HWvgPlW6k9BP8AFM",
   "name": "Crinwin",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "crinwin",
     "reference": "crinwin",
@@ -24,7 +24,7 @@
       "max": 3
     },
     "armor": "1 (reflexes)",
-    "damage": "claws, rocks, choking d6 (hand)",
+    "damage": "claws, rocks, choking d6 (_hand_)",
     "specialQuality": "climbs and jumps like a squirrel",
     "instinct": {
       "selected": [

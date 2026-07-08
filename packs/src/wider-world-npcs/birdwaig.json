@@ -3,7 +3,7 @@
   "_key": "!actors!8pXamC8nPV7Zu55O",
   "name": "Birdwaig",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "birdwaig",
     "reference": "spirits-of-the-wild",
@@ -25,7 +25,7 @@
       "max": 23
     },
     "armor": "3 (woody, no vital organs)",
-    "damage": "crushing branches d10+3 (close, reach, forceful), choking vines/roots d10+1 (reach, grabby)",
+    "damage": "crushing branches d10+3 (_close_, _reach_, _forceful_), choking vines/roots d10+1 (_reach_, _grabby_)",
     "specialQuality": "tethered to its tree",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!ocgFXIuo1RHCff0C",
   "name": "Star-mole",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "star-mole",
     "reference": "the-ruined-tower",
@@ -24,8 +24,8 @@
       "max": 7
     },
     "armor": "0",
-    "damage": "caustic spit or blood d6 w/disad- vantage (hand, close, messy, 1 piercing)",
-    "specialQuality": "blind tremorsense  bioluminescent",
+    "damage": "caustic spit or blood d6 w/disad- vantage (_hand_, _close_, _messy_, 1 piercing)",
+    "specialQuality": "blind; tremorsense; bioluminescent",
     "instinct": {
       "selected": [
         "to lure predators into traps"

@@ -3,7 +3,7 @@
   "_key": "!actors!fiLcZYdQTGxz20UV",
   "name": "The Chained Beast",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "the-chained-beast",
     "reference": "three-coven-lake",
@@ -24,7 +24,7 @@
       "max": 20
     },
     "armor": "2 (fur and scales)",
-    "damage": "toothy maw d10+3 w/advantage (close, grabby, messy, 1 piercing) or raking claws d10+1 (hand, messy, 1 piercing)",
+    "damage": "toothy maw d10+3 w/advantage (_close_, _grabby_, _messy_, 1 piercing) or raking claws d10+1 (_hand_, _messy_, 1 piercing)",
     "specialQuality": "chained to a heavy block of makerglass, takes +1d6 damage from bronze, soothed by a well-sung song",
     "instinct": {
       "selected": [

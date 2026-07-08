@@ -2,8 +2,8 @@
 	"_id": "BlankFollower001",
 	"_key": "!items!BlankFollower001",
 	"name": "New Follower",
-	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"type": "follower",
+	"img": "systems/stonetop/assets/content/icons/npc.png",
 	"system": {
 		"slug": "blank",
 		"arcanaSlug": null,

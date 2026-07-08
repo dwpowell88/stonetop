@@ -44,7 +44,7 @@ describe("migrateArcanumChoiceGroupSlugs", () => {
 	});
 
 	it("ignores non-arcanum items", async () => {
-		const actor = makeActor([{ _id: "n1", type: "npc", name: "Astor", system: { slug: "astor" } }]);
+		const actor = makeActor([{ _id: "n1", type: "follower", name: "Astor", system: { slug: "astor" } }]);
 		await migrateArcanumChoiceGroupSlugs(actor);
 		expect(actor.updatedDocs).toHaveLength(0);
 	});

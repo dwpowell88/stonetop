@@ -18,6 +18,16 @@ function stubGame(pack) {
 	vi.stubGlobal("game", { packs: { get: () => pack } });
 }
 
+// A world item (game.items) exposes `type` and toObject(); WorldItemStore reads game.items.contents.
+function worldItem(slug, sortOrder = 1, choices = null) {
+	const obj = { _id: `world-${slug}`, name: slug, type: "improvement", system: { slug, sortOrder, choices } };
+	return { type: "improvement", toObject: () => obj };
+}
+
+function stubGameWithWorld(pack, worldItems = []) {
+	vi.stubGlobal("game", { packs: { get: () => pack }, items: { contents: worldItems } });
+}
+
 describe("FoundrySteadingImprovementRepository", () => {
 	afterEach(() => vi.unstubAllGlobals());
 
@@ -52,6 +62,31 @@ describe("FoundrySteadingImprovementRepository", () => {
 		const repo = new FoundrySteadingImprovementRepository();
 		const items = await repo.getAll();
 		expect(items.map(i => i.slug)).toEqual(["mill", "palisade", "inn"]);
+	});
+
+	it("includes custom improvements authored in the world", async () => {
+		const choices = { slug: "watchtower", list: [] };
+		stubGameWithWorld(makePack([makeEntry("inn", 1)]), [worldItem("watchtower", 2, choices)]);
+		const repo = new FoundrySteadingImprovementRepository();
+		const items = await repo.getAll();
+		expect(items.map(i => i.slug)).toEqual(["inn", "watchtower"]);
+		expect(items[1].choices).toEqual(choices);
+	});
+
+	it("interleaves pack and world improvements by sortOrder", async () => {
+		stubGameWithWorld(
+			makePack([makeEntry("inn", 1), makeEntry("mill", 4)]),
+			[worldItem("watchtower", 2), worldItem("shrine", 3)],
+		);
+		const repo = new FoundrySteadingImprovementRepository();
+		const items = await repo.getAll();
+		expect(items.map(i => i.slug)).toEqual(["inn", "watchtower", "shrine", "mill"]);
+	});
+
+	it("returns world improvements even when the pack is missing", async () => {
+		vi.stubGlobal("game", { packs: { get: () => null }, items: { contents: [worldItem("watchtower", 1)] } });
+		const repo = new FoundrySteadingImprovementRepository();
+		expect((await repo.getAll()).map(i => i.slug)).toEqual(["watchtower"]);
 	});
 
 	it("caches results — getIndex called once", async () => {

@@ -1,6 +1,6 @@
 {
 	"name": "Animal Companion",
-	"type": "npc",
+	"type": "follower",
 	"img": "systems/stonetop/assets/content/icons/animal-companion.png",
 	"system": {
 		"slug": "animal-companion",

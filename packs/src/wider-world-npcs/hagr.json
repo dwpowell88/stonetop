@@ -3,7 +3,7 @@
   "_key": "!actors!uvfsOwCrFdXfpgSA",
   "name": "Hagr",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "hagr",
     "reference": "the-great-wood",
@@ -22,7 +22,7 @@
       "max": 16
     },
     "armor": "1 (blubbery hide)",
-    "damage": "meaty hands d10+3 (hand, close, grabby, forceful) or tree trunk d10+5 (reach, area, crude, forceful) or hurled heavy thing d10+3 (thrown, forceful)",
+    "damage": "meaty hands d10+3 (_hand_, _close_, _grabby_, _forceful_) or tree trunk d10+5 (_reach_, _area_, _crude_, _forceful_) or hurled heavy thing d10+3 (_thrown_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -1,0 +1,209 @@
+// Item sheet for authoring `npc` (follower) items — full parity with the creature + follower schema
+// (creature.js). Modeled on StonetopArcanumSheet: a rendered card VIEW (with an Edit button) ⇄ a data
+// EDITOR with a live preview pane. Fully featured: the creature core, the three Selection fields
+// (tagList/instinct/cost), the `choices` group (Crew-style — reuses the shared choice-group editor),
+// group `members`, and the animal-`companion` catalog.
+//
+// The rendered card + live preview use the SAME buildFollowerSnapshot + follower-card.hbs the
+// character sheet uses (one render path). Foundry's ItemSheet auto-saves `name` + scalar `name="system.*"`
+// inputs; everything with a bespoke shape (Selection round-trips, whole-array members, whole-object
+// companion) saves through the pure helpers in followerSelectionEdit / followerMemberEdit /
+// followerCompanionEdit. A locked (compendium) follower is always view-only.
+
+import * as CG from "../utils/choiceGroupEdit.js";
+import * as SE from "../utils/followerSelectionEdit.js";
+import * as ME from "../utils/followerMemberEdit.js";
+import * as CE from "../utils/followerCompanionEdit.js";
+import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
+import { activateComboBoxes } from "../utils/comboBox.js";
+import { buildFollowerSnapshot } from "../model/snapshot/character/buildFollowerSnapshot.js";
+import { enrichRichTextTree } from "../utils/enrichRichText.js";
+import { Selection } from "../model/data/Selection.js";
+
+// tagList is multi-select; instinct + cost are single-select.
+const SELECTION_MULTI = { tagList: true, instinct: false, cost: false };
+
+// "Blank" = a freshly-created follower with no authored content (name is ignored — it always has a
+// default). A blank follower opens straight in the editor; anything with content opens as a card.
+function isFollowerBlank(sys) {
+	const sel = s => (s?.options?.length ?? 0) > 0 || (s?.selected?.length ?? 0) > 0;
+	const has = v => v != null && v !== "";
+	return !(
+		sel(sys.tagList) || sel(sys.instinct) || sel(sys.cost) ||
+		has(sys.armor) || has(sys.damage) || has(sys.specialQuality) || has(sys.moves) ||
+		has(sys.description) || has(sys.notes) || (sys.hp?.max) ||
+		(sys.choices?.length) || (sys.members?.length) ||
+		sys.companion?.enabled || (sys.companion?.catalog?.length)
+	);
+}
+
+export function createStonetopFollowerSheetClass(Base) {
+	return class StonetopFollowerSheet extends Base {
+		static get defaultOptions() {
+			return foundry.utils.mergeObject(super.defaultOptions, {
+				classes: ["stonetop", "sheet", "item", "follower"],
+				width:  940,
+				height: 760,
+				resizable: true,
+			});
+		}
+
+		get template() {
+			return "systems/stonetop/templates/item/follower.hbs";
+		}
+
+		async getData() {
+			const context = await super.getData();
+			// Followers are referenced by a stable slug (playbook/arcana grants list them), so it must
+			// survive a rename. Generate one once if missing (not name-derived), mirroring the other sheets.
+			if (!this.item.system.slug) {
+				await this.item.update({ "system.slug": `custom-follower-${foundry.utils.randomID(8)}` });
+			}
+			const sys = this.item.system;
+			context.system = sys;
+
+			// Selection fields — normalized to raws with their fixed multi, for the string-list editors.
+			context.tagListSel  = SE.toSelectionRaw(sys.tagList,  SELECTION_MULTI.tagList);
+			context.instinctSel = SE.toSelectionRaw(sys.instinct, SELECTION_MULTI.instinct);
+			context.costSel     = SE.toSelectionRaw(sys.cost,     SELECTION_MULTI.cost);
+
+			// Choices group (a follower has at most one, at system.choices.0). buildRows may be [] for an
+			// empty group; hasChoices distinguishes "no group" from "empty group".
+			context.hasChoices = (sys.choices?.length ?? 0) > 0;
+			context.choiceRows = sys.choices?.[0] ? CG.buildRows(sys.choices[0]) : [];
+
+			// Members render their tags/traits as comma text (from the stored multi Selection); the change
+			// handler writes them back as a Selection raw.
+			context.members = (sys.members ?? []).map(m => ({
+				name:       m.name ?? "",
+				hp:         { value: m.hp?.value ?? 0, max: m.hp?.max ?? 0 },
+				tagsText:   Selection.fromStored(m.tags,   { multi: true }).values.join(", "),
+				traitsText: Selection.fromStored(m.traits, { multi: true }).values.join(", "),
+			}));
+			context.memberSuggestions = sys.memberSuggestions ?? { names: [], tags: [], traits: [] };
+			context.companion         = sys.companion ?? CE.blankCompanion();
+
+			// Live preview — the SAME snapshot builder + follower-card.hbs the character sheet renders.
+			context.preview = buildFollowerSnapshot(this.item, { loyaltyCurrent: sys.loyalty?.value ?? 0 });
+			await enrichRichTextTree(context.preview, this.item?.getRollData?.() ?? {});
+
+			// View-first: a follower with content opens as a rendered card; a blank one opens in the
+			// editor. A locked (non-editable) item is always view-only.
+			if (this._editMode === undefined) this._editMode = isFollowerBlank(sys);
+			if (!this.isEditable) this._editMode = false;
+			context.editMode = this._editMode;
+			return context;
+		}
+
+		activateListeners(html) {
+			super.activateListeners(html);
+
+			// The preview pane renders follower-card.hbs, whose tag/instinct/cost combo dropdowns are
+			// driven by the global (document-delegated, idempotent) combobox handler. The actor sheet
+			// installs it, but a follower Item opened on its own never would — so install it here too.
+			activateComboBoxes();
+
+			// Edit/view toggle — only rendered when editable, so it needs no isEditable guard.
+			html.find(".follower-edit-toggle").on("click", ev => {
+				this._editMode = ev.currentTarget.dataset.mode === "edit";
+				this.render(false);
+			});
+
+			if (!this.isEditable) return;
+			const item = this.item;
+			const numAttr = (el, name) => Number(el.dataset[name]); // one int-off-a-data-attr reader
+
+			// ── Choices group (system.choices.0) — reuse the shared editor + lifecycle buttons ──
+			activateChoiceGroupEditors(this, html);
+			html.find(".follower-choices-add").on("click", () => item.update({ "system.choices": [CG.newGroup("choices")] }));
+			html.find(".follower-choices-remove").on("click", () => item.update({ "system.choices": [] }));
+
+			// ── Selection fields (tagList/instinct/cost): options list + default → Selection raw ──
+			const multiOf  = field => !!SELECTION_MULTI[field];
+			const selOf    = field => item.system[field];
+			const saveSel  = (field, raw) => item.update({ [`system.${field}`]: raw });
+			const selField = el => el.closest("[data-selection-field]")?.dataset.selectionField;
+			const strIdx   = el => numAttr(el, "stringIndex");
+			html.find(".follower-option-add").on("click", ev => {
+				const f = selField(ev.currentTarget); if (f) saveSel(f, SE.addOption(selOf(f), multiOf(f)));
+			});
+			html.find(".follower-option-remove").on("click", ev => {
+				const f = selField(ev.currentTarget); if (f) saveSel(f, SE.removeOption(selOf(f), strIdx(ev.currentTarget), multiOf(f)));
+			});
+			html.find(".follower-option-input").on("change", ev => {
+				const f = selField(ev.currentTarget); if (f) saveSel(f, SE.setOption(selOf(f), strIdx(ev.currentTarget), ev.currentTarget.value, multiOf(f)));
+			});
+			html.find(".follower-selection-selected").on("change", ev => {
+				const f = ev.currentTarget.dataset.selectionField;
+				if (f) saveSel(f, SE.setSelected(selOf(f), SE.parseCsv(ev.currentTarget.value), multiOf(f)));
+			});
+
+			// ── Member suggestions (names/tags/traits) — plain string lists ──
+			const suggKey  = el => el.closest("[data-suggest-key]")?.dataset.suggestKey;
+			const suggOf   = key => [...(item.system.memberSuggestions?.[key] ?? [])];
+			const saveSugg = (key, list) => item.update({ [`system.memberSuggestions.${key}`]: list });
+			html.find(".follower-suggest-add").on("click", ev => {
+				const k = suggKey(ev.currentTarget); if (!k) return;
+				const l = suggOf(k); l.push(""); saveSugg(k, l);
+			});
+			html.find(".follower-suggest-remove").on("click", ev => {
+				const k = suggKey(ev.currentTarget); if (!k) return;
+				const l = suggOf(k); l.splice(strIdx(ev.currentTarget), 1); saveSugg(k, l);
+			});
+			html.find(".follower-suggest-input").on("change", ev => {
+				const k = suggKey(ev.currentTarget); if (!k) return;
+				const l = suggOf(k); l[strIdx(ev.currentTarget)] = ev.currentTarget.value; saveSugg(k, l);
+			});
+
+			// ── Group members — whole-array writes via helper ──
+			const members    = () => item.system.members ?? [];
+			const setMembers = list => item.update({ "system.members": list });
+			const idx        = ev => numAttr(ev.currentTarget, "index");
+			// Adding a member makes this a group follower — write the members array AND ensure the
+			// "group" tag is set on tagList (FollowerSnapshot derives isGroup from it).
+			html.find(".follower-member-add").on("click", () => item.update({
+				"system.members": ME.addMember(members(), item.system.hp?.max ?? 0),
+				"system.tagList": Selection.fromStored(item.system.tagList, { multi: true }).select("group").toRaw(),
+			}));
+			html.find(".follower-member-remove").on("click", ev => setMembers(ME.removeMember(members(), idx(ev))));
+			html.find(".follower-member-up").on("click", ev => setMembers(ME.moveMember(members(), idx(ev), -1)));
+			html.find(".follower-member-down").on("click", ev => setMembers(ME.moveMember(members(), idx(ev), 1)));
+			html.find(".follower-member-field").on("change", ev => {
+				const el = ev.currentTarget, field = el.dataset.field, index = numAttr(el, "index");
+				// tags/traits are multi Selections (stored as raws); scalars (name, hp.*) write directly.
+				if (field === "tags" || field === "traits") {
+					setMembers(ME.setMemberListField(members(), { index, field, csv: el.value }));
+				} else {
+					const value = el.type === "number" ? (el.value ? Number(el.value) : 0) : el.value;
+					setMembers(ME.setMemberField(members(), { index, field, value }));
+				}
+			});
+
+			// ── Animal companion — whole-object writes via helper ──
+			const companion    = () => item.system.companion ?? {};
+			const setCompanion = c => item.update({ "system.companion": c });
+			html.find(".follower-companion-enable").on("change", ev => setCompanion(CE.setEnabled(companion(), ev.currentTarget.checked)));
+			html.find(".follower-companion-add-type").on("click", () => setCompanion(CE.addType(companion())));
+			html.find(".follower-companion-remove-type").on("click", ev => setCompanion(CE.removeType(companion(), idx(ev))));
+			html.find(".follower-comp-field").on("change", ev => {
+				const el = ev.currentTarget;
+				const value = el.type === "number" ? (el.value ? Number(el.value) : 0) : el.value;
+				setCompanion(CE.setTypeField(companion(), { index: numAttr(el, "index"), field: el.dataset.field, value }));
+			});
+			// Companion per-type string lists (variants/options/defaults). Field from the [data-comp-field]
+			// wrapper, the owning type index from data-owner-index; each mutation rewrites that list.
+			const compField = el => el.closest("[data-comp-field]")?.dataset.compField;
+			const compList  = (c, ti, field) => [...((c.catalog?.[ti]?.[field]) ?? [])];
+			const saveComp  = (ev, mutate) => {
+				const el = ev.currentTarget, field = compField(el), ti = numAttr(el, "ownerIndex");
+				if (!field || Number.isNaN(ti)) return;
+				const c = companion(), list = compList(c, ti, field);
+				mutate(list);
+				setCompanion(CE.setTypeField(c, { index: ti, field, value: list }));
+			};
+			html.find(".follower-comp-list-add").on("click",    ev => saveComp(ev, list => list.push("")));
+			html.find(".follower-comp-list-remove").on("click", ev => saveComp(ev, list => list.splice(strIdx(ev.currentTarget), 1)));
+			html.find(".follower-comp-list-input").on("change", ev => saveComp(ev, list => { list[strIdx(ev.currentTarget)] = ev.currentTarget.value; }));
+		}
+	};
+}
