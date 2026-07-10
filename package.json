@@ -9,7 +9,8 @@
     "pack": "node scripts/pack.js",
     "unpack": "node scripts/unpack.js",
     "extract-art": "node scripts/import/pdf/extract-art.js",
-    "reorganize-packs": "node scripts/reorganize-playbook-moves.js"
+    "reorganize-packs": "node scripts/reorganize-playbook-moves.js",
+    "pack:module": "node scripts/pack-module.js"
   },
   "devDependencies": {
     "@foundryvtt/foundryvtt-cli": "^3.0.3",
