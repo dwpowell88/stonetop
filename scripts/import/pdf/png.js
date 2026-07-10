@@ -86,7 +86,7 @@ export function blackTransparent(buf, bg = 0) {
 }
 
 /** Decode an 8-bit PNG (grayscale=1ch, RGB=3ch, RGBA=4ch) to `{width,height,channels,px}`. */
-function decode8bit(buf) {
+export function decode8bit(buf) {
 	const chunks = readChunks(buf);
 	const ihdr = chunks.find((c) => c.type === "IHDR").data;
 	const width = ihdr.readUInt32BE(0), height = ihdr.readUInt32BE(4), depth = ihdr[8], ctype = ihdr[9];
@@ -146,6 +146,20 @@ export function whiteTransparent(buf) {
 	}
 	const ihdr = Buffer.alloc(13);
 	ihdr.writeUInt32BE(width, 0); ihdr.writeUInt32BE(height, 4); ihdr[8] = 8; ihdr[9] = 6; // RGBA
+	return Buffer.concat([SIG, chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+}
+
+/** Encode an 8-bit RGB `{width,height,px}` raster (3 channels, row-major) as a PNG. */
+export function encodeRGB(width, height, px) {
+	const stride = width * 3;
+	const raw = Buffer.alloc(height * (stride + 1));
+	for (let y = 0; y < height; y++) {
+		const row = y * (stride + 1);
+		raw[row] = 0; // filter: none
+		px.copy(raw, row + 1, y * stride, (y + 1) * stride);
+	}
+	const ihdr = Buffer.alloc(13);
+	ihdr.writeUInt32BE(width, 0); ihdr.writeUInt32BE(height, 4); ihdr[8] = 8; ihdr[9] = 2; // RGB
 	return Buffer.concat([SIG, chunk("IHDR", ihdr), chunk("IDAT", zlib.deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
 }
 
