@@ -21,6 +21,7 @@ const KEY_PREFIX = {
 	Actor:        "!actors",
 	Item:         "!items",
 	JournalEntry: "!journal",
+	Folder:       "!folders",
 };
 
 /** The `_key` for a top-level pack document of the given type. */

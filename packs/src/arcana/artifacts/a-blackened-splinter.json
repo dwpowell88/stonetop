@@ -1,0 +1,32 @@
+{
+	"_id": "DC9qClKvmzoRbssS",
+	"_key": "!items!DC9qClKvmzoRbssS",
+	"name": "A blackened splinter",
+	"type": "arcanum",
+	"system": {
+		"slug": "a-blackened-splinter",
+		"front": {
+			"title": "A blackened splinter",
+			"item": {
+				"name": "A blackened splinter",
+				"weight": 1,
+				"note": "*crude*, *magical*, *fireproof*",
+				"inventoryColumn": "regular"
+			},
+			"description": "Undead who see it are drawn to it, or else deeply agitated by its presence. When you **_touch the splinter to an undead entity,_** they see the Last Door yawning open before them. Roll 4d6. If the total is greater than the entity’s current HP, they are drawn through the Last Door and leave this world for good. Otherwise, they are transfixed for a few moments before the Door slams shut. Regardless, the splinter vanishes.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.sNLYfvJEFM1v463y]{Death and the undying}.*"
+		},
+		"back": {
+			"title": "A blackened splinter",
+			"item": {
+				"name": "A blackened splinter",
+				"weight": 1,
+				"note": "*crude*, *magical*, *fireproof*",
+				"inventoryColumn": "regular"
+			},
+			"description": "*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.sNLYfvJEFM1v463y]{Death and the undying}.*",
+			"resource": null
+		}
+	},
+	"flags": {},
+	"folder": "Ec1um00yDs4jNGDc"
+}
