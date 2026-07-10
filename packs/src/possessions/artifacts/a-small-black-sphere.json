@@ -1,0 +1,27 @@
+{
+	"_id": "BfXZwqpCfxtxjoi9",
+	"_key": "!items!BfXZwqpCfxtxjoi9",
+	"name": "A small black sphere",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-small-black-sphere",
+		"description": "*magical*, *indestructible*, *immobile*\n\nFound in or near some Rime Lord ruin, this… thing… appears to be a perfect sphere of lead, maybe 2 inches across. It hovers motionless in the air. No amount of physical force can mar it, nor move it from its relative position.\n\nWhen you **_focus all your will upon the black_** **_sphere_**, roll +WIS: **on a 10+**, you can slowly move the sphere with your mind, so long as you keep your attention fixed upon the task; **on a 7-9**, pick 1:\n\n- Mark a debility and move the sphere as per a 10+\n- Move the sphere, but only a few inches\n- Fling the sphere in a random vector (if it matters: d8 damage, *forceful*, *messy*)\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.DeWQFy1cWoLRvoU5]{Rime Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-small-black-sphere",
+				"name": "A small black sphere",
+				"weight": 1,
+				"note": "*magical*, *indestructible*, *immobile*",
+				"inventoryColumn": "regular"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

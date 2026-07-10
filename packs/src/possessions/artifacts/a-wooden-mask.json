@@ -1,0 +1,27 @@
+{
+	"_id": "cwtYGK8Sh7oDehGb",
+	"_key": "!items!cwtYGK8Sh7oDehGb",
+	"name": "A wooden mask",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-wooden-mask",
+		"description": "*fragile*, *magical*\n\nCarved from pale elder wood in the shape of a bird’s head, but with small horns and fangs. The inside is chiseled with glyphs like those that the Forest Folk used to make.\n\n**Something interesting:** You recognize glyphs for “beast,” “spirit,” “forest,” and… “peace?” Or maybe “treaty.”\n\n**Something useful:** When you **_wear the_** **_wooden mask_**, beasts of the Great Wood will do you no harm, though your companions have no such protection. Perversions of nature are unaffected. If you **_harm a beast of_** **_the Great Wood while wearing the mask_**, it loses all power and rapidly rots away.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.GaDYK1VEJEi6tHDa]{Forest Folk}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-wooden-mask",
+				"name": "A wooden mask",
+				"weight": 1,
+				"note": "*fragile*, *magical*",
+				"inventoryColumn": "regular"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}
