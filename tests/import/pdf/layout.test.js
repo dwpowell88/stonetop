@@ -97,3 +97,56 @@ describe("extractArticle — Aratis (4-column prose)", () => {
 		expect(r.body).toMatch(/<h3>Various treasures<\/h3>\s*<ul><li>A blanket woven/);
 	});
 });
+
+describe("extractArticle — stat-block anchors vs. same-named headings (segmentColumn guard)", () => {
+	// Book I's harm chapter has section headings that share names with stat-block fields ("Armor",
+	// "Damage") and prose that starts with "HP". Pre-guard, looksStatStart fired on such a heading,
+	// collectStatBlock immediately broke on it (endIdx === i), and segmentColumn spun on that row
+	// until the heap died. These synthetic pages reproduce both trigger shapes; if this suite hangs,
+	// the guard regressed.
+	const L = (text, y, { font = "ACaslonPro-Regular", size = 9 } = {}) =>
+		({ bbox: [36, y, 220, y + size], text, font, size, spans: [{ font, size, text }] });
+	// Page 1: an "Armor" heading with "HP"-leading prose nearby — prose with no HP value must not
+	// count as a stat-block anchor (pre-fix, isHpLine matched it and the heading row spun).
+	const proseTrap = {
+		width: 400, height: 600,
+		lines: [
+			L("Harm & recovery", 40, { font: "Avara-Bold", size: 18 }),
+			L("Armor", 70, { font: "Avara-Bold", size: 12 }),
+			L("It reduces harm. Some attacks ignore", 85),
+			L("HP. Good for them! It still helps.", 100),
+		],
+	};
+	// Page 2: a "Damage" heading directly above a real stat block. looksStatStart fires on the
+	// heading itself (field-name match + true HP line in range); the collector consumes nothing, and
+	// the guard must fall through to the heading branch, then collect the block off its real anchor.
+	const headingTrap = {
+		width: 400, height: 600,
+		lines: [
+			L("Damage", 200, { font: "Avara-Bold", size: 12 }),
+			L("Iron hound", 215, { font: "Avara-Bold", size: 9 }),
+			L("HP 12; Armor 3 (metal hide)", 230, { font: "ACaslonPro-Bold", size: 9 }),
+			L("Instinct: to hunt", 245, { font: "ACaslonPro-Italic", size: 9 }),
+		],
+	};
+	const doc = extractArticle([proseTrap, headingTrap], { title: "Harm & recovery" });
+	const body = renderHtml(doc);
+	const pageBlocks = (s) => [...s.left, ...s.right].flatMap((c) => c.blocks);
+
+	it("terminates, keeping the field-named headings as headings", () => {
+		expect(body).toContain("<h2>Armor</h2>");
+		expect(body).toContain("<h2>Damage</h2>");
+	});
+
+	it("keeps HP-leading prose as prose (no digit after HP = no stat-block anchor)", () => {
+		expect(pageBlocks(doc.sections[0]).filter((b) => b.type === "statblock")).toHaveLength(0);
+		expect(body).toContain("HP. Good for them!");
+	});
+
+	it("still collects the real stat block from its name + valued HP line", () => {
+		const sbs = pageBlocks(doc.sections[1]).filter((b) => b.type === "statblock");
+		expect(sbs).toHaveLength(1);
+		expect(sbs[0].lines.map((l) => l.text)).toContain("Iron hound");
+		expect(sbs[0].lines.some((l) => /^HP 12/.test(l.text))).toBe(true);
+	});
+});
