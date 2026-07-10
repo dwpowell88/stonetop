@@ -28,43 +28,51 @@ export function articleBoundaries(pdf, r) {
 	return { startPage: r.pdfPage, endPage, startRight, endLeft };
 }
 
-export function loadArticlePages(pdf, r, { imgDir, imgPrefix = "art", mapFile = (f) => f, dedup } = {}) {
+/** Load one PDF page for extraction: stext lines with the swirl/marker glyphs injected from the
+ *  vector layer, plus its dividers and extracted illustrations. Shared by the spread-aware Book II
+ *  article loader below and the Book I section loader (which has no spreads to crop). */
+export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f, dedup } = {}) {
+	const pg = loadStext(pdf, String(p))[0];
+	// Tag each list item with its swirl bullet (plain spiral vs pointing) via a marker span.
+	for (const sw of loadBullets(pdf, p)) {
+		const cy = sw.y - sw.h / 2;
+		// The bullet sits just left of its item's text — match a line whose left edge is right at
+		// (or just right of) the swirl, in the same row. A wide tolerance cross-matches columns.
+		const line = pg.lines
+			.filter((l) => !/^(marker|swirl)/.test(l.font) && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && l.bbox[0] >= sw.x - 6 && l.bbox[0] < sw.x + 45)
+			.sort((a, b) => a.bbox[0] - b.bbox[0])[0];
+		if (!line) continue;
+		const y0 = line.bbox[1];
+		const font = sw.kind === "point" ? "swirl-point" : "swirl";
+		pg.lines.push({ bbox: [sw.x - 3, y0, sw.x, y0 + 8], text: "", font, size: 7, spans: [{ font, size: 7, text: "" }] });
+	}
+	// Drop the resource/outfit check markers (small vector circles/diamonds) inline as glyphs.
+	// Align each to the text line it overlaps and merge it into that row; ordering by x then
+	// places it. Match by the nearest vertical centre (a marker sits between two rows, so the
+	// closest baseline wins, not the closest left-edge). A diamond is always a *leading* bullet —
+	// it precedes its item and never sits at a line's end — so it only attaches to a line that
+	// starts at/right of it. Circles can be inline (potency dots inside "(○○○ uses)"), so they
+	// keep the wider match.
+	for (const mk of loadMarkers(pdf, p)) {
+		const cy = mk.y - mk.h / 2;
+		const mid = (l) => (l.bbox[1] + l.bbox[3]) / 2;
+		const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && Math.abs(l.bbox[0] - mk.x) < 200);
+		const pool = mk.kind === "diamond" ? cand.filter((l) => l.bbox[0] >= mk.x - 2) : cand;
+		const line = (pool.length ? pool : cand).sort((a, b) => Math.abs(mid(a) - cy) - Math.abs(mid(b) - cy))[0];
+		const y0 = line ? line.bbox[1] : mk.y - mk.h;
+		const g = mk.kind === "circle" ? "○" : "◇";
+		pg.lines.push({ bbox: [mk.x, y0, mk.x + mk.w, y0 + 8], text: g, font: "marker", size: 7, spans: [{ font: "marker", size: 7, text: g }] });
+	}
+	const rules = loadDividers(pdf, p);
+	const images = extractPageArt(pdf, p, imgDir, `${imgPrefix}-p${p}`, { dedup }).map((im) => ({ ...im, file: mapFile(im.file) }));
+	return { pg, rules, images };
+}
+
+export function loadArticlePages(pdf, r, opts = {}) {
 	const { startPage, endPage, startRight, endLeft } = articleBoundaries(pdf, r);
 	const pages = [], pageRules = [], pageImages = [];
 	for (let p = startPage; p <= endPage; p++) {
-		const pg = loadStext(pdf, String(p))[0];
-		// Tag each list item with its swirl bullet (plain spiral vs pointing) via a marker span.
-		for (const sw of loadBullets(pdf, p)) {
-			const cy = sw.y - sw.h / 2;
-			// The bullet sits just left of its item's text — match a line whose left edge is right at
-			// (or just right of) the swirl, in the same row. A wide tolerance cross-matches columns.
-			const line = pg.lines
-				.filter((l) => !/^(marker|swirl)/.test(l.font) && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && l.bbox[0] >= sw.x - 6 && l.bbox[0] < sw.x + 45)
-				.sort((a, b) => a.bbox[0] - b.bbox[0])[0];
-			if (!line) continue;
-			const y0 = line.bbox[1];
-			const font = sw.kind === "point" ? "swirl-point" : "swirl";
-			pg.lines.push({ bbox: [sw.x - 3, y0, sw.x, y0 + 8], text: "", font, size: 7, spans: [{ font, size: 7, text: "" }] });
-		}
-		// Drop the resource/outfit check markers (small vector circles/diamonds) inline as glyphs.
-		// Align each to the text line it overlaps and merge it into that row; ordering by x then
-		// places it. Match by the nearest vertical centre (a marker sits between two rows, so the
-		// closest baseline wins, not the closest left-edge). A diamond is always a *leading* bullet —
-		// it precedes its item and never sits at a line's end — so it only attaches to a line that
-		// starts at/right of it. Circles can be inline (potency dots inside "(○○○ uses)"), so they
-		// keep the wider match.
-		for (const mk of loadMarkers(pdf, p)) {
-			const cy = mk.y - mk.h / 2;
-			const mid = (l) => (l.bbox[1] + l.bbox[3]) / 2;
-			const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && Math.abs(l.bbox[0] - mk.x) < 200);
-			const pool = mk.kind === "diamond" ? cand.filter((l) => l.bbox[0] >= mk.x - 2) : cand;
-			const line = (pool.length ? pool : cand).sort((a, b) => Math.abs(mid(a) - cy) - Math.abs(mid(b) - cy))[0];
-			const y0 = line ? line.bbox[1] : mk.y - mk.h;
-			const g = mk.kind === "circle" ? "○" : "◇";
-			pg.lines.push({ bbox: [mk.x, y0, mk.x + mk.w, y0 + 8], text: g, font: "marker", size: 7, spans: [{ font: "marker", size: 7, text: g }] });
-		}
-		let rules = loadDividers(pdf, p);
-		let imgs = extractPageArt(pdf, p, imgDir, `${imgPrefix}-p${p}`, { dedup }).map((im) => ({ ...im, file: mapFile(im.file) }));
+		let { pg, rules, images: imgs } = loadPage(pdf, p, opts);
 		const mid = pg.width / 2;
 		if (p === startPage && startRight) { pg.lines = pg.lines.filter((l) => l.bbox[0] >= mid); rules = rules.filter((x) => x.x >= mid); imgs = imgs.filter((im) => im.x >= mid); }
 		if (p === endPage && endLeft) { pg.lines = pg.lines.filter((l) => l.bbox[0] < mid); rules = rules.filter((x) => x.x < mid); imgs = imgs.filter((im) => im.x < mid); }
