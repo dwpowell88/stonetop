@@ -22,6 +22,7 @@ const KEY_PREFIX = {
 	Item:         "!items",
 	JournalEntry: "!journal",
 	Macro:        "!macros",
+	Folder:       "!folders",
 };
 
 /** The `_key` for a top-level pack document of the given type. */

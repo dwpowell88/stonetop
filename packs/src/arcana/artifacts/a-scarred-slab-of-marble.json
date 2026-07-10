@@ -1,0 +1,32 @@
+{
+	"_id": "TBeSh04V77pE2ExC",
+	"_key": "!items!TBeSh04V77pE2ExC",
+	"name": "A scarred slab of marble",
+	"type": "arcanum",
+	"system": {
+		"slug": "a-scarred-slab-of-marble",
+		"front": {
+			"title": "A scarred slab of marble",
+			"item": {
+				"name": "A scarred slab of marble",
+				"weight": 1,
+				"note": "*immobile*, *magical*",
+				"inventoryColumn": "regular"
+			},
+			"description": "A slab of once-beautiful stone, some 30 feet tall and about half again as wide, standing in a vaulted chamber, surrounded by deeply etched runes that speak of union and protection, consumption and sacrifice. The stone bears a multitude of chips, gouges, and cracks. Dust and debris surround it.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.UyUHhvUYqOaGERlu]{Stone Lords}.*"
+		},
+		"back": {
+			"title": "A scarred slab of marble",
+			"item": {
+				"name": "A scarred slab of marble",
+				"weight": 1,
+				"note": "*immobile*, *magical*",
+				"inventoryColumn": "regular"
+			},
+			"description": "When you **_pry a chip of stone from the mar_****_ble and swallow it whole, while standing_** **_within the ring of runes_**, your flesh becomes like stone and your DEX becomes -2 until the effect ends. The next three times you would suffer physical harm, the marble slab suffers the harm instead. The effect ends after the third blow.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.UyUHhvUYqOaGERlu]{Stone Lords}.*",
+			"resource": null
+		}
+	},
+	"flags": {},
+	"folder": "Ec1um00yDs4jNGDc"
+}
