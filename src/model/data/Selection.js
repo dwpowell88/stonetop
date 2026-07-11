@@ -57,6 +57,12 @@ export class Selection {
 		return [...fromOptions, ...customs];
 	}
 
+	/** New Selection with `value` present in `selected` (idempotent). Multi appends; single replaces. */
+	select(value) {
+		if (this.has(value)) return this;
+		return this._with({ selected: this.multi ? [...this.selected, value] : [value] });
+	}
+
 	/** New Selection with `tag` toggled (multi) or set/cleared (single). */
 	toggle(tag) {
 		if (!this.multi) {

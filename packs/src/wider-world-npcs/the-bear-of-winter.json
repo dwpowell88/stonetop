@@ -3,7 +3,7 @@
   "_key": "!actors!e5JstiQYlBCLRWCS",
   "name": "The Bear of Winter",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-rose.png",
   "system": {
     "slug": "the-bear-of-winter",
     "reference": "fae",
@@ -27,8 +27,8 @@
       "max": 26
     },
     "armor": "5 (resilience, ice), 2 vs. iron (hide, ice)",
-    "damage": "bite or maul d12+5 (close, hand, reach, forceful, grabby, messy, 1 piercing)",
-    "specialQuality": "Fae nature (page 98)  immune to cold; aura of wintry weath- er, matching his mood",
+    "damage": "bite or maul d12+5 (_close_, _hand_, _reach_, _forceful_, _grabby_, _messy_, 1 piercing)",
+    "specialQuality": "Fae nature (page 98); immune to cold; aura of wintry weath- er, matching his mood",
     "instinct": {
       "selected": [
         "to protect his status and holdings"

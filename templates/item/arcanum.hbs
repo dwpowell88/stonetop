@@ -55,7 +55,7 @@
 				{{#if editable}}
 				<div class="editor-content" data-edit="system.front.description">{{{front.description}}}</div>
 				{{else}}
-				<div class="editor-content stonetop-rich">{{{md front.description}}}</div>
+				<div class="editor-content">{{rich previewCard.front.description}}</div>
 				{{/if}}
 				</div>
 
@@ -93,7 +93,7 @@
 				{{#if editable}}
 				<div class="editor-content" data-edit="system.back.description">{{{back.description}}}</div>
 				{{else}}
-				<div class="editor-content stonetop-rich">{{{md back.description}}}</div>
+				<div class="editor-content">{{rich previewCard.back.description}}</div>
 				{{/if}}
 				</div>
 
@@ -113,7 +113,7 @@
 					<span>{{localize "stonetop.arcanum.mysteryMoves"}}</span>
 					<button type="button" class="arcanum-move-add">{{localize "stonetop.arcanum.add"}}</button>
 				</div>
-				<div class="stonetop-arcanum-moves">
+				<div class="stonetop-arcanum-move-editor-list">
 					{{#each mysteryMoves}}
 					{{> "stonetop.arcanum-mystery-move" move=this index=@index}}
 					{{/each}}

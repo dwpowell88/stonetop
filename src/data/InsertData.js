@@ -13,11 +13,12 @@ export class InsertData extends foundry.abstract.TypeDataModel {
 			description:  new f.StringField({ initial: "" }),
 			instinct:     new f.ObjectField({ nullable: true, initial: null }),
 			choices:      new f.ArrayField(new f.ObjectField()),
-			// Moves referenced by slug (resolved across compendium + world). Custom inserts attach
-			// existing moves this way instead of copying/re-tagging them. Built-in inserts still
-			// associate their moves by tag (`move.system.playbook === slug`); both are unioned.
-			moves:        new f.ArrayField(new f.StringField()),
-			choiceValues: new f.ObjectField(),
+			// Moves referenced by slug (resolved across compendium + world); moves don't back-reference
+			// the insert. `startingMoves` is the subset seeded acquired when the insert is granted
+			// (built-in inserts list all of them; custom inserts choose).
+			moves:         new f.ArrayField(new f.StringField()),
+			startingMoves: new f.ArrayField(new f.StringField()),
+			choiceValues:  new f.ObjectField(),
 		};
 	}
 }

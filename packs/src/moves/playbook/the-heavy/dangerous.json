@@ -4,9 +4,7 @@
 	"name": "Dangerous",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
-		"isStartingMove": true,
+		"moveType": null,
 		"description": "When you **_deal your damage_**, you have advantage.",
 		"requirement": {
 			"playbook": "The Heavy"

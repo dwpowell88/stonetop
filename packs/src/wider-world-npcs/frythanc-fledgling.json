@@ -3,7 +3,7 @@
   "_key": "!actors!XlcG1Oep88oHC1hH",
   "name": "Frythanc fledgling",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "frythanc-fledgling",
     "reference": "huffel-peaks",
@@ -22,7 +22,7 @@
     },
     "armor": "0 (scales)",
     "damage": "talons d8+2 (hand, forceful), beak d8 with disadvantage (hand)",
-    "specialQuality": "exceptional eyesight  terrible hearing",
+    "specialQuality": "exceptional eyesight; terrible hearing",
     "instinct": {
       "selected": [
         "to eat and grow"

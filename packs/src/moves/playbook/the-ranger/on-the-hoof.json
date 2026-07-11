@@ -4,8 +4,7 @@
 	"name": "On the Hoof",
 	"type": "move",
 	"system": {
-		"playbook": "The Ranger",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_travel through the wilderness_**, you can procure 1d6 uses of provisions each day (roll with disadvantage in winter or barren terrain). Provisions can substitute for supplies when you Make Camp.",
 		"slug": "on-the-hoof"
 	},

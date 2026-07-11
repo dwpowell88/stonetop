@@ -2,6 +2,9 @@
 	"TYPES": {
 		"Actor": {
 			"steading": "Steading"
+		},
+		"Item": {
+			"steadfast": "Steadfast"
 		}
 	},
 	"stonetop": {
@@ -14,6 +17,12 @@
 		},
 		"dialog": {
 			"roll": "Roll"
+		},
+		"confirm": {
+			"deleteTitle": "Delete",
+			"deleteNamed": "Delete \"{name}\"? This can't be undone.",
+			"deleteGeneric": "Delete this? This can't be undone.",
+			"deleteHint": "Right-click to delete without confirming"
 		},
 		"sheet": {
 			"tabs": {
@@ -52,6 +61,9 @@
 			"normal": "Normal",
 			"adv": "Advantage",
 			"dis": "Disadvantage"
+		},
+		"steading": {
+			"startsAt": "Starts at {value}"
 		},
 		"followers": {
 			"empty": "Drag followers here from the Followers compendium.",
@@ -97,12 +109,59 @@
 			"description": "Description",
 			"moves": "Moves",
 			"addMove": "Add move",
+			"startingMove": "Starts acquired (active when the insert is granted)",
 			"namePlaceholder": "Insert name",
 			"instinct": "Instinct",
 			"addInstinct": "Add instinct",
 			"removeInstinct": "Remove instinct",
 			"choices": "Choices",
 			"addChoices": "Add choices group"
+		},
+		"improvement": {
+			"namePlaceholder": "Improvement name",
+			"sortOrder": "Sort order",
+			"sortOrderPlaceholder": "Position in the catalog",
+			"choices": "Choices",
+			"edit": "Edit",
+			"done": "Done"
+		},
+		"steadfast": {
+			"namePlaceholder": "Steadfast name",
+			"startingValues": "Starting values",
+			"fortunes": "Fortunes",
+			"surplus": "Surplus",
+			"size": "Size",
+			"population": "Population",
+			"prosperity": "Prosperity",
+			"defenses": "Defenses",
+			"improvements": "Granted improvements",
+			"improvementsHint": "Drag improvement items here to grant them.",
+			"improvementsEmpty": "No improvements granted yet.",
+			"improvementRemove": "Remove"
+		},
+		"follower": {
+			"namePlaceholder": "Follower name",
+			"edit": "Edit",
+			"done": "Done",
+			"preview": "Preview",
+			"add": "Add",
+			"remove": "Remove",
+			"options": "Options",
+			"option": "option",
+			"default": "Default",
+			"defaultPlaceholder": "pre-selected, comma separated",
+			"choices": "Choices",
+			"membersNote": "Members note",
+			"suggestedTags": "Tag options",
+			"suggestedTraits": "Trait options",
+			"companion": "Animal companion",
+			"companionEnable": "This follower is an animal companion",
+			"companionAddType": "Add type",
+			"companionTypeName": "Type name (e.g. Bird)",
+			"companionPick": "Pick",
+			"companionVariants": "Variants",
+			"companionOptions": "Options",
+			"companionDefaults": "Starting options"
 		},
 		"possession": {
 			"namePlaceholder": "Special possession name",
@@ -133,6 +192,7 @@
 			"showBack": "Reveal Back",
 			"removeArcanum": "Remove",
 			"addToFollowers": "Add to followers",
+			"moves": "Moves",
 			"consequences": "Consequences"
 		},
 		"arcanum": {
@@ -307,10 +367,8 @@
 				"moveType": {
 					"none":      "— Type —",
 					"basic":     "Basic",
-					"playbook":  "Playbook",
 					"homefront": "Homefront",
 					"special":   "Special",
-					"postDeath": "Post-Death",
 					"follower":  "Follower",
 					"other":     "Other"
 				},
@@ -320,9 +378,7 @@
 					"failurePlaceholder": "What happens on a 6-…"
 				},
 				"details": {
-					"playbook":           "Playbook",
-					"repeatMax":          "Checkboxes",
-					"isStartingMove":     "Starting Move"
+					"repeatMax":          "Checkboxes"
 				}
 			}
 		}

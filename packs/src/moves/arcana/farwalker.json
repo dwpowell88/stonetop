@@ -1,0 +1,12 @@
+{
+	"_id": "a8b25c6f4c11b637",
+	"_key": "!items!a8b25c6f4c11b637",
+	"name": "Farwalker",
+	"type": "move",
+	"system": {
+		"slug": "farwalker",
+		"moveType": null,
+		"description": "When you **_mindwalk_**, you may spend 1 Power to instantly send your mind to any place you have ever visited, physically or mentally."
+	},
+	"folder": "ArcanaMoves00001"
+}

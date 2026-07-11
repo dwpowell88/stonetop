@@ -3,7 +3,7 @@
   "_key": "!actors!8BUpD4i78GiCflH3",
   "name": "Cwisarff",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "cwisarff",
     "reference": "the-great-wood",
@@ -19,11 +19,11 @@
       "allowCustom": true
     },
     "hp": {
-      "value": 0,
-      "max": 0
+      "value": 10,
+      "max": 10
     },
     "armor": "0",
-    "damage": "venomous bite d10 (close)",
+    "damage": "venomous bite d10 (_close_)",
     "specialQuality": "",
     "instinct": {
       "selected": [
@@ -33,7 +33,7 @@
       "multi": false,
       "allowCustom": true
     },
-    "moves": "- Wait patiently to spring on prey\n- Hiss menacingly at a threat\n- Bite quickly and ready to strike again\n\nThe vaunted “tree adder,” most lethal serpent in the Wood, up to 6 feet long and dripping with venom. In warm months, they hunt and bask in the canopy or sunny clearings. In colder months, they hide in hollows and under logs, going into torpor in winter. They don’t hunt people, but they don’t fear them either. When you are bitten by a cwisarff, mark a debility in addition to taking damage. Until the poison is treated, you can’t regain",
+    "moves": "- Wait patiently to spring on prey\n- Hiss menacingly at a threat\n- Bite quickly and ready to strike again\n\nThe vaunted \"tree adder,\" most lethal serpent in the Wood, up to 6 feet long and dripping with venom. In warm months, they hunt and bask in the canopy or sunny clearings. In colder months, they hide in hollows and under logs, going into torpor in winter. They don’t hunt people, but they don’t fear them either. When you are bitten by a cwisarff, mark a debility in addition to taking damage. Until the poison is treated, you can’t regain",
     "description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.JjyXyicr58qim0bV]{The Great Wood} (Book p.200-209)",
     "notes": ""
   },

@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { StonetopSteading } from "../../../src/actors/steading/StonetopSteading.js";
 import { SteadingSnapshot } from "../../../src/model/snapshot/steading/SteadingSnapshot.js";
 import { FakeSteadingBuilder } from "../../fakes/FakeSteadingBuilder.js";
-import { FakeSteadingMovesRepository } from "../../fakes/FakeSteadingMovesRepository.js";
+import { FakeMoveRepository } from "../../fakes/FakeMoveRepository.js";
 
-const fakeImprovementsRepo = {getAll: async () => []};
-const fakeMoves = new FakeSteadingMovesRepository();
+const fakeImprovementsRepo = {getBySlug: async () => null};
+const fakeMoves = new FakeMoveRepository();
 
 function make() {
 	return new StonetopSteading(new FakeSteadingBuilder().build(), fakeImprovementsRepo, fakeMoves);
@@ -16,9 +16,9 @@ describe("StonetopSteading.buildSnapshot", () => {
 		expect(await make().buildSnapshot()).toBeInstanceOf(SteadingSnapshot);
 	});
 
-	it("uses default fortunes when no value set", async () => {
+	it("reflects the stored fortunes value (+1 for Stonetop)", async () => {
 		const snap = await make().buildSnapshot();
-		expect(snap.fortunes.current).toBe(2);
+		expect(snap.fortunes.current).toBe(1);
 	});
 
 	it("uses default surplus when no value set", async () => {
@@ -56,12 +56,12 @@ describe("StonetopSteading — fortunes", () => {
 		expect((await s.buildSnapshot()).fortunes.current).toBe(4);
 	});
 
-	it("marks correct option as selected after setFortunes", async () => {
+	it("marks the option whose value matches after setFortunes", async () => {
 		const s = make();
-		await s.setFortunes(3);
+		await s.setFortunes(3); // +3
 		const options = (await s.buildSnapshot()).fortunes.options;
-		expect(options[3].selected).toBe(true);
-		expect(options[0].selected).toBe(false);
+		expect(options.find(o => o.value === 3).selected).toBe(true);
+		expect(options.find(o => o.value === -1).selected).toBe(false);
 	});
 });
 
@@ -94,46 +94,73 @@ describe("StonetopSteading.getRollableStats", () => {
 		expect(make().getRollableStats()).toHaveLength(4);
 	});
 
-	it("includes population with its current value", () => {
+	// The stored `current` is an index into the bonuses array [-1, 0, 1, 2, 3];
+	// the value shown/rolled is the bonus it points at, not the index. Default current 1 → +0.
+	it("includes population with its bonus value (index 1 → +0)", () => {
 		const stat = make().getRollableStats().find(s => s.key === "population");
 		expect(stat).toBeDefined();
-		expect(stat.value).toBe(1);
+		expect(stat.value).toBe(0);
 	});
 
-	it("includes prosperity with its current value", () => {
+	it("includes prosperity with its bonus value (index 1 → +0)", () => {
 		const stat = make().getRollableStats().find(s => s.key === "prosperity");
 		expect(stat).toBeDefined();
-		expect(stat.value).toBe(1);
+		expect(stat.value).toBe(0);
 	});
 
-	it("includes defenses with its current value", () => {
+	it("includes defenses with its bonus value (index 1 → +0)", () => {
 		const stat = make().getRollableStats().find(s => s.key === "defenses");
 		expect(stat).toBeDefined();
+		expect(stat.value).toBe(0);
+	});
+
+	it("includes fortunes with its bonus value (index 2 → +1)", () => {
+		const stat = make().getRollableStats().find(s => s.key === "fortunes");
+		expect(stat).toBeDefined();
 		expect(stat.value).toBe(1);
 	});
 
-	it("includes fortunes with its current value", () => {
-		const stat = make().getRollableStats().find(s => s.key === "fortunes");
-		expect(stat).toBeDefined();
-		expect(stat.value).toBe(2);
+	it("reflects a raised attribute value directly", async () => {
+		const s = make();
+		await s.attributes.setValue("population", 3); // +3
+		expect(s.getRollableStats().find(x => x.key === "population").value).toBe(3);
 	});
 });
 
 describe("StonetopSteading.resolveBonus", () => {
-	it("returns population.current for 'population'", () => {
-		expect(make().resolveBonus("population")).toBe(1);
+	// Ratings are stored as their actual value now; resolveBonus just returns it.
+	it("returns population's stored value (+0)", () => {
+		expect(make().resolveBonus("population")).toBe(0);
 	});
 
-	it("returns prosperity.current for 'prosperity'", () => {
-		expect(make().resolveBonus("prosperity")).toBe(1);
+	it("returns prosperity's stored value (+0)", () => {
+		expect(make().resolveBonus("prosperity")).toBe(0);
 	});
 
-	it("returns defenses.current for 'defenses'", () => {
-		expect(make().resolveBonus("defenses")).toBe(1);
+	it("returns defenses' stored value (+0)", () => {
+		expect(make().resolveBonus("defenses")).toBe(0);
 	});
 
-	it("returns fortunes for 'fortunes'", () => {
-		expect(make().resolveBonus("fortunes")).toBe(2);
+	it("returns fortunes' stored value (+1)", () => {
+		expect(make().resolveBonus("fortunes")).toBe(1);
+	});
+
+	it("returns a lowered attribute value (-1)", async () => {
+		const s = make();
+		await s.attributes.setValue("defenses", -1);
+		expect(s.resolveBonus("defenses")).toBe(-1);
+	});
+
+	it("returns a raised attribute value (+3)", async () => {
+		const s = make();
+		await s.attributes.setValue("prosperity", 3);
+		expect(s.resolveBonus("prosperity")).toBe(3);
+	});
+
+	it("returns surplus as its raw value (not index-mapped)", async () => {
+		const s = make();
+		await s.setSurplus(3);
+		expect(s.resolveBonus("surplus")).toBe(3);
 	});
 
 	it("returns null for unknown rollStat", () => {

@@ -4,8 +4,7 @@
 	"name": "Armistice",
 	"type": "move",
 	"system": {
-		"playbook": "The Judge",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_approach an enemy to negotiate in good faith_**, they will at least hear you out. Even the most debased and savage foe will delay violence until you've had your say.",
 		"requirement": {
 			"level": 6,

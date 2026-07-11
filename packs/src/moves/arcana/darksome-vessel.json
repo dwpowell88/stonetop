@@ -1,0 +1,12 @@
+{
+	"_id": "a1fb926f3d98b1c0",
+	"_key": "!items!a1fb926f3d98b1c0",
+	"name": "Darksome Vessel",
+	"type": "move",
+	"system": {
+		"slug": "darksome-vessel",
+		"moveType": null,
+		"description": "When you **_cast a Codex spell_**, on a 12+ you can choose the Empowered effect. When you **_choose to_** **_mark a consequence before casting a spell_**, don’t roll; you get a 12+."
+	},
+	"folder": "ArcanaMoves00001"
+}

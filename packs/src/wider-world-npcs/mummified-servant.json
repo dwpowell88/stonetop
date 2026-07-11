@@ -3,7 +3,7 @@
   "_key": "!actors!dw6DyVw0i2BsgZF6",
   "name": "Mummified servant",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "mummified-servant",
     "reference": "green-lords",
@@ -24,7 +24,7 @@
       "max": 11
     },
     "armor": "0",
-    "damage": "choking grip d6 (hand, grabby), spear d6 (close, 1 piercing)",
+    "damage": "choking grip d6 (_hand_, _grabby_), spear d6 (_close_, 1 piercing)",
     "specialQuality": "takes +1d4 damage from fire, tethered to canopic jars",
     "instinct": {
       "selected": [

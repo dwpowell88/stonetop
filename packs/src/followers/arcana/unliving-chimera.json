@@ -1,20 +1,42 @@
 {
+	"_id": "fIh7TkvwIHduk4p5",
+	"_key": "!items!fIh7TkvwIHduk4p5",
 	"name": "Unliving chimera",
-	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"type": "follower",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
 	"system": {
 		"slug": "unliving-chimera",
+		"reference": null,
 		"arcanaSlug": "rusty-cauldron",
+		"tagList": {
+			"selected": [
+				"Undead",
+				"construct",
+				"terrifying",
+				"clumsy"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
 		"hp": {
 			"value": 0,
 			"max": 3
 		},
-		"armor": "4",
-		"damage": "d6",
+		"armor": "4 (0 vs. bronze)",
+		"damage": "varies [[/r d6]] (_hand_, maybe others)",
 		"specialQuality": "",
 		"instinct": {
 			"selected": [
 				"to get confused and lash out"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"cost": {
+			"selected": [
+				"lots of fresh blood"
 			],
 			"options": [],
 			"multi": false,
@@ -30,32 +52,10 @@
 				"list": []
 			}
 		],
-		"description": "",
 		"moves": "- Do something one of its component beasts could do\n- Moan, wretchedly and disturbingly",
-		"cost": {
-			"selected": [
-				"lots of fresh blood (Loyalty ◯◯◯)"
-			],
-			"options": [],
-			"multi": false,
-			"allowCustom": true
-		},
-		"notes": "",
-		"reference": null,
-		"tagList": {
-			"selected": [
-				"Undead",
-				"construct",
-				"terrifying",
-				"clumsy"
-			],
-			"options": [],
-			"multi": true,
-			"allowCustom": true
-		}
+		"description": "",
+		"notes": ""
 	},
 	"flags": {},
-	"folder": "BNaYX2Y4eMe7EOPK",
-	"_id": "fIh7TkvwIHduk4p5",
-	"_key": "!items!fIh7TkvwIHduk4p5"
+	"folder": "BNaYX2Y4eMe7EOPK"
 }

@@ -3,7 +3,7 @@
   "_key": "!actors!fJsGAvcJMGO6kE5B",
   "name": "Mammoth",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "mammoth",
     "reference": "the-frozen-wastes",
@@ -22,7 +22,7 @@
       "max": 15
     },
     "armor": "1 (fur/hide)",
-    "damage": "tusks d6+5 (reach, forceful) or trample d6+5 (hand, area, forceful)",
+    "damage": "tusks d6+5 (_reach_, _forceful_) or trample d6+5 (_hand_, _area_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

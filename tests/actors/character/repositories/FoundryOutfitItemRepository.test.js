@@ -7,7 +7,7 @@ function makeEntry(slug, systemOverrides = {}) {
 	return {
 		_id: `id-${slug}`,
 		name: slug,
-		system: { slug, inventoryColumn: "regular", sortOrder: 1, weight: 1, tags: "", note: null, ...systemOverrides },
+		system: { slug, inventoryColumn: "regular", sortOrder: 1, weight: 1, tagList: "", note: null, ...systemOverrides },
 	};
 }
 
@@ -59,11 +59,18 @@ describe("FoundryOutfitItemRepository", () => {
 		expect(items[0].armor).toEqual({ modifier: 1 });
 	});
 
-	it("maps system.tags to item.tags", async () => {
-		stubGame(makePack([makeEntry("knife", { tags: "hand, thrown" })]));
+	it("maps system.tagList to item.tags", async () => {
+		stubGame(makePack([makeEntry("knife", { tagList: "hand, thrown" })]));
 		const repo = new FoundryOutfitItemRepository();
 		const items = await repo.getAll();
 		expect(items[0].tags).toBe("hand, thrown");
+	});
+
+	it("leaves item.tags empty when the reserved system.tags is used instead of tagList", async () => {
+		stubGame(makePack([makeEntry("knife", { tags: "hand, thrown", tagList: "" })]));
+		const repo = new FoundryOutfitItemRepository();
+		const items = await repo.getAll();
+		expect(items[0].tags).toBe("");
 	});
 
 	it("maps system.note to item.note", async () => {

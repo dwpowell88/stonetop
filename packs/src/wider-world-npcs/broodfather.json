@@ -3,7 +3,7 @@
   "_key": "!actors!O8BHF9tD6dlg5f2X",
   "name": "Broodfather",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "broodfather",
     "reference": "crinwin",
@@ -22,7 +22,7 @@
       "max": 12
     },
     "armor": "0",
-    "damage": "spindly choking fingers d8 (close), maw full of teeth d10+2 (hand, messy, 1 piercing)",
+    "damage": "spindly choking fingers d8 (_close_), maw full of teeth d10+2 (_hand_, _messy_, 1 piercing)",
     "specialQuality": "blind, tremorsense",
     "instinct": {
       "selected": [

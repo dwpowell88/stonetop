@@ -3,7 +3,7 @@
   "_key": "!actors!U56lcGIEp1wb8gWg",
   "name": "Phantom rider",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "phantom-rider",
     "reference": "barrow-builders",
@@ -24,8 +24,8 @@
       "max": 14
     },
     "armor": "2 (lacks organs, shield)",
-    "damage": "spear 1d8 (close, thrown) or trample d8+2 (hand, forceful) or bow d8 (near)",
-    "specialQuality": "bound to their bones  can travel far and wide; can’t manifest in daylight; takes +1d4 damage from silver",
+    "damage": "spear 1d8 (_close_, _thrown_) or trample d8+2 (_hand_, _forceful_) or bow d8 (_near_)",
+    "specialQuality": "bound to their bones; can travel far and wide; can’t manifest in daylight; takes +1d4 damage from silver",
     "instinct": {
       "selected": [
         "to seek tribute, to lord over others"

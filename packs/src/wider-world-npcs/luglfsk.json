@@ -3,7 +3,7 @@
   "_key": "!actors!wSwNpsi6pd7LYGZy",
   "name": "Luglfsk",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "luglfsk",
     "reference": "the-dread-river",
@@ -23,7 +23,7 @@
       "max": 3
     },
     "armor": "1 (hide)",
-    "damage": "electric shock d6 (hand, reload), or chew d4 (hand)",
+    "damage": "electric shock d6 (_hand_, _reload_), or chew d4 (_hand_)",
     "specialQuality": "lightning-proof",
     "instinct": {
       "selected": [

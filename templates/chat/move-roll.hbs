@@ -1,0 +1,19 @@
+{{!-- Move-roll / description chat card. Data object: { name, dice?, resultKey?, description?, resultText? }.
+      dice = { diceGroups:[{kept,values}], modeLabel, mod, total, rollMode }. description/resultText are
+      RichText (enriched by renderRollCard). --}}
+<h3>{{name}}</h3>
+{{#if dice}}
+<div class="stonetop-roll-dice">
+	{{#if dice.modeLabel}}<span class="stonetop-roll-mode stonetop-roll-mode--{{dice.rollMode}}">{{dice.modeLabel}}</span>{{/if}}
+	{{#each dice.diceGroups}}
+	{{#unless kept}}<span class="stonetop-dice-separator">|</span>{{/unless}}
+	<span class="stonetop-dice-group{{#unless kept}} stonetop-dice-group--dropped{{/unless}}">
+		{{#each values}}<span class="stonetop-die{{#unless ../kept}} stonetop-die--dropped{{/unless}}">{{this}}</span>{{/each}}
+	</span>
+	{{/each}}
+	{{#if dice.mod}}<span class="stonetop-roll-mod">{{dice.mod}}</span>{{/if}}
+	<span class="stonetop-roll-total">= {{dice.total}}</span>
+</div>
+{{/if}}
+{{#if description.raw}}{{rich description}}{{/if}}
+{{#if resultText.raw}}<div class="stonetop-move-result stonetop-move-result--{{resultKey}}">{{rich resultText}}</div>{{/if}}

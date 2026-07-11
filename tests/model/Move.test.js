@@ -16,10 +16,8 @@ const PLAYBOOK_ENTRY = {
 	_id: "pb001",
 	name: "Serenity",
 	system: {
-		playbook:       "The Blessed",
 		rollStat:       "wis",
 		description:    "<p>Roll +WIS.</p>",
-		isStartingMove: true,
 		requirement:    { level: 2, moves: ["Serenity"], playbook: null },
 		repeatMax:      2,
 		resource:       { max: 3, maxStat: null, title: "Stock", labels: [] },
@@ -45,10 +43,6 @@ describe("Move", () => {
 		expect(new Move(PLAYBOOK_ENTRY).name).toBe("Serenity");
 	});
 
-	it("stores playbook", () => {
-		expect(new Move(PLAYBOOK_ENTRY).playbook).toBe("The Blessed");
-	});
-
 	it("derives slug from name when system.slug is absent", () => {
 		expect(new Move(BASIC_ENTRY).slug).toBe("defy-danger");
 	});
@@ -64,10 +58,6 @@ describe("Move", () => {
 
 	it("stores description", () => {
 		expect(new Move(PLAYBOOK_ENTRY).description).toBe("<p>Roll +WIS.</p>");
-	});
-
-	it("stores isStarting from isStartingMove", () => {
-		expect(new Move(PLAYBOOK_ENTRY).isStarting).toBe(true);
 	});
 
 	it("stores requirement", () => {
@@ -101,20 +91,12 @@ describe("Move", () => {
 	});
 
 	describe("defaults for absent system fields", () => {
-		it("playbook defaults to null", () => {
-			expect(new Move(BASIC_ENTRY).playbook).toBeNull();
-		});
-
 		it("rollStat defaults to null", () => {
 			expect(new Move({ _id: "x", name: "x", system: {} }).rollStat).toBeNull();
 		});
 
 		it("description defaults to null", () => {
 			expect(new Move(BASIC_ENTRY).description).toBeNull();
-		});
-
-		it("isStarting defaults to false", () => {
-			expect(new Move(BASIC_ENTRY).isStarting).toBe(false);
 		});
 
 		it("requirement defaults to null", () => {

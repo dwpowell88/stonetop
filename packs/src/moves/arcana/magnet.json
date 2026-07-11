@@ -1,0 +1,12 @@
+{
+	"_id": "1ed344a7ccbd14ad",
+	"_key": "!items!1ed344a7ccbd14ad",
+	"name": "Magnet",
+	"type": "move",
+	"system": {
+		"slug": "magnet",
+		"moveType": null,
+		"description": "When you **_witness a magical attack_**, you can either spend 1 Readiness (from the Defend move) or mark a consequence to redirect the magic so that it affects only you. You can then stand fast against it."
+	},
+	"folder": "ArcanaMoves00001"
+}

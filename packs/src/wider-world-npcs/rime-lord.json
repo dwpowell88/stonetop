@@ -3,7 +3,7 @@
   "_key": "!actors!orNyQFCHa6jo2pMr",
   "name": "Rime Lord",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-eye.png",
   "system": {
     "slug": "rime-lord",
     "reference": "rime-lords",
@@ -26,8 +26,8 @@
       "max": 26
     },
     "armor": "5 (potent wards, skill)",
-    "damage": "conjured ice d12+3 (any range, area, grabby, forceful) or heat-drain d12+1 (reach, ignores armor)",
-    "specialQuality": "spirit sight telepathic cold-proof  ageless; no need to eat/drink/sleep/breathe; aura of bitter cold",
+    "damage": "conjured ice d12+3 (any range, _area_, _grabby_, _forceful_) or heat-drain d12+1 (_reach_, ignores armor)",
+    "specialQuality": "spirit sight; telepathic; cold-proof; ageless; no need to eat/drink/sleep/breathe; aura of bitter cold",
     "instinct": {
       "selected": [
         "to seek perfection (in themselves, in their surroundings, in others)"

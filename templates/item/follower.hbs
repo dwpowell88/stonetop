@@ -1,0 +1,154 @@
+<form class="stonetop sheet item follower" autocomplete="off">
+
+	<header class="stonetop-insert-sheet-header">
+		<img class="stonetop-insert-sheet-icon" src="{{data.img}}" data-edit="img" title="{{data.name}}" alt="">
+		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{data.name}}"
+		       placeholder="{{localize 'stonetop.follower.namePlaceholder'}}"
+		       {{#unless editable}}disabled{{/unless}}>
+	</header>
+
+	{{#unless editMode}}
+	{{!-- ── VIEW (rendered card, with an Edit button) ─────────────── --}}
+	<div class="stonetop-follower-view">
+		{{#if editable}}
+		<div class="stonetop-follower-view-head">
+			<button type="button" class="follower-edit-toggle" data-mode="edit">{{localize "stonetop.follower.edit"}}</button>
+		</div>
+		{{/if}}
+		<div class="stonetop-follower-preview">{{> "stonetop.follower-card" preview}}</div>
+	</div>
+	{{else}}
+
+	<div class="stonetop-follower-layout">
+
+		{{!-- ── EDITOR (left) ─────────────────────────────────────── --}}
+		<div class="stonetop-follower-editor">
+
+			<div class="stonetop-follower-core">
+				<span class="stonetop-follower-slug">{{system.slug}}</span>
+
+				{{> "stonetop.follower-selection-field" sel=tagListSel field="tagList"
+					label=(localize "stonetop.followers.tags") editable=editable}}
+
+				<div class="stonetop-follower-fields">
+					<label>{{localize "stonetop.followers.hp"}}
+						<input type="number" min="0" name="system.hp.value" value="{{system.hp.value}}">
+					</label>
+					<label>{{localize "stonetop.followers.hp"}} max
+						<input type="number" min="0" name="system.hp.max" value="{{system.hp.max}}">
+					</label>
+					<label>{{localize "stonetop.followers.armor"}}
+						<input type="text" name="system.armor" value="{{system.armor}}">
+					</label>
+					<label>{{localize "stonetop.followers.damage"}}
+						<input type="text" name="system.damage" value="{{system.damage}}">
+					</label>
+					<label>{{localize "stonetop.followers.loyalty"}} max
+						<input type="number" min="0" name="system.loyalty.max" value="{{system.loyalty.max}}">
+					</label>
+				</div>
+
+				{{> "stonetop.follower-selection-field" sel=instinctSel field="instinct"
+					label=(localize "stonetop.followers.instinct") editable=editable}}
+
+				<label class="stonetop-follower-label">{{localize "stonetop.followers.specialQuality"}}</label>
+				<input type="text" name="system.specialQuality" value="{{system.specialQuality}}">
+
+				<label class="stonetop-follower-label">{{localize "stonetop.followers.moves"}}</label>
+				<textarea name="system.moves" rows="3">{{system.moves}}</textarea>
+
+				{{> "stonetop.follower-selection-field" sel=costSel field="cost"
+					label=(localize "stonetop.followers.cost") editable=editable}}
+
+				<label class="stonetop-follower-label">{{localize "stonetop.followers.description"}}</label>
+				<textarea name="system.description" rows="3">{{system.description}}</textarea>
+
+				<label class="stonetop-follower-label">{{localize "stonetop.followers.notes"}}</label>
+				<textarea name="system.notes" rows="2">{{system.notes}}</textarea>
+			</div>
+
+			{{!-- ── CHOICES (the Crew-style choice group) ──────────────── --}}
+			<section class="stonetop-follower-section">
+				<div class="stonetop-follower-subhead">
+					<span>{{localize "stonetop.follower.choices"}}</span>
+					{{#if hasChoices}}
+					<button type="button" class="follower-choices-remove">{{localize "stonetop.follower.remove"}}</button>
+					{{else}}
+					<button type="button" class="follower-choices-add">{{localize "stonetop.follower.add"}}</button>
+					{{/if}}
+				</div>
+				{{#if hasChoices}}{{> "stonetop.choice-group-editor" cgPath="system.choices.0" rows=choiceRows}}{{/if}}
+			</section>
+
+			{{!-- ── GROUP MEMBERS ──────────────────────────────────────── --}}
+			<section class="stonetop-follower-section follower-members-panel">
+				<div class="stonetop-follower-subhead">
+					<span>{{localize "stonetop.followers.members"}}</span>
+					<button type="button" class="follower-member-add">+ {{localize "stonetop.followers.addMember"}}</button>
+				</div>
+				{{!-- One enclosing panel: the note, the name/tag/trait pools, and the member cards
+				      all read as belonging to the group (mirrors the boxed Selection fields above). --}}
+				<div class="follower-members-body">
+					<label class="stonetop-follower-label">{{localize "stonetop.follower.membersNote"}}</label>
+					<textarea name="system.membersNote" rows="2">{{system.membersNote}}</textarea>
+
+					<div class="follower-suggestions" data-suggest-key="names">
+						{{> "stonetop.string-list-editor" items=memberSuggestions.names editable=editable
+							label=(localize "stonetop.followers.suggestedNames") addLabel=(localize "stonetop.follower.option")
+							addClass="follower-suggest-add" rowClass="follower-suggest-input" removeClass="follower-suggest-remove"}}
+					</div>
+					<div class="follower-suggestions" data-suggest-key="tags">
+						{{> "stonetop.string-list-editor" items=memberSuggestions.tags editable=editable
+							label=(localize "stonetop.follower.suggestedTags") addLabel=(localize "stonetop.follower.option")
+							addClass="follower-suggest-add" rowClass="follower-suggest-input" removeClass="follower-suggest-remove"}}
+					</div>
+					<div class="follower-suggestions" data-suggest-key="traits">
+						{{> "stonetop.string-list-editor" items=memberSuggestions.traits editable=editable
+							label=(localize "stonetop.follower.suggestedTraits") addLabel=(localize "stonetop.follower.option")
+							addClass="follower-suggest-add" rowClass="follower-suggest-input" removeClass="follower-suggest-remove"}}
+					</div>
+
+					<div class="follower-members-list">
+						{{#each members}}
+						{{> "stonetop.follower-member-editor" member=this index=@index editable=../editable}}
+						{{/each}}
+					</div>
+				</div>
+			</section>
+
+			{{!-- ── ANIMAL COMPANION ───────────────────────────────────── --}}
+			<section class="stonetop-follower-section">
+				<div class="stonetop-follower-subhead">
+					<span>{{localize "stonetop.follower.companion"}}</span>
+					<label class="follower-companion-enable-label">
+						<input type="checkbox" class="follower-companion-enable" {{#if companion.enabled}}checked{{/if}}
+						       {{#unless editable}}disabled{{/unless}}>
+						<span>{{localize "stonetop.follower.companionEnable"}}</span>
+					</label>
+				</div>
+				{{#if companion.enabled}}
+				<div class="follower-companion-catalog">
+					{{#each companion.catalog}}
+					{{> "stonetop.follower-companion-type" type=this index=@index editable=../editable}}
+					{{/each}}
+				</div>
+				{{#if editable}}
+				<button type="button" class="follower-companion-add-type">+ {{localize "stonetop.follower.companionAddType"}}</button>
+				{{/if}}
+				{{/if}}
+			</section>
+
+		</div>
+
+		{{!-- ── LIVE PREVIEW (right) — same render as the character card ── --}}
+		<aside class="stonetop-follower-preview-pane">
+			<div class="stonetop-follower-preview-head">
+				<span>{{localize "stonetop.follower.preview"}}</span>
+				<button type="button" class="follower-edit-toggle" data-mode="view">{{localize "stonetop.follower.done"}}</button>
+			</div>
+			<div class="stonetop-follower-preview">{{> "stonetop.follower-card" preview}}</div>
+		</aside>
+
+	</div>
+	{{/unless}}
+</form>

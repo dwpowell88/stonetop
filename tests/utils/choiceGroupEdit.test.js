@@ -97,4 +97,22 @@ describe("choiceGroupEdit", () => {
 		expect(rows[0]).toMatchObject({ _index: 0, _target: "row", _rowIndex: 0, _hasOptionIndex: false });
 		expect(rows[1].options[0]).toMatchObject({ _index: 0, _target: "option", _rowIndex: 1, _hasOptionIndex: true, _optionIndex: 0 });
 	});
+
+	it("buildRows seeds content.textHtml (md→HTML) for rows and pick options — the <prose-mirror> seed", () => {
+		const group = {
+			slug: "choices",
+			list: [
+				{ type: "entry", slug: "e", content: { title: null, text: "**Requires** this" } },
+				{ type: "pick", pickCount: 1, options: [{ slug: "o", content: { title: "O", text: "*maybe*" } }] },
+			],
+		};
+		const rows = buildRows(group);
+		expect(rows[0].content.textHtml).toContain("<strong>Requires</strong>");
+		expect(rows[1].options[0].content.textHtml).toContain("<em>maybe</em>");
+	});
+
+	it("buildRows seeds empty textHtml when content.text is absent", () => {
+		const rows = buildRows(addRow(g(), "entry"));
+		expect(rows[0].content.textHtml).toBe("");
+	});
 });

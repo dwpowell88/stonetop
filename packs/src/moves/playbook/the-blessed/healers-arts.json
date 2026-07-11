@@ -4,8 +4,7 @@
 	"name": "Healer's Arts",
 	"type": "move",
 	"system": {
-		"playbook": "The Blessed",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When **_someone Recovers under your care_**, they recover extra HP equal to your WIS. If you also spend 1 Stock, they heal an extra 5 HP and their wounds/injuries are stabilized.",
 		"slug": "healers-arts"
 	},

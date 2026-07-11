@@ -3,7 +3,7 @@
   "_key": "!actors!OSoXnGbIUeaQk6vW",
   "name": "Dawa Eyegouger",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "dawa-eyegouger",
     "reference": "gordins-delve",
@@ -23,7 +23,7 @@
       "max": 16
     },
     "armor": "0",
-    "damage": "knife or fingers d8 (hand, messy, 1 piercing, advantage)",
+    "damage": "knife or fingers d8 (_hand_, _messy_, 1 piercing, advantage)",
     "specialQuality": "",
     "instinct": {
       "selected": [

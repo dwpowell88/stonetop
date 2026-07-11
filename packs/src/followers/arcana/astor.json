@@ -2,7 +2,7 @@
 	"_id": "QrCWSgMjE96X4dGl",
 	"_key": "!items!QrCWSgMjE96X4dGl",
 	"name": "Astor",
-	"type": "npc",
+	"type": "follower",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
 		"slug": "astor",
@@ -36,7 +36,7 @@
 		"moves": "- Stalk assigned prey\n- Manifest a ghostly presence (harmed only by silver or salt)\n- Make a pessimistic observation",
 		"cost": {
 			"selected": [
-				"proof of honor, nobility (Loyalty ◯◯◯)"
+				"proof of honor, nobility"
 			],
 			"options": [],
 			"multi": false,

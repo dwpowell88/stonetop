@@ -1,39 +1,48 @@
+import { rich } from "../RichText.js";
+
 export class SelectOptionSnapshot {
-	constructor(label, index, selected) {
-		this.label    = label;
+	// `value` is what the option stores when picked — a rating bonus (−1…+3) or a size tier string.
+	// `index` is kept only for stable DOM keys/ordering; selection is by value, not position.
+	constructor(label, index, value, selected) {
+		this.label    = rich(label);
 		this.index    = index;
+		this.value    = value;
 		this.selected = selected;
 	}
 }
 
 export class FortunesSnapshot {
-	constructor(title, note, current, options) {
+	// `current` is the stored actual value (e.g. +1); options are selected by matching that value.
+	constructor(title, note, current, options, values) {
 		this.title = title;
-		this.note = note;
+		this.note = rich(note);
 		this.current = current;
-		this.options = options.map((label, i) => new SelectOptionSnapshot(label, i, i === current));
+		this.options = options.map((label, i) => new SelectOptionSnapshot(label, i, values[i], values[i] === current));
 	}
 }
 
 export class SurplusSnapshot {
 	constructor(title, note, current) {
 		this.title = title;
-		this.note = note;
+		this.note = rich(note);
 		this.current = current;
 	}
 }
 
 export class AttributeSnapshot {
-	constructor(slug, title, note, current, options, items = []) {
+	// `current` is the stored actual value: a rating bonus (−1…+3) or a size tier string ("village").
+	// `values` are each option's stored value, parallel to `options` (their labels); an option is
+	// selected when its value equals `current`.
+	constructor(slug, title, note, current, options, values, items = []) {
 		this.slug = slug;
 		this.title = title;
-		this.note = note;
+		this.note = rich(note);
 
-		// Current selection
+		// Current selection (the actual value, not an index)
 		this.current = current;
-		// Selectable options, ex. -1, 0, +1
-		this.options = options.map((label, i) => new SelectOptionSnapshot(label, i, i === current));
-		// List of strings for things like "resources" or "fortifications"
+		// Selectable options, ex. -1, 0, +1 (or the size tiers)
+		this.options = options.map((label, i) => new SelectOptionSnapshot(label, i, values[i], values[i] === current));
+		// List of strings backing the rating — resources (Prosperity) or fortifications (Defenses)
 		this.items = items;
 	}
 }
@@ -41,8 +50,8 @@ export class AttributeSnapshot {
 export class DebilitySnapshot {
 	constructor(slug, description, note, active) {
 		this.slug = slug;
-		this.description = description;
-		this.note = note;
+		this.description = rich(description);
+		this.note = rich(note);
 		this.active = active;
 	}
 }
@@ -50,9 +59,9 @@ export class DebilitySnapshot {
 export class ContentSection {
 	constructor(slug, label, note, text, items = []) {
 		this.slug = slug;
-		this.label = label;
-		this.note = note;
-		this.text = text;
+		this.label = rich(label);
+		this.note = rich(note);
+		this.text = text;          // edit-only (rendered into a textarea) — stays a raw string
 		this.items = items;
 	}
 }
@@ -96,7 +105,7 @@ function splitIntoImprovementColumns(items) {
 	};
 }
 
-function splitIntoColumns(items, columnCount) {
+export function splitIntoColumns(items, columnCount) {
 	const rowsPerColumn = Math.ceil(items.length / columnCount) || 1;
 	return Array.from({ length: columnCount }, (_, i) =>
 		items.slice(i * rowsPerColumn, (i + 1) * rowsPerColumn)

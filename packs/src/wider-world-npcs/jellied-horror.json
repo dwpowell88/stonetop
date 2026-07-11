@@ -3,7 +3,7 @@
   "_key": "!actors!QJnJTLoZhVUuXGfq",
   "name": "Jellied horror",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "jellied-horror",
     "reference": "the-dread-river",
@@ -24,8 +24,8 @@
       "max": 19
     },
     "armor": "1 (lacks organs)",
-    "damage": "pseudopod d10+1 (reach, hand, grabby, messy, 1 piercing)",
-    "specialQuality": "immune to stabbing takes half damage from weapons unless they’re forceful; acid-proof; harmed by chalk/quicklime/similar chemics",
+    "damage": "pseudopod d10+1 (_reach_, _hand_, _grabby_, _messy_, 1 piercing)",
+    "specialQuality": "immune to stabbing; takes half damage from weapons unless they’re forceful; acid-proof; harmed by chalk/quicklime/similar chemics",
     "instinct": {
       "selected": [
         "to seep, to consume, to grow"

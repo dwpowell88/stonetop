@@ -3,7 +3,7 @@
   "_key": "!actors!k6k6fs6jBf3sVsBT",
   "name": "The Crombil, Awakened",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "the-crombil-awakened",
     "reference": "the-crombil",
@@ -24,7 +24,7 @@
       "max": 26
     },
     "armor": "3 (scales, boney ridges)",
-    "damage": "jaws like a cave d12+7 (reach, forceful, messy, 3 piercing), thrashing coils d12+5 (close, area, forceful)",
+    "damage": "jaws like a cave d12+7 (_reach_, _forceful_, _messy_, 3 piercing), thrashing coils d12+5 (_close_, _area_, _forceful_)",
     "specialQuality": "fiery heat, stomach like a furnace, too big to hurt with most weapons",
     "instinct": {
       "selected": [

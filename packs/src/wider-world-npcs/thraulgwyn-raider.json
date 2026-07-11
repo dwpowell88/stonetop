@@ -3,7 +3,7 @@
   "_key": "!actors!X8UUld5u6dtkG60l",
   "name": "Thraulgwyn raider",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "thraulgwyn-raider",
     "reference": "the-labyrinth",
@@ -24,7 +24,7 @@
       "max": 6
     },
     "armor": "0 or 1 (human hide)",
-    "damage": "obsidian-tipped bone spear d8 (close, thrown, crude), femur d8 (close, crude), hair-rope net (thrown, crude, grabby), bite d6 (hand)",
+    "damage": "obsidian-tipped bone spear d8 (_close_, _thrown_, _crude_), femur d8 (_close_, _crude_), hair-rope net (_thrown_, _crude_, _grabby_), bite d6 (_hand_)",
     "specialQuality": "gifted and marked according to their tribe (page 248)",
     "instinct": {
       "selected": [

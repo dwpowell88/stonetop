@@ -11,15 +11,19 @@ export class ChoiceGroupFactory {
 		return this;
 	}
 
-	forItem(itemId, valueField) {
+	// `sideEffects: false` yields a value-persistence-only controller (no follower/outfit-item handlers
+	// fire). Use it for choice groups whose side effects are owned by a bespoke, non-choice-group path —
+	// e.g. possessions, whose item-granting is selection-gated and handled by syncPossessionItems, so
+	// routing writes through the shared controller must NOT also fire the registered OutfitItemSideEffectHandler.
+	forItem(itemId, valueField, { sideEffects = true } = {}) {
 		const actor   = this._actor;
 		const handlers = this._handlers;
 		const getItem  = () => [...actor.items].find(i => i._id === itemId) ?? null;
 		return new ChoiceGroupController({
 			reader:           () => getItem()?.system?.[valueField] ?? {},
 			writer:           async (v) => actor.updateEmbeddedDocuments("Item", [{ _id: itemId, system: { [valueField]: v } }]),
-			definitionGetter: (ns) => _smartDefaultDef(getItem(), ns),
-			handlers,
+			definitionGetter: sideEffects ? (ns) => _smartDefaultDef(getItem(), ns) : () => null,
+			handlers:         sideEffects ? handlers : [],
 		});
 	}
 

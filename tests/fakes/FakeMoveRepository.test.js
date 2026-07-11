@@ -11,29 +11,6 @@ describe("FakeMoveRepository — world moves via addWorld", () => {
 		expect(index.get("iron-wall").name).toBe("Iron Wall");
 	});
 
-	it("getPlaybookMoves returns world move matching playbook and moveType", async () => {
-		const repo = new FakeMoveRepository();
-		repo.addWorld(
-			new FakeCompendiumMoveBuilder()
-				.withName("Smite").withMoveType("playbook").withPlaybook("The Blessed")
-				.build()
-		);
-		const moves = await repo.getPlaybookMoves("The Blessed");
-		expect(moves).toHaveLength(1);
-		expect(moves[0].name).toBe("Smite");
-	});
-
-	it("getPlaybookMoves does not return world move for a different playbook", async () => {
-		const repo = new FakeMoveRepository();
-		repo.addWorld(
-			new FakeCompendiumMoveBuilder()
-				.withName("Smite").withMoveType("playbook").withPlaybook("The Blessed")
-				.build()
-		);
-		const moves = await repo.getPlaybookMoves("The Heavy");
-		expect(moves).toHaveLength(0);
-	});
-
 	it("getBasicMoves returns world moves with moveType basic", async () => {
 		const repo = new FakeMoveRepository();
 		repo.addWorld(
@@ -43,12 +20,12 @@ describe("FakeMoveRepository — world moves via addWorld", () => {
 		expect(moves.some(m => m.name === "Defy Danger")).toBe(true);
 	});
 
-	it("getBasicMoveDocument falls back to world store when not in basicMoves", async () => {
+	it("getReferencedMoveDocument falls back to world store", async () => {
 		const repo = new FakeMoveRepository();
 		repo.addWorld(
 			new FakeCompendiumMoveBuilder().withName("Aid or Interfere").withMoveType("basic").build()
 		);
-		const doc = await repo.getBasicMoveDocument("aid-or-interfere");
+		const doc = await repo.getReferencedMoveDocument("aid-or-interfere");
 		expect(doc).not.toBeNull();
 		expect(doc.name).toBe("Aid or Interfere");
 	});

@@ -1,7 +1,7 @@
 {
 	"name": "Crew",
-	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"type": "follower",
+	"img": "systems/stonetop/assets/content/playbooks/the-marshal.png",
 	"system": {
 		"slug": "crew",
 		"arcanaSlug": null,

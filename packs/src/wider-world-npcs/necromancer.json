@@ -3,7 +3,7 @@
   "_key": "!actors!A62aRyxD0FFKIY4v",
   "name": "Necromancer",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "necromancer",
     "reference": "death-and-the-undying",
@@ -24,7 +24,7 @@
       "max": 12
     },
     "armor": "0 (or by worn armor)",
-    "damage": "silver-alloy knife d8 (hand)",
+    "damage": "silver-alloy knife d8 (_hand_)",
     "specialQuality": "can sense active spirits",
     "instinct": {
       "selected": [

@@ -4,8 +4,7 @@
 	"name": "Parry & Riposte",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Defend with a weapon that you can wield quickly_**, you can spend 1 Readiness to both halve an attack's effects/damage and strike back at the attacker (deal your damage with disadvantage), instead of spending 1 Readiness for each.",
 		"requirement": {
 			"moves": [

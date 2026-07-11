@@ -3,7 +3,7 @@
   "_key": "!actors!QKGVSN9EKkazJooF",
   "name": "Desperate souls",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "desperate-souls",
     "reference": "gordins-delve",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "0",
-    "damage": "brick, makeshift club, rusty knife d6 (hand, crude)",
+    "damage": "brick, makeshift club, rusty knife d6 (_hand_, _crude_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

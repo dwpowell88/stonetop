@@ -7,9 +7,22 @@
 	"system": {
 		"slug": "aviary",
 		"label": "Aviary",
-		"description": "a building with trained birds to carry messages. When you *send a message by trained bird*, the GM will tell you when (or if) you receive a reply, and what it says.",
+		"description": "thick gloves, bird hoods, tethers, seed, ◇ messenger birds, ◇ birdcages, etc.",
 		"resource": null,
-		"outfitItems": [],
+		"outfitItems": [
+			{
+				"slug": "messenger-birds",
+				"name": "Messenger birds",
+				"weight": 1,
+				"inventoryColumn": "regular"
+			},
+			{
+				"slug": "birdcages",
+				"name": "Birdcages",
+				"weight": 1,
+				"inventoryColumn": "regular"
+			}
+		],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null

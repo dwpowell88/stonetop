@@ -7,11 +7,14 @@ import { CharacterFollowers } from "../actors/character/CharacterFollowers.js";
 import { ActorOutfitItems } from "../actors/character/ActorOutfitItems.js";
 import { ResourceController } from "../actors/character/ResourceController.js";
 import { migrateChoiceRow } from "./migrateChoices.js";
+import { Selection } from "../model/data/Selection.js";
 
 const SCOPE = "stonetop";
 
 const VALID_ITEM_TYPES = new Set([
-	"move", "playbook", "possession", "arcanum", "npc", "insert", "outfitItem", "equipment",
+	// "npc" kept alongside "follower" so pre-rename follower items survive migrateStaleItemTypes long
+	// enough for migrateFollowerItemType to convert them.
+	"move", "playbook", "possession", "arcanum", "follower", "npc", "insert", "outfitItem", "equipment",
 ]);
 
 // ── Public exports ────────────────────────────────────────────────────────────
@@ -21,6 +24,21 @@ export async function migrateStaleItemTypes(actor) {
 	if (stale.length) await actor.deleteEmbeddedDocuments("Item", stale.map(i => i._id));
 }
 
+// The follower Item type was renamed `npc` → `follower`. Foundry can't change a document's `type` in
+// place, so recreate each legacy `npc` item as `follower` (preserving name/img/flags/system) and
+// delete the original. Followers match by slug (not _id) and loyalty is slug-keyed in flags, so the
+// new _ids are harmless. Same create-then-delete pattern as migrateWorldItems (equipment → arcanum).
+export async function migrateFollowerItemType(actor) {
+	const legacy = [...actor.items].filter(i => i.type === "npc");
+	if (!legacy.length) return;
+	const created = legacy.map(i => {
+		const o = i.toObject?.() ?? i;
+		return { name: o.name, img: o.img ?? null, type: "follower", system: o.system ?? {}, flags: o.flags ?? {} };
+	});
+	await actor.createEmbeddedDocuments("Item", created);
+	await actor.deleteEmbeddedDocuments("Item", legacy.map(i => i._id));
+}
+
 function _logArcanumFlipped(actor, label) {
 	const arcanums = [...actor.items].filter(i => i.type === "arcanum");
 	for (const a of arcanums) info(`  [${label}] ${a.system?.slug}: flipped=${a.system?.flipped}`);
@@ -28,9 +46,10 @@ function _logArcanumFlipped(actor, label) {
 
 export async function migrateCharacter(actor, repos, insertRepo = null) {
 	await migrateStaleItemTypes(actor);
+	await migrateFollowerItemType(actor);
 	await migrateCharacterFlags(actor);
 	await migrateEmbeddedMoveSlugs(actor);
-	await migrateCharacterMoves(actor, repos.moves);
+	await migrateCharacterMoves(actor, repos.moves, insertRepo);
 	await migratePlaybookSpecialPossessions(actor);
 	await migratePlaybookChoices(actor, repos.playbooks);
 	await migratePlaybookIntroductions(actor, repos.playbooks);
@@ -42,8 +61,12 @@ export async function migrateCharacter(actor, repos, insertRepo = null) {
 	_logArcanumFlipped(actor, "after migrateArcana");
 	await migrateArcanumPackData(actor, repos.arcana);
 	_logArcanumFlipped(actor, "after migrateArcanumPackData");
+	await migrateArcanaMoves(actor, repos.arcana, repos.moves);
+	_logArcanumFlipped(actor, "after migrateArcanaMoves");
+	await migrateArcanumChoiceGroupSlugs(actor);
 	await migrateFollowers(actor, repos.followers, resourceController);
 	_logArcanumFlipped(actor, "after migrateFollowers");
+	await migrateArcanaFollowerPackData(actor, repos.followers);
 
 	const moves = new CharacterMoves(repos.moves, actor, null);
 	await migratePossessions(actor, repos.possessions, moves, outfitItems);
@@ -106,7 +129,7 @@ export async function migrateEmbeddedMoveSlugs(actor) {
 
 // ── B. Embedded move items ────────────────────────────────────────────────────
 
-export async function migrateCharacterMoves(actor, moveRepo) {
+export async function migrateCharacterMoves(actor, moveRepo, insertRepo = null) {
 	const existing = [...actor.items].filter(i => i.type === "move");
 	if (existing.some(i => i.system?.categoryKey != null)) return;
 
@@ -150,7 +173,8 @@ export async function migrateCharacterMoves(actor, moveRepo) {
 
 	for (const cat of categories.filter(c => c.key.startsWith("post-death-"))) {
 		const insertSlug = cat.key.replace("post-death-", "");
-		await moves.addCategory(`insert-${insertSlug}`, cat.label ?? insertSlug, insertSlug);
+		const insertDoc  = insertRepo ? await insertRepo.findBySlug(insertSlug) : null;
+		await moves.addCategory(`insert-${insertSlug}`, cat.label ?? insertSlug, insertDoc?.system?.moves ?? [], insertDoc?.system?.startingMoves ?? []);
 	}
 }
 
@@ -271,25 +295,72 @@ export async function migrateArcana(actor, arcanaRepo, followerRepo) {
 		const item = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === slug);
 		info(`migrateArcana [${slug}]: item found=${!!item} id=${item?._id} currentFlipped=${item?.system?.flipped}`);
 		if (!item) continue;
+		// Unlock + back-choice groups are both namespaced by the arcanum slug, so they share the arcanum
+		// slug as their key in the single `choiceValues` store.
 		const update = {
 			_id: item._id,
 			system: {
-				flipped:          flippedSet.has(slug),
-				unlockValues:     { [slug]: unlockMap[slug] ?? {} },
-				backChoiceValues: { [slug]: backMap[slug]   ?? {} },
+				flipped:      flippedSet.has(slug),
+				choiceValues: { [slug]: { ...(unlockMap[slug] ?? {}), ...(backMap[slug] ?? {}) } },
 			},
 		};
-		info(`migrateArcana [${slug}]: sending update flipped=${update.system.flipped} unlockValues=${JSON.stringify(update.system.unlockValues)}`);
+		info(`migrateArcana [${slug}]: sending update flipped=${update.system.flipped} choiceValues=${JSON.stringify(update.system.choiceValues)}`);
 		await actor.updateEmbeddedDocuments("Item", [update]);
 		const after = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === slug);
-		info(`migrateArcana [${slug}]: after update flipped=${after?.system?.flipped} unlockValues=${JSON.stringify(after?.system?.unlockValues)}`);
+		info(`migrateArcana [${slug}]: after update flipped=${after?.system?.flipped} choiceValues=${JSON.stringify(after?.system?.choiceValues)}`);
 	}
+}
+
+// ── F2. Arcana mystery moves → real move items ────────────────────────────────
+// Major arcana now own their mystery moves as real `move` items in an `arcana-<slug>` category
+// (mystery-moves-as-real-moves). Existing embedded major arcana carry the legacy inline back.moves and
+// no category; refresh their `back` from the repo so they gain back.moveSlugs, then register the
+// category. addCategory is idempotent (skips if the category already exists), so this is re-run safe.
+export async function migrateArcanaMoves(actor, arcanaRepo, moveRepo) {
+	const arcana = [...actor.items].filter(i => i.type === "arcanum");
+	if (!arcana.length) return;
+
+	const moves = new CharacterMoves(moveRepo, actor, null, null);
+	for (const item of arcana) {
+		const slug = item.system?.slug;
+		if (!slug) continue;
+
+		let back = item.system?.back ?? {};
+		if (!(back.moveSlugs?.length)) {
+			const raw = await arcanaRepo.findBySlug(slug);
+			if (raw?.back?.moveSlugs?.length) {
+				back = raw.back;
+				await actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { back } }]);
+			}
+		}
+
+		const moveSlugs = back.moveSlugs ?? [];
+		if (moveSlugs.length) await moves.addCategory(`arcana-${slug}`, item.name ?? slug, moveSlugs, []);
+	}
+}
+
+// Normalize each embedded arcanum's back-choices group slug to the arcanum's own slug. Two
+// hand-authored arcana (blackwood-fetishes, mindgem) shipped with `back.choices.slug: "followers"`,
+// but the group is namespaced by the arcanum slug everywhere else in the pipeline (write, read,
+// side-effect def lookup). The mismatch made the choice-group side effect silently no-op, so ticking
+// a follower box never embedded the follower. Idempotent; only touches items that actually differ.
+export async function migrateArcanumChoiceGroupSlugs(actor) {
+	const updates = [];
+	for (const item of actor.items) {
+		if (item.type !== "arcanum") continue;
+		const slug      = item.system?.slug;
+		const back      = item.system?.back;
+		const groupSlug = back?.choices?.slug;
+		if (!slug || groupSlug == null || groupSlug === slug) continue;
+		updates.push({ _id: item._id, system: { back: { ...back, choices: { ...back.choices, slug } } } });
+	}
+	if (updates.length) await actor.updateEmbeddedDocuments("Item", updates);
 }
 
 // ── G. Follower items ─────────────────────────────────────────────────────────
 
 export async function migrateFollowers(actor, followerRepo, resourceController) {
-	if ([...actor.items].some(i => i.type === "npc" && i.system?.owned)) return;
+	if ([...actor.items].some(i => i.type === "follower" && i.system?.owned)) return;
 
 	const ownedSlugs = actor.getFlag(SCOPE, "followers.owned") ?? [];
 	const state      = actor.getFlag(SCOPE, "followers.state") ?? {};
@@ -301,7 +372,7 @@ export async function migrateFollowers(actor, followerRepo, resourceController) 
 		if (slug.startsWith("custom-")) {
 			const s = state[slug] ?? {};
 			await actor.createEmbeddedDocuments("Item", [{
-				name: s.name ?? "New Follower", type: "npc",
+				name: s.name ?? "New Follower", type: "follower",
 				system: {
 					slug, arcanaSlug: null, tagList: s.tags ?? "",
 					hp:     { value: s.hp ?? 0, max: s.hpMax ?? 0 },
@@ -320,7 +391,7 @@ export async function migrateFollowers(actor, followerRepo, resourceController) 
 
 	// Apply mutable state
 	for (const [slug, s] of Object.entries(state)) {
-		const item = [...actor.items].find(i => i.type === "npc" && i.system?.slug === slug);
+		const item = [...actor.items].find(i => i.type === "follower" && i.system?.slug === slug);
 		if (!item) continue;
 		const update = { _id: item._id, system: {} };
 		if (s.hp != null || s.hpMax != null)
@@ -345,7 +416,7 @@ export async function migrateInsert(actor, insertRepo, moves) {
 	if (!doc) return;
 
 	await actor.createEmbeddedDocuments("Item", [doc.toObject()]);
-	await moves.addCategory(`insert-${slug}`, doc.name ?? slug, slug);
+	await moves.addCategory(`insert-${slug}`, doc.name ?? slug, doc.system?.moves ?? [], doc.system?.startingMoves ?? []);
 }
 
 // ── I. Equipment → arcanum ────────────────────────────────────────────────────
@@ -360,13 +431,12 @@ export async function migrateEmbeddedEquipment(actor) {
 			img:    item.img ?? null,
 			type:   "arcanum",
 			system: {
-				slug:             sys.slug   ?? null,
-				major:            sys.major  ?? false,
-				front:            sys.front,
-				back:             sys.back,
-				flipped:          false,
-				unlockValues:     {},
-				backChoiceValues: {},
+				slug:         sys.slug   ?? null,
+				major:        sys.major  ?? false,
+				front:        sys.front,
+				back:         sys.back,
+				flipped:      false,
+				choiceValues: {},
 			},
 		}]);
 		await actor.deleteEmbeddedDocuments("Item", [item._id]);
@@ -515,20 +585,55 @@ export async function migratePlaybookChoices(actor, playbookRepo) {
 	await actor.updateEmbeddedDocuments("Item", [{ _id: pbItem._id, system: { choices: compendiumChoices } }]);
 }
 
-// ── M. Repair arcanum items with empty front/back ─────────────────────────────
-
+// ── M. Refresh arcanum authored content (front/back) from the compendium ──────
+// An embedded arcanum is an independent copy — regenerating the pack doesn't reach it. Refresh every
+// arcanum's authored `front`/`back` from the repo (matched by slug) so pack fixes reach existing
+// characters: cleaned front/back text, the inline @DrawTableInline dice table, and the re-added
+// follower `back.choices`. Player state (`flipped` + `choiceValues`: marked circles, picks, follower
+// selections) lives outside front/back, so a front/back-only merge update preserves it. Idempotent —
+// runs once per world migration (also covers the old case of an item left with an empty front).
 export async function migrateArcanumPackData(actor, arcanaRepo) {
-	const stale = [...actor.items].filter(
-		i => i.type === "arcanum" && Object.keys(i.system?.front ?? {}).length === 0,
-	);
-	if (!stale.length) return;
+	const items = [...actor.items].filter(i => i.type === "arcanum" && i.system?.slug);
 	const updates = [];
-	for (const item of stale) {
-		const slug = item.system?.slug;
-		if (!slug) continue;
-		const raw = await arcanaRepo.findBySlug(slug);
+	for (const item of items) {
+		const raw = await arcanaRepo.findBySlug(item.system.slug);
 		if (!raw?.front) continue;
 		updates.push({ _id: item._id, system: { front: raw.front, back: raw.back } });
+	}
+	if (updates.length) await actor.updateEmbeddedDocuments("Item", updates);
+}
+
+// ── N. Refresh an acquired arcana follower's authored stat block from the pack ─
+// An acquired arcana follower is an embedded copy, so regenerating the pack doesn't reach it. Refresh
+// each embedded arcana follower's authored fields from the repo (matched by slug): the tag/instinct/
+// cost pick-list options, the selectable-move choice group, moves, marker icon, and stats. Player state
+// is preserved by omission — loyalty, current HP (hp.value), owned, choiceValues (which moves/picks are
+// checked), inventory, members, companion all stay (Foundry merges the partial update). Scoped to arcana
+// followers (arcanaSlug set); playbook/custom followers aren't parsed from the book. Idempotent.
+export async function migrateArcanaFollowerPackData(actor, followerRepo) {
+	const items = [...actor.items].filter(i => i.type === "follower" && i.system?.arcanaSlug && i.system?.slug);
+	if (!items.length) return;
+	const bySlug = new Map((await followerRepo.findBySlugs(items.map(i => i.system.slug))).map(f => [f.slug, f]));
+	const updates = [];
+	for (const item of items) {
+		const f = bySlug.get(item.system.slug);
+		if (!f) continue;
+		updates.push({
+			_id: item._id,
+			...(f.img ? { img: f.img } : {}),
+			system: {
+				tagList:        Selection.fromStored(f.tags,     { multi: true  }).toRaw(),
+				instinct:       Selection.fromStored(f.instinct, { multi: false }).toRaw(),
+				cost:           Selection.fromStored(f.cost,     { multi: false }).toRaw(),
+				moves:          f.moves ?? "",
+				choices:        f.choices ?? [{ slug: "choices", list: [] }],
+				armor:          f.armor ?? "",
+				damage:         f.damage ?? "",
+				specialQuality: f.specialQuality ?? "",
+				description:    f.description ?? "",
+				hp:             { value: item.system?.hp?.value ?? 0, max: f.hp?.max ?? 0 }, // keep current HP, refresh max
+			},
+		});
 	}
 	if (updates.length) await actor.updateEmbeddedDocuments("Item", updates);
 }

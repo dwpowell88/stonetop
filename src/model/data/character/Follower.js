@@ -2,6 +2,7 @@ export class Follower {
 	constructor(data) {
 		this.slug             = data.slug;
 		this.name             = data.name;
+		this.img              = data.img              ?? null;
 		this.tags             = data.tagList     ?? data.tags ?? null;
 		this.hp               = data.hp               ?? { value: 0, max: 0 };
 		this.armor            = data.armor            ?? "";

@@ -3,7 +3,7 @@
   "_key": "!actors!NB1CCQ4S9GBtDNE2",
   "name": "The Ghostly Legion",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "the-ghostly-legion",
     "reference": "death-and-the-undying",
@@ -26,7 +26,7 @@
       "max": 10
     },
     "armor": "1 (lacks organs)",
-    "damage": "ghostly short sword or spear d6 w/advantage (hand, close)",
+    "damage": "ghostly short sword or spear d6 w/advantage (_hand_, _close_)",
     "specialQuality": "roams far and wide, but tethered to the cave; shuns daylight; can only touch the world through violence; upsetting to/afraid of dogs",
     "instinct": {
       "selected": [

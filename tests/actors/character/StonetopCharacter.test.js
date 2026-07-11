@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import {TestCharacterBuilder} from "../../fakes/TestCharacterBuilder.js";
-import {FakeActorBuilder} from "../../fakes/FakeActorBuilder.js";
+import {FakeCharacterActorBuilder} from "../../fakes/FakeCharacterActorBuilder.js";
 
 // -- onDropItems --------------------------------------------------------------
 
 describe("StonetopCharacter.onDropItems", () => {
 	function makeChar() {
-		return new TestCharacterBuilder(new FakeActorBuilder().build()).build();
+		return new TestCharacterBuilder(new FakeCharacterActorBuilder().build()).build();
 	}
 
 	it("returns arcanum items in others for Foundry to embed natively", async () => {
@@ -67,7 +67,7 @@ describe("StonetopCharacter.onDropItems", () => {
 
 	it("deletes existing playbook item before returning new one in others", async () => {
 		const existingPlaybook = { _id: "old-pb-id", type: "playbook", system: { slug: "the-blessed" } };
-		const actor = new FakeActorBuilder().withItems([existingPlaybook]).build();
+		const actor = new FakeCharacterActorBuilder().withItems([existingPlaybook]).build();
 		const char = new TestCharacterBuilder(actor).build();
 		const newPlaybook = { type: "playbook", system: { slug: "the-ranger" } };
 
@@ -96,7 +96,7 @@ describe("StonetopCharacter._onDeleteDescendantDocuments", () => {
 			_id: "pouch-item-id", type: "possession",
 			system: { slug: "sacred-pouch", playbookSlug: "the-blessed" },
 		};
-		const actor = new FakeActorBuilder().withItems([possessionItem]).build();
+		const actor = new FakeCharacterActorBuilder().withItems([possessionItem]).build();
 		const char = new TestCharacterBuilder(actor).build();
 
 		await char._onDeleteDescendantDocuments([
@@ -111,7 +111,7 @@ describe("StonetopCharacter._onDeleteDescendantDocuments", () => {
 			_id: "pouch-item-id", type: "possession",
 			system: { slug: "sacred-pouch", playbookSlug: "the-fox" },
 		};
-		const actor = new FakeActorBuilder().withItems([possessionItem]).build();
+		const actor = new FakeCharacterActorBuilder().withItems([possessionItem]).build();
 		const char = new TestCharacterBuilder(actor).build();
 
 		await char._onDeleteDescendantDocuments([
@@ -126,7 +126,7 @@ describe("StonetopCharacter._onDeleteDescendantDocuments", () => {
 			_id: "pouch-item-id", type: "possession",
 			system: { slug: "sacred-pouch", playbookSlug: "the-blessed" },
 		};
-		const actor = new FakeActorBuilder().withItems([possessionItem]).build();
+		const actor = new FakeCharacterActorBuilder().withItems([possessionItem]).build();
 		const char = new TestCharacterBuilder(actor).build();
 
 		await char._onDeleteDescendantDocuments([
@@ -141,7 +141,7 @@ describe("StonetopCharacter._onDeleteDescendantDocuments", () => {
 
 describe("StonetopCharacter.selectBackground", () => {
 	it("calls background.selectBackground with the slug", async () => {
-		const char = new TestCharacterBuilder(new FakeActorBuilder().build()).build();
+		const char = new TestCharacterBuilder(new FakeCharacterActorBuilder().build()).build();
 		const selectBg = vi.spyOn(char.background, "selectBackground").mockResolvedValue();
 
 		await char.selectBackground("vessel");
@@ -150,7 +150,7 @@ describe("StonetopCharacter.selectBackground", () => {
 	});
 
 	it("passes the slug through to background.selectBackground", async () => {
-		const char = new TestCharacterBuilder(new FakeActorBuilder().build()).build();
+		const char = new TestCharacterBuilder(new FakeCharacterActorBuilder().build()).build();
 		const selectBg = vi.spyOn(char.background, "selectBackground").mockResolvedValue();
 
 		await char.selectBackground("initiate");
@@ -165,7 +165,7 @@ describe("StonetopCharacter.selectBackground", () => {
 
 describe("StonetopCharacter — bio and notes", () => {
 	function makeCharWith(system = {}) {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		Object.assign(actor.system, system);
 		return { char: new TestCharacterBuilder(actor).build(), actor };
 	}
@@ -195,7 +195,7 @@ describe("StonetopCharacter — bio and notes", () => {
 
 describe("StonetopCharacter.setChoicePick — playbook choice routing", () => {
 	function makeChar() {
-		return new TestCharacterBuilder(new FakeActorBuilder().build()).build();
+		return new TestCharacterBuilder(new FakeCharacterActorBuilder().build()).build();
 	}
 
 	it.each(["lore", "playbook-choice", "instinct", "appearance", "intro-npc", "intro-pc"])(

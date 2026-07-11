@@ -3,13 +3,13 @@ import { CharacterBackgrounds } from "../../../src/actors/character/CharacterBac
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
 import { FollowerSideEffectHandler } from "../../../src/actors/character/SideEffectHandler.js";
 import { ResourceController } from "../../../src/actors/character/ResourceController.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeFollowers } from "../../fakes/FakeFollowers.js";
 import { BackgroundSection } from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 import { ChoiceGroup } from "../../../src/model/snapshot/character/ChoiceGroup.js";
 
 function makeResourceController() {
-	return new ResourceController(new FakeActorBuilder().build());
+	return new ResourceController(new FakeCharacterActorBuilder().build());
 }
 
 function makePbItem(backgroundValues = {}, backgrounds = []) {
@@ -17,7 +17,7 @@ function makePbItem(backgroundValues = {}, backgrounds = []) {
 }
 
 function makeBg(selectedSlug = "", backgroundValues = {}, followers = null, resourceCtrl = null, pbBackgrounds = []) {
-	const actor = new FakeActorBuilder().withItems([makePbItem(backgroundValues, pbBackgrounds)]).build();
+	const actor = new FakeCharacterActorBuilder().withItems([makePbItem(backgroundValues, pbBackgrounds)]).build();
 	actor.system.background = { selected: selectedSlug };
 	const factory = new ChoiceGroupFactory(actor);
 	if (followers) factory.register(new FollowerSideEffectHandler(followers));
@@ -117,8 +117,8 @@ describe("CharacterBackgrounds.buildSnapshot", () => {
 	it("option has slug, label, and description", async () => {
 		const snap = await makeBg().buildSnapshot(SIMPLE_BG_DATA);
 		expect(snap.options[0].slug).toBe("initiate");
-		expect(snap.options[0].label).toBe("Initiate");
-		expect(snap.options[0].description).toBe("<p>Initiate.</p>");
+		expect(snap.options[0].label.raw).toBe("Initiate");
+		expect(snap.options[0].description.raw).toBe("<p>Initiate.</p>");
 	});
 
 	it("option matching selectedSlug is marked selected", async () => {

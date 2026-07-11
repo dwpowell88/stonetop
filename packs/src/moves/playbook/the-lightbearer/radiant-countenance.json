@@ -4,8 +4,7 @@
 	"name": "Radiant Countenance",
 	"type": "move",
 	"system": {
-		"playbook": "The Lightbearer",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_give someone your fond attention_**, you can then Persuade them with advantage. If they are a follower, you can instead choose to Strengthen Your Bond (as if you paid their cost).",
 		"slug": "radiant-countenance"
 	},

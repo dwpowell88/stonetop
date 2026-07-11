@@ -1,4 +1,5 @@
 import { OutfitSection, OutfitItemSnapshotBuilder } from "./InventorySnapshot.js";
+import { rich } from "../RichText.js";
 
 // Group outfit items into render sections for one inventory column ("regular" | "small").
 // Repo (pack/world) items are grouped by their folder-derived `group`, preserving encounter order;
@@ -34,8 +35,8 @@ export function buildOutfitColumn(repoItems, customItems, checkedMap, column, re
 	const mapItem = (oi) => new OutfitItemSnapshotBuilder()
 		.withSlug(oi.slug)
 		.withName(oi.name)
-		.withTags(oi.tags)
-		.withNote(oi.note)
+		.withTags(rich(oi.tags))
+		.withNote(rich(oi.note))
 		.withWeight(oi.weight)
 		.withChecked(checkedMap[oi.slug] ?? false)
 		.withResource(resourceFn(oi))

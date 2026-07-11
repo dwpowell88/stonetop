@@ -3,7 +3,7 @@
   "_key": "!actors!Cu8RAG7lySmlsOnn",
   "name": "Wisent",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "wisent",
     "reference": "the-great-wood",
@@ -22,7 +22,7 @@
       "max": 10
     },
     "armor": "0",
-    "damage": "headbutt, gore, trample d8+3 (hand, close, forceful)",
+    "damage": "headbutt, gore, trample d8+3 (_hand_, _close_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

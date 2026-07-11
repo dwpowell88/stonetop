@@ -65,6 +65,16 @@ export class StonetopPlaybook {
 		return this._stonetopItem.system?.inserts ?? [];
 	}
 
+	// The playbook owns its moves by slug; startingMoves is the subset seeded acquired at creation.
+	// initPlaybookCategory reads both — without these getters the moves tab stays empty.
+	get moves() {
+		return this._stonetopItem.system?.moves ?? [];
+	}
+
+	get startingMoves() {
+		return this._stonetopItem.system?.startingMoves ?? [];
+	}
+
 	get lore() {
 		return this._stonetopItem.system?.lore ?? [];
 	}

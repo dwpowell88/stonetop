@@ -1,0 +1,12 @@
+{
+	"_id": "fcaef86bf811904d",
+	"_key": "!items!fcaef86bf811904d",
+	"name": "Roots of the Elder Tree",
+	"type": "move",
+	"system": {
+		"slug": "roots-of-the-elder-tree",
+		"moveType": null,
+		"description": "When you **_stand with your feet firmly on the ground and strike a spirit, ghost, or demon_**, you can mark a consequence to send your target coursing through you and into the depths of the earth, where it is bound fast."
+	},
+	"folder": "ArcanaMoves00001"
+}

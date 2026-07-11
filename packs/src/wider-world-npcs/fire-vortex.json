@@ -3,7 +3,7 @@
   "_key": "!actors!FqGQGutoqve2LJI6",
   "name": "Fire vortex",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "fire-vortex",
     "reference": "tempest-lords",
@@ -26,8 +26,8 @@
       "max": 0
     },
     "armor": "by HP",
-    "damage": "flames & fire (damage and tags by HP, +dangerous)",
-    "specialQuality": "fireproof harmed only by magical attacks, water, or smothering",
+    "damage": "flames & fire (damage and tags by HP, +_dangerous_)",
+    "specialQuality": "fireproof; harmed only by magical attacks, water, or smothering",
     "instinct": {
       "selected": [
         "to consume"

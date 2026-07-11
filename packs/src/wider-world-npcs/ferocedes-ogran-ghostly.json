@@ -3,7 +3,7 @@
   "_key": "!actors!8UOrRQNuPTrhMiJV",
   "name": "Ferocedes Ogran, ghostly",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-eye.png",
   "system": {
     "slug": "ferocedes-ogran-ghostly",
     "reference": "the-ruined-tower",
@@ -28,7 +28,7 @@
       "max": 23
     },
     "armor": "4 (metal, amorphous)",
-    "damage": "pummel d12+3 (close, reach, forceful) or barrage of metal d10+1 (near, area, messy, forceful, reload, 1 piercing)",
+    "damage": "pummel d12+3 (_close_, _reach_, _forceful_) or barrage of metal d10+1 (_near_, _area_, _messy_, _forceful_, _reload_, 1 piercing)",
     "specialQuality": "tethered to his forge, and can’t venture far from it; speaks Tem- pest Lord (understood by all)",
     "instinct": {
       "selected": [

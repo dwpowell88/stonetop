@@ -9,7 +9,20 @@
 		"label": "Mummer's kit",
 		"description": "juggling balls, whirlybird seeds, motley, ribbons, bells, ◇ puppets, ◇ a fiddle, etc.",
 		"resource": null,
-		"outfitItems": [],
+		"outfitItems": [
+			{
+				"slug": "mummer-puppets",
+				"name": "Puppets",
+				"weight": 1,
+				"inventoryColumn": "regular"
+			},
+			{
+				"slug": "mummer-fiddle",
+				"name": "A fiddle",
+				"weight": 1,
+				"inventoryColumn": "regular"
+			}
+		],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null

@@ -28,12 +28,21 @@ describe("CharacterData defaults", () => {
 		expect(new CharacterData().playbookSlug).toBe("");
 	});
 
-	it("defaults choices, resources, and moveResources sections", () => {
+	it("defaults choices, resources, and moveResources sections (counts + texts)", () => {
 		const d = new CharacterData();
 		expect(d.choices.values).toEqual({});
 		expect(d.choices.groupDefs).toEqual({});
 		expect(d.resources.counts).toEqual({});
+		expect(d.resources.texts).toEqual({});
 		expect(d.moveResources.counts).toEqual({});
+		expect(d.moveResources.texts).toEqual({});
+	});
+
+	it("keeps a resource fill-in text on moveResources.texts (the section CharacterMoves writes to)", () => {
+		// A move's resource controller uses the "moveResources" section, so its texts field must exist in
+		// the schema — otherwise the DataModel strips the write and the fill-in never persists.
+		const d = new CharacterData({ moveResources: { texts: { moves: { battery: "a caged storm" } } } });
+		expect(d.moveResources.texts).toEqual({ moves: { battery: "a caged storm" } });
 	});
 
 	it("defaults background, instinct, origin, and lore sections", () => {

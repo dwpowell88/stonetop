@@ -1,0 +1,13 @@
+{
+	"_id": "cf00f8a3cdb5c747",
+	"_key": "!items!cf00f8a3cdb5c747",
+	"name": "Fanning the Flames",
+	"type": "move",
+	"system": {
+		"slug": "fanning-the-flames",
+		"moveType": null,
+		"description": "When you **_use Inflame_**, you can incite everyone who can hear you into violent action, not just an individual. If you do, roll once for the entire crowd, but each target makes their own choices. **On a 7-9**, you must also choose a Consequence; **on a 6-**, the GM chooses a Consequence for you in addition to whatever else happens.\n\nWhen you **_use Burning Hatred_**, you can mark a consequence to target not just the person or thing you hate but also everything near them. Roll +CHA once but roll damage for each victim. Any combustibles on your targets also erupt into flame.",
+		"rollStat": "cha"
+	},
+	"folder": "ArcanaMoves00001"
+}

@@ -1,0 +1,19 @@
+{{!-- Editor for one follower Selection field (tagList / instinct / cost). Authors the pickable
+      `options` (via the shared string-list editor) plus the pre-selected default(s). The enclosing
+      [data-selection-field] wrapper tells the sheet's handlers which field to write; they round-trip
+      through Selection (NOT the choice-group instinct helpers — different shape). Params: sel (the
+      normalized Selection raw {selected,options,...}), field, label, editable. --}}
+<div class="follower-selection" data-selection-field="{{field}}">
+	<span class="follower-selection-head stonetop-follower-label">{{label}}</span>
+	<div class="follower-selection-body">
+		{{> "stonetop.string-list-editor" items=sel.options editable=editable
+			label=(localize "stonetop.follower.options") addLabel=(localize "stonetop.follower.option")
+			addClass="follower-option-add" rowClass="follower-option-input" removeClass="follower-option-remove"}}
+		<label class="follower-selection-default">
+			<span>{{localize "stonetop.follower.default"}}</span>
+			<input type="text" class="follower-selection-selected" data-selection-field="{{field}}"
+			       value="{{join sel.selected}}" placeholder="{{localize 'stonetop.follower.defaultPlaceholder'}}"
+			       {{#unless editable}}disabled{{/unless}}>
+		</label>
+	</div>
+</div>

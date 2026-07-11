@@ -3,7 +3,7 @@
   "_key": "!actors!f7T5AFZQ06BGwF9M",
   "name": "Infantry",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "infantry",
     "reference": "lygos-and-the-south",
@@ -21,7 +21,7 @@
       "max": 3
     },
     "armor": "2 (shield, linen cuirass)",
-    "damage": "iron-tipped long spear d6 (reach), or short sword d6 (hand, close)",
+    "damage": "iron-tipped long spear d6 (_reach_), or short sword d6 (_hand_, _close_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

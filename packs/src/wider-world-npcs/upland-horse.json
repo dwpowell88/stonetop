@@ -3,7 +3,7 @@
   "_key": "!actors!GBc6q3UEPOYXcfF4",
   "name": "Upland horse",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "upland-horse",
     "reference": "hillfolk",
@@ -25,7 +25,7 @@
       "max": 14
     },
     "armor": "0",
-    "damage": "kick, trample d6+3 (hand, close, forceful)",
+    "damage": "kick, trample d6+3 (_hand_, _close_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

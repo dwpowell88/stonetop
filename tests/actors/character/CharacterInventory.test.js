@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { CharacterInventory } from "../../../src/actors/character/CharacterInventory.js";
 import { ResourceController } from "../../../src/actors/character/ResourceController.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { OutfitItemBuilder } from "../../../src/model/data/character/OutfitItem.js";
 import { FakeInventoryRepository } from "../../fakes/FakeInventoryRepository.js";
 import { OutfitSnapshot } from "../../../src/model/snapshot/character/CharacterSnapshot.js";
@@ -9,7 +9,7 @@ import { OutfitSnapshot } from "../../../src/model/snapshot/character/CharacterS
 // -- Fake helpers ---------------------------------------------------------------
 
 function makeActor(inventoryState = {}) {
-	const actor = new FakeActorBuilder().build();
+	const actor = new FakeCharacterActorBuilder().build();
 	actor.system.inventory = {
 		checked:     inventoryState.checked     ?? {},
 		loadLevel:   inventoryState.loadLevel   ?? null,
@@ -48,7 +48,7 @@ function makeRawEmbeddedItem(overrides = {}) {
 			slug:            overrides.slug            ?? null,
 			inventoryColumn: overrides.inventoryColumn ?? "regular",
 			weight:          overrides.weight          ?? 1,
-			tags:            overrides.tags            ?? "",
+			tagList:         overrides.tagList         ?? "",
 			note:            overrides.note            ?? null,
 			resource:        overrides.resource        ?? null,
 			twoCol:          overrides.twoCol          ?? false,
@@ -68,7 +68,7 @@ function makeActorOutfitItems(items = []) {
 }
 
 function makeResourceController() {
-	return new ResourceController(new FakeActorBuilder().build());
+	return new ResourceController(new FakeCharacterActorBuilder().build());
 }
 
 function makeCi(inventoryState = {}, repo = null, outfitItems = null, resourceCtrl = null) {
@@ -269,6 +269,13 @@ describe("CharacterInventory.buildSnapshot", () => {
 		const item = regularItems(snap).find(i => i.slug === "custom-1");
 		expect(item.isCustom).toBe(true);
 		expect(item.ownedId).toBe("custom-1");
+	});
+
+	it("embedded item surfaces system.tagList as the snapshot tags", async () => {
+		const embedded = makeRawEmbeddedItem({ _id: "custom-1", slug: "custom-1", tagList: "warm" });
+		const snap = await makeCi({}, null, makeActorOutfitItems([embedded])).buildSnapshot(1);
+		const item = regularItems(snap).find(i => i.slug === "custom-1");
+		expect(item.tags.raw).toBe("warm");
 	});
 
 	it("embedded item with source has isCustom=false and ownedId=null", async () => {

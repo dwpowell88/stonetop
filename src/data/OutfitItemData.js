@@ -5,7 +5,10 @@ export class OutfitItemData extends foundry.abstract.TypeDataModel {
 			slug:            new f.StringField({ nullable: true, initial: null }),
 			inventoryColumn: new f.StringField({ nullable: true, initial: null }),
 			weight:          new f.NumberField({ initial: 1, integer: true }),
-			tags:            new f.StringField({ initial: "" }),
+			// `tagList`, not `tags`: Foundry reserves the item field `system.tags` and wipes it on
+			// every update (see creature.js / follower-data-architecture). Outfit tags are display-
+			// only markdown, so a plain StringField is enough (unlike the editable Selection on NPCs).
+			tagList:         new f.StringField({ initial: "" }),
 			note:            new f.StringField({ initial: "" }),
 			resource:        new f.ObjectField({ nullable: true, initial: null }),
 			twoCol:          new f.BooleanField({ initial: false }),

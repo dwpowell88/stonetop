@@ -13,6 +13,8 @@
 
 import * as CG from "../utils/choiceGroupEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
+import { itemDescriptionRich } from "./itemDescriptionRich.js";
+import { enrichRichTextTree } from "../utils/enrichRichText.js";
 
 const BLANK_RESOURCE   = () => ({ max: 1, maxStat: null, title: null, labels: [] });
 const BLANK_OUTFIT_ITEM = () => ({ slug: "", name: "", weight: 0, inventoryColumn: "regular" });
@@ -45,6 +47,8 @@ export function createStonetopPossessionSheetClass(Base) {
 			const sys = this.item.system;
 			context.system    = sys;
 			context.choicesRows = sys.choices ? CG.buildRows(sys.choices) : null;
+			context.rich = itemDescriptionRich(sys);
+			await enrichRichTextTree(context.rich, this.item?.getRollData?.() ?? {});
 			return context;
 		}
 

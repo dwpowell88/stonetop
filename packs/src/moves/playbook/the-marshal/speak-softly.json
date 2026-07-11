@@ -4,8 +4,7 @@
 	"name": "Speak Softly",
 	"type": "move",
 	"system": {
-		"playbook": "The Marshal",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_offer peace but your enemy refuses_**, gain advantage on your next roll against them.",
 		"slug": "speak-softly"
 	},

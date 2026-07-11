@@ -3,7 +3,7 @@
   "_key": "!actors!jZfCPTsneu7x0568",
   "name": "Fadyn",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "fadyn",
     "reference": "spirits-of-the-wild",
@@ -27,7 +27,7 @@
       "max": 16
     },
     "armor": "1 (reflexes)",
-    "damage": "bite, scratches, or knife d6 (hand, disadvantage)",
+    "damage": "bite, scratches, or knife d6 (_hand_, disadvantage)",
     "specialQuality": "tethered to a fox skull",
     "instinct": {
       "selected": [

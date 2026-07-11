@@ -4,8 +4,7 @@
   "name": "All is Illuminated",
   "type": "move",
   "system": {
-    "playbook": "The Lightbearer",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_look closely on another and see their soul laid bare_**, roll +WIS: **on a 10+**, ask their player 1 question from the list below, plus \"And what would make them feel loved, beautiful, or worthy?\"; **_on a 7-9_**, ask them 1 question from the list. In any case, they must answer truthfully.\n\n- Of what are they most ashamed?\n- What do they most desire or covet?\n- What hope have they abandoned?\n- Who or what is most precious to them?",
     "moveResults": {
       "success": {

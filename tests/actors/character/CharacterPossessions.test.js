@@ -2,8 +2,10 @@ import { describe, it, expect } from "vitest";
 import { CharacterPossessions } from "../../../src/actors/character/CharacterPossessions.js";
 import { PossessionsSnapshot } from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 import { FakeMoves } from "../../fakes/FakeMoves.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeOutfitItems } from "../../fakes/FakeOutfitItems.js";
+import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
+import { OutfitItemSideEffectHandler } from "../../../src/actors/character/SideEffectHandler.js";
 import { FakePossessionRepository } from "../../fakes/FakePossessionRepository.js";
 import { TestPossessionBuilder } from "../../fakes/TestPossessionBuilder.js";
 import { TestChoiceGroupBuilder } from "../../fakes/TestChoiceGroupBuilder.js";
@@ -12,7 +14,7 @@ import { TestChoiceRowBuilder } from "../../fakes/TestChoiceRowBuilder.js";
 // -- Helpers ------------------------------------------------------------------
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 function makeMoves()       { return new FakeMoves(); }
@@ -250,6 +252,36 @@ describe("CharacterPossessions — sub-choices", () => {
 		expect(row.options.find(o => o.slug === "axe").checked).toBe(true);
 		expect(row.options.find(o => o.slug === "sword").checked).toBe(false);
 	});
+
+	// Guard: a possession's sub-choices ARE a choice group, so writes go through the shared
+	// ChoiceGroupController. But its item-granting is owned by syncPossessionItems (selection-gated), so
+	// the shared OutfitItemSideEffectHandler must NOT also fire — otherwise a possession whose
+	// choices.slug equals its own slug (e.g. symbol-of-authority) would grant every picked item twice.
+	it("does not double-grant items via the registered OutfitItemSideEffectHandler", async () => {
+		const p = {
+			slug: "symbol-of-authority",
+			choices: {
+				slug: "symbol-of-authority", // matches the possession slug — the double-grant trap
+				list: [{ type: "pick", pickCount: 1, options: [
+					{ slug: "maul",   outfitItems: [{ slug: "maul",   name: "Maul",   weight: 1 }] },
+					{ slug: "shield", outfitItems: [{ slug: "shield", name: "Shield", weight: 1 }] },
+				]}],
+			},
+		};
+		const item    = makePossessionItem(p, { selected: true });
+		const actor   = makeActor([item]);
+		const outfit  = new FakeOutfitItems();
+		const factory = new ChoiceGroupFactory(actor);
+		factory.register(new OutfitItemSideEffectHandler("choice", outfit));
+		const cp = new CharacterPossessions(actor, makeMoves(), outfit, null, factory);
+
+		await cp.addSubChoice("symbol-of-authority", "maul");
+
+		// Granted exactly once, by syncPossessionItems, under the possession source.
+		expect(outfit.getSlugs("possession:symbol-of-authority")).toContain("maul");
+		// The choice-group side-effect handler did NOT also grant it under a choice source.
+		expect(outfit.hasSource("choice:symbol-of-authority:maul")).toBe(false);
+	});
 });
 
 // -- computeMaxUses ────────────────────────────────────────────────────────────
@@ -429,8 +461,8 @@ describe("CharacterPossessions — buildSnapshot — choices", () => {
 		const snap = await cp.buildSnapshot(1);
 		const heading = snap.items.find(i => i.slug === "weapons-of-war").choices.list[0];
 		expect(heading.type).toBe("entry");
-		expect(heading.content.title).toBe("Choose your weapon");
-		expect(heading.content.titleNote).toBe("pick 1");
+		expect(heading.content.title.raw).toBe("Choose your weapon");
+		expect(heading.content.titleNote.raw).toBe("pick 1");
 	});
 
 	it("pick row with pickCount 1 has radio=true", async () => {

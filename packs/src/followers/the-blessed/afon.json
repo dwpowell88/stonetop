@@ -2,7 +2,7 @@
 	"_id": "AUcGUCtuZs1Z0pRE",
 	"_key": "!items!AUcGUCtuZs1Z0pRE",
 	"name": "Afon, a Fellow Initiate",
-	"type": "npc",
+	"type": "follower",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
 		"slug": "afon",

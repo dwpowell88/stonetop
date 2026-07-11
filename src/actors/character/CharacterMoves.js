@@ -1,12 +1,14 @@
 import {
 	MoveCategorySnapshotBuilder,
-	MoveSnapshotBuilder,
 	MovelistBuilder,
-	RequirementSnapshot,
 } from "../../model/snapshot/character/CharacterSnapshot.js";
-import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
-import { ResourceController } from "./ResourceController.js";
-import { ValueMax } from "../../model/snapshot/character/VitalsSnapshot.js";
+import {
+	withCategoryFields,
+	computeSelectable,
+	incrementMove,
+	decrementMove,
+	buildMoveSnapshot,
+} from "../embeddedMoves.js";
 import { toSlug } from "../../utils/slug.js";
 
 export class CharacterMoves {
@@ -33,29 +35,34 @@ export class CharacterMoves {
 		const existingSlugs = new Set(existing.map(i => toSlug(i.name)));
 		const newEntries = entries.filter(m => !existingSlugs.has(m.slug));
 		if (!newEntries.length) return;
-		const docs = await Promise.all(newEntries.map(m => this._moveRepo.getBasicMoveDocument(m.id)));
+		const docs = await Promise.all(newEntries.map(m => this._moveRepo.getReferencedMoveDocument(m.id)));
 		await this._actor.createEmbeddedDocuments("Item",
 			docs.filter(Boolean).map((d, i) =>
-				_withCategoryFields(d.toObject(), moveType, true, { sortOrder: existing.length + i, compendiumId: d._id ?? null })
+				withCategoryFields(d.toObject(), moveType, true, { sortOrder: existing.length + i, compendiumId: d._id ?? null })
 			)
 		);
 	}
 
+	// A playbook owns its moves by slug (playbookData.moves) and marks a subset as starting
+	// (playbookData.startingMoves) — those seed acquired at character creation. Resolution + sort
+	// (by level + dependency) live here; the move items themselves carry no playbook back-reference.
 	async initPlaybookCategory(playbookData) {
 		const existingPlaybook = [...this._actor.items]
 			.filter(i => i.type === "move" && i.system?.categoryKey?.startsWith("playbook-"));
 		if (existingPlaybook.length) {
 			await this._actor.deleteEmbeddedDocuments("Item", existingPlaybook.map(i => i._id));
 		}
-		const playbookMoves = await this._moveRepo.getPlaybookMoves(playbookData.name);
+		const resolved = await this._moveRepo.getMovesBySlugs(playbookData.moves ?? []);
+		const playbookMoves = this.sortPlaybookMoves(resolved);
+		const starting = new Set(playbookData.startingMoves ?? []);
 		const catKey = `playbook-${playbookData.slug}`;
 		const pairs = await Promise.all(
-			playbookMoves.map(async (m, i) => ({ move: m, doc: await this._moveRepo.getPlaybookMoveDocument(m.id), index: i }))
+			playbookMoves.map(async (m, i) => ({ move: m, doc: await this._moveRepo.getReferencedMoveDocument(m.id), index: i }))
 		);
 		await this._actor.createEmbeddedDocuments("Item",
 			pairs
 				.filter(({ doc }) => doc !== null)
-				.map(({ move, doc, index }) => _withCategoryFields(doc.toObject(), catKey, move.isStarting, {
+				.map(({ move, doc, index }) => withCategoryFields(doc.toObject(), catKey, starting.has(move.slug), {
 					sortOrder:     index,
 					compendiumId:  doc._id ?? null,
 					categoryLabel: playbookData.name,
@@ -64,23 +71,21 @@ export class CharacterMoves {
 		);
 	}
 
-	async addCategory(key, label, slug, moveSlugs = []) {
+	// Register a move category (insert or arcanum) from a list of move slugs. Inserts pass their
+	// `system.moves`, arcana their `back.moveSlugs`; both resolve across compendium + world. A move
+	// seeds acquired iff its slug is in `startingSlugs` — built-in inserts pass all their moves
+	// (active on grant), arcana pass none (player ticks each mystery to unlock).
+	async addCategory(key, label, moveSlugs = [], startingSlugs = []) {
 		const exists = [...this._actor.items].some(i => i.type === "move" && i.system?.categoryKey === key);
 		if (exists) return;
-		// An insert's moves come from two sources, unioned + de-duped by slug: legacy tag-based
-		// association (`move.system.playbook === slug`, used by built-in inserts) and the insert's
-		// own `system.moves` slug references (custom inserts attach existing moves this way).
-		const [tagged, referenced] = await Promise.all([
-			this._moveRepo.getInsertMoves(slug),
-			this._moveRepo.getMovesBySlugs(moveSlugs),
-		]);
-		const bySlug = new Map();
-		for (const m of [...tagged, ...referenced]) bySlug.set(m.slug, m);
-		const entries = [...bySlug.values()];
-		const docs = await Promise.all(entries.map(m => this._moveRepo.getInsertMoveDocument(m.id)));
+		const starting = new Set(startingSlugs);
+		const entries = await this._moveRepo.getMovesBySlugs(moveSlugs);
+		const pairs = await Promise.all(
+			entries.map(async move => ({ move, doc: await this._moveRepo.getReferencedMoveDocument(move.id) }))
+		);
 		await this._actor.createEmbeddedDocuments("Item",
-			docs.filter(Boolean).map((doc, i) =>
-				_withCategoryFields(doc.toObject(), key, true, {
+			pairs.filter(({ doc }) => doc).map(({ move, doc }, i) =>
+				withCategoryFields(doc.toObject(), key, starting.has(move.slug), {
 					sortOrder:     i,
 					compendiumId:  doc._id ?? null,
 					categoryLabel: label,
@@ -97,21 +102,11 @@ export class CharacterMoves {
 	}
 
 	async incrementMove(categoryKey, moveSlug) {
-		const item = _findMoveItem(this._actor, categoryKey, moveSlug);
-		if (!item) return;
-		const count = item.system?.instanceCount ?? 0;
-		if (count >= (item.system?.repeatMax ?? 1)) return;
-		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { acquired: true, instanceCount: count + 1 } }]);
+		await incrementMove(this._actor, categoryKey, moveSlug);
 	}
 
 	async decrementMove(categoryKey, moveSlug) {
-		const item = _findMoveItem(this._actor, categoryKey, moveSlug);
-		if (!item) return;
-		const count = item.system?.instanceCount ?? 0;
-		if (count === 0) return;
-		if ((item.system?.isStartingMove ?? false) && count <= 1) return;
-		const newCount = count - 1;
-		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { acquired: newCount > 0, instanceCount: newCount } }]);
+		await decrementMove(this._actor, categoryKey, moveSlug);
 	}
 
 	async addMoveToOther(moveData) {
@@ -125,7 +120,7 @@ export class CharacterMoves {
 			system: {
 				...moveData.system,
 				moveType: "other", categoryKey: "other", categoryLabel: null, categoryNote: null,
-				acquired: true, instanceCount: 1, isStartingMove: false,
+				acquired: true, instanceCount: 1,
 				sortOrder: existing.length, compendiumId: moveData._id ?? null,
 			},
 		}]);
@@ -158,14 +153,22 @@ export class CharacterMoves {
 		await this._resourceController.set("moves", moveSlug, current);
 	}
 
+	async setMoveResourceText(moveSlug, value) {
+		await this._resourceController.setText("moves", moveSlug, value);
+	}
+
 	async buildSnapshot() {
 		const allMoveItems = [...this._actor.items].filter(i => i.type === "move");
 		const level              = this._vitals?.level ?? 1;
 		const acquiredSlugs      = _acquiredSlugs(allMoveItems);
 		const resourceController = this._resourceController;
 
+		// Arcana mystery moves live in `arcana-<slug>` categories; they render on their arcanum card, not
+		// the moves tab. They still count toward acquiredSlugs above (for other moves' requirements).
+		const tabMoveItems = allMoveItems.filter(i => !(i.system?.categoryKey ?? "").startsWith("arcana-"));
+
 		const byCatKey = new Map();
-		for (const item of allMoveItems) {
+		for (const item of tabMoveItems) {
 			const key = item.system?.categoryKey ?? "other";
 			if (!byCatKey.has(key)) byCatKey.set(key, []);
 			byCatKey.get(key).push(item);
@@ -179,8 +182,8 @@ export class CharacterMoves {
 		const categories = await Promise.all(sortedKeys.map(async catKey => {
 			const meta  = _categoryMetadata(catKey, byCatKey.get(catKey));
 			const moves = await Promise.all(byCatKey.get(catKey).map(item =>
-				_buildMoveSnapshot(item, catKey,
-					_computeSelectable(item),
+				buildMoveSnapshot(item, catKey,
+					computeSelectable(item),
 					_requirementsMet(item.system ?? null, level, acquiredSlugs),
 					resourceController)
 			));
@@ -208,8 +211,8 @@ export class CharacterMoves {
 		const allMoveItems  = [...this._actor.items].filter(i => i.type === "move");
 		const acquiredSlugs = _acquiredSlugs(allMoveItems);
 		return Promise.all(items.map(item =>
-			_buildMoveSnapshot(item, key,
-				_computeSelectable(item),
+			buildMoveSnapshot(item, key,
+				computeSelectable(item),
 				_requirementsMet(item.system ?? null, level, acquiredSlugs),
 				this._resourceController)
 		));
@@ -221,7 +224,7 @@ export class CharacterMoves {
 			i => i.type === "move" && toSlug(i.name) === itemSlug
 		);
 		if (existing) {
-			if (_computeSelectable(existing)) {
+			if (computeSelectable(existing)) {
 				await this.incrementMove(existing.system?.categoryKey, itemSlug);
 				return true;
 			}
@@ -248,44 +251,12 @@ export class CharacterMoves {
 
 // ── Private helpers ───────────────────────────────────────────────────────────
 
-export function withCategoryFields(obj, categoryKey, acquired = true, opts = {}) {
-	return _withCategoryFields(obj, categoryKey, acquired, opts);
-}
-
-function _withCategoryFields(obj, categoryKey, acquired = true, opts = {}) {
-	const instanceCount = acquired ? 1 : 0;
-	return {
-		...obj,
-		system: {
-			...obj.system,
-			moveType:      categoryKey,
-			categoryKey,
-			acquired,
-			instanceCount,
-			sortOrder:     opts.sortOrder     ?? null,
-			compendiumId:  opts.compendiumId  ?? null,
-			categoryLabel: opts.categoryLabel ?? null,
-			categoryNote:  opts.categoryNote  ?? null,
-		},
-	};
-}
-
-function _findMoveItem(actor, categoryKey, moveSlug) {
-	return [...actor.items].find(
-		i => i.type === "move" && i.system?.categoryKey === categoryKey && toSlug(i.name) === moveSlug
-	) ?? null;
-}
-
 function _acquiredSlugs(moveItems) {
 	return new Set(
 		moveItems
 			.filter(i => i.system?.acquired ?? false)
 			.map(i => i.system?.slug ?? toSlug(i.name))
 	);
-}
-
-function _computeSelectable(item) {
-	return (item?.system?.instanceCount ?? 0) < (item?.system?.repeatMax ?? 1);
 }
 
 function _categoryOrder(key) {
@@ -314,42 +285,6 @@ function _requirementsMet(move, level, acquiredSlugs) {
 	if (req.level && level < req.level) return false;
 	if ((req.moves ?? []).some(name => !acquiredSlugs.has(toSlug(name)))) return false;
 	return true;
-}
-
-async function _buildMoveSnapshot(item, categoryKey, selectable, requirementsMet, resourceController) {
-	const sys    = item?.system ?? null;
-	const slug   = sys?.slug ?? toSlug(item?.name ?? "");
-	const resDef = sys?.resource ?? null;
-	const resource = resourceController
-		? resourceController.buildSnapshot("moves", resDef, slug)
-		: null;
-	let choices = null;
-	if (sys?.choices) {
-		const values = new ChoiceValues(sys.pickValues ?? {});
-		choices = ChoiceGroup.fromPackData(sys.choices, values);
-	}
-	const req      = sys?.requirement ?? null;
-	const reqParts = [...(req?.moves ?? []), req?.level ? `Level ${req.level}` : ""].filter(Boolean);
-	const requirement = reqParts.length
-		? new RequirementSnapshot(reqParts.join(", "), requirementsMet)
-		: null;
-	return new MoveSnapshotBuilder()
-		.withId(sys?.compendiumId ?? null)
-		.withOwnedId(item?._id ?? null)
-		.withSlug(slug)
-		.withName(item?.name ?? slug)
-		.withDescription(sys?.description ?? "")
-		.withRollStat(sys?.rollStat ?? null)
-		.withIsStarting(sys?.isStartingMove ?? false)
-		.withSource({ type: categoryKey })
-		.withSourceLabel(null)
-		.withSelection(new ValueMax(sys?.instanceCount ?? 0, sys?.repeatMax ?? 1))
-		.withSelectable(selectable)
-		.withRequirement(requirement)
-		.withRequiresLabel(requirement?.label ?? null)
-		.withResource(resource)
-		.withChoices(choices)
-		.build();
 }
 
 function _sortGroup(moves, groupNames) {

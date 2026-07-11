@@ -4,8 +4,7 @@
 	"name": "Catlike",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_carry a light load and act with care_**, you move silently. When you **_hide in shadows or darkness_**, you remain unseen until you draw attention to yourself, move positions, or attack.",
 		"slug": "catlike"
 	},

@@ -4,8 +4,7 @@
 	"name": "For the Greater Good",
 	"type": "move",
 	"system": {
-		"playbook": "The Judge",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Persuade someone to act in defense of their community or civilization at large_**, you have advantage.",
 		"slug": "for-the-greater-good"
 	},

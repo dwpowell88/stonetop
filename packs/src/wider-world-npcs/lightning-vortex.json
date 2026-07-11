@@ -3,7 +3,7 @@
   "_key": "!actors!0LCVe4ot9knSJG10",
   "name": "Lightning vortex",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "lightning-vortex",
     "reference": "tempest-lords",
@@ -27,7 +27,7 @@
     },
     "armor": "by HP",
     "damage": "zap (damage and tags by HP)",
-    "specialQuality": "flies harmed only by magical attacks",
+    "specialQuality": "flies; harmed only by magical attacks",
     "instinct": {
       "selected": [
         "to lash out"

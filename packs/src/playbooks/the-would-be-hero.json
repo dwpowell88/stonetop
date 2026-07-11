@@ -1,7 +1,7 @@
 {
   "_id": "MlxHjzcHt0f2ACqH",
   "_key": "!items!MlxHjzcHt0f2ACqH",
-  "img": "stonetop-art/playbooks/the-would-be-hero.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-would-be-hero.png",
   "name": "The Would-Be Hero",
   "type": "playbook",
   "flags": {},
@@ -843,6 +843,34 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "a-force-to-be-reckoned-with",
+      "anger-is-a-gift",
+      "better-part-of-valor",
+      "big-damn-hero",
+      "but-i-get-up-again",
+      "i-get-knocked-down",
+      "improved-stat",
+      "in-over-your-head",
+      "inquiring-minds",
+      "iron-will",
+      "never-gonna-keep-me-down",
+      "potential-for-greatness",
+      "resourceful",
+      "something-to-remember-me-by",
+      "speak-truth-to-power",
+      "superior-stat",
+      "tough-love",
+      "undaunted",
+      "underestimated",
+      "up-with-people",
+      "versatile",
+      "voice-of-experience"
+    ],
+    "startingMoves": [
+      "anger-is-a-gift",
+      "potential-for-greatness"
+    ]
   }
 }

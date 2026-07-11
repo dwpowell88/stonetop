@@ -1,0 +1,12 @@
+{
+  "_id": "RSU9hi365AvbQklT",
+  "_key": "!items!RSU9hi365AvbQklT",
+  "name": "Pathfinder",
+  "type": "move",
+  "system": {
+    "moveType": null,
+    "description": "When you **_lead your people to Pull Together or Deploy beyond sight of home_**, you have advantage.",
+    "slug": "pathfinder"
+  },
+  "folder": "iQmUxwLPUFZ74UJg"
+}

@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { migrateInsertChoiceValues } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 
 function makeInsertItem(choiceValues = {}) {
 	return { _id: "ins1", type: "insert", name: "Thrall", system: { slug: "thrall", choiceValues } };
 }
 
 function makeActor(flags = {}, items = []) {
-	const builder = new FakeActorBuilder().withItems(items);
-	builder._flagsBuilder.withFlags(flags);
+	const builder = new FakeCharacterActorBuilder().withItems(items);
+	builder.withFlags(flags);
 	return builder.build();
 }
 

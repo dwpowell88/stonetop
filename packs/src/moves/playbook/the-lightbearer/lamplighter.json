@@ -4,8 +4,7 @@
 	"name": "Lamplighter",
 	"type": "move",
 	"system": {
-		"playbook": "The Lightbearer",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_whisper to a flammable object (a torch, a wick, kindling, etc.)_**, it ignites in moments.",
 		"slug": "lamplighter"
 	},

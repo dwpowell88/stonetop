@@ -4,9 +4,7 @@
 	"name": "Potential for Greatness",
 	"type": "move",
 	"system": {
-		"playbook": "The Would-Be Hero",
-		"moveType": "playbook",
-		"isStartingMove": true,
+		"moveType": null,
 		"description": "Once per level, **_when you roll a stat and get a 10+_**, mark one of the following (note the level during which you marked it). You don't have to mark them in order.",
 		"choices": {
 			"slug": "choices",

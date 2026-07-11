@@ -1,0 +1,13 @@
+{
+	"_id": "e69c6ed650af5f6b",
+	"_key": "!items!e69c6ed650af5f6b",
+	"name": "Maelstrom",
+	"type": "move",
+	"system": {
+		"slug": "maelstrom",
+		"moveType": null,
+		"description": "When you **_use Siphon_**, you can mark a consequence before rolling to affect a number of victims within range. Roll +CON once, but roll damage separately for each target.",
+		"rollStat": "con"
+	},
+	"folder": "ArcanaMoves00001"
+}

@@ -3,7 +3,7 @@
   "_key": "!actors!T52QuZ0Z1PG3LBF6",
   "name": "Judge of Aratis",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "judge-of-aratis",
     "reference": "aratis-the-lawkeeper",
@@ -22,7 +22,7 @@
       "max": 8
     },
     "armor": "2 (shield, leather cuirass)",
-    "damage": "mallet d8 (hand) or maul d8+2 (close, forceful, awkward)",
+    "damage": "mallet d8 (_hand_) or maul d8+2 (_close_, _forceful_, _awkward_)",
     "specialQuality": "bound by the require- ments of a true disciple (previous page), at least publicly Stalwart instinct to see things as black and white (+tough, +4 HP)",
     "instinct": {
       "selected": [],

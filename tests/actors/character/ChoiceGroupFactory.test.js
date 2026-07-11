@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeFollowers } from "../../fakes/FakeFollowers.js";
 import { FollowerSideEffectHandler, OutfitItemSideEffectHandler } from "../../../src/actors/character/SideEffectHandler.js";
 import { FakeOutfitItems } from "../../fakes/FakeOutfitItems.js";
@@ -16,7 +16,7 @@ function makeItem(overrides = {}) {
 }
 
 function makeFactory(items = []) {
-	const actor = new FakeActorBuilder().withItems(items).build();
+	const actor = new FakeCharacterActorBuilder().withItems(items).build();
 	return { factory: new ChoiceGroupFactory(actor), actor };
 }
 
@@ -91,14 +91,27 @@ describe("ChoiceGroupFactory.forItem", () => {
 
 	it("default definition getter falls back to item.system.back.choices", async () => {
 		const followers = new FakeFollowers();
-		const item = makeItem({ system: { backChoiceValues: {}, back: { choices: {
+		const item = makeItem({ system: { choiceValues: {}, back: { choices: {
 			slug: "ns",
 			list: [{ type: "entry", slug: "companion", followers: ["enfys"] }],
 		}}}});
 		const { factory } = makeFactory([item]);
 		factory.register(new FollowerSideEffectHandler(followers));
-		await factory.forItem("item-1", "backChoiceValues").setCount("ns", "companion", 1);
+		await factory.forItem("item-1", "choiceValues").setCount("ns", "companion", 1);
 		expect(followers.isOwned("enfys")).toBe(true);
+	});
+
+	it("sideEffects:false persists the value but does NOT fire registered handlers", async () => {
+		const followers = new FakeFollowers();
+		const item = makeItem({ system: { pickValues: {}, choices: {
+			slug: "ns",
+			list: [{ type: "entry", slug: "companion", followers: ["enfys"] }],
+		}}});
+		const { factory, actor } = makeFactory([item]);
+		factory.register(new FollowerSideEffectHandler(followers));
+		await factory.forItem("item-1", "pickValues", { sideEffects: false }).setCount("ns", "companion", 1);
+		expect(actor.items.get("item-1").system.pickValues).toEqual({ ns: { companion: 1 } });
+		expect(followers.isOwned("enfys")).toBe(false);
 	});
 });
 

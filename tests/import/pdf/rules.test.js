@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseDividers } from "../../../scripts/import/pdf/rules.js";
+import { parseDividers, parseMarkers } from "../../../scripts/import/pdf/rules.js";
 
 const stroke = (color, e, f, w) =>
 	`<stroke_path linewidth=".5" colorspace="DeviceRGB" color="${color}" transform="1 0 0 -1 ${e} ${f}">` +
@@ -24,5 +24,34 @@ describe("parseDividers", () => {
 	it("drops non-horizontal strokes", () => {
 		const diag = `<stroke_path color="0 0 0" transform="1 0 0 -1 36 100"><moveto x="0" y="0"/><lineto x="156" y="40"/></stroke_path>`;
 		expect(parseDividers(diag)).toEqual([]);
+	});
+});
+
+describe("parseMarkers", () => {
+	// A small straight-sided ~square box (≥3 lineto) → "square" (the choice-group pick/track checkbox).
+	const square = `<stroke_path color="0 0 0" transform="1 0 0 -1 600 313">` +
+		`<moveto x="0" y="0"/><lineto x="6" y="0"/><lineto x="6" y="-6"/><lineto x="0" y="-6"/><lineto x="0" y="0"/></stroke_path>`;
+	// A curved outline filling its bbox → "circle"; a curved outline filling ~half → "diamond".
+	const circle = `<stroke_path color="0 0 0" transform="1 0 0 -1 100 200">` +
+		`<moveto x="0" y="0"/><curveto x1="6" y1="0" x2="6" y2="-6" x3="0" y3="-6"/>` +
+		`<curveto x1="0" y1="-6" x2="0" y2="0" x3="6" y3="0"/><curveto x1="6" y1="0" x2="3" y2="-3" x3="6" y3="-6"/></stroke_path>`;
+	const diamond = `<stroke_path color="0 0 0" transform="1 0 0 -1 50 80">` +
+		`<moveto x="3" y="0"/><curveto x1="3" y1="0" x2="6" y2="-3" x3="6" y3="-3"/>` +
+		`<curveto x1="6" y1="-3" x2="3" y2="-6" x3="3" y3="-6"/><curveto x1="3" y1="-6" x2="0" y2="-3" x3="0" y3="-3"/></stroke_path>`;
+
+	it("detects square checkboxes (straight-sided box)", () => {
+		expect(parseMarkers(square)).toEqual([{ x: 600, y: 313, w: 6, h: 6, kind: "square" }]);
+	});
+
+	it("classifies curved outlines as circle (fills bbox) vs diamond (fills ~half)", () => {
+		expect(parseMarkers(circle)[0].kind).toBe("circle");
+		expect(parseMarkers(diamond)[0].kind).toBe("diamond");
+	});
+
+	it("ignores white markers and oblong (non-square) straight shapes", () => {
+		expect(parseMarkers(square.replace('color="0 0 0"', 'color="1 1 1"'))).toEqual([]);
+		const oblong = `<stroke_path color="0 0 0" transform="1 0 0 -1 600 313">` +
+			`<moveto x="0" y="0"/><lineto x="14" y="0"/><lineto x="14" y="-3"/><lineto x="0" y="-3"/><lineto x="0" y="0"/></stroke_path>`;
+		expect(parseMarkers(oblong)).toEqual([]);
 	});
 });

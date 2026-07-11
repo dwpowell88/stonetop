@@ -1,0 +1,12 @@
+{
+	"_id": "289dbee25a8469c0",
+	"_key": "!items!289dbee25a8469c0",
+	"name": "A Mighty Will",
+	"type": "move",
+	"system": {
+		"slug": "a-mighty-will",
+		"moveType": null,
+		"description": "When you **_mindwalk_**, hold +1 Power."
+	},
+	"folder": "ArcanaMoves00001"
+}

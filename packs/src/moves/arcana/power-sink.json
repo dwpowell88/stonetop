@@ -1,0 +1,12 @@
+{
+	"_id": "b91be31c101f0b89",
+	"_key": "!items!b91be31c101f0b89",
+	"name": "Power Sink",
+	"type": "move",
+	"system": {
+		"slug": "power-sink",
+		"moveType": null,
+		"description": "When you **_wear the Rune-laden Scales and stand fast against a magical attack_**, **on a 12+** the armor drains the attacker’s power. That form of attack is lost to them, though they might regain it with time, study, or effort.\n\nWhen you **_wear the Rune-laden Scales and spend time in quiet communion with the elements_**, the power absorbed by the armor dissipates harmlessly.\n\nIf you **_trigger Power Sink again before dissipating the absorbed power_**, mark XP, ask the GM what happens, and brace yourself for the worst."
+	},
+	"folder": "ArcanaMoves00001"
+}

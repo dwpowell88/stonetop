@@ -1,0 +1,12 @@
+{
+	"_id": "01619818f8079f48",
+	"_key": "!items!01619818f8079f48",
+	"name": "Call Forth and Command",
+	"type": "move",
+	"system": {
+		"slug": "call-forth-and-command",
+		"moveType": null,
+		"description": "When you **_mark both figurines with your own blood and call both Astor and Halix by name_**, their ghosts manifest before you. Treat them as followers. They are bound to obey your direct commands and can take no overt action against you, but you might need to Persuade them to do anything other than follow your orders to the letter. When you **_dismiss either Astor or Halix_**, both return to their figurines until you call them forth again.\n\nWhen e**_ither Astor or Halix is banished or reduced to 0 HP_**, they both return to their respective fetish. They cannot be called forth again until the next new moon.\n\n*In life, Astor was a hunter, low-born but handsome and proud. Halix was the lordly heir of Astor’s people:* *spoiled, manipulative, vain. Halix took Astor as one of many furtive lovers, making an insincere blood-oath* *that one day they would wed.* *Their clan fell under the sway of a sorcerer. Astor snuck away to warn the Makers of rebellion, but Halix* *sided with the sorcerer. The sorcerer used the blood-oath between them to work foul magic, wrenching Astor’s* *soul from their body and binding it. To their surprise, Halix’s soul was likewise bound. The sorcerer used* *them as spies and assassins, leaving Astor’s once-noble soul bitter and distrustful. Halix, though, revels in* *immortality and delights in the opportunities afforded by this undead state.*"
+	},
+	"folder": "ArcanaMoves00001"
+}

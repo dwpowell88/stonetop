@@ -4,8 +4,7 @@
 	"name": "A Bundle of Sticks Unbroken",
 	"type": "move",
 	"system": {
-		"playbook": "The Judge",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Struggle as One_**, you and one ally of your choice have advantage.",
 		"requirement": {
 			"moves": [

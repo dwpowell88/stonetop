@@ -4,7 +4,6 @@ export class FakeCompendiumMoveBuilder {
 	_name = "Test Move";
 	_rollStat = null;
 	_description = "";
-	_isStartingMove = false;
 	_requirement = null;
 	_repeatMax = null;
 	_resource = null;
@@ -12,11 +11,6 @@ export class FakeCompendiumMoveBuilder {
 
 	withName(name) {
 		this._name = name;
-		return this;
-	}
-
-	withPlaybook(playbookName) {
-		this._playbook = playbookName;
 		return this;
 	}
 
@@ -32,8 +26,10 @@ export class FakeCompendiumMoveBuilder {
 		return this;
 	}
 
+	// Test-scenario marker (NOT a move field): "this move is one its container offers as starting".
+	// The fake repo surfaces it via startingSlugs() so tests can build a playbook's startingMoves.
 	asStarting() {
-		this._isStartingMove = true;
+		this._starting = true;
 		return this;
 	}
 
@@ -74,12 +70,10 @@ export class FakeCompendiumMoveBuilder {
 			slug,
 			rollStat: this._rollStat,
 			description: this._description,
-			isStartingMove: this._isStartingMove,
 			requirement: this._requirement,
 			repeatMax: this._repeatMax,
 			resource: this._resource,
 			choices: this._choices,
-			playbook: this._playbook,
 			moveType: this._moveType ?? null,
 			moveResults: this._moveResults ?? null,
 		};
@@ -87,6 +81,7 @@ export class FakeCompendiumMoveBuilder {
 			_id: slug,
 			name,
 			type: "move",   // real items carry a top-level type; WorldItemStore filters on it
+			_starting: this._starting ?? false,   // test-only marker (see asStarting); not in system/toObject
 			system,
 			toObject() {
 				return {name, type: "move", system};

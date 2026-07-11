@@ -1,6 +1,5 @@
 // Single pipeline for rendering game text (markdown stored): bold/italic via markdown,
 // bare dice -> Foundry inline rolls, plus @UUID links - all through Foundry's enrichHTML.
-// See helper/text-rendering.md.
 import snarkdown from "../../lib/snarkdown.es.js";
 
 const DIE       = "\\d*d\\d+(?:\\s*[+-]\\s*\\d+)?";
@@ -30,15 +29,6 @@ export function toRollableMarkup(raw, { autoRoll = true } = {}) {
 	return snarkdown(shielded).replace(SENTINEL, (_, i) => tokens[Number(i)]);
 }
 
-/**
- * Prose markdown -> HTML for the `{{md}}` helper: renders markdown and preserves any
- * explicit [[ ]] rolls / @UUID links as text (a later enrichHTML pass makes them clickable),
- * but does NOT auto-roll bare dice. Synchronous, so the template renders without flicker.
- */
-export function renderMarkdown(raw) {
-	return toRollableMarkup(raw, { autoRoll: false });
-}
-
 // Cross-render memo cache. The followers tab re-runs ~6 enrichGameText calls per follower on every
 // re-render (each tag/item edit, each tab switch), and enrichHTML is the dominant cost. The same
 // prose enriches identically across renders, so cache it. Only cache text with NO `@` reference,
@@ -61,21 +51,4 @@ export async function enrichGameText(raw, { rollData = {}, autoRoll = true } = {
 		_enrichCache.set(key, out);
 	}
 	return out;
-}
-
-/**
- * Post-render pass: upgrade explicit Foundry tokens ([[ ]] rolls, @UUID links) inside
- * already-rendered `.stonetop-rich` elements into clickable HTML. The markdown was rendered
- * synchronously by the `{{md}}` helper, so this only runs enrichHTML \u2014 and only on elements
- * that actually contain a token, so it's a no-op when there are none.
- */
-export async function enrichRichTokens(root, { rollData = {} } = {}) {
-	if (!root) return;
-	const els = root.querySelectorAll(".stonetop-rich");
-	await Promise.all([...els].map(async el => {
-		if (el.dataset.tokensEnriched || !/\[\[|@\w+\[/.test(el.innerHTML)) return;
-		el.innerHTML = await foundry.applications.ux.TextEditor.implementation
-			.enrichHTML(el.innerHTML, { async: true, rollData });
-		el.dataset.tokensEnriched = "1";
-	}));
 }

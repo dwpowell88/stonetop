@@ -40,6 +40,8 @@ export function activateChoiceGroupEditors(sheet, html) {
 	onClick(".choices-add-outfit-item",  (g, d) => CG.addOutfitItem(g, ri(d), oiOf(d)));
 	onClick(".choices-outfit-item-delete", (g, d) => CG.removeOutfitItem(g, ri(d), Number(d.outfitItemIndex), oiOf(d)));
 
+	// Field changes (text/number/checkbox/select inputs AND the content.text <prose-mirror> editor,
+	// which fires `change` on blur with its HTML in `.value`) → coerce, then whole-group atomic write.
 	html.find("[data-choices-field]").on("change", ev => {
 		const el   = ev.currentTarget;
 		const path = pathOf(el);
@@ -49,7 +51,7 @@ export function activateChoiceGroupEditors(sheet, html) {
 		else if (el.type === "number")   value = el.value ? Number(el.value) : null;
 		else if (el.dataset.choicesField === "followers")
 			value = el.value ? el.value.split(",").map(s => s.trim()).filter(Boolean) : [];
-		else value = el.value || null;
+		else value = el.value || null; // text inputs, selects, and <prose-mirror> (el.value = HTML)
 		save(path, CG.setField(group(path), {
 			target:      el.dataset.choicesTarget,
 			rowIndex:    el.dataset.choicesRowIndex    !== undefined ? Number(el.dataset.choicesRowIndex)    : null,

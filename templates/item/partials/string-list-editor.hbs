@@ -1,0 +1,30 @@
+{{!-- Generic "list of strings" editor (add / edit / remove). SCHEMA-AGNOSTIC: it emits string rows
+      only and carries NO knowledge of how the field is stored — each consumer's own click/change
+      handlers save in that field's own shape (follower Selection options, member suggestions,
+      companion variants/options/defaults). NEW partial (the insert sheet has a near-identical inline
+      instinct list that could later migrate here — flagged, not refactored). See
+      dont-reshape-data-for-partials.
+
+      Params: items[] (strings), label, addLabel, editable, addClass, rowClass, removeClass,
+      ownerIndex (optional parent index, e.g. a companion-type index; stamped as data-owner-index so
+      the handler knows which parent this list belongs to). Row position is data-string-index. --}}
+<div class="follower-string-list">
+	<div class="follower-string-list-head">
+		<span class="stonetop-follower-label">{{label}}</span>
+		{{#if editable}}
+		<button type="button" class="{{addClass}}" data-owner-index="{{ownerIndex}}">+ {{#if addLabel}}{{addLabel}}{{else}}{{localize "stonetop.follower.add"}}{{/if}}</button>
+		{{/if}}
+	</div>
+	<ul class="follower-string-list-items">
+		{{#each items}}
+		<li class="follower-string-list-row">
+			<input type="text" class="{{../rowClass}}" data-owner-index="{{../ownerIndex}}" data-string-index="{{@index}}"
+			       value="{{this}}" {{#unless ../editable}}disabled{{/unless}}>
+			{{#if ../editable}}
+			<button type="button" class="{{../removeClass}}" data-owner-index="{{../ownerIndex}}" data-string-index="{{@index}}"
+			        title="{{localize 'stonetop.follower.remove'}}">✕</button>
+			{{/if}}
+		</li>
+		{{/each}}
+	</ul>
+</div>

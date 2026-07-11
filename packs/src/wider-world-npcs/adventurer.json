@@ -3,7 +3,7 @@
   "_key": "!actors!Gwqi3HJ2lLTEASBi",
   "name": "Adventurer",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "adventurer",
     "reference": "lygos-and-the-south",
@@ -23,7 +23,7 @@
       "max": 8
     },
     "armor": "1 to 3 (skill, armor, and/or shield)",
-    "damage": "whatever’s at hand d8 (hand, close, maybe forceful or messy)",
+    "damage": "whatever’s at hand d8 (_hand_, _close_, maybe _forceful_ or _messy_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -1,0 +1,13 @@
+{
+	"_id": "406d78e1ddbe2cc1",
+	"_key": "!items!406d78e1ddbe2cc1",
+	"name": "Chosen of the Storm-bringer",
+	"type": "move",
+	"system": {
+		"slug": "chosen-of-the-storm-bringer",
+		"moveType": null,
+		"description": "Add these to the list of potential manifestations granted by Storm’s Fury:\n- Roll +CON to Let Fly with a bolt of lightning (2d6 damage, *thrown*, *forceful*, *loud*, *dangerous*, ignores armor)\n- Make a prodigious leap, buoyed by the wind\n- Summon a powerful gale with you at its center—dirt and debris swirl about, the wind is deafening, people must brace themselves to keep from getting bowled over, projectiles careen off course—and take disadvantage on all rolls as long as you sustain it",
+		"rollStat": "con"
+	},
+	"folder": "ArcanaMoves00001"
+}

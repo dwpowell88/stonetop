@@ -4,8 +4,7 @@
 	"name": "Never Gonna Keep Me Down",
 	"type": "move",
 	"system": {
-		"playbook": "The Would-Be Hero",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_have 5 or fewer current HP_**, you impose disadvantage on any damage you take.\n\nOnce per session, when you are at Death's Door, don't roll. You get a 10+.",
 		"resource": {
 			"max": 1

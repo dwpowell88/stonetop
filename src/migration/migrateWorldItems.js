@@ -10,8 +10,24 @@ export async function migrateWorldMoveSlugs() {
 	if (updates.length) await Item.updateDocuments(updates);
 }
 
+// Legacy `npc`-type follower world items → `follower` (create + delete; type is immutable in place).
+// Same pattern as the equipment → arcanum conversion below.
+export async function migrateWorldFollowerItemType() {
+	const legacy = (game.items ?? []).filter(i => i.type === "npc");
+	if (!legacy.length) return;
+	const created = legacy.map(item => {
+		const o = item.toObject?.() ?? item;
+		return { name: o.name, img: o.img ?? null, folder: item.folder?.id ?? null, type: "follower", system: o.system ?? {}, flags: o.flags ?? {} };
+	});
+	// Batch both writes (matches the actor-side migrateFollowerItemType) instead of a create+delete
+	// round-trip per item.
+	await Item.createDocuments(created);
+	await Item.deleteDocuments(legacy.map(i => i.id));
+}
+
 export async function migrateWorldItems() {
 	await migrateWorldMoveSlugs();
+	await migrateWorldFollowerItemType();
 
 	const equipmentItems = (game.items ?? []).filter(i => i.type === "equipment");
 	for (const item of equipmentItems) {
@@ -26,13 +42,12 @@ export async function migrateWorldItems() {
 			folder: item.folder?.id ?? null,
 			type:   "arcanum",
 			system: {
-				slug:             sys.slug  ?? null,
-				major:            sys.major ?? false,
-				front:            sys.front,
-				back:             sys.back,
-				flipped:          false,
-				unlockValues:     {},
-				backChoiceValues: {},
+				slug:         sys.slug  ?? null,
+				major:        sys.major ?? false,
+				front:        sys.front,
+				back:         sys.back,
+				flipped:      false,
+				choiceValues: {},
 			},
 		});
 		await item.delete();

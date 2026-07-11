@@ -3,7 +3,7 @@
   "_key": "!actors!EjgtwdjSyDLTAy0K",
   "name": "Servants of Daagon",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-water.png",
   "system": {
     "slug": "servants-of-daagon",
     "reference": "blackwater-lake",

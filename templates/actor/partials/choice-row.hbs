@@ -28,7 +28,7 @@
        data-cg-group="{{row.cgGroup}}"
        data-cg-option="{{opt.slug}}"
        data-cg-siblings="{{row.siblingSlugsCsv}}"
-       data-display-label="{{opt.text}}{{#if withDescription}} — {{opt.description}}{{/if}}"
+       data-display-label="{{opt.text}}{{#if withDescription}} — {{opt.description.raw}}{{/if}}"
        {{else}}
        {{#if row.possessionSlug}}data-possession-slug="{{row.possessionSlug}}"{{/if}}
        {{#if row.siblingSlugsCsv}}data-sibling-slugs-csv="{{row.siblingSlugsCsv}}"{{/if}}
@@ -47,20 +47,20 @@
     {{> follower-check}}
     {{/if}}
     {{#each followers}}{{> "stonetop.follower-card" this}}{{/each}}
-    {{else if content.text}}
+    {{else if (hasText content.text)}}
     <label class="stonetop-arcanum-follower-label">
         {{#if track}}
         {{> follower-check}}
         {{/if}}
-        <span class="stonetop-rich">{{{md content.text}}}</span>
+        <span>{{rich content.text}}</span>
     </label>
     {{/if}}
 </div>
 {{else}}
 {{! Entry without followers: content/track/input }}
-{{#if content.title}}{{> "stonetop.section-heading" title=content.title note=content.titleNote}}{{/if}}
+{{#if (hasText content.title)}}{{> "stonetop.section-heading" title=content.title note=content.titleNote}}{{/if}}
 {{#if track}}
-{{#if content.subtitle}}
+{{#if (hasText content.subtitle)}}
 <div class="stonetop-choice-track stonetop-column">
     <div class="stonetop-choice-header-wrapper">
         <span class="stonetop-choice-track-checks">
@@ -68,25 +68,25 @@
         </span>
         {{> "stonetop.section-sub-heading" subtitle=content.subtitle subtitleNote=content.subtitleNote}}
     </div>
-    <span class="stonetop-choice-track-desc stonetop-rich">{{{md content.text}}}</span>
+    <span class="stonetop-choice-track-desc">{{rich content.text}}</span>
 </div>
 {{else}}
 <div class="stonetop-choice-track stonetop-row">
     <div class="stonetop-choice-track-checks">
         {{> track-checks}}
     </div>
-    <span class="stonetop-choice-track-desc stonetop-choice-track-desc-row stonetop-rich">{{{md content.text}}}</span>
+    <span class="stonetop-choice-track-desc stonetop-choice-track-desc-row">{{rich content.text}}</span>
 </div>
 {{/if}}
 
 {{else}}
 {{! No track: still render the entry's subtitle/subtitleNote (the track branch above is the only
     other place they're emitted), then the body text. }}
-{{#if content.subtitle}}
+{{#if (hasText content.subtitle)}}
 {{> "stonetop.section-sub-heading" subtitle=content.subtitle subtitleNote=content.subtitleNote}}
 {{/if}}
-{{#if content.text}}
-<div class="stonetop-choice-description stonetop-rich">{{{md content.text}}}</div>
+{{#if (hasText content.text)}}
+<div class="stonetop-choice-description">{{rich content.text}}</div>
 {{/if}}
 {{/if}}
 {{#if input}}
@@ -118,14 +118,14 @@
 {{! Pick row (type="choice") }}
 <div class="stonetop-choice-row{{#if inline}} stonetop-choice-row--inline{{/if}}">
     {{#each options}}
-    {{#if description}}
+    {{#if (hasText description)}}
     {{! Pick mode — card layout when option has a description }}
     <label class="stonetop-item{{#if checked}} is-checked{{/if}}">
         <div class="stonetop-item-header">
             {{> pick-input row=.. opt=this withDescription=true}}
             <strong class="stonetop-item-name">{{text}}</strong>
         </div>
-        <div class="stonetop-item-description">{{description}}</div>
+        <div class="stonetop-item-description">{{rich description}}</div>
     </label>
     {{else}}
     {{! Pick mode — inline (no description) }}

@@ -3,7 +3,7 @@
 	"id": "stonetop",
 	"title": "Stonetop",
 	"description": "An unofficial system for playing Stonetop in Foundry VTT.",
-	"version": "0.12.0",
+	"version": "0.13.0",
 	"compatibility": {
 		"minimum": "13",
 		"verified": "14"
@@ -59,6 +59,8 @@
 			"playbook":    {},
 			"insert":      {},
 			"improvement": {},
+			"steadfast":   {},
+			"follower":    {},
 			"npc":         {},
 			"outfitItem":  {},
 			"possession":  {}
@@ -122,6 +124,13 @@
 			"system": "stonetop"
 		},
 		{
+			"name": "steadfasts",
+			"label": "Steadfasts",
+			"path": "packs/steadfasts",
+			"type": "Item",
+			"system": "stonetop"
+		},
+		{
 			"name": "wider-world-npcs",
 			"label": "Wider World NPCs",
 			"path": "packs/wider-world-npcs",
@@ -150,7 +159,7 @@
 			"type": "RollTable",
 			"system": "stonetop",
 			"ownership": {
-				"PLAYER": "NONE",
+				"PLAYER": "OBSERVER",
 				"ASSISTANT": "OWNER"
 			}
 		}

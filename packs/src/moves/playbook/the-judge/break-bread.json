@@ -4,8 +4,7 @@
 	"name": "Break Bread",
 	"type": "move",
 	"system": {
-		"playbook": "The Judge",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_share a proper meal with someone and each of you eats their fill_**, each of you recovers 1d8 (extra) HP.",
 		"slug": "break-bread"
 	},

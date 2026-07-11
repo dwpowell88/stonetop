@@ -1,5 +1,7 @@
 import {PossessionUseButton} from "./elements/possession-use-button.js";
 import { FoundryPlaybookRepository } from "./repositories/FoundryPlaybookRepository.js";
+import { enrichRichTextTree } from "../../utils/enrichRichText.js";
+import { confirmDelete } from "../../utils/confirmDelete.js";
 
 export function createStonetopCharacterSheetClass(Base) {
 	return class StonetopCharacterSheet extends Base {
@@ -30,6 +32,8 @@ export function createStonetopCharacterSheetClass(Base) {
 			this._openFollowerInventories ??= new Set();
 			this._stonetopCharacter.setOpenFollowerInventories(this._openFollowerInventories);
 			context.stonetop = await this._stonetopCharacter.buildSnapshot();
+			// Single rich-text pass: enrich every RichText in the snapshot in one go.
+			await enrichRichTextTree(context.stonetop, this.actor?.getRollData?.() ?? {});
 			context.availablePlaybooks = await this._playbookRepository.getAllPlaybooks();
 			return context;
 		}
@@ -120,10 +124,14 @@ export function createStonetopCharacterSheetClass(Base) {
 				this._onInventoryResource({ currentTarget: btn });
 			}, true);
 			html.find(".stonetop-inv-add-btn").on("click", this._onAddInventoryItem.bind(this));
-			html.find(".stonetop-inv-delete").on("click", this._onDeleteCustomInventoryItem.bind(this));
+			html.find(".stonetop-inv-delete")
+				.on("click", ev => this._onDeleteCustomInventoryItem(ev))
+				.on("contextmenu", ev => { ev.preventDefault(); this._onDeleteCustomInventoryItem(ev, { skipConfirm: true }); });
 			html.find(".stonetop-outfit-load-radio").on("change", this._onOutfitLoad.bind(this));
 			html.find(".stonetop-possession-check").on("change", this._onPossessionCheck.bind(this));
-			html.find(".stonetop-possession-delete").on("click", this._onDeletePossession.bind(this));
+			html.find(".stonetop-possession-delete")
+				.on("click", ev => this._onDeletePossession(ev))
+				.on("contextmenu", ev => { ev.preventDefault(); this._onDeletePossession(ev, { skipConfirm: true }); });
 			html.find(".stonetop-possession-sub-check").on("change", this._onPossessionSubCheck.bind(this));
 			html.find(".stonetop-possession-sub-radio").on("change", this._onPossessionSubRadio.bind(this));
 			html.find(".stonetop-regular-pool-btn").on("change", this._onRegularPool.bind(this));
@@ -156,10 +164,9 @@ export function createStonetopCharacterSheetClass(Base) {
 					?? null;
 				if (doc) doc.sheet.render(true);
 			});
-			html.find(".stonetop-other-move-delete").on("click", async ev => {
-				const { moveSlug } = ev.currentTarget.dataset;
-				await this._stonetopCharacter.deleteMove(moveSlug);
-			});
+			html.find(".stonetop-other-move-delete")
+				.on("click", ev => this._onDeleteOtherMove(ev.currentTarget.dataset))
+				.on("contextmenu", ev => { ev.preventDefault(); this._onDeleteOtherMove(ev.currentTarget.dataset, { skipConfirm: true }); });
 
 			html[0].addEventListener("click", async ev => {
 				const btn = ev.target.closest(".stonetop-arcanum-flip-btn");
@@ -197,8 +204,15 @@ export function createStonetopCharacterSheetClass(Base) {
 				const btn = ev.target.closest(".stonetop-arcanum-delete");
 				if (!btn) return;
 				ev.stopPropagation();
-				const { slug } = btn.dataset;
-				await this._stonetopCharacter.removeArcanum(slug);
+				await this._onDeleteArcanum(btn.dataset);
+			}, true);
+
+			html[0].addEventListener("contextmenu", async ev => {
+				const btn = ev.target.closest(".stonetop-arcanum-delete");
+				if (!btn) return;
+				ev.preventDefault();
+				ev.stopPropagation();
+				await this._onDeleteArcanum(btn.dataset, { skipConfirm: true });
 			}, true);
 
 			html[0].addEventListener("change", async ev => {
@@ -218,6 +232,12 @@ export function createStonetopCharacterSheetClass(Base) {
 						insertEl.dataset.insertItemId, cgGroup, cgOption, count);
 					return;
 				}
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (arcEl) {
+					await this._stonetopCharacter.setArcanumChoiceCount(
+						arcEl.dataset.slug, cgGroup, cgOption, count);
+					return;
+				}
 				this._stonetopCharacter.setChoiceCount(cgContext, cgGroup, cgOption, count);
 			}, true);
 
@@ -232,10 +252,24 @@ export function createStonetopCharacterSheetClass(Base) {
 						insertEl.dataset.insertItemId, cgGroup, cgOption, cgSiblings ?? null);
 					return;
 				}
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (arcEl) {
+					await this._stonetopCharacter.selectArcanumChoice(
+						arcEl.dataset.slug, cgGroup, cgOption, cgSiblings ?? null);
+					return;
+				}
 				if (cgContext === "instinct") {
 					html.find(".stonetop-instinct-custom").val(displayLabel ?? "");
 				}
 				this._stonetopCharacter.setChoicePick(cgContext, cgGroup, cgOption, cgSiblings ?? null, el.checked);
+			}, true);
+
+			html[0].addEventListener("change", async ev => {
+				const el = ev.target.closest(".stonetop-resource-input");
+				if (!el) return;
+				if (el.dataset.moveSlug !== undefined) {
+					await this._stonetopCharacter.setMoveResourceText(el.dataset.moveSlug, el.value);
+				}
 			}, true);
 
 			html[0].addEventListener("change", async ev => {
@@ -255,16 +289,38 @@ export function createStonetopCharacterSheetClass(Base) {
 						insertEl.dataset.insertItemId, cgGroup, cgOption, el.value);
 					return;
 				}
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (arcEl) {
+					await this._stonetopCharacter.setArcanumChoiceText(
+						arcEl.dataset.slug, cgGroup, cgOption, el.value);
+					return;
+				}
 				this._stonetopCharacter.setChoiceText(cgContext, cgGroup, cgOption, el.value);
 			}, true);
+
+			// Write-in blank fields inside an arcanum card (rendered from `@Blank[key]` tokens by the
+			// enricher). Persist the typed value on change; the fill pass below seeds each from storage.
+			html[0].addEventListener("change", async ev => {
+				const el = ev.target.closest(".stonetop-arcanum-blank");
+				if (!el) return;
+				const arcEl = el.closest(".stonetop-arcanum-card");
+				if (!arcEl) return;
+				await this._stonetopCharacter.setArcanumBlank(arcEl.dataset.slug, el.dataset.blankKey, el.value);
+			}, true);
+			for (const card of html[0].querySelectorAll(".stonetop-arcanum-card")) {
+				const blanks = this._stonetopCharacter.getArcanumBlanks(card.dataset.slug);
+				for (const input of card.querySelectorAll("input.stonetop-arcanum-blank"))
+					input.value = blanks[input.dataset.blankKey] ?? "";
+			}
 
 			html[0].addEventListener("change", async ev => {
 				const el = ev.target.closest(".stonetop-arcanum-follower-check");
 				if (!el) return;
 				const { cgContext, slug: groupSlug, option: optionSlug, index } = el.dataset;
 				const count = el.checked ? Number(index) + 1 : Number(index);
-				if (cgContext === "arcana-back") {
-					await this._stonetopCharacter.setArcanumBackChoiceValue(groupSlug, optionSlug, count);
+				if (cgContext === "arcana") {
+					const arcEl = el.closest(".stonetop-arcanum-card");
+					await this._stonetopCharacter.setArcanumChoiceCount(arcEl.dataset.slug, groupSlug, optionSlug, count);
 				} else if (cgContext === "background") {
 					await this._stonetopCharacter.setChoiceCount(cgContext, groupSlug, optionSlug, count);
 				}
@@ -287,7 +343,15 @@ export function createStonetopCharacterSheetClass(Base) {
 				const btn = ev.target.closest(".stonetop-follower-delete");
 				if (!btn) return;
 				ev.stopPropagation();
-				await this._stonetopCharacter.removeFollower(btn.dataset.slug);
+				await this._onDeleteFollower(btn.dataset);
+			}, true);
+
+			html[0].addEventListener("contextmenu", async ev => {
+				const btn = ev.target.closest(".stonetop-follower-delete");
+				if (!btn) return;
+				ev.preventDefault();
+				ev.stopPropagation();
+				await this._onDeleteFollower(btn.dataset, { skipConfirm: true });
 			}, true);
 
 			html[0].addEventListener("change", ev => {
@@ -392,6 +456,18 @@ export function createStonetopCharacterSheetClass(Base) {
 				this._stonetopCharacter.setFollowerNotes(input.dataset.slug, input.value);
 			}, true);
 
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-special-quality");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerSpecialQuality(input.dataset.slug, input.value);
+			}, true);
+
+			html[0].addEventListener("change", ev => {
+				const input = ev.target.closest(".stonetop-follower-description");
+				if (!input) return;
+				this._stonetopCharacter.setFollowerDescription(input.dataset.slug, input.value);
+			}, true);
+
 			// Group members (per-member name + HP, add/remove)
 			html[0].addEventListener("change", ev => {
 				const name = ev.target.closest(".stonetop-member-name");
@@ -494,8 +570,25 @@ export function createStonetopCharacterSheetClass(Base) {
 			}
 		}
 
-		async _onDeletePossession(ev) {
-			await this._stonetopCharacter.deletePossession(ev.currentTarget.dataset.slug);
+		async _onDeletePossession(ev, { skipConfirm = false } = {}) {
+			const { slug, name } = ev.currentTarget.dataset;
+			if (!skipConfirm && !(await confirmDelete(name))) return;
+			await this._stonetopCharacter.deletePossession(slug);
+		}
+
+		async _onDeleteArcanum({ slug, name }, { skipConfirm = false } = {}) {
+			if (!skipConfirm && !(await confirmDelete(name))) return;
+			await this._stonetopCharacter.removeArcanum(slug);
+		}
+
+		async _onDeleteFollower({ slug, name }, { skipConfirm = false } = {}) {
+			if (!skipConfirm && !(await confirmDelete(name))) return;
+			await this._stonetopCharacter.removeFollower(slug);
+		}
+
+		async _onDeleteOtherMove({ moveSlug, name }, { skipConfirm = false } = {}) {
+			if (!skipConfirm && !(await confirmDelete(name))) return;
+			await this._stonetopCharacter.deleteMove(moveSlug);
 		}
 
 		async _onPossessionUseChange(ev) {
@@ -599,8 +692,9 @@ export function createStonetopCharacterSheetClass(Base) {
 			);
 		}
 
-		async _onDeleteCustomInventoryItem(ev) {
+		async _onDeleteCustomInventoryItem(ev, { skipConfirm = false } = {}) {
 			const el = ev.currentTarget;
+			if (!skipConfirm && !(await confirmDelete(el.dataset.name))) return;
 			const fSlug = this._followerInvSlug(el);
 			if (fSlug) return this._stonetopCharacter.removeFollowerInvCustomItem(fSlug, el.dataset.ownedId);
 			await this._stonetopCharacter.removeCustomInventoryItem(el.dataset.ownedId);

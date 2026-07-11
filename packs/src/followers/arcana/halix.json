@@ -2,7 +2,7 @@
 	"_id": "qefhHxkAI1atQFh3",
 	"_key": "!items!qefhHxkAI1atQFh3",
 	"name": "Halix",
-	"type": "npc",
+	"type": "follower",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
 		"slug": "halix",
@@ -36,7 +36,7 @@
 		"moves": "- Manifest a ghostly presence (harmed only by silver or salt)\n- Possess an inebriated victim\n- Spot a weakness, want, or fear\n- Spin plots and falsehoods",
 		"cost": {
 			"selected": [
-				"pleasures of the flesh (Loyalty ◯◯◯)"
+				"pleasures of the flesh"
 			],
 			"options": [],
 			"multi": false,

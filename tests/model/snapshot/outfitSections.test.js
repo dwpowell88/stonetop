@@ -54,6 +54,8 @@ describe("buildOutfitColumn", () => {
 		expect(coin.isCustom).toBe(true);            // custom item (has ownedId)
 		expect(coin.ownedId).toBe("lucky-coin");
 		expect(coin.twoCol).toBe(true);
+		expect(hatchet.note.raw).toBe("x");          // note wrapped as RichText
+		expect(hatchet.tags.raw).toBe("hand");       // tags wrapped as RichText
 	});
 
 	it("defaults resource to null when no resourceFn is given", () => {

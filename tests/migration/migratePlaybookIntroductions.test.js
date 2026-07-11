@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { migratePlaybookIntroductions } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakePlaybookRepository } from "../fakes/FakePlaybookRepository.js";
 import { TestPlaybookItemBuilder } from "../fakes/TestPlaybookItemBuilder.js";
 
@@ -18,7 +18,7 @@ const INTRO_NO_INPUT = {
 
 function makeActor(introductions = null) {
 	const item = new TestPlaybookItemBuilder().withIntroductions(introductions).build();
-	return new FakeActorBuilder().withItems([item]).build();
+	return new FakeCharacterActorBuilder().withItems([item]).build();
 }
 
 function makeRepo(introductions = null) {
@@ -29,7 +29,7 @@ function makeRepo(introductions = null) {
 
 describe("migratePlaybookIntroductions", () => {
 	it("does nothing when actor has no playbook item", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await migratePlaybookIntroductions(actor, makeRepo(INTRO));
 		expect(actor.updatedDocs).toHaveLength(0);
 	});
@@ -50,7 +50,7 @@ describe("migratePlaybookIntroductions", () => {
 	it("updates when introductions is a stale array", async () => {
 		const item = new TestPlaybookItemBuilder().build();
 		item.system.introductions = [];
-		const actor = new FakeActorBuilder().withItems([item]).build();
+		const actor = new FakeCharacterActorBuilder().withItems([item]).build();
 		await migratePlaybookIntroductions(actor, makeRepo(INTRO));
 		expect(actor.updatedDocs).toHaveLength(1);
 		expect(actor.updatedDocs[0].system.introductions).toEqual(INTRO);

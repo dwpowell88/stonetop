@@ -100,7 +100,7 @@
 				       data-slug="{{slug}}"
 				       {{#if checked}}checked{{/if}}>
 				<span class="stonetop-inv-label">{{name}}
-					{{#if note}}<span class="stonetop-inv-note">({{{note}}})</span>{{/if}}
+					{{#if note.raw}}<span class="stonetop-inv-note">({{rich note}})</span>{{/if}}
 				</span>
 				{{#if resource}}
 				<span class="stonetop-inv-resources">
@@ -108,7 +108,7 @@
 				</span>
 				{{/if}}
 				{{#if isCustom}}
-				<a class="stonetop-inv-delete" data-owned-id="{{ownedId}}" title="{{localize 'stonetop.inventory.removeItem'}}"><i class="fas fa-times"></i></a>
+				<a class="stonetop-inv-delete" data-owned-id="{{ownedId}}" data-name="{{name}}" title="{{localize 'stonetop.inventory.removeItem'}} — {{localize 'stonetop.confirm.deleteHint'}}"><i class="fas fa-times"></i></a>
 				{{/if}}
 			</label>
 			{{/each}}
@@ -139,17 +139,17 @@
 					       data-slug="{{slug}}"
 					       {{#if checked}}checked{{/if}}
 					       {{#if disabled}}disabled{{/if}}>
-					<strong class="stonetop-item-name stonetop-rich">{{{md label}}}</strong>
+					<strong class="stonetop-item-name">{{rich label}}</strong>
 					{{#if preselectedSource}}<span class="stonetop-item-source">{{preselectedSource}}</span>{{/if}}
 					{{#if resource}}
 					<span class="stonetop-item-resources">
 						{{> "stonetop.resource-track" resource=resource btnClass="stonetop-item-resource-check" possessionSlug=slug}}
 					</span>
 					{{/if}}
-					{{#if removable}}<a class="stonetop-possession-delete" data-slug="{{slug}}" title="{{localize 'stonetop.inventory.removeItem'}}"><i class="fas fa-trash"></i></a>{{/if}}
+					{{#if removable}}<a class="stonetop-possession-delete" data-slug="{{slug}}" data-name="{{label.raw}}" title="{{localize 'stonetop.inventory.removeItem'}} — {{localize 'stonetop.confirm.deleteHint'}}"><i class="fas fa-trash"></i></a>{{/if}}
 				</div>
 				{{#if description}}
-				<div class="stonetop-item-description stonetop-rich">{{{md description}}}</div>
+				<div class="stonetop-item-description">{{rich description}}</div>
 				{{/if}}
 				{{#if choices}}
 				<div class="stonetop-choice-rows" data-possession-slug="{{slug}}">

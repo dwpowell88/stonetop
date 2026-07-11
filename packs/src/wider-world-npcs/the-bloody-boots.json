@@ -3,7 +3,7 @@
   "_key": "!actors!vdVBA6B2baj0t7HJ",
   "name": "The Bloody Boots",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-rose.png",
   "system": {
     "slug": "the-bloody-boots",
     "reference": "fae",
@@ -24,8 +24,8 @@
       "max": 12
     },
     "armor": "4 (resilience), 2 vs. iron",
-    "damage": "oversized club d8 w/advantage (close, crude) or iron-shod boots d8+2 w/advantage (hand, forceful)",
-    "specialQuality": "Fae nature (page 98)  tolerates iron; can’t start violence",
+    "damage": "oversized club d8 w/advantage (_close_, _crude_) or iron-shod boots d8+2 w/advantage (_hand_, _forceful_)",
+    "specialQuality": "Fae nature (page 98); tolerates iron; can’t start violence",
     "instinct": {
       "selected": [
         "to brawl, the nastier the better"

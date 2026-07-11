@@ -1,0 +1,15 @@
+export const PACKS = [
+	"playbooks",
+	"moves",
+	"outfit-items",
+	"arcana",
+	"followers",
+	"inserts",
+	"insert-moves",
+	"possessions",
+	"steading-improvements",
+	"steadfasts",
+	"wider-world-npcs",
+	"wider-world-and-other-wonders",
+	"wonder-tables",
+];

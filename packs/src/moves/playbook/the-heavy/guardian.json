@@ -4,8 +4,7 @@
 	"name": "Guardian",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Defend_**, hold 1 extra Readiness. Even **on a 6-**, hold 1 Readiness (plus whatever the GM says).",
 		"slug": "guardian"
 	},

@@ -1,0 +1,53 @@
+{{!-- Editor for one animal-companion catalog type. Scalar fields save through the .follower-comp-field
+      change handler (data-index = type index, data-field dotted e.g. "hp.max"); the whole companion
+      object is rewritten. The three string sub-lists (variants / options / defaults) reuse the shared
+      string-list editor, each wrapped in a [data-comp-field] container so its handlers know which list
+      to write (ownerIndex = this type's index). Params: type, index, editable. --}}
+<div class="follower-companion-type" data-index="{{index}}">
+	<div class="follower-companion-type-head">
+		<input type="text" class="follower-comp-field" data-index="{{index}}" data-field="name"
+		       value="{{type.name}}" placeholder="{{localize 'stonetop.follower.companionTypeName'}}"
+		       {{#unless editable}}disabled{{/unless}}>
+		{{#if editable}}
+		<button type="button" class="follower-companion-remove-type" data-index="{{index}}"
+		        title="{{localize 'stonetop.follower.remove'}}">✕</button>
+		{{/if}}
+	</div>
+	<div class="follower-companion-type-stats">
+		<label>{{localize "stonetop.followers.hp"}}
+			<input type="number" min="0" class="follower-comp-field" data-index="{{index}}" data-field="hp.value"
+			       value="{{type.hp.value}}" {{#unless editable}}disabled{{/unless}}>
+		</label>
+		<span>/</span>
+		<input type="number" min="0" class="follower-comp-field" data-index="{{index}}" data-field="hp.max"
+		       value="{{type.hp.max}}" title="{{localize 'stonetop.followers.hp'}} max" {{#unless editable}}disabled{{/unless}}>
+		<label>{{localize "stonetop.followers.armor"}}
+			<input type="text" class="follower-comp-field" data-index="{{index}}" data-field="armor"
+			       value="{{type.armor}}" {{#unless editable}}disabled{{/unless}}>
+		</label>
+		<label>{{localize "stonetop.followers.damage"}}
+			<input type="text" class="follower-comp-field" data-index="{{index}}" data-field="damage"
+			       value="{{type.damage}}" {{#unless editable}}disabled{{/unless}}>
+		</label>
+		<label>{{localize "stonetop.follower.companionPick"}}
+			<input type="number" min="0" class="follower-comp-field" data-index="{{index}}" data-field="pickCount"
+			       value="{{type.pickCount}}" {{#unless editable}}disabled{{/unless}}>
+		</label>
+	</div>
+
+	<div class="follower-comp-strings" data-comp-field="variants">
+		{{> "stonetop.string-list-editor" items=type.variants ownerIndex=index editable=editable
+			label=(localize "stonetop.follower.companionVariants") addLabel=(localize "stonetop.follower.option")
+			addClass="follower-comp-list-add" rowClass="follower-comp-list-input" removeClass="follower-comp-list-remove"}}
+	</div>
+	<div class="follower-comp-strings" data-comp-field="options">
+		{{> "stonetop.string-list-editor" items=type.options ownerIndex=index editable=editable
+			label=(localize "stonetop.follower.companionOptions") addLabel=(localize "stonetop.follower.option")
+			addClass="follower-comp-list-add" rowClass="follower-comp-list-input" removeClass="follower-comp-list-remove"}}
+	</div>
+	<div class="follower-comp-strings" data-comp-field="defaults">
+		{{> "stonetop.string-list-editor" items=type.defaults ownerIndex=index editable=editable
+			label=(localize "stonetop.follower.companionDefaults") addLabel=(localize "stonetop.follower.option")
+			addClass="follower-comp-list-add" rowClass="follower-comp-list-input" removeClass="follower-comp-list-remove"}}
+	</div>
+</div>

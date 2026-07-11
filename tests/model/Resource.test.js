@@ -25,4 +25,13 @@ describe("Resource", () => {
 	it("defaults labels to [] when absent", () => {
 		expect(new Resource({}).labels).toEqual([]);
 	});
+
+	it("stores an input (fill-in blank) def when present", () => {
+		const def = new Resource({ max: 1, input: { type: "inline", placeholder: "what?" } });
+		expect(def.input).toEqual({ type: "inline", placeholder: "what?" });
+	});
+
+	it("defaults input to null when absent", () => {
+		expect(new Resource({}).input).toBeNull();
+	});
 });

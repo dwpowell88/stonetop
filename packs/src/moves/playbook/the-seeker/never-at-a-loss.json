@@ -4,8 +4,7 @@
 	"name": "Never at a Loss",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Know Things and roll a 6-_**, you may choose to not mark XP. If you don't mark XP, the worst that happens is that the GM tells you nothing interesting or useful about the subject, but instead tells you how you could learn more.",
 		"slug": "never-at-a-loss"
 	},

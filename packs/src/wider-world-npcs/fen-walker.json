@@ -3,7 +3,7 @@
   "_key": "!actors!qlG1rWUGfIic89j4",
   "name": "Fen-walker",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "fen-walker",
     "reference": "ferriers-fen",
@@ -12,8 +12,7 @@
         "Fen-wise",
         "cautious",
         "stealthy",
-        "observant",
-        "(and see below)"
+        "observant"
       ],
       "options": [],
       "multi": true,
@@ -24,7 +23,7 @@
       "max": 8
     },
     "armor": "1 (leather cuirass)",
-    "damage": "knife d8 (hand), sling d6 (near, reload)",
+    "damage": "knife d8 (_hand_), sling d6 (_near_, _reload_)",
     "specialQuality": "",
     "instinct": {
       "selected": [],

@@ -3,7 +3,7 @@
   "_key": "!actors!tC68JyTGz9tGO5gv",
   "name": "Blue magpie",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "blue-magpie",
     "reference": "the-ruined-tower",
@@ -26,7 +26,7 @@
     },
     "armor": "1 (size)",
     "damage": "peck d4-2 w/disadvantage (hand)",
-    "specialQuality": "smart as a child (at least)  can speak Tempest Lord (understood by all)",
+    "specialQuality": "smart as a child (at least); can speak Tempest Lord (understood by all)",
     "instinct": {
       "selected": [
         "to amuse/impress its friends"

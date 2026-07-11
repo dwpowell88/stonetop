@@ -54,12 +54,13 @@ function hullArea(pts) {
 }
 
 /**
- * Small check markers from the vector layer: the resource **circle** ○ and the outfit **diamond**
- * ◇. Both are drawn as small unfilled curved outlines (`stroke_path`, ≥3 arcs, no straight sides),
- * so they're told apart by how much of their bounding box the shape fills (including curve control
- * points): a circle ≈ 0.9, a diamond ≈ 0.5. Everything else — filled swirls and the
- * swirl+triangle/arrow list bullets — is left alone (the lists detect themselves).
- * Returns `[{x, y, w, h, kind}]` in page coordinates.
+ * Small check markers from the vector layer, drawn as small black outlines (`stroke_path`):
+ *   • **circle** ○ and **diamond** ◇ — curved outlines (≥3 arcs, no straight sides), told apart by
+ *     how much of their bounding box the shape fills (a circle ≈ 0.9, a diamond ≈ 0.5).
+ *   • **square** □ — a straight-sided, roughly-square box (the choice-group pick/track checkbox,
+ *     e.g. the Blackwater "Getting there" list and the arcana tracks).
+ * Everything else — filled swirls and the swirl+triangle/arrow list bullets — is left alone (the
+ * lists detect themselves). Returns `[{x, y, w, h, kind}]` in page coordinates.
  */
 export function parseMarkers(xml) {
 	const out = [];
@@ -67,14 +68,21 @@ export function parseMarkers(xml) {
 	let m;
 	while ((m = re.exec(xml))) {
 		const body = m[2];
-		if (!/color="0 0 0"/.test(m[1]) || /lineto/.test(body) || (body.match(/curveto/g) || []).length < 3) continue;
+		if (!/color="0 0 0"/.test(m[1])) continue;
 		const t = m[1].match(/transform="1 0 0 -1 ([-\d.]+) ([-\d.]+)"/);
 		if (!t) continue;
 		const pts = [...body.matchAll(/x\d?="([-\d.]+)"\s+y\d?="([-\d.]+)"/g)].map((p) => [+p[1], +p[2]]);
+		if (!pts.length) continue;
 		const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
 		const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
 		if (w < 2 || w >= 16 || h >= 16) continue;
-		out.push({ x: +t[1], y: +t[2], w, h, kind: hullArea(pts) / (w * h) < 0.7 ? "diamond" : "circle" });
+		const curves = (body.match(/curveto/g) || []).length;
+		const lines = (body.match(/lineto/g) || []).length;
+		let kind;
+		if (curves >= 3 && lines === 0) kind = hullArea(pts) / (w * h) < 0.7 ? "diamond" : "circle"; // curved outline
+		else if (lines >= 3 && Math.abs(w - h) <= Math.max(w, h) * 0.35) kind = "square";            // straight-sided box
+		else continue;
+		out.push({ x: +t[1], y: +t[2], w, h, kind });
 	}
 	return out;
 }

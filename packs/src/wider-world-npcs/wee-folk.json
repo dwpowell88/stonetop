@@ -3,7 +3,7 @@
   "_key": "!actors!Q5r8z1pKwEKuUwrD",
   "name": "Wee folk",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-rose.png",
   "system": {
     "slug": "wee-folk",
     "reference": "fae",
@@ -25,7 +25,7 @@
       "max": 1
     },
     "armor": "6 (resilience, size, speed), 2 vs. iron",
-    "damage": "stings/darts d6-2 (hand or reach)",
+    "damage": "stings/darts d6-2 (_hand_ or _reach_)",
     "specialQuality": "Fae nature (page 98)",
     "instinct": {
       "selected": [],

@@ -1,3 +1,5 @@
+import { enrichRichTextTree } from "../../utils/enrichRichText.js";
+
 export function createStonetopNpcSheetClass(Base) {
     return class StonetopNpcSheet extends Base {
 
@@ -19,6 +21,7 @@ export function createStonetopNpcSheetClass(Base) {
         async getData() {
 			const ctx = await super.getData();
 			ctx.stonetop = await this._stonetopNpc.buildSnapshot();
+			await enrichRichTextTree(ctx.stonetop, this.actor?.getRollData?.() ?? {});
 			return ctx;
 		}
 

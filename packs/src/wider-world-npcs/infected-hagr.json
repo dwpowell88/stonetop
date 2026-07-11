@@ -3,7 +3,7 @@
   "_key": "!actors!MX0hbjqdwyirYUAF",
   "name": "INFECTED HAGR",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/icons/npc.png",
   "system": {
     "slug": "infected-hagr",
     "reference": "fomoraij",
@@ -25,7 +25,7 @@
     },
     "armor": "4 (resilience), 1 vs. bronze (blubbery hide)",
     "damage": "meaty hands d10+3 (hand, close, grabby, forceful) or tree trunk d10+5 (reach, area, crude, forceful) or hurled heavy thing d10+3 (thrown, forceful)",
-    "specialQuality": "infectious blood  suffers from delusions, behaves erratically",
+    "specialQuality": "infectious blood; suffers from delusions, behaves erratically",
     "instinct": {
       "selected": [
         "to spread its master’s influence > Fix someone with its evil eye, inflicting overwhelming delusions > Pluck things from the ground as if weightless > Obsessively carve its master’s sigils into things > Fly into a senseless rage > Spew forth an infectious, silvery cloud (reach, area, reload)"

@@ -24,8 +24,6 @@ export class MoveData extends foundry.abstract.TypeDataModel {
 			}),
 			resource:       new f.ObjectField({ nullable: true, initial: null }),
 			repeatMax:      new f.NumberField({ initial: 1, integer: true }),
-			isStartingMove: new f.BooleanField({ initial: false }),
-			playbook:       new f.StringField({ nullable: true, initial: null }),
 			slug:           new f.StringField({ nullable: true, initial: null }),
 			sortOrder:      new f.NumberField({ nullable: true, initial: null }),
 			choices:       new f.ObjectField({ nullable: true, initial: null }),

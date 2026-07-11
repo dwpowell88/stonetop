@@ -2,7 +2,10 @@
 // shared by move choices, insert choices, and insert instinct). Each helper takes a group and
 // returns a NEW group (clones first) so callers can `item.update({ <path>: group })`. Extracted
 // from StonetopMoveSheet so both the move sheet and the insert sheet share — and TEST — one
-// implementation. Only depends on foundry.utils.{deepClone,setProperty} (mocked in tests).
+// implementation. Depends on foundry.utils.{deepClone,setProperty} (mocked in tests) and the
+// rich-text handler (to seed the content.text <prose-mirror> editor).
+
+import { rich } from "../model/snapshot/RichText.js";
 
 export const DEFAULT_ROWS = {
 	entry: { type: "entry", slug: "", content: { title: null, text: null }, note: null, track: null, input: null, followers: [], outfitItems: [], inlineDisplay: false },
@@ -118,13 +121,23 @@ export function instinctFromStrings(strings) {
 	};
 }
 
+// Content with `textHtml`: the stored markdown `content.text` rendered to HTML, to seed the
+// <prose-mirror> editor (which reads/writes HTML). Uses the rich-text handler's sync render — NOT the
+// async enrich pass — on purpose: the editor must show @UUID/roll tokens as their editable source,
+// not baked-in links. Both entry rows and pick options are editable.
+function contentWithHtml(content) {
+	return { ...content, textHtml: rich(content?.text ?? "").render() };
+}
+
 // Render-ready rows with the metadata the choice-group-editor partial needs.
 export function buildRows(group) {
 	return (group?.list ?? []).map((row, ri) => ({
 		...row,
+		content: contentWithHtml(row.content),
 		_index: ri, _target: "row", _rowIndex: ri, _hasOptionIndex: false, _optionIndex: null,
 		options: row.options?.map((opt, oi) => ({
-			...opt, _index: oi, _rowIndex: ri, _target: "option", _hasOptionIndex: true, _optionIndex: oi,
+			...opt, content: contentWithHtml(opt.content),
+			_index: oi, _rowIndex: ri, _target: "option", _hasOptionIndex: true, _optionIndex: oi,
 		})),
 	}));
 }

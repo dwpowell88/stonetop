@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { migratePossessions } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakePossessionRepository } from "../fakes/FakePossessionRepository.js";
 import { FakeOutfitItems } from "../fakes/FakeOutfitItems.js";
 import { FakeMoves } from "../fakes/FakeMoves.js";
 
 function makeActor(flags = {}, items = []) {
-	const builder = new FakeActorBuilder().withItems(items);
-	builder._flagsBuilder.withFlags(flags);
+	const builder = new FakeCharacterActorBuilder().withItems(items);
+	builder.withFlags(flags);
 	return builder.build();
 }
 

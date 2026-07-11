@@ -1,0 +1,12 @@
+{
+	"_id": "c8ff4595219ae62b",
+	"_key": "!items!c8ff4595219ae62b",
+	"name": "Promise of Doom",
+	"type": "move",
+	"system": {
+		"slug": "promise-of-doom",
+		"moveType": null,
+		"description": "When you **_hold the Twisted Spear and speak aloud an oath to destroy a spirit or demon_**, you do +2d4 damage against them and -4 damage to everything else. This lasts until you destroy them or forsake your oath. If you forsake your oath, mark a consequence."
+	},
+	"folder": "ArcanaMoves00001"
+}

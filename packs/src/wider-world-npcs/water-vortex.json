@@ -3,7 +3,7 @@
   "_key": "!actors!gLEysjpAIhntv0ow",
   "name": "Water vortex",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "water-vortex",
     "reference": "tempest-lords",

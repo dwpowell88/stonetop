@@ -10,7 +10,7 @@
 	{{!-- Back side --}}
 	<div class="stonetop-arcanum-header">
 		<div class="stonetop-arcanum-header-left">
-			<span class="stonetop-arcanum-title">{{back.title}}</span>
+			<span class="stonetop-arcanum-title">{{rich back.title}}</span>
 			{{#if back.item}}{{> "stonetop.outfit-item-row" back.item}}{{/if}}
 		</div>
 		{{#if back.resource}}
@@ -20,23 +20,30 @@
 		{{/if}}
 	</div>
 	<div class="stonetop-arcanum-body">
-		<div class="stonetop-rich">{{{md back.description}}}</div>
-		{{#each back.moves}}
-		<p class="stonetop-arcanum-move-trigger"><strong>{{name}}</strong>{{#if subtitle}} <span class="stonetop-arcanum-move-subtitle">{{subtitle}}</span>{{/if}}</p>
-		<div class="stonetop-rich">{{{md text}}}</div>
-		{{/each}}
+		<div>{{rich back.description}}</div>
+		{{#if back.moves.length}}
+		<p class="stonetop-arcanum-section-label">{{localize "stonetop.arcana.moves"}}</p>
+		<ol class="items-list stonetop-arcanum-moves">
+			{{!-- Major arcana: real move items the player ticks to unlock (categoryKey = source.type =
+			      arcana-<slug>), rollable via the shared move-row wrapper (so the roll resolves the owned
+			      move item, not a bare stat). Minor/custom arcana render inline, always-active, no checkbox. --}}
+			{{#each back.moves}}
+			{{> "stonetop.move-row" showCheck=../major categoryKey=source.type alwaysShowResource=true}}
+			{{/each}}
+		</ol>
+		{{/if}}
 		{{#if back.choices}}
 		<div class="stonetop-arcanum-back-choices">
 			{{#each back.choices.list}}
-			{{> "stonetop.choice-row" cgContext="arcana-back" cgGroup=../slug}}
+			{{> "stonetop.choice-row" cgContext="arcana" cgGroup=../back.choices.slug}}
 			{{/each}}
 		</div>
 		{{/if}}
 		{{#if back.consequences}}
 		<div class="stonetop-arcanum-consequences">
-			<p class="stonetop-arcanum-consequences-label">{{localize "stonetop.arcana.consequences"}}</p>
+			<p class="stonetop-arcanum-section-label">{{localize "stonetop.arcana.consequences"}}</p>
 			{{#each back.consequences.list}}
-			{{> "stonetop.choice-row"}}
+			{{> "stonetop.choice-row" cgContext="arcana" cgGroup=../back.consequences.slug}}
 			{{/each}}
 		</div>
 		{{/if}}
@@ -46,15 +53,16 @@
 	{{!-- Front side --}}
 	<div class="stonetop-arcanum-header">
 		<div class="stonetop-arcanum-header-left">
-			<span class="stonetop-arcanum-title">{{front.title}}</span>
+			<span class="stonetop-arcanum-title">{{rich front.title}}</span>
 			{{#if front.item}}{{> "stonetop.outfit-item-row" front.item}}{{/if}}
+			{{#if front.tags}}<span class="stonetop-arcanum-tags">{{front.tags}}</span>{{/if}}
 		</div>
 	</div>
 	<div class="stonetop-arcanum-body">
-		<div class="stonetop-rich">{{{md front.description}}}</div>
+		<div>{{rich front.description}}</div>
 		<div class="stonetop-arcanum-unlock">
 			{{#each front.unlock.list}}
-			{{> "stonetop.choice-row" cgContext="arcana-unlock" cgGroup=../slug}}
+			{{> "stonetop.choice-row" cgContext="arcana" cgGroup=../front.unlock.slug}}
 			{{/each}}
 		</div>
 	</div>
@@ -65,8 +73,8 @@
 		        data-slug="{{slug}}" data-flipped="{{flipped}}">
 			{{#if flipped}}{{localize "stonetop.arcana.showFront"}}{{else}}{{localize "stonetop.arcana.showBack"}}{{/if}}
 		</button>
-		<button type="button" class="stonetop-arcanum-delete" data-slug="{{slug}}"
-		        title="{{localize 'stonetop.arcana.removeArcanum'}}">
+		<button type="button" class="stonetop-arcanum-delete" data-slug="{{slug}}" data-name="{{name}}"
+		        title="{{localize 'stonetop.arcana.removeArcanum'}} — {{localize 'stonetop.confirm.deleteHint'}}">
 			<img src="systems/stonetop/assets/ui/controls/delete-icon.png" alt="{{localize 'stonetop.arcana.removeArcanum'}}">
 		</button>
 	</div>

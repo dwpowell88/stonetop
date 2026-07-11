@@ -1,0 +1,19 @@
+{
+	"_id": "1ebab154aca631c5",
+	"_key": "!items!1ebab154aca631c5",
+	"name": "Battery",
+	"type": "move",
+	"system": {
+		"slug": "battery",
+		"moveType": null,
+		"description": "When you **_gather elemental power about the Azure Hand_**, you can choose to store the energy in the staff itself. It no longer requires your touch or focus to maintain. You cannot do this again until you use up the energy contained within (see reverse).",
+		"resource": {
+			"max": 1,
+			"title": null,
+			"input": {
+				"type": "inline"
+			}
+		}
+	},
+	"folder": "ArcanaMoves00001"
+}

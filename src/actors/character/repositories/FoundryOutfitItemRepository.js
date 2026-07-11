@@ -4,7 +4,7 @@ import { WorldItemStore } from "./WorldItemStore.js";
 
 const FIELDS = [
 	"system.slug", "system.inventoryColumn", "system.sortOrder",
-	"system.weight", "system.tags", "system.note", "system.resource",
+	"system.weight", "system.tagList", "system.note", "system.resource",
 	"system.twoCol", "system.armor",
 	"folder",
 ];
@@ -15,7 +15,7 @@ function _toOutfitItem(item, group = null) {
 		.withSlug(sys.slug)
 		.withName(item.name)
 		.withWeight(sys.weight ?? 0)
-		.withTags(sys.tags ?? "")
+		.withTags(sys.tagList ?? "")
 		.withNote(sys.note ?? null)
 		.withInventoryColumn(sys.inventoryColumn ?? null)
 		.withResource(sys.resource ?? null)

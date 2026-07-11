@@ -7,7 +7,7 @@
 	"system": {
 		"slug": "books-and-scrolls",
 		"label": "Books & scrolls",
-		"description": "(○○○○○ uses): expend a use to consult your collection and turn a Know Things roll you just made into a 10+",
+		"description": "expend a use to consult your collection and turn a Know Things roll you just made into a 10+",
 		"resource": {
 			"max": 5,
 			"title": null,

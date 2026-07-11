@@ -1,0 +1,12 @@
+{
+	"_id": "b599a87126956c28",
+	"_key": "!items!b599a87126956c28",
+	"name": "Telepathy",
+	"type": "move",
+	"system": {
+		"slug": "telepathy",
+		"moveType": null,
+		"description": "When you **_mindwalk_**, you may spend 1 Power to become able to communicate mentally with someone nearby, as long as you remain in their presence. They can choose whether to respond, and can attempt to ignore you, but cannot shut you out completely without magic of their own."
+	},
+	"folder": "ArcanaMoves00001"
+}

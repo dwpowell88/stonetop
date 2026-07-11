@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { CharacterOrigin } from "../../../src/actors/character/CharacterOrigin.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { OriginSection } from "../../../src/model/snapshot/character/CharacterSnapshot.js";
 
 // -- Helpers ------------------------------------------------------------------
 
 function makeOrigin(selected = "") {
-	const actor = new FakeActorBuilder().build();
+	const actor = new FakeCharacterActorBuilder().build();
 	actor.system.origin = { selected };
 	return new CharacterOrigin(actor);
 }

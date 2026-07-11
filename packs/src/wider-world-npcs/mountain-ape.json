@@ -3,7 +3,7 @@
   "_key": "!actors!iZONPdl63NyuZU9s",
   "name": "Mountain ape",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "mountain-ape",
     "reference": "the-whitefang-mountains",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "1 (thick fur, hide)",
-    "damage": "grasping hands d8+2 (reach, close, grabby, forceful)",
+    "damage": "grasping hands d8+2 (_reach_, _close_, _grabby_, _forceful_)",
     "specialQuality": "arboreal, cold proof, keen senses of smell and hearing",
     "instinct": {
       "selected": [

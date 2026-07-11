@@ -9,21 +9,30 @@ import { createStonetopMoveSheetClass } from "./src/item/StonetopMoveSheet.js";
 import { createStonetopInsertSheetClass } from "./src/item/StonetopInsertSheet.js";
 import { createStonetopArcanumSheetClass } from "./src/item/StonetopArcanumSheet.js";
 import { createStonetopPossessionSheetClass } from "./src/item/StonetopPossessionSheet.js";
+import { createStonetopFollowerSheetClass } from "./src/item/StonetopFollowerSheet.js";
+import { createStonetopImprovementSheetClass } from "./src/item/StonetopImprovementSheet.js";
+import { createStonetopSteadfastSheetClass } from "./src/item/StonetopSteadfastSheet.js";
+import { withSheetSizeMemory } from "./src/utils/withSheetSizeMemory.js";
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
+import { onPreCreateActor } from "./src/hooks/PreCreateActor.js";
+import { onCreateActor } from "./src/hooks/CreateActor.js";
+import { installBrokenImageHider } from "./src/hooks/HideBrokenImages.js";
 import { info } from "./src/utils/logger.js";
-import { renderMarkdown } from "./src/utils/enrichGameText.js";
+import { rich, hasText } from "./src/model/snapshot/RichText.js";
 import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
+import { registerBlankFieldEnricher } from "./src/journal/blankFieldEnricher.js";
 import { CharacterData } from "./src/data/CharacterData.js";
 import { NpcData } from "./src/data/NpcData.js";
 import { SteadingData } from "./src/data/SteadingData.js";
 import { MoveData }        from "./src/data/MoveData.js";
 import { ArcanumData }     from "./src/data/ArcanumData.js";
 import { PlaybookData }    from "./src/data/PlaybookData.js";
+import { SteadfastData }   from "./src/data/SteadfastData.js";
 import { InsertData }      from "./src/data/InsertData.js";
 import { ImprovementData } from "./src/data/ImprovementData.js";
-import { NpcItemData }     from "./src/data/NpcItemData.js";
+import { FollowerData }    from "./src/data/FollowerData.js";
 import { OutfitItemData }  from "./src/data/OutfitItemData.js";
 import { PossessionData }  from "./src/data/PossessionData.js";
 import "./src/dev/quenchTests.js"; // registers in-Foundry integration tests (no-op unless Quench is installed)
@@ -34,6 +43,8 @@ import "./src/dev/quenchTests.js"; // registers in-Foundry integration tests (no
 Hooks.once("init", () => {
 	info("Initializing");
 
+	installBrokenImageHider(); // hide broken-image placeholders when stonetop-art/ illustrations are absent
+
 	Object.assign(CONFIG.Actor.dataModels, { character: CharacterData, npc: NpcData, steading: SteadingData });
 	Object.assign(CONFIG.Item.dataModels, {
 		move:        MoveData,
@@ -41,13 +52,16 @@ Hooks.once("init", () => {
 		playbook:    PlaybookData,
 		insert:      InsertData,
 		improvement: ImprovementData,
-		npc:         NpcItemData,
+		steadfast:   SteadfastData,
+		follower:    FollowerData,
+		npc:         FollowerData, // legacy alias: pre-rename follower items still load, then migrate to `follower`
 		outfitItem:  OutfitItemData,
 		possession:  PossessionData,
 	});
 
 	registerSettings();
 	registerDrawTableEnricher();
+	registerBlankFieldEnricher();
 
 	Handlebars.registerHelper("resourceChecks", resource => {
 		if (!resource) return [];
@@ -84,10 +98,13 @@ Hooks.once("init", () => {
 	Handlebars.registerHelper("join", (arr, sep) => (Array.isArray(arr) ? arr.join(typeof sep === "string" ? sep : ", ") : ""));
 	Handlebars.registerHelper("concat", (...args) => args.slice(0, -1).join(""));
 
-	// Render stored markdown -> HTML synchronously (no auto-roll for prose). Explicit
-	// [[ ]] rolls / @UUID links survive as text and are made clickable post-render by
-	// enrichRichTokens(). Use on .stonetop-rich containers: {{{md description}}}
-	Handlebars.registerHelper("md", text => new Handlebars.SafeString(renderMarkdown(text ?? "")));
+	// The single render path for game text. Accepts a RichText (enriched by enrichRichTextTree in
+	// getData) or a bare string (rendered as markdown). One way to render text: {{rich field}}.
+	Handlebars.registerHelper("rich", value => new Handlebars.SafeString(rich(value).render()));
+
+	// Truthiness for an optional text field that may arrive as a bare string OR a RichText — used to
+	// guard optional notes/subtitles in the shared heading partials: {{#if (hasText note)}}.
+	Handlebars.registerHelper("hasText", hasText);
 
 	Handlebars.registerHelper("repeatChecks", move => {
 		const sel = move?.selection;
@@ -122,35 +139,60 @@ Hooks.once("init", () => {
 		label: "Stonetop Steading Sheet",
 	});
 
-	const StonetopMoveSheet = createStonetopMoveSheetClass(foundry.appv1.sheets.ItemSheet);
+	// All item sheets share the size-memory mixin (actor sheets get it via StonetopActorSheet).
+	const ItemSheetBase = withSheetSizeMemory(foundry.appv1.sheets.ItemSheet);
+
+	const StonetopMoveSheet = createStonetopMoveSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopMoveSheet, {
 		types: ["move"],
 		makeDefault: true,
 		label: "Stonetop Move Sheet",
 	});
 
-	const StonetopInsertSheet = createStonetopInsertSheetClass(foundry.appv1.sheets.ItemSheet);
+	const StonetopInsertSheet = createStonetopInsertSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopInsertSheet, {
 		types: ["insert"],
 		makeDefault: true,
 		label: "Stonetop Insert Sheet",
 	});
 
-	const StonetopArcanumSheet = createStonetopArcanumSheetClass(foundry.appv1.sheets.ItemSheet);
+	const StonetopArcanumSheet = createStonetopArcanumSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopArcanumSheet, {
 		types: ["arcanum"],
 		makeDefault: true,
 		label: "Stonetop Arcanum Sheet",
 	});
 
-	const StonetopPossessionSheet = createStonetopPossessionSheetClass(foundry.appv1.sheets.ItemSheet);
+	const StonetopPossessionSheet = createStonetopPossessionSheetClass(ItemSheetBase);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopPossessionSheet, {
 		types: ["possession"],
 		makeDefault: true,
 		label: "Stonetop Possession Sheet",
 	});
 
+	const StonetopFollowerSheet = createStonetopFollowerSheetClass(ItemSheetBase);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopFollowerSheet, {
+		types: ["follower", "npc"], // "npc" = legacy items awaiting migration to "follower"
+		makeDefault: true,
+		label: "Stonetop Follower Sheet",
+	});
+
+	const StonetopImprovementSheet = createStonetopImprovementSheetClass(ItemSheetBase);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopImprovementSheet, {
+		types: ["improvement"],
+		makeDefault: true,
+		label: "Stonetop Steading Improvement Sheet",
+	});
+
+	const StonetopSteadfastSheet = createStonetopSteadfastSheetClass(ItemSheetBase);
+	foundry.documents.collections.Items.registerSheet("stonetop", StonetopSteadfastSheet, {
+		types: ["steadfast"],
+		makeDefault: true,
+		label: "Stonetop Steadfast Sheet",
+	});
+
 	foundry.applications.handlebars.loadTemplates({
+		"stonetop.chat-move-roll":   "systems/stonetop/templates/chat/move-roll.hbs",
 		"stonetop.actor-header":     "systems/stonetop/templates/actor/partials/actor-header.hbs",
 		"stonetop.actor-stats":      "systems/stonetop/templates/actor/partials/actor-stats.hbs",
 		"stonetop.actor-attributes": "systems/stonetop/templates/actor/partials/actor-attributes.hbs",
@@ -165,18 +207,29 @@ Hooks.once("init", () => {
 		"stonetop.follower-inventory": "systems/stonetop/templates/actor/partials/follower-inventory.hbs",
 		"stonetop.outfit-items":       "systems/stonetop/templates/actor/partials/outfit-items.hbs",
 		"stonetop.editable-field":   "systems/stonetop/templates/actor/partials/editable-field.hbs",
+		"stonetop.editable-rich-block": "systems/stonetop/templates/actor/partials/editable-rich-block.hbs",
 		"stonetop.tab-insert":        "systems/stonetop/templates/actor/partials/tab-insert.hbs",
 		"stonetop.tab-notes":         "systems/stonetop/templates/actor/partials/tab-notes.hbs",
 		"stonetop.selection-chips":   "systems/stonetop/templates/actor/partials/selection-chips.hbs",
 		"stonetop.selection-input":   "systems/stonetop/templates/actor/partials/selection-input.hbs",
 		"stonetop.instinct-section":  "systems/stonetop/templates/actor/partials/instinct-section.hbs",
 		"stonetop.move-group":       "systems/stonetop/templates/actor/partials/move-group.hbs",
+		"stonetop.move-row":         "systems/stonetop/templates/actor/partials/move-row.hbs",
+		"stonetop.move-item":        "systems/stonetop/templates/actor/partials/move-item.hbs",
 		"stonetop.choice-group":     "systems/stonetop/templates/actor/partials/choice-group.hbs",
 		"stonetop.choice-row":       "systems/stonetop/templates/actor/partials/choice-row.hbs",
+		"stonetop.improvement-group": "systems/stonetop/templates/actor/partials/improvement-group.hbs",
 		"stonetop.choice-section":   "systems/stonetop/templates/actor/partials/lore-section.hbs",
 		"stonetop.section-heading":  "systems/stonetop/templates/actor/partials/section-heading.hbs",
+		"stonetop.panel-frame":              "systems/stonetop/templates/actor/partials/panel-frame.hbs",
+		"stonetop.steading-stat-panel":      "systems/stonetop/templates/actor/partials/steading-stat-panel.hbs",
+		"stonetop.steading-ratings-list":    "systems/stonetop/templates/actor/partials/steading-ratings-list.hbs",
+		"stonetop.steading-assets":          "systems/stonetop/templates/actor/partials/steading-assets.hbs",
+		"stonetop.steading-places-of-interest": "systems/stonetop/templates/actor/partials/steading-places-of-interest.hbs",
+		"stonetop.steading-neighbor-places": "systems/stonetop/templates/actor/partials/steading-neighbor-places.hbs",
 		"stonetop.section-sub-heading":  "systems/stonetop/templates/actor/partials/section-sub-heading.hbs",
 		"stonetop.resource-track":   "systems/stonetop/templates/actor/partials/resource-track.hbs",
+		"stonetop.resource-input":   "systems/stonetop/templates/actor/partials/resource-input.hbs",
 		"stonetop.outfit-item-row":  "systems/stonetop/templates/actor/partials/outfit-item-row.hbs",
 		"stonetop.steading":              "systems/stonetop/templates/actor/steading.hbs",
 		"stonetop.choices-entry-fields":  "systems/stonetop/templates/item/partials/choices-entry-fields.hbs",
@@ -184,6 +237,10 @@ Hooks.once("init", () => {
 		"stonetop.arcanum-item-def":      "systems/stonetop/templates/item/partials/arcanum-item-def.hbs",
 		"stonetop.arcanum-resource":      "systems/stonetop/templates/item/partials/arcanum-resource.hbs",
 		"stonetop.arcanum-mystery-move":  "systems/stonetop/templates/item/partials/arcanum-mystery-move.hbs",
+		"stonetop.string-list-editor":         "systems/stonetop/templates/item/partials/string-list-editor.hbs",
+		"stonetop.follower-selection-field":   "systems/stonetop/templates/item/partials/follower-selection-field.hbs",
+		"stonetop.follower-member-editor":     "systems/stonetop/templates/item/partials/follower-member-editor.hbs",
+		"stonetop.follower-companion-type":    "systems/stonetop/templates/item/partials/follower-companion-type.hbs",
 	});
 });
 
@@ -198,3 +255,8 @@ Hooks.once("ready", onReady);
 // -- RENDER ACTOR SHEET ----------------------------------------
 // Fires every time any actor sheet renders.
 Hooks.on("renderActorSheet", onRenderActorSheet);
+
+// -- PRE-CREATE ACTOR ------------------------------------------
+// Give new NPCs our house default icon instead of Foundry's mystery-man.
+Hooks.on("preCreateActor", onPreCreateActor);
+Hooks.on("createActor", onCreateActor);

@@ -3,7 +3,7 @@
   "_key": "!actors!8A9hH8BnFpTIe5Hf",
   "name": "Tal gerdwyr",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "tal-gerdwyr",
     "reference": "the-great-wood",
@@ -21,7 +21,7 @@
       "max": 14
     },
     "armor": "2 (feathers, scales)",
-    "damage": "trample, kick d8+5 (close, forceful), tail sweep d8+5 (reach, area, forceful)",
+    "damage": "trample, kick d8+5 (_close_, _forceful_), tail sweep d8+5 (_reach_, _area_, _forceful_)",
     "specialQuality": "extremely long neck",
     "instinct": {
       "selected": [
@@ -31,7 +31,7 @@
       "multi": false,
       "allowCustom": true
     },
-    "moves": "- Bellow loudly\n- Smash down or through a barrier\n- Reach very, very high up\n\nThe Forest Folk would sometimes tell sto- ries of the “tall walkers,” drakes with necks like trees and bodies like small hills, draped in feathers that look like vines and leaves. Supposedly, they roam deep in the forest, blithely chewing leaves from the canopy and singing mournful songs to each other.",
+    "moves": "- Bellow loudly\n- Smash down or through a barrier\n- Reach very, very high up\n\nThe Forest Folk would sometimes tell sto- ries of the \"tall walkers,\" drakes with necks like trees and bodies like small hills, draped in feathers that look like vines and leaves. Supposedly, they roam deep in the forest, blithely chewing leaves from the canopy and singing mournful songs to each other.",
     "description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.JjyXyicr58qim0bV]{The Great Wood} (Book p.200-209)",
     "notes": ""
   },
