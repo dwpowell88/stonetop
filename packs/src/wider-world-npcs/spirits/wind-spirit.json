@@ -33,9 +33,9 @@
 			"multi": false,
 			"allowCustom": true
 		},
-		"moves": "<figure class=\"art\"></figure>",
+		"moves": "",
 		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
-		"notes": "Howls, moans, whispers; hates all limits, confinement.<figure class=\"art\"></figure>"
+		"notes": "Howls, moans, whispers; hates all limits, confinement."
 	},
 	"ownership": {
 		"default": 0

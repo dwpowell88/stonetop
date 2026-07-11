@@ -72,7 +72,9 @@ export function extractNpcBlocks(html) {
 		if (!NPC_TAGS.test(tags)) continue;
 		const rest = html.slice(re.lastIndex);
 		const end = rest.search(/<h[1-6][ >]/);
-		const bodyHtml = (end === -1 ? rest : rest.slice(0, end)).replace(/<aside[\s\S]*?<\/aside>/g, "");
+		const bodyHtml = (end === -1 ? rest : rest.slice(0, end))
+			.replace(/<aside[\s\S]*?<\/aside>/g, "")
+			.replace(/<figure[\s\S]*?<\/figure>/g, ""); // inline illustrations (htmlToMarkdown strips the img but not the figure shell)
 		blocks.push({ name: htmlToMarkdown(m[2]), icon: m[1] || null, tags, body: htmlToMarkdown(bodyHtml) });
 	}
 	return blocks;
