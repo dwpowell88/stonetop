@@ -12,6 +12,7 @@ import { createStonetopPossessionSheetClass } from "./src/item/StonetopPossessio
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
+import { onUpdateActor, onSteadingCreatedOrDeleted } from "./src/hooks/SteadingChanged.js";
 import { info } from "./src/utils/logger.js";
 import { renderMarkdown } from "./src/utils/enrichGameText.js";
 import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
@@ -198,3 +199,9 @@ Hooks.once("ready", onReady);
 // -- RENDER ACTOR SHEET ----------------------------------------
 // Fires every time any actor sheet renders.
 Hooks.on("renderActorSheet", onRenderActorSheet);
+
+// -- STEADING CHANGES ------------------------------------------
+// Character sheets show steading data (Prosperity); keep them live.
+Hooks.on("updateActor", onUpdateActor);
+Hooks.on("createActor", onSteadingCreatedOrDeleted);
+Hooks.on("deleteActor", onSteadingCreatedOrDeleted);
