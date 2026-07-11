@@ -1,0 +1,45 @@
+{
+	"_id": "KIftx0TS4vK8Hv3S",
+	"_key": "!actors!KIftx0TS4vK8Hv3S",
+	"name": "Beast warden",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "beast-warden",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"beast-like",
+				"protective"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to see its wards thrive, prosper"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "A different spirit watching over each type of beast."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

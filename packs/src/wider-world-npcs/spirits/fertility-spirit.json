@@ -1,0 +1,46 @@
+{
+	"_id": "1lCSwJov2DTzVw3Z",
+	"_key": "!actors!1lCSwJov2DTzVw3Z",
+	"name": "Fertility spirit",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "fertility-spirit",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Group",
+				"spirit",
+				"earthy",
+				"sensual",
+				"positive"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to encourage growth"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "Giggles, touchy; frustrated by prudery, inhibition, restraint."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

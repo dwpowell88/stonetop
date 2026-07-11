@@ -1,0 +1,45 @@
+{
+	"_id": "JRU3WvkKqoYB94YT",
+	"_key": "!actors!JRU3WvkKqoYB94YT",
+	"name": "Wind spirit",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "wind-spirit",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Horde",
+				"spirit",
+				"restless",
+				"temperamental"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to get distracted"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "<figure class=\"art\"></figure>",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "Howls, moans, whispers; hates all limits, confinement.<figure class=\"art\"></figure>"
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}
