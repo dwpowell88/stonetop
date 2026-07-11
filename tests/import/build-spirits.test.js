@@ -9,6 +9,7 @@ const ARTICLE = `
 <h3><img class="icon" src="systems/stonetop/assets/content/wonders/markers/marker-swirl.png">Hearth spirit</h3>
 <p class="artifact-tags"><em>Solitary</em>, <em>spirit</em>, <em>friendly</em>, <em>nurturing</em></p>
 <p><strong>Instinct</strong> to belong. <strong>Manifests</strong> as pops &amp; whispers. <strong>Expects</strong> warm greetings. <strong>Notes</strong> Natters on quietly.</p>
+<figure class="art"><img src="stonetop-art/wonders/abc123.png"></figure>
 <h3><img class="icon" src="systems/stonetop/assets/content/wonders/markers/marker-swirl.png">The Halfeyd</h3>
 <p class="artifact-tags"><em>Spirit</em>, <em>magical</em>, <em>fickle</em></p>
 <p><strong>Instinct</strong> to terrorize its prey</p>
@@ -58,6 +59,10 @@ describe("extractNpcBlocks", () => {
 
 	it("strips embedded statblock asides from the body (those are separate build-npcs actors)", () => {
 		expect(blocks[1].body).not.toContain("Nerth serpent");
+	});
+
+	it("strips inline illustration figures entirely (no empty figure shells in the body)", () => {
+		expect(blocks[0].body).not.toContain("figure");
 	});
 });
 
