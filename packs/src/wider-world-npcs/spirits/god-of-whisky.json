@@ -1,0 +1,45 @@
+{
+	"_id": "gPncIdT3smdQebCk",
+	"_key": "!actors!gPncIdT3smdQebCk",
+	"name": "God of whisky",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "god-of-whisky",
+		"reference": "gods-and-religion",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"secretive",
+				"grandiose"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to take its sweet time"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "**Manifests** as a vaporous figure.\n\n**Expects** the head & tail of each batch.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.ixv4UMnNgm2a0ECI]{Gods and religion} (Book p.178-185)",
+		"notes": "Passionate about flavors, smells."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

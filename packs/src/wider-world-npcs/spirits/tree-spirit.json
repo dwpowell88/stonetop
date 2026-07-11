@@ -1,0 +1,46 @@
+{
+	"_id": "qAhwJ2es25EYCJdk",
+	"_key": "!actors!qAhwJ2es25EYCJdk",
+	"name": "Tree spirit",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "tree-spirit",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"proud",
+				"stubborn",
+				"stoic"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to take its time"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "Speaks slowly; clings to hurts, grudges, kindnesses."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

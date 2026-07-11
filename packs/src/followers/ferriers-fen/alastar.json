@@ -1,0 +1,60 @@
+{
+	"_id": "PcImb8S9T4tnN0OB",
+	"_key": "!items!PcImb8S9T4tnN0OB",
+	"name": "Alastar",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
+	"system": {
+		"slug": "alastar",
+		"reference": "ferriers-fen",
+		"arcanaSlug": null,
+		"playbookSlug": null,
+		"owned": false,
+		"tagList": {
+			"selected": [
+				"Fen-wise",
+				"cautious",
+				"stealthy",
+				"observant",
+				"exceptional",
+				"old",
+				"devious"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 8,
+			"max": 8
+		},
+		"armor": "1 (leather cuirass)",
+		"damage": "knife d8 (hand), sling d6 (near, reload)",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to feel no remorse"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"cost": {
+			"selected": [
+				"payment in hand"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"loyalty": {
+			"value": 0,
+			"max": 3
+		},
+		"moves": "- Spot/avoid a hidden hazard\n- Berate outsiders for carelessness\n- Do something gross or unpleasant without flinching",
+		"description": "A notable fen-walker guide — base stats from the @UUID[Compendium.stonetop.wider-world-npcs.Actor.qlG1rWUGfIic89j4]{Fen-walker} stat block.\n\nSource: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.805M3qxHZCLZS3Io]{Ferrier's Fen} (Book p.116-125)",
+		"notes": ""
+	},
+	"flags": {},
+	"folder": "d0GyWMenUhRd3h7r"
+}

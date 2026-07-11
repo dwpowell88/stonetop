@@ -1,0 +1,45 @@
+{
+	"_id": "jhus1NCJ8ClBRM1e",
+	"_key": "!actors!jhus1NCJ8ClBRM1e",
+	"name": "Ancestral spirits",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "ancestral-spirits",
+		"reference": "gods-and-religion",
+		"tagList": {
+			"selected": [
+				"Group",
+				"spirit",
+				"protective",
+				"conservative"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to protect their family’s honor"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "**Manifests** in dreams, as drafty whispers.\n\n**Expects** an altar, prayers, incense/libations.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.ixv4UMnNgm2a0ECI]{Gods and religion} (Book p.178-185)",
+		"notes": "Like grandparents who don’t quite get you."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

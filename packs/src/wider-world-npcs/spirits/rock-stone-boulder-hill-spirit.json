@@ -1,0 +1,45 @@
+{
+	"_id": "am5Jjp7tsynp8ieb",
+	"_key": "!actors!am5Jjp7tsynp8ieb",
+	"name": "Rock/stone/boulder/hill spirit",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "rock-stone-boulder-hill-spirit",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Group or solitary",
+				"spirit",
+				"reliable",
+				"chill"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to remain unperturbed"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "Speaks very slowly; friendly; no urgency; “Relax, man.”"
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}
