@@ -4,6 +4,7 @@ import {fakeI18n} from "./foundry/FakeI18n.js";
 export class FakeGameBuilder {
 	_packs = {};
 	_worldItems = [];
+	_worldActors = [];
 
 	build() {
 		const worldItems = this._worldItems;
@@ -15,6 +16,7 @@ export class FakeGameBuilder {
 				contents: worldItems,
 				get: (id) => worldItems.find(i => i._id === id) ?? null,
 			},
+			actors: this._worldActors,
 			i18n: fakeI18n(),
 		});
 	}
@@ -26,6 +28,11 @@ export class FakeGameBuilder {
 
 	withWorldItem(item) {
 		this._worldItems.push(item);
+		return this;
+	}
+
+	withWorldActor(actor) {
+		this._worldActors.push(actor);
 		return this;
 	}
 }
