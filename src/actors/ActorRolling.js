@@ -64,6 +64,7 @@ export class ActorRolling {
 				xpMarked,
 			}),
 			rolls: [roll],
+			...(xpMarked ? {flags: {stonetop: {xpMark: {undone: false}}}} : {}),
 		});
 	}
 

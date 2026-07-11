@@ -241,6 +241,21 @@ describe("ActorRolling.execute — XP on a 6-", () => {
 		expect(rolling._actor.typedActor.xpMarks).toBe(1);
 	});
 
+	it("stamps the card with the xpMark flag and undo toggle when the mark lands", async () => {
+		const rolling = makeRolling({ bonuses: { str: 0 } });
+		FakeRoll.setNextTotal(6);
+		await rolling.execute(moveRequest());
+		expect(FakeChatMessage.lastCreated.flags).toEqual({ stonetop: { xpMark: { undone: false } } });
+		expect(FakeChatMessage.lastCreated.content).toContain("stonetop-xp-toggle");
+	});
+
+	it("stamps no flag when nothing was marked", async () => {
+		const rolling = makeRolling({ bonuses: { str: 0 } });
+		FakeRoll.setNextTotal(10);
+		await rolling.execute(moveRequest());
+		expect(FakeChatMessage.lastCreated.flags).toBeUndefined();
+	});
+
 	it("shows no XP line when the track is already full", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		rolling._actor.typedActor.xpFull = true;

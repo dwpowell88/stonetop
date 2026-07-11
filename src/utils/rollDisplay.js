@@ -1,3 +1,5 @@
+import {buildXpLine} from "../chat/xpMarkControl.js";
+
 export class RollDisplay {
 	constructor(localize) {
 		this._localize = localize;
@@ -45,7 +47,7 @@ export class RollDisplay {
 		const parts = [`<h3>${name}</h3>`, diceSection];
 		if (description) parts.push(description);
 		if (resultText)  parts.push(`<div class="stonetop-move-result stonetop-move-result--${resultKey}">${resultText}</div>`);
-		if (xpMarked)    parts.push(`<div class="stonetop-roll-xp">${this._localize("stonetop.rollResults.xpMarked")}</div>`);
+		if (xpMarked)    parts.push(buildXpLine(false, this._localize));
 
 		return parts.join("");
 	}

@@ -13,6 +13,7 @@ import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
 import { onUpdateActor, onSteadingCreatedOrDeleted } from "./src/hooks/SteadingChanged.js";
+import { onRenderChatMessage } from "./src/chat/xpMarkControl.js";
 import { info } from "./src/utils/logger.js";
 import { renderMarkdown } from "./src/utils/enrichGameText.js";
 import { registerDrawTableEnricher } from "./src/journal/drawTableEnricher.js";
@@ -205,3 +206,7 @@ Hooks.on("renderActorSheet", onRenderActorSheet);
 Hooks.on("updateActor", onUpdateActor);
 Hooks.on("createActor", onSteadingCreatedOrDeleted);
 Hooks.on("deleteActor", onSteadingCreatedOrDeleted);
+
+// -- RENDER CHAT MESSAGE ---------------------------------------
+// Binds the "Undo XP mark" toggle on roll cards that auto-marked XP.
+Hooks.on("renderChatMessageHTML", onRenderChatMessage);
