@@ -3,7 +3,7 @@
 	"_key": "!actors!2H8w2CmCMyFOlrpr",
 	"name": "Mist/fog spirit",
 	"type": "npc",
-	"img": "stonetop-art/wonders/412d163e957670ed186f655b60944233033e6ed1005937d0dd8f449bb0cf099e.png",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
 	"system": {
 		"slug": "mist-fog-spirit",
 		"reference": "spirits-of-the-wild",
@@ -34,7 +34,7 @@
 			"allowCustom": true
 		},
 		"moves": "",
-		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the Wild} (Book p.356-371)",
 		"notes": "Hushed, dripping voice; spaced-out; touchy-feely."
 	},
 	"ownership": {
