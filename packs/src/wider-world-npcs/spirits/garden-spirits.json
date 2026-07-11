@@ -1,0 +1,45 @@
+{
+	"_id": "HRhU86lGUfUGAewm",
+	"_key": "!actors!HRhU86lGUfUGAewm",
+	"name": "Garden spirits",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "garden-spirits",
+		"reference": "gods-and-religion",
+		"tagList": {
+			"selected": [
+				"Horde",
+				"spirit",
+				"coy",
+				"needy"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"(roll 1d4) 1 = to languish; 2 = to run rampant; 3 = to show off; 4 = to give back"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "**Manifests** as flower-folk and little creatures.\n\n**Expects** first fruits, water, blood.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.ixv4UMnNgm2a0ECI]{Gods and religion} (Book p.178-185)",
+		"notes": "Many voices talking over each other."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

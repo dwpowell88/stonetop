@@ -1,0 +1,45 @@
+{
+	"_id": "Pu4EZqwJ71PRgXia",
+	"_key": "!actors!Pu4EZqwJ71PRgXia",
+	"name": "Threshold spirit",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "threshold-spirit",
+		"reference": "gods-and-religion",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"protective",
+				"vigilant"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to dislike outsiders"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "**Manifests** as a grumpy little person.\n\n**Expects** sprinkles of salt, poured-out whisky, reverent touches.\n\nSee also the following **elemental spirits** (pages @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{360}-@UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{361}):\n\n- Beast wardens (for livestock)\n- Fertility spirits\n- Meadow/prairie/grass spirits (for the fields)\n- Rock/stone spirits (for the Stone or the Ringwall)\n- Stream/creek spirit (for the Stream).",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.ixv4UMnNgm2a0ECI]{Gods and religion} (Book p.178-185)",
+		"notes": "Crosses arms, puffs up, harrumphs."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

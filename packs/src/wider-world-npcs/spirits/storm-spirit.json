@@ -1,0 +1,46 @@
+{
+	"_id": "NPitwa1PTQdXXhYF",
+	"_key": "!actors!NPitwa1PTQdXXhYF",
+	"name": "Storm spirit",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "storm-spirit",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"brash",
+				"arrogant",
+				"potent"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to test any who stand before it"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "Big, rumbling voice; intense but distracted, has places to be."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

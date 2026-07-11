@@ -1,0 +1,46 @@
+{
+	"_id": "e4Fqq9aq544QGDuQ",
+	"_key": "!actors!e4Fqq9aq544QGDuQ",
+	"name": "The Halfeyd",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "the-halfeyd",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Spirit",
+				"magical",
+				"fickle",
+				"sadistic",
+				"terrifying"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to terrorize its prey"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "- Manifest as eyes in the dark, watching\n- Mark someone as prey\n- Set all manner of hunting beasts on their trail\n- Put ambush predators in their path\n\nThe hunters and trappers of Stonetop know. So do the Hillfolk. The Manmarchers know, and Fen-walkers, too. When you make a kill, you leave an offering. An offering for the Halfeyd. Fail to do so, and you might find yourself as prey—for everything.\n\n**Something interesting:** If the Halfeyd marks you, you’ll be hounded for 3 days and 3 nights—even by small predators who would never normally hunt you. **Something** **useful:** A spirit of running water (like that of a stream) can wash away the Halfeyd’s mark.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": ""
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

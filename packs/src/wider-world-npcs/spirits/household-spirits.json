@@ -1,0 +1,45 @@
+{
+	"_id": "u605SIUYlvcy3VN2",
+	"_key": "!actors!u605SIUYlvcy3VN2",
+	"name": "Household spirits",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "household-spirits",
+		"reference": "gods-and-religion",
+		"tagList": {
+			"selected": [
+				"Group",
+				"spirit",
+				"helpful",
+				"mischievous"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to easily take offense"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "**Manifests** as gnomish little folk.\n\n**Expects** bowls of goat’s milk, bits of bread.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.ixv4UMnNgm2a0ECI]{Gods and religion} (Book p.178-185)",
+		"notes": "Complain loudly to each other, grumble about leaving if things don’t improve."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}
