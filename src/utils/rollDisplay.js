@@ -3,7 +3,7 @@ export class RollDisplay {
 		this._localize = localize;
 	}
 
-	build(roll, {name, rollMode, bonus, statKey, resultKey, description, resultText} = {}) {
+	build(roll, {name, rollMode, bonus, statKey, resultKey, description, resultText, xpMarked = false} = {}) {
 		const allResults = roll.dice.flatMap(d => d.results);
 		const hasDropped = allResults.some(r => !r.active);
 
@@ -45,6 +45,7 @@ export class RollDisplay {
 		const parts = [`<h3>${name}</h3>`, diceSection];
 		if (description) parts.push(description);
 		if (resultText)  parts.push(`<div class="stonetop-move-result stonetop-move-result--${resultKey}">${resultText}</div>`);
+		if (xpMarked)    parts.push(`<div class="stonetop-roll-xp">${this._localize("stonetop.rollResults.xpMarked")}</div>`);
 
 		return parts.join("");
 	}
