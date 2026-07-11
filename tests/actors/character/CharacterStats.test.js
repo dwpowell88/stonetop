@@ -89,7 +89,7 @@ describe("CharacterStats.buildStatsSnapshot", () => {
 	});
 
 	it("carries a description for every stat (localization key when no i18n)", () => {
-		const snap = new CharacterStats(new FakeCharacterActorBuilder().build()).buildStatsSnapshot();
+		const snap = new CharacterStats(new FakeActorBuilder().build()).buildStatsSnapshot();
 		for (const key of ["str", "dex", "int", "wis", "con", "cha"]) {
 			expect(snap[key].description).toBe(`stonetop.character.stats.desc.${key}`);
 		}
@@ -99,7 +99,7 @@ describe("CharacterStats.buildStatsSnapshot", () => {
 		const prev = globalThis.game;
 		globalThis.game = { i18n: { localize: (k) => (k === "stonetop.character.stats.desc.str" ? "Your physical power" : k) } };
 		try {
-			const snap = new CharacterStats(new FakeCharacterActorBuilder().build()).buildStatsSnapshot();
+			const snap = new CharacterStats(new FakeActorBuilder().build()).buildStatsSnapshot();
 			expect(snap.str.description).toBe("Your physical power");
 		} finally {
 			globalThis.game = prev;

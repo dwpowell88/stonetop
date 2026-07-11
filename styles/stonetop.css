@@ -1905,6 +1905,14 @@ body,
 	margin: 0 0 4px;
 }
 
+.stonetop-outfit-prosperity {
+	margin: 0 0 4px;
+}
+
+.stonetop-outfit-prosperity em {
+	opacity: 0.75;
+}
+
 .stonetop-outfit-loads {
 	list-style: none;
 	padding: 0;
