@@ -26,6 +26,10 @@ export class PlaybookData extends foundry.abstract.TypeDataModel {
 			// §4): follower & insert slugs granted on select, removed on swap.
 			followers:          new f.ArrayField(new f.StringField()),
 			inserts:            new f.ArrayField(new f.StringField()),
+			// The playbook owns its move list by slug (moves don't back-reference a playbook).
+			// `startingMoves` is the subset seeded acquired at character creation.
+			moves:              new f.ArrayField(new f.StringField()),
+			startingMoves:      new f.ArrayField(new f.StringField()),
 			specialPossessions: new f.ObjectField({ nullable: true, initial: null }),
 			instinct:           new f.ObjectField({ nullable: true, initial: null }),
 			appearance:         new f.ObjectField({ nullable: true, initial: null }),

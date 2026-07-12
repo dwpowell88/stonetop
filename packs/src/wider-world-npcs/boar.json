@@ -3,7 +3,7 @@
   "_key": "!actors!wRZAw3W9VCTB7kRY",
   "name": "Boar",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "boar",
     "reference": "the-great-wood",
@@ -21,7 +21,7 @@
       "max": 10
     },
     "armor": "0",
-    "damage": "gore d8 (hand, messy, 1 piercing)",
+    "damage": "gore d8 (_hand_, _messy_, 1 piercing)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -1,8 +1,7 @@
-import { FollowerSnapshotBuilder } from "../../model/snapshot/character/FollowerSnapshot.js";
-import { enrichGameText } from "../../utils/enrichGameText.js";
-import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
+import { buildFollowerSnapshot } from "../../model/snapshot/character/buildFollowerSnapshot.js";
 import { ResourceController } from "./ResourceController.js";
 import { Selection } from "../../model/data/Selection.js";
+import { blankCompanion } from "../../utils/followerCompanionEdit.js";
 import { buildOutfitColumn, loadBand } from "../../model/snapshot/character/outfitSections.js";
 
 export class CharacterFollowers {
@@ -68,7 +67,7 @@ export class CharacterFollowers {
 
 	get ownedSlugs() {
 		return [...this._actor.items]
-			.filter(i => i.type === "npc" && (i.system?.owned ?? false))
+			.filter(i => i.type === "follower" && (i.system?.owned ?? false))
 			.map(i => i.system?.slug)
 			.filter(Boolean);
 	}
@@ -83,7 +82,8 @@ export class CharacterFollowers {
 		const [follower] = await this._followerRepo.findBySlugs([slug]);
 		if (!follower) return;
 		await this._actor.createEmbeddedDocuments("Item", [{
-			name: follower.name, type: "npc",
+			name: follower.name, type: "follower",
+			...(follower.img ? { img: follower.img } : {}),
 			system: { ..._followerToSystemFields(follower), owned: true },
 		}]);
 	}
@@ -95,7 +95,7 @@ export class CharacterFollowers {
 		// `stonetop.grantedByPlaybook`; fall back to the legacy `system.playbookSlug` so followers
 		// embedded before Phase 4 are still cleaned up on swap.
 		for (const item of [...this._actor.items]) {
-			if (item.type !== "npc") continue;
+			if (item.type !== "follower") continue;
 			const grantedBy = item.flags?.stonetop?.grantedByPlaybook ?? item.system?.playbookSlug;
 			if (grantedBy && grantedBy !== playbookSlug) {
 				await this._actor.deleteEmbeddedDocuments("Item", [item._id]);
@@ -107,21 +107,10 @@ export class CharacterFollowers {
 		for (const follower of followers) {
 			if (_findFollowerItem(this._actor, follower.slug)) continue;
 			await this._actor.createEmbeddedDocuments("Item", [{
-				name: follower.name, type: "npc",
+				name: follower.name, type: "follower",
+				...(follower.img ? { img: follower.img } : {}),
 				system: { ..._followerToSystemFields(follower), owned: true },
 				flags: { stonetop: { grantedByPlaybook: playbookSlug } },
-			}]);
-		}
-	}
-
-	async embedLinkedFollowers(slugs) {
-		for (const slug of slugs) {
-			if (_findFollowerItem(this._actor, slug)) continue;
-			const [follower] = await this._followerRepo.findBySlugs([slug]);
-			if (!follower) continue;
-			await this._actor.createEmbeddedDocuments("Item", [{
-				name: follower.name, type: "npc",
-				system: { ..._followerToSystemFields(follower), owned: false },
 			}]);
 		}
 	}
@@ -132,17 +121,22 @@ export class CharacterFollowers {
 		await this._actor.deleteEmbeddedDocuments("Item", [item._id]);
 	}
 
-	async removeLinkedFollower(slug) {
-		const item = _findFollowerItem(this._actor, slug);
-		if (!item || item.system?.owned) return;
-		await this._actor.deleteEmbeddedDocuments("Item", [item._id]);
+	// Remove every follower an arcanum embedded. Arcana followers carry `system.arcanaSlug` (their
+	// source arcanum, from pack data); playbook/custom/independent followers have it null, so they
+	// never match. Mirrors the outfit-item `deleteBySource("arcana:" + slug)` provenance cleanup.
+	async removeByArcanum(arcanumSlug) {
+		const ids = [...this._actor.items]
+			.filter(i => i.type === "follower" && i.system?.arcanaSlug === arcanumSlug)
+			.map(i => i._id);
+		if (ids.length) await this._actor.deleteEmbeddedDocuments("Item", ids);
 	}
 
 	async addCustomFollower() {
 		const slug = `custom-${Date.now()}`;
 		const [blank] = await this._followerRepo.findBySlugs(["blank"]);
 		await this._actor.createEmbeddedDocuments("Item", [{
-			name: blank?.name ?? "New Follower", type: "npc",
+			name: blank?.name ?? "New Follower", type: "follower",
+			...(blank?.img ? { img: blank.img } : {}),
 			system: {
 				slug, arcanaSlug: null, tagList: Selection.fromStored(blank?.tags).toRaw(), owned: true, choiceValues: {},
 				hp:      { value: blank?.hp?.max ?? 6, max: blank?.hp?.max ?? 6 },
@@ -160,7 +154,8 @@ export class CharacterFollowers {
 		const slug    = `custom-${Date.now()}`;
 		const [blank] = await this._followerRepo.findBySlugs(["blank"]);
 		await this._actor.createEmbeddedDocuments("Item", [{
-			name: npcActor.name, type: "npc",
+			name: npcActor.name, type: "follower",
+			...(npcActor.img ? { img: npcActor.img } : {}),
 			system: {
 				// creature core copied from the NPC (shared schema → direct copy)
 				tagList:   Selection.fromStored(sys.tagList).toRaw(),
@@ -227,7 +222,9 @@ export class CharacterFollowers {
 		const max = item.system?.hp?.max ?? 0;
 		const blank = { name: "", hp: { value: max, max }, tags: Selection.multi([]).toRaw(), traits: Selection.multi([]).toRaw() };
 		const members = [..._members(item), blank];
-		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { members } }]);
+		// Adding a member makes this a group follower — ensure the "group" tag is set (FollowerSnapshot.isGroup).
+		const tagList = Selection.fromStored(item.system?.tagList, { multi: true }).select("group").toRaw();
+		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { members, tagList } }]);
 	}
 
 	async removeMember(slug, index) {
@@ -298,6 +295,18 @@ export class CharacterFollowers {
 		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { notes } }]);
 	}
 
+	async setSpecialQuality(slug, specialQuality) {
+		const item = _findFollowerItem(this._actor, slug);
+		if (!item) return;
+		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { specialQuality } }]);
+	}
+
+	async setDescription(slug, description) {
+		const item = _findFollowerItem(this._actor, slug);
+		if (!item) return;
+		await this._actor.updateEmbeddedDocuments("Item", [{ _id: item._id, system: { description } }]);
+	}
+
 	// Animal companion: `system.companion` is atomic (one opaque object), so every writer
 	// read-modify-writes the WHOLE object — a partial path would drop sibling keys.
 
@@ -346,58 +355,42 @@ export class CharacterFollowers {
 	}
 
 	async buildSnapshot(extraSlugs = []) {
-		const npcItems      = [...this._actor.items].filter(i => i.type === "npc");
+		const npcItems      = [...this._actor.items].filter(i => i.type === "follower");
 		const ownedItems    = npcItems.filter(i => i.system?.owned === true);
 		const ownedSlugsSet = new Set(ownedItems.map(i => i.system?.slug).filter(Boolean));
+		const embeddedSlugs = new Set(npcItems.map(i => i.system?.slug).filter(Boolean));
 		const staticSlugs   = extraSlugs.filter(s => !ownedSlugsSet.has(s));
 		const staticItems   = npcItems.filter(i => staticSlugs.includes(i.system?.slug));
+		// A linked slug (extraSlugs) with no embedded item at all → a read-only card preview sourced from
+		// the follower repo. This lets an arcanum card show its follower stat block before the player
+		// checks the box (which is what actually embeds the follower as owned).
+		const previewSlugs  = staticSlugs.filter(s => !embeddedSlugs.has(s));
 
-		if (!ownedItems.length && !staticItems.length) return [];
+		if (!ownedItems.length && !staticItems.length && !previewSlugs.length) return [];
 
 		// Fetch the shared outfit-item catalog once (async) and pass it into each follower's snapshot.
 		const repoItems = this._inventoryRepo ? await this._inventoryRepo.getAll() : [];
 
 		const result = ownedItems.map(item => this._buildFollowerSnapshotFromItem(item, repoItems));
 		for (const item of staticItems) result.push(this._buildFollowerSnapshotFromItem(item, repoItems));
+		if (previewSlugs.length) {
+			const previews = await this._followerRepo.findBySlugs(previewSlugs);
+			for (const follower of previews) {
+				const item = { name: follower.name, img: follower.img ?? null, system: { ..._followerToSystemFields(follower), owned: false } };
+				result.push(this._buildFollowerSnapshotFromItem(item, repoItems));
+			}
+		}
 
-		const rollData = this._actor.getRollData?.() ?? {};
-		await Promise.all(result.map(async snap => {
-			snap.damageHtml   = await enrichGameText(snap.damage, { rollData });
-			snap.armorHtml    = await enrichGameText(snap.armor, { rollData });
-			snap.instinctHtml = await enrichGameText(snap.instinct, { rollData });
-			snap.movesHtml    = await enrichGameText(snap.moves, { rollData });
-			snap.costHtml     = await enrichGameText(snap.cost, { rollData });
-			snap.notesHtml    = await enrichGameText(snap.notes, { rollData });
-		}));
+		// Game-text fields are RichText on the snapshot; the character sheet's enrichRichTextTree pass
+		// enriches the whole tree (these followers included) — one render path, no bespoke enrichHTML.
 		return result;
 	}
 
 	_buildFollowerSnapshotFromItem(item, repoItems = []) {
-		const sys      = item.system;
-		const values   = new ChoiceValues(sys?.choiceValues ?? {});
-		const loyalty  = this._resourceController.getCurrent("followers", sys.slug);
-		return new FollowerSnapshotBuilder()
-			.withSlug(sys.slug)
-			.withName(item.name)
-			.withTags(sys.tagList ?? null)
-			.withHp(sys.hp?.value ?? 0)
-			.withHpMax(sys.hp?.max ?? 0)
-			.withArmor(sys.armor ?? "")
-			.withDamage(sys.damage ?? "")
-			.withInstinct(sys.instinct ?? "")
-			.withMoves(sys.moves ?? "")
-			.withCost(sys.cost ?? "")
-			.withLoyalty(ResourceController.build({ max: sys.loyalty?.max ?? 3, title: null, labels: [] }, loyalty))
-			.withDescription(sys.description ?? "")
-			.withNotes(sys.notes ?? "")
-			.withChoices(sys.choices?.length ? ChoiceGroup.fromPackData(sys.choices[0], values) : null)
-			.withArcanaSlug(sys.arcanaSlug ?? null)
-			.withMembers(sys.members ?? [])
-			.withMemberSuggestions(sys.memberSuggestions ?? { names: [], tags: [], traits: [] })
-			.withMembersNote(sys.membersNote ?? "")
-			.withCompanion(sys.companion ?? {})
-			.withInventory(this._buildFollowerInventory(sys.slug, sys.inventory ?? {}, repoItems))
-			.build();
+		const sys            = item.system;
+		const loyaltyCurrent = this._resourceController.getCurrent("followers", sys.slug);
+		const inventory      = this._buildFollowerInventory(sys.slug, sys.inventory ?? {}, repoItems);
+		return buildFollowerSnapshot(item, { loyaltyCurrent, inventory });
 	}
 
 	// Build the follower's inventory snapshot — parity with the character (twoCol grids, resources,
@@ -439,7 +432,7 @@ export class CharacterFollowers {
 }
 
 function _findFollowerItem(actor, slug) {
-	return [...actor.items].find(i => i.type === "npc" && i.system?.slug === slug) ?? null;
+	return [...actor.items].find(i => i.type === "follower" && i.system?.slug === slug) ?? null;
 }
 
 // Plain-object clone of a follower's members (Foundry replaces arrays wholesale on update).
@@ -491,6 +484,6 @@ function _followerToSystemFields(follower) {
 		})),
 		memberSuggestions: follower.memberSuggestions ?? { names: [], tags: [], traits: [] },
 		membersNote:    follower.membersNote ?? "",
-		companion:      follower.companion ?? { enabled: false, type: { selected: [], options: [], multi: false, allowCustom: true }, options: { selected: [], options: [], multi: true, allowCustom: true }, catalog: [] },
+		companion:      follower.companion ?? blankCompanion(),
 	};
 }

@@ -21,6 +21,16 @@ export function registerSettings() {
 		default: false
 	});
 
+	// Remembered last window size per sheet type ({ "Actor.character": {width, height}, ... }).
+	// Client-scoped so each user keeps their own preferred sheet sizes; restored on open.
+	game.settings.register("stonetop", "sheetSizes", {
+		name: "Sheet Sizes",
+		scope: "client",
+		config: false,
+		type: Object,
+		default: {}
+	});
+
 	// Turn debug logging on
 	game.settings.register("stonetop", "debugMode", {
 		name: "stonetop.settings.debugMode.name",

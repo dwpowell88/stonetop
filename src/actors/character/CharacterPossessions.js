@@ -4,15 +4,27 @@ import {
 } from "../../model/snapshot/character/CharacterSnapshot.js";
 import { ResourceController } from "./ResourceController.js";
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
+import { ChoiceGroupFactory } from "./ChoiceGroupFactory.js";
 import { EmbeddedOutfitItemBuilder } from "../../model/data/character/EmbeddedOutfitItem.js";
 import { Possession } from "../../model/data/character/Possession.js";
+import { rich } from "../../model/snapshot/RichText.js";
 
 export class CharacterPossessions {
-	constructor(actor, moves, outfitItems = null, possessionRepo = null) {
+	constructor(actor, moves, outfitItems = null, possessionRepo = null, factory = null) {
 		this._actor          = actor;
 		this._moves          = moves;
 		this._outfitItems    = outfitItems;
 		this._possessionRepo = possessionRepo;
+		this._factory        = factory ?? new ChoiceGroupFactory(actor);
+	}
+
+	// A possession's sub-choices ARE a choice group, so their value persistence goes through the shared
+	// ChoiceGroupController rather than hand-rolled ChoiceValues writes. Side effects are suppressed: the
+	// item-granting is selection-gated and owned by syncPossessionItems (not a pure choice-group side
+	// effect), so it must NOT also fire the registered OutfitItemSideEffectHandler. The namespace stays the
+	// possession slug — the key the stored pickValues already use and buildSnapshot forces — so no data is rewritten.
+	_pickController(itemId) {
+		return this._factory.forItem(itemId, "pickValues", { sideEffects: false });
 	}
 
 	get selected() {
@@ -55,35 +67,21 @@ export class CharacterPossessions {
 	async addSubChoice(possessionSlug, choiceSlug) {
 		const item = _findPossessionItem(this._actor, possessionSlug);
 		if (!item) return;
-		const cv = new ChoiceValues(item.system?.pickValues ?? {});
-		await this._actor.updateEmbeddedDocuments("Item", [{
-			_id: item._id,
-			system: { pickValues: cv.set(possessionSlug, choiceSlug, 1).toRaw() },
-		}]);
+		await this._pickController(item._id).setCount(possessionSlug, choiceSlug, 1);
 		await this.syncPossessionItems(possessionSlug);
 	}
 
 	async removeSubChoice(possessionSlug, choiceSlug) {
 		const item = _findPossessionItem(this._actor, possessionSlug);
 		if (!item) return;
-		const cv = new ChoiceValues(item.system?.pickValues ?? {});
-		await this._actor.updateEmbeddedDocuments("Item", [{
-			_id: item._id,
-			system: { pickValues: cv.set(possessionSlug, choiceSlug, 0).toRaw() },
-		}]);
+		await this._pickController(item._id).setCount(possessionSlug, choiceSlug, 0);
 		await this.syncPossessionItems(possessionSlug);
 	}
 
 	async selectExclusive(possessionSlug, choiceSlug, exclusiveSlugs) {
 		const item = _findPossessionItem(this._actor, possessionSlug);
 		if (!item) return;
-		let cv = new ChoiceValues(item.system?.pickValues ?? {});
-		for (const s of exclusiveSlugs) cv = cv.set(possessionSlug, s, 0);
-		cv = cv.set(possessionSlug, choiceSlug, 1);
-		await this._actor.updateEmbeddedDocuments("Item", [{
-			_id: item._id,
-			system: { pickValues: cv.toRaw() },
-		}]);
+		await this._pickController(item._id).selectOption(possessionSlug, choiceSlug, exclusiveSlugs.join(","));
 		await this.syncPossessionItems(possessionSlug);
 	}
 
@@ -103,11 +101,7 @@ export class CharacterPossessions {
 	async setChoiceValue(possessionSlug, optionSlug, value) {
 		const item = _findPossessionItem(this._actor, possessionSlug);
 		if (!item) return;
-		const cv = new ChoiceValues(item.system?.pickValues ?? {});
-		await this._actor.updateEmbeddedDocuments("Item", [{
-			_id: item._id,
-			system: { pickValues: cv.set(possessionSlug, optionSlug, value).toRaw() },
-		}]);
+		await this._pickController(item._id).setCount(possessionSlug, optionSlug, value);
 		await this.syncPossessionItems(possessionSlug);
 	}
 
@@ -218,8 +212,8 @@ export class CharacterPossessions {
 			const pickValues = new ChoiceValues(item.system?.pickValues ?? {});
 			return new PossessionItemSnapshotBuilder()
 				.withSlug(p.slug)
-				.withLabel(item.name)
-				.withDescription(p.description ?? "")
+				.withLabel(rich(item.name))
+				.withDescription(rich(p.description ?? ""))
 				.withSelected(isSelected)
 				.withChecked(isSelected)
 				.withDisabled(isPre)
@@ -242,8 +236,8 @@ export class CharacterPossessions {
 			const pickValues = new ChoiceValues(item.system?.pickValues ?? {});
 			items.push(new PossessionItemSnapshotBuilder()
 				.withSlug(p.slug)
-				.withLabel(item.name)
-				.withDescription(p.description ?? "")
+				.withLabel(rich(item.name))
+				.withDescription(rich(p.description ?? ""))
 				.withSelected(isSelected)
 				.withChecked(isSelected)
 				.withDisabled(false)

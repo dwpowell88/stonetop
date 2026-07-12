@@ -3,7 +3,7 @@
   "_key": "!actors!loOBRIGtVKpT8G8I",
   "name": "Wild horse",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "wild-horse",
     "reference": "the-flats",
@@ -23,7 +23,7 @@
       "max": 10
     },
     "armor": "0",
-    "damage": "trample d6+3 (hand, close, forceful)",
+    "damage": "trample d6+3 (_hand_, _close_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

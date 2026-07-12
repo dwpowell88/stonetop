@@ -1,14 +1,24 @@
 import { describe, it, expect } from "vitest";
 import { StonetopNpc } from "../../../src/actors/npc/StonetopNpc.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeNpcActorBuilder } from "../../fakes/FakeNpcActorBuilder.js";
+
+// Map test overrides onto builder methods so construction always flows through the builder — never
+// poke fields onto the actor after build() (see no-direct-mutation-after-builder).
+const SETTERS = {
+	hp:             (b, v) => b.withHp(v.value, v.max),
+	armor:          (b, v) => b.withArmor(v),
+	damage:         (b, v) => b.withDamage(v),
+	specialQuality: (b, v) => b.withSpecialQuality(v),
+	instinct:       (b, v) => b.withInstinct(v),
+	description:    (b, v) => b.withDescription(v),
+	moves:          (b, v) => b.withMoves(v),
+	tagList:        (b, v) => b.withTagList(v),
+};
 
 function makeActor(overrides = {}) {
-	const actor = new FakeActorBuilder().build();
-	actor.system.hp     = { value: 0, max: 0 };
-	actor.system.armor  = "";
-	actor.system.damage = "";
-	Object.assign(actor.system, overrides);
-	return actor;
+	const b = new FakeNpcActorBuilder();
+	for (const [key, value] of Object.entries(overrides)) SETTERS[key]?.(b, value);
+	return b.build();
 }
 
 function makeNpc(overrides = {}) {
@@ -38,11 +48,10 @@ describe("StonetopNpc — getters reflect pre-seeded system values", () => {
 });
 
 describe("StonetopNpc — moves and tags in the snapshot", () => {
-	it("exposes tags and renders moves markdown as an enriched list", async () => {
+	it("exposes tags and moves as RichText carrying raw markdown", async () => {
 		const snap = await makeNpc({ tagList: "fae", moves: "- Bite d6\n- Vanish" }).buildSnapshot();
 		expect(snap.tags).toBe("fae");
-		expect(snap.moves).toBe("- Bite d6\n- Vanish");
-		expect(snap.movesHtml).toBe("<ul><li>Bite [[/r d6]]</li><li>Vanish</li></ul>");
+		expect(snap.moves.raw).toBe("- Bite d6\n- Vanish");
 	});
 
 	// Parity with the follower card: the snapshot must carry the stored Selection's options
@@ -65,24 +74,24 @@ describe("StonetopNpc — moves and tags in the snapshot", () => {
 	});
 });
 
-describe("StonetopNpc — buildSnapshot enriches game text", () => {
-	it("exposes enriched damage with inline rolls and formatting", async () => {
+describe("StonetopNpc — buildSnapshot wraps game text as RichText", () => {
+	it("keeps damage raw with roll:true so dice become roll buttons when enriched", async () => {
 		const snap = await makeNpc({ damage: "**maw** d10+2 (messy)" }).buildSnapshot();
-		expect(snap.damage).toBe("**maw** d10+2 (messy)");           // raw kept for editing
-		expect(snap.damageHtml).toBe("<strong>maw</strong> [[/r d10+2]] (messy)");
+		expect(snap.damage.raw).toBe("**maw** d10+2 (messy)");   // raw kept for editing
+		expect(snap.damage.autoRoll).toBe(true);
 	});
 
-	it("enriches special quality, instinct, description and armor note", async () => {
+	it("wraps specialQuality (roll), description and armor as RichText", async () => {
 		const snap = await makeNpc({
 			specialQuality: "*blind*, tremorsense",
-			instinct: "to feed",
 			description: "A **horror**.",
 			armor: "4 (resilience), 0 vs. bronze",
 		}).buildSnapshot();
-		expect(snap.specialQualityHtml).toBe("<em>blind</em>, tremorsense");
-		expect(snap.instinctHtml).toBe("to feed");
-		expect(snap.descriptionHtml).toBe("A <strong>horror</strong>.");
-		expect(snap.armorHtml).toBe("4 (resilience), 0 vs. bronze");
+		expect(snap.specialQuality.raw).toBe("*blind*, tremorsense");
+		expect(snap.specialQuality.autoRoll).toBe(true);
+		expect(snap.description.raw).toBe("A **horror**.");
+		expect(snap.armor.raw).toBe("4 (resilience), 0 vs. bronze");
+		expect(snap.armor.autoRoll).toBe(false);
 	});
 });
 

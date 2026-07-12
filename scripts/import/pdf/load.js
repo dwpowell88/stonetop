@@ -46,21 +46,28 @@ export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f
 		const font = sw.kind === "point" ? "swirl-point" : "swirl";
 		pg.lines.push({ bbox: [sw.x - 3, y0, sw.x, y0 + 8], text: "", font, size: 7, spans: [{ font, size: 7, text: "" }] });
 	}
-	// Drop the resource/outfit check markers (small vector circles/diamonds) inline as glyphs.
-	// Align each to the text line it overlaps and merge it into that row; ordering by x then
-	// places it. Match by the nearest vertical centre (a marker sits between two rows, so the
-	// closest baseline wins, not the closest left-edge). A diamond is always a *leading* bullet —
-	// it precedes its item and never sits at a line's end — so it only attaches to a line that
-	// starts at/right of it. Circles can be inline (potency dots inside "(○○○ uses)"), so they
-	// keep the wider match.
+	// Drop the resource/outfit check markers (small vector circles/squares/diamonds) inline as
+	// glyphs. Align each to the text line it overlaps and merge it into that row; ordering by x
+	// then places it.
 	for (const mk of loadMarkers(pdf, p)) {
-		const cy = mk.y - mk.h / 2;
 		const mid = (l) => (l.bbox[1] + l.bbox[3]) / 2;
-		const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && Math.abs(l.bbox[0] - mk.x) < 200);
-		const pool = mk.kind === "diamond" ? cand.filter((l) => l.bbox[0] >= mk.x - 2) : cand;
-		const line = (pool.length ? pool : cand).sort((a, b) => Math.abs(mid(a) - cy) - Math.abs(mid(b) - cy))[0];
-		const y0 = line ? line.bbox[1] : mk.y - mk.h;
-		const g = mk.kind === "circle" ? "○" : "◇";
+		let line;
+		if (mk.kind === "square") {
+			// A square checkbox's origin (mk.y) sits at the *top* of its (item-first) line — so it
+			// must attach there by line-top proximity, not line-center, or a 2-line wrapped item gets
+			// the box on its second line and is split. Only leading lines (starting at/right of it).
+			const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[0] >= mk.x - 2 && Math.abs(l.bbox[1] - mk.y) < 8);
+			line = cand.sort((a, b) => Math.abs(a.bbox[1] - mk.y) - Math.abs(b.bbox[1] - mk.y))[0];
+		} else {
+			// Circle ○ / diamond ◇: match by vertical center. A diamond is a leading bullet (precedes
+			// its item); a circle can be inline (potency dots in "(○○○ uses)"), so it keeps the wider match.
+			const cy = mk.y - mk.h / 2;
+			const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && Math.abs(l.bbox[0] - mk.x) < 200);
+			const pool = mk.kind === "diamond" ? cand.filter((l) => l.bbox[0] >= mk.x - 2) : cand;
+			line = (pool.length ? pool : cand).sort((a, b) => Math.abs(mid(a) - cy) - Math.abs(mid(b) - cy))[0];
+		}
+		const y0 = line ? line.bbox[1] : mk.y;
+		const g = mk.kind === "circle" ? "○" : mk.kind === "square" ? "□" : "◇";
 		pg.lines.push({ bbox: [mk.x, y0, mk.x + mk.w, y0 + 8], text: g, font: "marker", size: 7, spans: [{ font: "marker", size: 7, text: g }] });
 	}
 	const rules = loadDividers(pdf, p);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { StonetopCharacter } from "../../../src/actors/character/StonetopCharacter.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeRepositoryFactory } from "../../fakes/FakeRepositoryFactory.js";
 
 function makeCharacter(actor) {
@@ -11,17 +11,17 @@ function makeCharacter(actor) {
 
 describe("StonetopCharacter.rollMode", () => {
 	it("returns stored flag value", () => {
-		const actor = new FakeActorBuilder().withRollMode("adv").build();
+		const actor = new FakeCharacterActorBuilder().withRollMode("adv").build();
 		expect(makeCharacter(actor).rollMode).toBe("adv");
 	});
 
 	it("defaults to 'normal' when flag not set", () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		expect(makeCharacter(actor).rollMode).toBe("normal");
 	});
 
 	it("setRollMode writes flag and updates rollMode", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		const character = makeCharacter(actor);
 		await character.setRollMode("adv");
 		expect(character.rollMode).toBe("adv");

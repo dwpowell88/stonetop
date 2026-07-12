@@ -3,7 +3,7 @@
   "_key": "!actors!gwISfVAVQrbqJL1R",
   "name": "MYGHAL, DEATHLESS SORCERER",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/icons/npc.png",
   "system": {
     "slug": "myghal-deathless-sorcerer",
     "reference": "barrow-builders",
@@ -30,7 +30,7 @@
     "specialQuality": "tethered to the device; broken body; aware of all that his servants perceive",
     "instinct": {
       "selected": [
-        "to jealously hoard secrets > Inflict false sensations on others > Fix someone with his terrible gaze > Reveal a plan or a horrid truth > Control his lithic servants like they were extensions of himself >  Recover from any wound, slowly and never fully"
+        "to jealously hoard secrets > Inflict false sensations on others > Fix someone with his terrible gaze > Reveal a plan or a horrid truth > Control his lithic servants like they were extensions of himself > Recover from any wound, slowly and never fully"
       ],
       "options": [],
       "multi": false,

@@ -3,7 +3,7 @@
   "_key": "!actors!jJEgoIty8Ig9Wwuz",
   "name": "Pacifier",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "pacifier",
     "reference": "stone-lords",
@@ -23,7 +23,7 @@
       "max": 10
     },
     "armor": "4 (just a stone sphere)",
-    "damage": "stupefying pulse of sound d6 (reach, area, reload, ignores armor)",
+    "damage": "stupefying pulse of sound d6 (_reach_, _area_, _reload_, ignores armor)",
     "specialQuality": "must recharge after a few hours; limited autonomy; blind; tremorsense; has trouble with stairs; vulnerable to blunt, forceful attacks",
     "instinct": {
       "selected": [

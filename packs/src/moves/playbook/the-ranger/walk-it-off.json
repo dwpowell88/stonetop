@@ -4,8 +4,7 @@
 	"name": "Walk It Off",
 	"type": "move",
 	"system": {
-		"playbook": "The Ranger",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When **_you'd mark a debility_**, you can mark this move instead to no ill effect. Clear it as you would a debility.",
 		"requirement": {
 			"level": 6

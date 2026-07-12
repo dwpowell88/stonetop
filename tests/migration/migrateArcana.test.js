@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { migrateArcana } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakeArcanaRepository } from "../fakes/FakeArcanaRepository.js";
 import { FakeFollowerRepository } from "../fakes/FakeFollowerRepository.js";
 
@@ -10,8 +10,8 @@ const FRONT = { title: "Front", unlock: null, item: null, description: "desc" };
 const BACK  = { title: "Back",  choices: null, moves: [], consequences: null, unlockAt: null, item: null, description: "" };
 
 function makeActor(flags = {}, items = []) {
-	const builder = new FakeActorBuilder().withItems(items);
-	builder._flagsBuilder.withFlags(flags);
+	const builder = new FakeCharacterActorBuilder().withItems(items);
+	builder.withFlags(flags);
 	return builder.build();
 }
 
@@ -74,7 +74,7 @@ describe("migrateArcana — mutable state", () => {
 		expect(arcanum.system.flipped).toBe(false);
 	});
 
-	it("applies unlockValues from arcana.unlock flag, nested under arcanum slug", async () => {
+	it("folds arcana.unlock flag into choiceValues under the arcanum slug", async () => {
 		const actor = makeActor({
 			"arcana.owned":  ["maw"],
 			"arcana.unlock": { "maw": { "opt-a": 1 } },
@@ -82,10 +82,10 @@ describe("migrateArcana — mutable state", () => {
 		const repo = makeArcanaRepo([{ slug: "maw", name: "Maw", front: FRONT, back: BACK }]);
 		await migrateArcana(actor, repo, makeFollowerRepo());
 		const arcanum = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === "maw");
-		expect(arcanum.system.unlockValues).toEqual({ "maw": { "opt-a": 1 } });
+		expect(arcanum.system.choiceValues).toEqual({ "maw": { "opt-a": 1 } });
 	});
 
-	it("applies backChoiceValues from arcana.backChoices flag, nested under arcanum slug", async () => {
+	it("folds arcana.backChoices flag into choiceValues under the arcanum slug", async () => {
 		const actor = makeActor({
 			"arcana.owned":       ["maw"],
 			"arcana.backChoices": { "maw": { "follower-adra": 1 } },
@@ -93,6 +93,6 @@ describe("migrateArcana — mutable state", () => {
 		const repo = makeArcanaRepo([{ slug: "maw", name: "Maw", front: FRONT, back: BACK }]);
 		await migrateArcana(actor, repo, makeFollowerRepo());
 		const arcanum = [...actor.items].find(i => i.type === "arcanum" && i.system?.slug === "maw");
-		expect(arcanum.system.backChoiceValues).toEqual({ "maw": { "follower-adra": 1 } });
+		expect(arcanum.system.choiceValues).toEqual({ "maw": { "follower-adra": 1 } });
 	});
 });

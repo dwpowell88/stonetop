@@ -3,7 +3,7 @@
   "_key": "!actors!STY9XWr74MePdg5l",
   "name": "Plasmic horror",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "plasmic-horror",
     "reference": "vor-svetelik",
@@ -24,8 +24,8 @@
       "max": 19
     },
     "armor": "2 (membrane, lacks organs)",
-    "damage": "pseudopod d10+3 (hand, close, reach, grabby, forceful) or acidic engulf d10+5 (hand, grabby, forceful, messy, ignores armor)",
-    "specialQuality": "child-like intellect  susceptible to strong wills",
+    "damage": "pseudopod d10+3 (_hand_, _close_, _reach_, _grabby_, _forceful_) or acidic engulf d10+5 (_hand_, _grabby_, _forceful_, _messy_, ignores armor)",
+    "specialQuality": "child-like intellect; susceptible to strong wills",
     "instinct": {
       "selected": [
         "to recklessly explore the world"

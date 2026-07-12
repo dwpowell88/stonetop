@@ -3,7 +3,7 @@
   "_key": "!actors!ljOJ8UPlfpCdkB0A",
   "name": "Caribou",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "caribou",
     "reference": "the-frozen-wastes",
@@ -21,7 +21,7 @@
       "max": 7
     },
     "armor": "0",
-    "damage": "antlers/hoofs d6 (hand, close)",
+    "damage": "antlers/hoofs d6 (_hand_, _close_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

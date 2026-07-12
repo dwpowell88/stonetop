@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { ResourceController } from "../../../src/actors/character/ResourceController.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 
 function makeController() {
-	return new ResourceController(new FakeActorBuilder().build());
+	return new ResourceController(new FakeCharacterActorBuilder().build());
 }
 
 // ── getCurrent ────────────────────────────────────────────────────────────────
@@ -44,6 +44,34 @@ describe("ResourceController.set", () => {
 	});
 });
 
+// ── getText / setText (fill-in blank) ─────────────────────────────────────────
+
+describe("ResourceController.getText / setText", () => {
+	it("returns '' when nothing saved", () => {
+		expect(makeController().getText("moves", "battery")).toBe("");
+	});
+
+	it("saves and reads back the fill-in text for a namespace and slug", async () => {
+		const ctrl = makeController();
+		await ctrl.setText("moves", "battery", "a bolt of lightning");
+		expect(ctrl.getText("moves", "battery")).toBe("a bolt of lightning");
+	});
+
+	it("keeps text and count independent for the same namespace and slug", async () => {
+		const ctrl = makeController();
+		await ctrl.set("moves", "battery", 1);
+		await ctrl.setText("moves", "battery", "a summer gale");
+		expect(ctrl.getCurrent("moves", "battery")).toBe(1);
+		expect(ctrl.getText("moves", "battery")).toBe("a summer gale");
+	});
+
+	it("isolates text by namespace", async () => {
+		const ctrl = makeController();
+		await ctrl.setText("moves", "battery", "stored energy");
+		expect(ctrl.getText("possessions", "battery")).toBe("");
+	});
+});
+
 // ── buildSnapshot (instance) ──────────────────────────────────────────────────
 
 describe("ResourceController.buildSnapshot", () => {
@@ -62,6 +90,18 @@ describe("ResourceController.buildSnapshot", () => {
 	it("uses 0 as current when slug has no saved value", () => {
 		const snap = makeController().buildSnapshot("backgrounds", { max: 2, title: null, labels: [] }, "foo");
 		expect(snap.current).toBe(0);
+	});
+
+	it("resolves a resource's fill-in input value from saved text", async () => {
+		const ctrl = makeController();
+		await ctrl.setText("moves", "battery", "a caged storm");
+		const snap = ctrl.buildSnapshot("moves", { max: 1, input: { type: "inline" } }, "battery");
+		expect(snap.input).toEqual({ value: "a caged storm", placeholder: null, type: "inline" });
+	});
+
+	it("leaves input null for a resource def without an input", () => {
+		const snap = makeController().buildSnapshot("moves", { max: 3, title: null }, "mindwalking");
+		expect(snap.input).toBeNull();
 	});
 });
 
@@ -113,5 +153,19 @@ describe("ResourceController.build", () => {
 
 	it("defaults maxStat to null when absent", () => {
 		expect(ResourceController.build({ max: 1 }, 0).maxStat).toBeNull();
+	});
+
+	it("builds an input from a def with a fill-in blank, using the passed value", () => {
+		const snap = ResourceController.build({ max: 1, input: { type: "inline", placeholder: "what?" } }, 0, "a gale");
+		expect(snap.input).toEqual({ value: "a gale", placeholder: "what?", type: "inline" });
+	});
+
+	it("falls back to the input's default when no value is passed", () => {
+		const snap = ResourceController.build({ max: 1, input: { default: "nothing yet" } }, 0);
+		expect(snap.input).toEqual({ value: "nothing yet", placeholder: null, type: "inline" });
+	});
+
+	it("leaves input null when the def has no input", () => {
+		expect(ResourceController.build({ max: 2, title: null }, 1).input).toBeNull();
 	});
 });

@@ -7,6 +7,13 @@
 	border: none;
 }
 
+/* Hide images that fail to load (tagged by installBrokenImageHider). Our copyrighted
+   illustrations live in the gitignored stonetop-art/ store; when it isn't populated those
+   refs would otherwise show Foundry's broken-image placeholder. */
+img.stonetop-broken-img {
+	display: none;
+}
+
 @font-face {
 	font-family: "StonetopUI";
 	src: url("/systems/stonetop/assets/fonts/Historical-FellTypeRomanSC.ttf") format("truetype");
@@ -28,6 +35,13 @@
 	font-style: normal;
 }
 
+@font-face {
+	font-family: "IM Fell English";
+	src: url("/systems/stonetop/assets/fonts/IMFellEnglish-Regular.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+}
+
 .stonetop.sheet .sheet-tabs,
 .stonetop.sheet .sheet-tabs .item,
 .stonetop.sheet h1,
@@ -42,14 +56,42 @@
 .stonetop.sheet .stonetop-move-group-title,
 .stonetop.sheet .stonetop-arcanum-title,
 .stonetop.sheet .stonetop-follower-name-input,
-.stonetop.sheet .stonetop-introductions-title {
+.stonetop.sheet .stonetop-introductions-title,
+.stonetop.sheet.steading .steading-steadfast-input,
+.stonetop-roll-dialog .window-title,
+.stonetop-roll-dialog .stonetop-roll-mode-header,
+.stonetop-roll-dialog .dialog-button {
 	font-family: "StonetopUI", serif;
 	font-weight: bolder;
 	letter-spacing: 0.4px;
 }
 
+/* The character name and the steading name share one heading size (the largest rem step), so the two
+   sheets read consistently instead of relying on the h1 element's browser-default em. */
+.stonetop.sheet.character .charname input {
+	font-size: var(--fs-name);
+}
+
 :root {
 	--font-primary: Signika, sans-serif;
+	--font-serif: 'IM Fell English', Georgia, serif;
+
+	/* Type scale — one unit (rem, never compounds), one vocabulary, applied by content ROLE.
+	   Every flowing text element on a sheet picks one of these; never hand-pick a raw size.
+	   (Exceptions, by design: display numerals locked to fixed-px art frames — stat/resource
+	   badges, creature-HP, stepper controls — and the self-contained .stonetop-wonder journal
+	   article, which keeps its own em scale so it zooms as one unit.) */
+	--fs-micro:      0.65rem;  /* tiny meta: creature labels, dense counters       */
+	--fs-fine:       0.72rem;  /* source labels, page refs, fine print             */
+	--fs-note:       0.8rem;   /* notes, captions, move/choice/consequence prose    */
+	--fs-body:       0.85rem;  /* item names, primary descriptions, option labels   */
+	--fs-label:      0.9rem;   /* form labels, emphasised inline text               */
+	--fs-subheading: 0.95rem;  /* sub-headings                                      */
+	--fs-heading:    1rem;     /* section titles: "Moves" / "Consequences"          */
+	--fs-title:      1.2rem;   /* card / panel / arcanum titles                     */
+	--fs-display:    1.6rem;   /* large display type                                */
+	--fs-name:       2rem;     /* actor / steading name heading (largest)           */
+
 	--stonetop-bg: hsl(30deg 20% 94%);
 	--color-border-highlight-alt: slategrey;
 	--color-shadow-highlight: slategrey;
@@ -191,14 +233,14 @@ body,
    creation h3, which were already 1rem). */
 .stonetop.sheet .stonetop-move-group-title,
 .stonetop.sheet .stonetop-introductions-title {
-	font-size: 1rem;
+	font-size: var(--fs-heading);
 	border-bottom: none;
 	margin-bottom: 0;
 }
 
 /* Sub-heading scale: section-sub-heading h4 matches the choice-track subtitle h4 (0.95rem). */
 .stonetop.sheet .stonetop-move-group-sub-heading {
-	font-size: 0.95rem;
+	font-size: var(--fs-subheading);
 }
 
 /* Remove PBTA border on the tabs section and add breathing room above */
@@ -234,7 +276,7 @@ body,
 	background-repeat: no-repeat;
 	background-size: 100% 100%;
 	box-shadow: none;
-	font-size: 1rem;
+	font-size: var(--fs-heading);
 	font-weight: bold;
 	line-height: 1;
 	cursor: pointer;
@@ -641,7 +683,7 @@ body,
 }
 
 .stonetop-playbook-description {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	color: var(--color-text-dark-secondary);
 	margin: 0 0 4px;
@@ -678,7 +720,7 @@ body,
 	display: block;
 	height: 34px;
 	cursor: pointer;
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	font-weight: normal;
 	color: var(--color-text-dark-secondary);
@@ -791,7 +833,7 @@ body,
 
 .stonetop-introductions-preamble,
 .stonetop-introductions-preamble * {
-	font-size: 0.85em;
+	font-size: var(--fs-body);
 	font-weight: normal;
 	font-family: var(--font-primary);
 	margin: 0 0 8px;
@@ -824,7 +866,7 @@ body,
 	background: #000;
 	color: #fff;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: var(--fs-title);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -832,7 +874,7 @@ body,
 
 .stonetop-intro-step p {
 	margin: 0;
-	font-size: 0.85em;
+	font-size: var(--fs-body);
 	font-family: var(--font-primary);
 	font-weight: normal;
 }
@@ -854,12 +896,12 @@ body,
 
 .creation-section h3 {
 	margin-bottom: 4px;
-	font-size: 1rem;
+	font-size: var(--fs-heading);
 	border-bottom: 1px solid var(--color-border-light-2);
 }
 
 .creation-choose {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	font-weight: normal;
 	color: var(--color-text-dark-secondary);
 	margin-left: 4px;
@@ -888,7 +930,7 @@ body,
 }
 
 .creation-option__desc {
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	color: var(--color-text-dark-secondary);
 	margin-left: 4px;
 }
@@ -905,7 +947,7 @@ body,
 
 .creation-subchoices__label {
 	margin-bottom: 4px;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 }
 
 .creation-hint {
@@ -929,7 +971,7 @@ body,
 }
 
 .stonetop-selection-label {
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
@@ -943,7 +985,7 @@ body,
 	padding: 1px 2px;
 	cursor: pointer;
 	font-family: inherit;
-	font-size: 0.9rem;
+	font-size: var(--fs-label);
 	color: inherit;
 	text-align: left;
 }
@@ -996,7 +1038,7 @@ body,
 
 .selection-option-body p {
 	margin: 0;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	color: var(--color-text-dark-secondary);
 	line-height: 1.4;
 }
@@ -1018,7 +1060,7 @@ body,
 .appearance-instruction {
 	margin: 0 0 8px;
 	font-style: italic;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	color: var(--color-text-dark-secondary);
 }
 
@@ -1040,7 +1082,7 @@ body,
 }
 
 .appearance-row-num {
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	font-weight: bold;
 	color: var(--color-text-dark-secondary);
 	background: rgba(0, 0, 0, 0.06);
@@ -1065,7 +1107,7 @@ body,
 	align-items: center;
 	gap: 4px;
 	cursor: pointer;
-	font-size: 0.9rem;
+	font-size: var(--fs-label);
 }
 
 /* Origin dialog */
@@ -1095,7 +1137,7 @@ body,
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	font-size: 0.95rem;
+	font-size: var(--fs-subheading);
 	cursor: pointer;
 	margin-bottom: 6px;
 }
@@ -1105,7 +1147,7 @@ body,
 }
 
 .origin-names-label {
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
@@ -1125,7 +1167,7 @@ body,
 	border: 1px solid var(--color-border-light-2);
 	border-radius: 3px;
 	padding: 2px 6px;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	cursor: pointer;
 	font-family: inherit;
 }
@@ -1146,7 +1188,7 @@ body,
 }
 
 .stonetop-origin-name {
-	font-size: 0.78rem;
+	font-size: var(--fs-note);
 	cursor: pointer;
 }
 
@@ -1294,14 +1336,14 @@ body,
 /* -- Moves tab -------------------------------------------- */
 
 .stonetop-moves-note {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	color: var(--color-text-dark-secondary);
 	margin: 0 0 6px;
 }
 
 .stonetop-section-note {
-	font-size: 0.7em;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	font-weight: normal;
 	font-family: var(--font-primary);
@@ -1359,12 +1401,12 @@ body,
 }
 
 .stonetop-item-name {
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	line-height: 1.3;
 }
 
 .stonetop-item-source {
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	color: var(--color-text-dark-secondary);
 	margin-left: 2px;
@@ -1372,7 +1414,7 @@ body,
 }
 
 .stonetop-uses-label {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	color: var(--color-text-dark-secondary);
 	margin-right: 2px;
@@ -1385,7 +1427,7 @@ body,
 }
 
 .stonetop-choice-group-heading {
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: bold;
 	margin: 2px 0;
 }
@@ -1401,7 +1443,7 @@ body,
 	display: flex;
 	align-items: flex-start;
 	gap: 4px;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	cursor: pointer;
 	font-weight: normal;
 }
@@ -1430,7 +1472,7 @@ body,
 
 .stonetop-item-description {
 	padding-left: 20px;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: normal;
 	color: var(--color-text-dark-secondary);
 	line-height: 1.4;
@@ -1442,7 +1484,7 @@ body,
 }
 
 .stonetop-insert-description {
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: normal;
 	font-style: normal;
 	color: var(--color-text-dark-secondary);
@@ -1492,7 +1534,7 @@ body,
 
 .stonetop-choice-header-wrapper h4 {
 	margin-bottom: 0px;
-	font-size: 0.95rem;
+	font-size: var(--fs-subheading);
 }
 
 .stonetop-choice-track-checks {
@@ -1511,7 +1553,7 @@ body,
 }
 
 .stonetop-choice-track-desc {
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	line-height: 1.3;
 	padding-left: 30px;
 	font-weight: normal;
@@ -1530,7 +1572,7 @@ body,
 }
 
 .stonetop-item-requirement {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	padding-left: 20px;
 	color: var(--color-text-dark-secondary);
@@ -1584,6 +1626,30 @@ body,
 	background-color: var(--color-text-dark-primary) !important;
 }
 
+/* A resource's fill-in blank (the book's dotted write-in line beside a ○ track, e.g. Battery). */
+.stonetop-resource-input-wrap {
+	display: inline-flex;
+	flex: 1 1 60px;
+	min-width: 40px;
+}
+
+.stonetop-resource-input {
+	width: 100%;
+	height: 18px;
+	background: none;
+	border: none !important;
+	border-bottom: 1px dotted var(--color-text-dark-primary) !important;
+	border-radius: 0 !important;
+	padding: 0 2px;
+	font-style: italic;
+}
+
+.stonetop-resource-input--rich {
+	min-height: 3em;
+	resize: vertical;
+	border: 1px dotted var(--color-text-dark-primary) !important;
+}
+
 /* -- attrLeft header row ---------------------------------- */
 
 .sheet-attributes-left {
@@ -1615,7 +1681,7 @@ body,
 	align-items: center;
 	gap: 6px;
 	padding: 2px 0;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 }
 
 .stonetop-sub-choice-label {
@@ -1631,7 +1697,7 @@ body,
 	margin-left: auto;
 	color: var(--color-text-dark-secondary);
 	cursor: pointer;
-	font-size: 0.75em;
+	font-size: var(--fs-fine);
 }
 
 .stonetop-item:hover .stonetop-other-move-delete {
@@ -1643,7 +1709,7 @@ body,
 	margin-left: auto;
 	color: var(--color-text-dark-secondary);
 	cursor: pointer;
-	font-size: 0.75em;
+	font-size: var(--fs-fine);
 }
 
 /* When a resource is present it owns the auto-margin; the delete just sits a small fixed gap to
@@ -1679,7 +1745,7 @@ body,
 	align-items: center;
 	gap: 4px;
 	margin: 1px 0;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 }
 
 .stonetop-inv-diamonds {
@@ -1754,7 +1820,7 @@ body,
 }
 
 .stonetop-inv-resource-label {
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	margin-left: 1px;
 }
 
@@ -1784,7 +1850,7 @@ body,
 	margin-left: auto;
 	color: var(--color-text-dark-secondary);
 	cursor: pointer;
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 }
 
 .stonetop-inv-item:hover .stonetop-inv-delete {
@@ -1792,7 +1858,7 @@ body,
 }
 
 .stonetop-inv-add-btn {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 1px 6px;
 	margin-top: 4px;
 	cursor: pointer;
@@ -1823,7 +1889,7 @@ body,
 
 .stonetop-playbook-title-img {
 	display: block;
-	height: 45px;
+	height: 31.5px;
 	width: auto;
 	margin-bottom: 4px;
 	border: none;
@@ -1851,7 +1917,7 @@ body,
 
 /* -- Section notes -------------------------------------------- */
 .stonetop-inv-section-note {
-	font-size: 0.8em;
+	font-size: var(--fs-note);
 	color: var(--color-text-dark-secondary, #666);
 	margin: 0 0 4px;
 	font-style: italic;
@@ -1868,7 +1934,7 @@ body,
 	background: white;
 	margin-bottom: 8px;
 	padding: 10px 12px;
-	font-size: 0.9em;
+	font-size: var(--fs-label);
 }
 
 .stonetop-outfit-header::before {
@@ -1901,7 +1967,7 @@ body,
 }
 
 .stonetop-outfit-heading {
-	font-size: 1em;
+	font-size: var(--fs-heading);
 	margin: 0 0 4px;
 }
 
@@ -1966,7 +2032,7 @@ body,
 	gap: 0.35em;
 	flex-wrap: wrap;
 	margin-bottom: 0.5em;
-	font-size: 1.05em;
+	font-size: var(--fs-heading);
 }
 
 .stonetop-die {
@@ -2054,7 +2120,7 @@ body,
 .stonetop-roll-mode-header .stonetop-outfit-heading {
 	font-family: "StonetopUI", serif;
 	font-weight: bolder;
-	font-size: 1rem;
+	font-size: var(--fs-heading);
 	letter-spacing: 0.4px;
 	margin: 0;
 	flex-shrink: 0;
@@ -2070,6 +2136,7 @@ body,
 .stonetop-roll-dialog .window-content {
 	padding: 8px;
 	background: var(--stonetop-bg);
+	font-family: var(--font-primary);
 }
 
 .stonetop-roll-pick-content {
@@ -2077,7 +2144,7 @@ body,
 	background: white;
 	padding: 10px 12px;
 	margin-bottom: 8px;
-	font-size: 0.9em;
+	font-size: var(--fs-label);
 }
 
 .stonetop-roll-pick-content::before {
@@ -2207,7 +2274,7 @@ body,
 }
 
 .stonetop-supplies-pool-note {
-	font-size: 0.85em;
+	font-size: var(--fs-body);
 	color: var(--color-text-dark-secondary, #666);
 	font-style: italic;
 	margin: 0 0 4px;
@@ -2272,8 +2339,16 @@ body,
 
 .stonetop-arcanum-title {
 	font-weight: bold;
-	font-size: 0.9em;
+	font-size: var(--fs-title);
 	display: block;
+}
+
+/* A front with no ◇ outfit item shows the arcanum's disguise tags instead (e.g. "magical, terrifying"). */
+.stonetop-arcanum-tags {
+	display: block;
+	font-size: var(--fs-note);
+	font-style: italic;
+	color: var(--color-text-dark-secondary, #666);
 }
 
 .stonetop-arcanum-weight-note-row {
@@ -2284,14 +2359,14 @@ body,
 }
 
 .stonetop-arcanum-note {
-	font-size: 0.78em;
+	font-size: var(--fs-note);
 	color: var(--color-text-dark-secondary, #666);
 }
 
 .stonetop-arcanum-body {
 	flex: 1;
 	padding: 6px 8px;
-	font-size: 0.8em;
+	font-size: var(--fs-note);
 	overflow-y: auto;
 }
 
@@ -2302,6 +2377,30 @@ body,
 .stonetop-arcanum-body ul {
 	margin: 0 0 4px;
 	padding-left: 1.2em;
+}
+
+/* Write-in blank field: the book's fill-in line, rendered as a small inline input styled as an
+   underline (no box) so it reads as "write here" within the flowing text. */
+.stonetop-arcanum-blank {
+	display: inline-block;
+	width: 3.5em;
+	min-width: 2em;
+	margin: 0 2px;
+	padding: 0 2px;
+	font: inherit;
+	line-height: inherit;
+	color: inherit;
+	text-align: center;
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid var(--color-text-dark-secondary, #666);
+	border-radius: 0;
+}
+
+.stonetop-arcanum-blank:focus {
+	outline: none;
+	border-bottom-color: var(--color-shadow-primary, #782e22);
+	box-shadow: none;
 }
 
 /* Issue #7/#8: inside an arcanum card the "text" content role is ONE size everywhere — the plain
@@ -2347,7 +2446,7 @@ body,
 }
 
 .stonetop-arcanum-flip-btn {
-	font-size: 0.75em;
+	font-size: var(--fs-fine);
 	padding: 2px 0;
 	flex: 1 1 auto;
 }
@@ -2395,8 +2494,8 @@ body,
 }
 
 .stonetop-arcanum-resource-title {
-	font-size: 0.85em;
-	font-weight: bold;
+	font-size: var(--fs-body);
+	font-weight: normal;
 	margin-right: 4px;
 }
 
@@ -2425,13 +2524,28 @@ body,
 }
 
 .stonetop-arcanum-resource-label {
-	font-size: 0.78em;
+	font-size: var(--fs-note);
 	color: var(--color-text-dark-secondary, #666);
 	margin-right: 4px;
 }
 
-.stonetop-arcanum-move-trigger {
-	margin: 6px 0 2px;
+/* Major-arcana mystery moves reuse the moves-tab move-item partial, but single-column. */
+.stonetop-arcanum-moves {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 6px 0 0;
+	padding: 0;
+}
+
+/* PDF-style section titles on the arcanum card ("Moves" / "Consequences"). */
+.stonetop-arcanum-section-label {
+	font-weight: bold;
+	font-variant: small-caps;
+	font-size: var(--fs-heading);
+	letter-spacing: 0.03em;
+	margin: 8px 0 2px;
 }
 
 .stonetop-arcanum-follower {
@@ -2445,7 +2559,7 @@ body,
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: normal;
 	cursor: pointer;
 }
@@ -2461,7 +2575,7 @@ body,
 }
 
 .stonetop-choice-description {
-	font-size: 0.9em;
+	font-size: var(--fs-label);
 	font-style: normal;
 	font-weight: normal;
 	font-family: var(--font-primary);
@@ -2514,7 +2628,7 @@ body,
 .stonetop-option-desc {
 	flex: 1;
 	font-style: normal;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	min-width: 0;
 }
 
@@ -2572,7 +2686,7 @@ body,
 	gap: 6px;
 	background: white;
 	padding: 12px;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 }
 
 .stonetop-follower-card::before {
@@ -2604,11 +2718,35 @@ body,
 	z-index: 1;
 }
 
+/* Card header: the follower's icon sits top-left; the name (and tags/companion below it) fill the
+   column to its right, so the icon pushes both to the right. */
+.stonetop-follower-head {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+.stonetop-follower-head-main {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.stonetop-follower-img {
+	flex: none;
+	width: 48px;
+	height: 48px;
+	object-fit: cover;
+	border: none;
+}
+
 .stonetop-follower-name-input {
 	display: block;
 	width: 100%;
 	padding-right: 24px;
-	font-size: 0.95rem;
+	font-size: var(--fs-subheading);
 	font-weight: bold;
 	background: transparent;
 	border: none;
@@ -2653,7 +2791,7 @@ body,
 .stonetop-member-add:hover { opacity: 1; }
 .stonetop-member-note {
 	margin: 2px 0 4px;
-	font-size: 0.74rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	opacity: 0.75;
 	line-height: 1.35;
@@ -2675,7 +2813,7 @@ body,
 	flex: 1 1 auto;
 	width: auto;
 	min-width: 0;
-	font-size: 0.9rem;
+	font-size: var(--fs-label);
 	font-weight: bold;
 	background: transparent;
 	border: none;
@@ -2692,7 +2830,7 @@ body,
 }
 .stonetop-member-fieldlabel {
 	flex: 0 0 auto;
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	opacity: 0.6;
@@ -2700,7 +2838,7 @@ body,
 }
 .stonetop-member-suggest {
 	margin: 4px 0 0;
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	opacity: 0.7;
 	line-height: 1.35;
@@ -2762,7 +2900,7 @@ body,
 	flex: 1 1 auto;
 	width: auto !important;
 	min-width: 4em;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	background: transparent;
 	border: none;
 	border-bottom: 1px solid transparent;
@@ -2778,7 +2916,7 @@ body,
 	background: none !important;
 	box-shadow: none !important;
 	color: inherit;
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	line-height: 1;
 	cursor: pointer;
 	opacity: 0.55;
@@ -2803,7 +2941,7 @@ body,
 .stonetop-combo-list[hidden] { display: none; }
 .stonetop-combo-option {
 	padding: 3px 6px;
-	font-size: 0.82rem;
+	font-size: var(--fs-note);
 	line-height: 1.3;
 	color: inherit;       /* not Foundry's default <li> color (the list is portaled to <body>) */
 	cursor: pointer;
@@ -2822,7 +2960,7 @@ body,
 	width: 100%;
 	max-width: 100%;
 	min-width: 0;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 }
 .stonetop-fill-blank {
 	flex: 1 1 5em;
@@ -2830,7 +2968,7 @@ body,
 	max-width: 100%;
 	width: auto !important;
 	box-sizing: border-box;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	background: transparent;
 	border: none;
 	border-bottom: 1px solid var(--color-border-dark);
@@ -2845,7 +2983,7 @@ body,
 	background: none !important;
 	box-shadow: none !important;
 	line-height: 1;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	cursor: pointer;
 }
 .stonetop-fill-confirm { color: #2e7d32; }
@@ -2856,7 +2994,7 @@ body,
 /* Animal companion (Ranger): Type dropdown + "pick N" options pool. */
 .stonetop-companion { display: flex; flex-direction: column; gap: 4px; }
 .stonetop-companion-options { display: flex; flex-direction: column; gap: 2px; }
-.stonetop-companion-pick { font-size: 0.7rem; font-style: italic; opacity: 0.6; }
+.stonetop-companion-pick { font-size: var(--fs-fine); font-style: italic; opacity: 0.6; }
 
 /* Foundry's core button styling boxes our icon-only buttons (background, border, box-shadow
    glow, focus outline). Null it with the sheet-scoped prefix `.stonetop.sheet` (the sheet's own
@@ -2894,6 +3032,21 @@ body,
 /* Insert tab header: name on the left, delete icon pinned to the top-right (no button box). */
 .stonetop-insert-header {
 	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+.stonetop-insert-icon {
+	flex: none;
+	width: 48px;
+	height: 48px;
+	object-fit: cover;
+	border: none;
+}
+.stonetop-insert-heading {
+	flex: 1;
+	min-width: 0;
+	padding-right: 20px;
 }
 .stonetop-insert-remove {
 	position: absolute;
@@ -2919,7 +3072,7 @@ body,
 	display: block;
 	width: 100%;
 	padding-right: 24px;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	font-style: italic;
 	color: var(--color-text-dark-secondary, #666);
 	background: transparent;
@@ -2971,7 +3124,7 @@ body,
 
 .stonetop-follower-label {
 	font-weight: bold;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	text-transform: uppercase;
 	color: var(--color-text-dark-secondary, #555);
 }
@@ -3023,7 +3176,7 @@ body,
 	display: inline-flex;
 	gap: 4px;
 	margin-left: auto;
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	text-transform: uppercase;
 	letter-spacing: 0.03em;
 }
@@ -3041,9 +3194,9 @@ body,
 	gap: 1px;
 	margin-top: 2px;
 }
-.stonetop-follower-inventory-empty { opacity: 0.5; font-style: italic; font-size: 0.8rem; }
+.stonetop-follower-inventory-empty { opacity: 0.5; font-style: italic; font-size: var(--fs-note); }
 .stonetop-follower-inventory .stonetop-inv-section-name {
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	text-transform: uppercase;
 	letter-spacing: 0.03em;
 	opacity: 0.6;
@@ -3052,7 +3205,7 @@ body,
 
 .stonetop-follower-card .stonetop-choice-description {
 	font-weight: bold;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-style: italic;
 	text-transform: uppercase;
 	color: var(--color-text-dark-secondary, #555);
@@ -3066,7 +3219,7 @@ body,
 	background: transparent;
 	border: 1px solid transparent;
 	border-radius: 2px;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 }
 
 /* ===== Steading Sheet (new panel-frame system) ===== */
@@ -3135,7 +3288,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-panel-frame h2 {
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
@@ -3151,25 +3304,45 @@ form.stonetop.sheet.steading {
 
 .stonetop.sheet.steading .sheet-header.steading-top {
 	flex-direction: column;
+	align-items: stretch; /* override Foundry's .sheet-header align-items:center, which centres the column */
 	padding: 0;
 	margin-bottom: 6px;
 }
 
-.stonetop.sheet.steading .steading-name-row {
+.stonetop.sheet.steading .steading-steadfast-row {
 	display: flex;
-	justify-content: center;
+	justify-content: flex-start;
+	align-items: baseline;   /* the large name and the small hint sit on one baseline */
+	flex-wrap: wrap;
+	gap: 4px 12px;
 	margin-bottom: 8px;
 }
 
-.stonetop.sheet.steading .steading-logo {
-	height: 60px;
-	width: auto;
-	border: none;
+.stonetop.sheet.steading .steading-steadfast-hint {
+	font-size: var(--fs-note);
+	font-style: italic;
+	opacity: 0.7;
+}
+
+/* Size to the name so the hint sits right after it, not shoved to the far edge by the input's
+   intrinsic column width. */
+.stonetop.sheet.steading .steading-steadfast-combo {
+	flex: 0 1 auto;
+}
+
+/* The steading's name reads as the sheet heading: title font (via the shared group above) at the same
+   name-heading step the character sheet uses. */
+.stonetop.sheet.steading .steading-steadfast-input {
+	font-size: var(--fs-name);
+	field-sizing: content;
+	min-width: 8ch;
+	max-width: 100%;
 }
 
 .stonetop.sheet.steading .steading-header-grid {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: flex-start;
 	gap: 6px;
 }
 
@@ -3191,7 +3364,7 @@ form.stonetop.sheet.steading {
 /* ── Start line ──────────────────────────────────────────────────────────────── */
 
 .stonetop.sheet.steading .steading-start-line {
-	font-size: 0.68rem;
+	font-size: var(--fs-micro);
 	font-style: italic;
 	color: var(--color-text-dark-secondary, #555);
 	margin: 0 0 5px;
@@ -3262,12 +3435,12 @@ form.stonetop.sheet.steading {
 .stonetop.sheet.steading .steading-option-text {
 	display: flex;
 	flex-direction: column;
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	line-height: 1.3;
 }
 
 .stonetop.sheet.steading .steading-option-text small {
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	color: var(--color-text-dark-secondary, #666);
 }
 
@@ -3275,7 +3448,7 @@ form.stonetop.sheet.steading {
 
 .stonetop.sheet.steading .steading-surplus-input {
 	width: 56px;
-	font-size: 1.6rem;
+	font-size: var(--fs-display);
 	font-family: var(--font-primary);
 	text-align: center;
 	border: 1px solid rgba(0,0,0,0.25);
@@ -3299,7 +3472,7 @@ form.stonetop.sheet.steading {
 	padding: 0;
 	cursor: pointer;
 	font-family: "StonetopUI", serif;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
@@ -3324,13 +3497,13 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-debility-option span:last-child {
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	line-height: 1.35;
 }
 
 .stonetop.sheet.steading .steading-debility-option small {
 	display: block;
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	color: var(--color-text-dark-secondary, #555);
 	font-style: italic;
 }
@@ -3369,7 +3542,7 @@ form.stonetop.sheet.steading {
 	resize: none;
 	border: none;
 	background: transparent;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	line-height: 1.5;
 	padding: 4px 0;
 	font-family: var(--font-primary);
@@ -3404,7 +3577,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid transparent;
 	background: transparent;
-	font-size: 0.78rem;
+	font-size: var(--fs-note);
 	font-family: var(--font-primary);
 	padding: 1px 2px;
 }
@@ -3443,12 +3616,12 @@ form.stonetop.sheet.steading {
 	border-radius: 3px;
 	padding: 4px 6px;
 	background: rgba(255,255,255,0.3);
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	cursor: default;
 }
 
 .stonetop.sheet.steading .steading-asset-currency-frame span {
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	color: var(--color-text-dark-secondary, #555);
 	white-space: nowrap;
 }
@@ -3459,7 +3632,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid rgba(0,0,0,0.2);
 	background: transparent;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	font-family: var(--font-primary);
 	padding: 1px 2px;
 }
@@ -3493,7 +3666,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-names-text {
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	line-height: 1.5;
 	color: var(--color-text-dark-secondary, #555);
 	margin: 0;
@@ -3523,7 +3696,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-residents-header span {
-	font-size: 0.68rem;
+	font-size: var(--fs-micro);
 	font-weight: bold;
 	color: var(--color-text-dark-secondary, #555);
 	padding-bottom: 3px;
@@ -3534,7 +3707,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid transparent;
 	background: transparent;
-	font-size: 0.78rem;
+	font-size: var(--fs-note);
 	font-family: var(--font-primary);
 	padding: 1px 2px;
 	width: 100%;
@@ -3569,7 +3742,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-npc-traits-heading span {
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	font-style: italic;
 	color: var(--color-text-dark-secondary, #555);
 }
@@ -3591,7 +3764,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-npc-trait {
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	line-height: 1.5;
 	color: var(--color-text-dark-primary, #222);
 }
@@ -3637,7 +3810,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-neighbor-place h2 small {
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	font-weight: normal;
 	font-style: italic;
 	color: var(--color-text-dark-secondary, #555);
@@ -3650,7 +3823,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .steading-neighbor-text-field span {
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	font-weight: bold;
 	color: var(--color-text-dark-secondary, #555);
 	text-transform: uppercase;
@@ -3662,7 +3835,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid rgba(0,0,0,0.15);
 	background: transparent;
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	font-family: var(--font-primary);
 	line-height: 1.4;
 	min-height: 36px;
@@ -3734,7 +3907,7 @@ form.stonetop.sheet.steading {
 	resize: none;
 	border: none;
 	background: transparent;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	line-height: 1.5;
 	padding: 4px 0;
 	font-family: var(--font-primary);
@@ -3753,14 +3926,14 @@ form.stonetop.sheet.steading {
 	resize: none;
 	border: none;
 	background: transparent;
-	font-size: 0.78rem;
+	font-size: var(--fs-note);
 	line-height: 1.5;
 	padding: 2px 0;
 	font-family: var(--font-primary);
 }
 
 .stonetop.sheet.steading .steading-notes-content-field h2 small {
-	font-size: 0.65rem;
+	font-size: var(--fs-micro);
 	font-weight: normal;
 	font-style: italic;
 	color: var(--color-text-dark-secondary, #555);
@@ -3783,7 +3956,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid transparent;
 	background: transparent;
-	font-size: 0.78rem;
+	font-size: var(--fs-note);
 	font-family: var(--font-primary);
 	padding: 1px 2px;
 }
@@ -3809,7 +3982,7 @@ form.stonetop.sheet.steading {
 }
 
 .stonetop.sheet.steading .stonetop-place-key {
-	font-size: 0.72rem;
+	font-size: var(--fs-fine);
 	font-weight: bold;
 	color: var(--color-text-dark-secondary, #555);
 	flex-shrink: 0;
@@ -3821,7 +3994,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid transparent;
 	background: transparent;
-	font-size: 0.78rem;
+	font-size: var(--fs-note);
 	font-family: var(--font-primary);
 	padding: 1px 2px;
 }
@@ -3871,7 +4044,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px solid #bbb;
 	color: inherit;
-	font-size: 1.2rem;
+	font-size: var(--fs-title);
 	font-weight: bold;
 	font-family: inherit;
 	width: 100%;
@@ -3899,7 +4072,7 @@ form.stonetop.sheet.steading {
 	color: inherit;
 	border-radius: 3px;
 	padding: 0.15rem 0.4rem;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 }
 
 .move-sheet-selects select:disabled {
@@ -3964,7 +4137,7 @@ form.stonetop.sheet.steading {
 	justify-content: center;
 	min-width: 2.8rem;
 	padding: 0.5rem 0.4rem;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	font-weight: bold;
 	letter-spacing: 0.02em;
 	flex-shrink: 0;
@@ -3992,7 +4165,7 @@ form.stonetop.sheet.steading {
 	border-left: 1px solid #ddd;
 	color: inherit;
 	font-family: inherit;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	line-height: 1.4;
 	padding: 0.4rem 0.6rem;
 	resize: vertical;
@@ -4010,7 +4183,7 @@ form.stonetop.sheet.steading {
 .move-sheet-result-text {
 	flex: 1;
 	padding: 0.4rem 0.6rem;
-	font-size: 0.85rem;
+	font-size: var(--fs-body);
 	line-height: 1.4;
 	border-left: 1px solid #ddd;
 }
@@ -4060,7 +4233,7 @@ form.stonetop.sheet.steading {
 }
 
 .move-sheet-detail-label {
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	color: #666;
 	white-space: nowrap;
 }
@@ -4074,7 +4247,7 @@ form.stonetop.sheet.steading {
 	border-radius: 3px;
 	color: inherit;
 	font-family: inherit;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	padding: 0.2rem 0.4rem;
 	min-width: 0;
 }
@@ -4126,7 +4299,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #ccc;
 	border-radius: 3px;
 	cursor: pointer;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0.15rem 0.5rem;
 	color: #a00;
 	margin-left: auto;
@@ -4154,7 +4327,7 @@ form.stonetop.sheet.steading {
 }
 
 .choices-row-type {
-	font-size: 0.68rem;
+	font-size: var(--fs-micro);
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
@@ -4183,7 +4356,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	cursor: pointer;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	padding: 0.1rem 0.4rem;
 	color: #555;
 	line-height: 1;
@@ -4213,40 +4386,47 @@ form.stonetop.sheet.steading {
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	min-width: 0;
 }
 
 .choices-field > span:first-child {
 	min-width: 4.5rem;
 	color: #666;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 }
 
 .choices-field input[type="text"],
 .choices-field input[type="number"],
-.choices-field select,
-.choices-field textarea {
+.choices-field select {
 	flex: 1;
 	background: rgba(255, 255, 255, 0.7);
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	font-family: inherit;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	padding: 0.15rem 0.35rem;
 	color: inherit;
 	min-width: 0;
 }
 
-.choices-field textarea {
-	resize: vertical;
-	min-height: 2.5rem;
+/* content.text rich editor: a <prose-mirror> seeded with HTML, saved back as HTML. Match the field
+   frame the plain inputs use and give the editor a sensible editing height. */
+.choices-field--rich { align-items: stretch; }
+.choices-field .choices-rich-text {
+	flex: 1;
+	min-width: 0;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	padding: 0.15rem 0.35rem;
 }
+.choices-field .choices-rich-text .editor-content { min-height: 4rem; }
+.choices-field .choices-rich-text:focus-within { border-color: #8b5c2a; }
 
 .choices-field input[type="text"]:focus,
 .choices-field input[type="number"]:focus,
-.choices-field select:focus,
-.choices-field textarea:focus {
+.choices-field select:focus {
 	outline: none;
 	border-color: #8b5c2a;
 }
@@ -4278,13 +4458,13 @@ form.stonetop.sheet.steading {
 	align-items: center;
 	gap: 0.4rem;
 	min-width: 0;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 }
 
 .choices-field--toggle > span:first-child {
 	min-width: unset;
 	color: #666;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 }
 
 .choices-field--toggle input[type="number"],
@@ -4297,7 +4477,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	font-family: inherit;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	padding: 0.15rem 0.35rem;
 	color: inherit;
 	height: auto;
@@ -4310,7 +4490,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	cursor: pointer;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0 0.35rem;
 	line-height: 1.6;
 	color: #555;
@@ -4353,7 +4533,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	font-family: inherit;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0.12rem 0.3rem;
 	color: inherit;
 }
@@ -4363,7 +4543,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	font-family: inherit;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0.12rem 0.2rem;
 	color: inherit;
 }
@@ -4381,7 +4561,7 @@ form.stonetop.sheet.steading {
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	font-family: inherit;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0.15rem 0.3rem;
 	color: inherit;
 	resize: vertical;
@@ -4403,7 +4583,7 @@ form.stonetop.sheet.steading {
 	border-radius: 3px;
 	cursor: pointer;
 	color: #a00;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0.1rem 0.35rem;
 	flex: none;
 	line-height: 1;
@@ -4419,7 +4599,7 @@ form.stonetop.sheet.steading {
 	border: 1px dashed #bbb;
 	border-radius: 3px;
 	cursor: pointer;
-	font-size: 0.75rem;
+	font-size: var(--fs-fine);
 	padding: 0.15rem 0.5rem;
 	color: #666;
 	align-self: flex-start;
@@ -4443,7 +4623,7 @@ form.stonetop.sheet.steading {
 	border: 1px dashed #bbb;
 	border-radius: 3px;
 	cursor: pointer;
-	font-size: 0.8rem;
+	font-size: var(--fs-note);
 	padding: 0.25rem 0.75rem;
 	color: #555;
 }
@@ -4532,7 +4712,7 @@ form.stonetop.sheet.steading {
 	border-radius: 999px;
 	background: transparent;
 	color: var(--color-text-dark-secondary, #4b4a44);
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 	line-height: 1;
 	white-space: nowrap;
 	cursor: pointer;
@@ -4553,7 +4733,7 @@ form.stonetop.sheet.steading {
 	border: none;
 	border-bottom: 1px dotted var(--color-border-dark-3, #8a7b66);
 	background: transparent;
-	font-size: 0.7rem;
+	font-size: var(--fs-fine);
 }
 
 /* ── Notes-style textareas (inventory "other items", and the character Notes tab) ── */
@@ -4653,7 +4833,7 @@ form.stonetop.sheet.steading {
 	color: #1a1a1a;
 	line-height: 1;
 }
-.stonetop-creature-hp > .stonetop-follower-label { font-size: 0.6rem; }
+.stonetop-creature-hp > .stonetop-follower-label { font-size: var(--fs-micro); }
 .stonetop-creature-hp__row {
 	display: flex;
 	align-items: baseline;
@@ -4685,9 +4865,9 @@ form.stonetop.sheet.steading {
 /* -- Custom insert item sheet (StonetopInsertSheet) ----------------------------- */
 .stonetop-insert-sheet-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .stonetop-insert-sheet-icon { width: 48px; height: 48px; flex: 0 0 auto; border: none !important; }
-.stonetop-insert-sheet-name { flex: 1 1 auto; font-size: 1.3rem; font-weight: bold; }
+.stonetop-insert-sheet-name { flex: 1 1 auto; font-size: var(--fs-title); font-weight: bold; }
 .stonetop-insert-sheet-body { display: flex; flex-direction: column; gap: 8px; }
-.stonetop-insert-sheet-label { font-weight: bold; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; }
+.stonetop-insert-sheet-label { font-weight: bold; font-size: var(--fs-note); text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; }
 .stonetop-insert-sheet-description { width: 100%; min-height: 120px; resize: vertical; }
 .stonetop-insert-sheet-section { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--color-border-light-2, #c9c7b8); padding-top: 8px; }
 .stonetop-insert-sheet-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -4698,11 +4878,16 @@ form.stonetop.sheet.steading {
 .stonetop-insert-sheet-instinct-row .insert-instinct-remove-string { flex: 0 0 auto; }
 .stonetop-insert-sheet-choices-group { border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px; margin-bottom: 6px; }
 .stonetop-insert-sheet-choices-group-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
-.stonetop-insert-sheet-choices-slug { font-size: 0.78rem; opacity: 0.6; font-style: italic; }
+.stonetop-insert-sheet-choices-slug { font-size: var(--fs-note); opacity: 0.6; font-style: italic; }
 .stonetop-insert-sheet-move-list { list-style: none; margin: 0; padding: 0; }
 .stonetop-insert-sheet-move { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px; }
 .stonetop-insert-sheet-move .insert-move-open { flex: 1 1 auto; cursor: pointer; }
 .stonetop-insert-sheet-move .insert-move-open:hover { text-decoration: underline; }
+
+/* -- Improvement item sheet (StonetopImprovementSheet) — reuses .stonetop-insert-sheet-* layout. --
+   The rendered view shares improvement-group.hbs with the steading; its tracks are a read-only
+   preview of the improvement's structure (real track state lives on each steading), so disable them. */
+.stonetop-improvement-preview input { pointer-events: none; }
 
 /* -- Possession item sheet (StonetopPossessionSheet) — reuses .stonetop-insert-sheet-* layout -- */
 .stonetop-possession-outfit-list,
@@ -4712,38 +4897,38 @@ form.stonetop.sheet.steading {
 	display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
 	border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px;
 }
-.stonetop-possession-outfit-field { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; }
+.stonetop-possession-outfit-field { display: flex; align-items: center; gap: 6px; font-size: var(--fs-fine); }
 .stonetop-possession-outfit-field > span { flex: 0 0 auto; white-space: nowrap; }
 .stonetop-possession-outfit-field input,
 .stonetop-possession-outfit-field select { flex: 1 1 auto; min-width: 0; }
 .stonetop-possession-outfit-field--wide { flex: 1 1 100%; }
 .stonetop-possession-outfit-field--narrow { flex: 0 0 auto; }
 .stonetop-possession-outfit-field--narrow input { flex: 0 0 auto; width: 4.5em; }
-.stonetop-possession-scaling-field { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; margin: 2px 0; }
+.stonetop-possession-scaling-field { display: flex; align-items: center; gap: 6px; font-size: var(--fs-note); margin: 2px 0; }
 .stonetop-possession-scaling-field input { width: 4.5em; }
 .stonetop-possession-scaling-head {
 	display: flex; align-items: center; justify-content: space-between; gap: 8px;
-	margin: 6px 0 2px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
+	margin: 6px 0 2px; font-size: var(--fs-note); text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
 }
-.stonetop-possession-scaling-note { font-size: 0.75rem; opacity: 0.7; margin: 2px 0; }
+.stonetop-possession-scaling-note { font-size: var(--fs-fine); opacity: 0.7; margin: 2px 0; }
 
 /* -- Arcanum item sheet (StonetopArcanumSheet) — reuses .stonetop-insert-sheet-* layout ------- */
 .stonetop-arcanum-core { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
 .stonetop-arcanum-field--check { display: inline-flex; align-items: center; gap: 5px; }
 .stonetop-arcanum-field--narrow { display: inline-flex; align-items: center; gap: 4px; }
 .stonetop-arcanum-field--narrow input { width: 56px; }
-.stonetop-arcanum-slug { margin-left: auto; font-size: 0.75rem; opacity: 0.5; font-style: italic; }
+.stonetop-arcanum-slug { margin-left: auto; font-size: var(--fs-fine); opacity: 0.5; font-style: italic; }
 .stonetop-arcanum-title-field { display: block; margin: 4px 0; }
 .stonetop-arcanum-title-field input { width: 100%; }
 .stonetop-arcanum-subhead {
 	display: flex; align-items: center; justify-content: space-between; gap: 8px;
-	margin: 8px 0 2px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
+	margin: 8px 0 2px; font-size: var(--fs-note); text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
 }
 .stonetop-arcanum-item-def, .stonetop-arcanum-resource-editor {
 	border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px; margin: 4px 0;
 }
 .stonetop-arcanum-fields { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
-.stonetop-arcanum-fields label { display: flex; flex-direction: row; align-items: center; font-size: 0.75rem; gap: 6px; }
+.stonetop-arcanum-fields label { display: flex; flex-direction: row; align-items: center; font-size: var(--fs-fine); gap: 6px; }
 .stonetop-arcanum-fields label > span { flex: 0 0 auto; white-space: nowrap; }
 .stonetop-arcanum-fields label input,
 .stonetop-arcanum-fields label select { flex: 1 1 auto; min-width: 0; }
@@ -4752,7 +4937,7 @@ form.stonetop.sheet.steading {
 .stonetop-arcanum-field--narrow input { flex: 0 0 auto; width: 4.5em; }
 .stonetop-arcanum-field--check { flex: 0 0 auto; }
 .stonetop-arcanum-field--check input { flex: 0 0 auto; width: auto; }
-.stonetop-arcanum-moves { display: flex; flex-direction: column; gap: 6px; }
+.stonetop-arcanum-move-editor-list { display: flex; flex-direction: column; gap: 6px; }
 .stonetop-arcanum-move {
 	border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px;
 	display: flex; flex-direction: column; gap: 4px;
@@ -4760,7 +4945,7 @@ form.stonetop.sheet.steading {
 .stonetop-arcanum-move-head { display: flex; align-items: center; gap: 4px; }
 .stonetop-arcanum-move-head input { flex: 1 1 auto; }
 .stonetop-arcanum-move textarea { width: 100%; min-height: 48px; resize: vertical; }
-.stonetop-arcanum-move-tracker { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; }
+.stonetop-arcanum-move-tracker { display: flex; align-items: center; gap: 6px; font-size: var(--fs-fine); }
 .stonetop-arcanum-move-tracker input[type=number] { width: 50px; }
 
 /* Two-column layout: editor (scrolls) + sticky live preview on the right. */
@@ -4777,7 +4962,7 @@ form.stonetop.sheet.steading {
 }
 .stonetop-arcanum-preview-head {
 	display: flex; align-items: center; justify-content: space-between; gap: 8px;
-	font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
+	font-size: var(--fs-note); text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
 }
 .stonetop-arcanum-preview-actions { display: flex; align-items: center; gap: 6px; }
 
@@ -4785,6 +4970,98 @@ form.stonetop.sheet.steading {
 .stonetop-arcanum-view { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .stonetop-arcanum-view-head { display: flex; align-self: flex-end; gap: 6px; }
 .stonetop-arcanum-view .stonetop-arcanum-preview { width: 100%; max-width: 420px; }
+
+/* ── Follower item sheet — same view/editor+preview pattern as the arcanum sheet ── */
+.stonetop.sheet.item.follower .window-content { overflow-y: auto; }
+
+.stonetop-follower-view { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.stonetop-follower-view-head { display: flex; align-self: flex-end; gap: 6px; }
+.stonetop-follower-view .stonetop-follower-preview { width: 100%; max-width: 460px; }
+
+.stonetop-follower-layout { display: flex; gap: 16px; align-items: flex-start; }
+.stonetop-follower-editor { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.stonetop-follower-preview-pane {
+	flex: 0 0 360px;
+	position: sticky;
+	top: 0;
+	align-self: flex-start;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.stonetop-follower-preview-head {
+	display: flex; align-items: center; justify-content: space-between; gap: 8px;
+	font-size: var(--fs-note); text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7;
+}
+
+.stonetop-follower-core { display: flex; flex-direction: column; gap: 6px; }
+.stonetop-follower-slug { font-size: var(--fs-note); opacity: 0.6; }
+.stonetop-follower-fields { display: flex; flex-wrap: wrap; gap: 8px; }
+.stonetop-follower-fields label { display: flex; flex-direction: column; font-size: var(--fs-note); gap: 2px; }
+.stonetop-follower-fields input[type="number"] { width: 5em; }
+.stonetop-follower-section { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--color-border-light-2, #c9c7b8); padding-top: 8px; }
+.stonetop-follower-subhead {
+	display: flex; align-items: center; justify-content: space-between; gap: 8px;
+	font-weight: 600; text-transform: uppercase; font-size: var(--fs-note); letter-spacing: 0.04em;
+}
+
+/* Selection field editor — a boxed, tinted panel (set off from the plain fields around it by its
+   own border, fill, and margin) so its Options + Default read as belonging to the field
+   (Tags / Instinct / Cost) named in the heading. */
+.stonetop-follower-core .follower-selection {
+	display: flex; flex-direction: column; gap: 4px;
+	border: 1px solid var(--color-border-light-2, #c9c7b8);
+	border-radius: 4px;
+	padding: 6px 8px;
+	margin: 4px 0;
+	background: rgba(0, 0, 0, 0.03);
+}
+.stonetop-follower-core .follower-selection-head { margin-bottom: 2px; }
+/* Indent the body under the heading so Options + Default sit visibly inside the field. */
+.stonetop-follower-core .follower-selection-body {
+	display: flex; flex-direction: column; gap: 4px;
+	padding-left: 8px;
+	border-left: 2px solid var(--color-border-light-2, #c9c7b8);
+}
+.stonetop-follower-core .follower-selection-default { display: flex; align-items: center; gap: 6px; font-size: var(--fs-note); }
+.stonetop-follower-core .follower-selection-default input { flex: 1 1 auto; }
+
+/* Members: one enclosing panel, styled like the boxed Selection fields above — the note, the
+   name/tag/trait pools, and the member cards all read as a single group under the MEMBERS heading. */
+.follower-members-panel {
+	border: 1px solid var(--color-border-light-2, #c9c7b8);
+	border-radius: 4px;
+	padding: 6px 8px;
+	background: rgba(0, 0, 0, 0.03);
+}
+.follower-members-body {
+	display: flex; flex-direction: column; gap: 6px;
+	padding-left: 8px;
+	border-left: 2px solid var(--color-border-light-2, #c9c7b8);
+}
+
+/* Shared string-list editor */
+.follower-string-list { display: flex; flex-direction: column; gap: 2px; }
+.follower-string-list-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.follower-string-list-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.follower-string-list-row { display: flex; align-items: center; gap: 4px; }
+.follower-string-list-row input { flex: 1 1 auto; }
+
+/* Member + companion-type editors */
+.follower-members-list, .follower-companion-catalog { display: flex; flex-direction: column; gap: 8px; }
+.follower-member-row, .follower-companion-type {
+	display: flex; flex-direction: column; gap: 4px;
+	border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 6px;
+}
+.follower-member-top, .follower-companion-type-head, .follower-companion-type-stats {
+	display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+}
+.follower-member-top input[type="number"], .follower-companion-type-stats input[type="number"] { width: 4.5em; }
+.follower-member-line { display: flex; align-items: center; gap: 6px; font-size: var(--fs-note); }
+.follower-member-line input { flex: 1 1 auto; }
+.follower-companion-type-stats label { display: flex; align-items: center; gap: 4px; font-size: var(--fs-note); }
+.follower-comp-strings { margin-top: 4px; }
+.follower-companion-enable-label { display: flex; align-items: center; gap: 4px; font-weight: 400; text-transform: none; }
 
 /* The preview reuses the real card render but is non-interactive; hide the card's own footer. */
 .stonetop-arcanum-preview { pointer-events: none; }
@@ -4794,7 +5071,7 @@ form.stonetop.sheet.steading {
 /* Bigger, clearly separated FRONT / BACK headers. */
 .stonetop-arcanum-side { margin-top: 14px; }
 .stonetop-arcanum-side-title {
-	font-size: 1.1rem; font-weight: bold; margin: 0 0 6px; padding-bottom: 4px;
+	font-size: var(--fs-title); font-weight: bold; margin: 0 0 6px; padding-bottom: 4px;
 	border-bottom: 2px solid var(--color-border-dark, #7a7971); text-transform: uppercase; letter-spacing: 0.04em;
 }
 
@@ -4836,6 +5113,13 @@ form.stonetop.sheet.steading {
 .stonetop-wonder li.swirl-point { list-style: none; }
 .stonetop-wonder li.swirl::before { content: ""; display: inline-block; width: 0.9em; height: 0.9em; margin: 0 0.35em 0 -1.3em; vertical-align: -0.12em; background: url(/systems/stonetop/assets/ui/decor/swirl.png) no-repeat left center / contain; }
 .stonetop-wonder li.swirl-point::before { content: ""; display: inline-block; width: 1.4em; height: 0.9em; margin: 0 0.35em 0 -1.7em; vertical-align: -0.12em; background: url(/systems/stonetop/assets/ui/decor/swirl-point.png) no-repeat left center / contain; }
+/* square pick/track checkboxes (the book's □ vector mark) — render an empty box bullet */
+.stonetop-wonder li.checkbox { list-style: none; }
+.stonetop-wonder li.checkbox::before {
+	content: ""; display: inline-block; width: 0.85em; height: 0.85em;
+	margin: 0 0.4em 0 -1.3em; vertical-align: -0.05em;
+	border: 1px solid var(--color-text-dark-3, #444);
+}
 /* stylized arrow bullets (the book's "ä" dingbat) — stat-block moves and ä-lists */
 .stonetop-wonder ul.sb-moves,
 .stonetop-wonder li.arrow { list-style: none; }
@@ -4883,6 +5167,23 @@ form.stonetop.sheet.steading {
 .stonetop-wonder table td { border: 1px solid rgba(0, 0, 0, 0.25); padding: 0.2em 0.5em; text-align: left; vertical-align: top; }
 .stonetop-wonder table thead th { background: rgba(0, 0, 0, 0.06); font-family: "StonetopUI", serif; }
 .stonetop-wonder table tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.03); }
+
+/* Inline dice table on a player-facing arcanum back (the @DrawTableInline enricher): the roll button
+   sits as a caption above the table's rows. Self-contained (not .stonetop-wonder-scoped) so it also
+   styles the roll button, which the journal rules above don't reach on the arcanum sheet. */
+.stonetop-inline-table { margin: 0.6em 0 0.9em; }
+.stonetop-inline-table figcaption { margin-bottom: 0.3em; }
+.stonetop-inline-table a.stonetop-draw-table {
+	display: inline-flex; align-items: center; cursor: pointer; padding: 0.05em 0.55em; line-height: 1.4;
+	font-size: 0.9em; border: 1px solid var(--color-border-dark, #6a6256); border-radius: 3px;
+	background: rgba(0, 0, 0, 0.05); color: inherit; text-decoration: none; white-space: nowrap;
+}
+.stonetop-inline-table a.stonetop-draw-table:hover { background: rgba(0, 0, 0, 0.12); }
+.stonetop-inline-table a.stonetop-draw-table i.fa-dice-d6 { margin-right: 0.35em; }
+.stonetop-inline-table table { border-collapse: collapse; width: 100%; background: transparent; margin: 0; }
+.stonetop-inline-table td { border: 1px solid rgba(0, 0, 0, 0.25); padding: 0.2em 0.5em; text-align: left; vertical-align: top; }
+.stonetop-inline-table td.roll { width: 2.5em; text-align: center; font-weight: bold; white-space: nowrap; }
+.stonetop-inline-table tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.03); }
 
 /* ── bugs.md batch 1 (CSS) ─────────────────────────────────────────────────────────────────────
    #7 — no border/drop-shadow on journal images (Foundry adds one). */
@@ -4959,4 +5260,46 @@ form.stonetop.sheet.steading {
    backing sits behind them.) */
 .application.image-popout {
 	background: var(--stonetop-bg, #f4ecd8) url(/systems/stonetop/assets/ui/decor/sheet-bg.png) center / cover !important;
+}
+
+/* ── Steadfast item sheet ──────────────────────────────────────────────────────
+   The steadfast form also carries the `steading` class, so it inherits the shared
+   profile styling (panels, rating options, resource/asset lists). These rules cover
+   the single-page item layout, which differs from the steading's tabbed sheet. */
+.stonetop.sheet.steadfast .stonetop-steadfast-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+/* The overview row (Resources / Defenses / Assets) fills the tab on a steading; on the
+   steadfast's scrolling page it sizes to its content instead. */
+.stonetop.sheet.steadfast .steading-overview-grid {
+	height: auto;
+	min-height: 0;
+	gap: 10px;
+}
+
+.stonetop.sheet.steadfast .stonetop-steadfast-resident-names,
+.stonetop.sheet.steadfast .steading-npc-traits-source {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+/* Granted improvements stack in one column (not the steading's three) with a corner remove. */
+.stonetop.sheet.steadfast .stonetop-steadfast-improvement-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.stonetop.sheet.steadfast .stonetop-steadfast-improvement {
+	position: relative;
+}
+
+.stonetop.sheet.steadfast .steadfast-improvement-remove {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	z-index: 1;
 }

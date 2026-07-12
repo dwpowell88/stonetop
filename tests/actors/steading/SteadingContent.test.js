@@ -24,16 +24,16 @@ describe("SteadingContent.buildSnapshot", () => {
 
 	it("excluded section has correct note", () => {
 		const excluded = make().buildSnapshot().find(s => s.slug === "excluded");
-		expect(excluded.note).toBe("(Not part of the game, on-camera or off)");
+		expect(excluded.note.raw).toBe("(Not part of the game, on-camera or off)");
 	});
 
 	it("veiled section has correct note", () => {
 		const veiled = make().buildSnapshot().find(s => s.slug === "veiled");
-		expect(veiled.note).toBe("(Part of the fiction, but only off-camera)");
+		expect(veiled.note.raw).toBe("(Part of the fiction, but only off-camera)");
 	});
 
 	it("specialHandling section has null note", () => {
-		expect(make().buildSnapshot().find(s => s.slug === "specialHandling").note).toBeNull();
+		expect(make().buildSnapshot().find(s => s.slug === "specialHandling").note.raw).toBe("");
 	});
 });
 

@@ -1,0 +1,12 @@
+{
+	"_id": "9e59c14c624555ea",
+	"_key": "!items!9e59c14c624555ea",
+	"name": "Proof Against Harm",
+	"type": "move",
+	"system": {
+		"slug": "proof-against-harm",
+		"moveType": null,
+		"description": "The Rune-laden Scales now provide you 3 armor, even against piercing and attacks that normally ignore armor. When you **_wear the Rune-laden Scales and find yourself at Death’s Door_**, you may mark a consequence before you roll to automatically get a 10+."
+	},
+	"folder": "ArcanaMoves00001"
+}

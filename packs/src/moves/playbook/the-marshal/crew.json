@@ -4,9 +4,7 @@
 	"name": "Crew",
 	"type": "move",
 	"system": {
-		"playbook": "The Marshal",
-		"moveType": "playbook",
-		"isStartingMove": true,
+		"moveType": null,
 		"description": "You've got a crew of stalwarts, six or so residents of Stonetop with some steel to them. See the Crew insert for details.",
 		"slug": "crew"
 	},

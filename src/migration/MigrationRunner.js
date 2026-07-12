@@ -15,6 +15,7 @@ export class MigrationRunner {
 	async run() {
 		info("Running world migration to 0.10.1…");
 		await _migrateResourceFlags();
+		const steadfastDefaults = await _stonetopDefaults();
 		for (const actor of [...(game.actors ?? [])]) {
 			try {
 				if (actor.type === "character") {
@@ -22,7 +23,7 @@ export class MigrationRunner {
 				} else if (actor.type === "npc") {
 					await migrateNpc(actor);
 				} else if (actor.type === "steading") {
-					await migrateSteading(actor);
+					await migrateSteading(actor, steadfastDefaults);
 				}
 			} catch (err) {
 				error(`Migration failed for actor "${actor.name}": ${err.message}`);
@@ -31,6 +32,17 @@ export class MigrationRunner {
 		await migrateWorldItems();
 		info("Migration complete.");
 	}
+}
+
+// What a legacy steading should adopt from the Stonetop steadfast on migration: its granted
+// improvements (what the old repository surfaced to every steading) and its starting attributes (kept
+// as the baseline for the "Starts at …" notes). Empty defaults if the pack/item isn't available.
+async function _stonetopDefaults() {
+	const pack = game.packs?.get("stonetop.steadfasts");
+	if (!pack) return { improvements: [], attributes: {} };
+	const docs = await pack.getDocuments();
+	const sys = docs.find(d => d.system?.slug === "stonetop")?.system;
+	return { improvements: sys?.improvements ?? [], attributes: sys?.attributes ?? {} };
 }
 
 // Pre-0.9.1 resource flag consolidation (kept for anyone skipping intermediate releases)

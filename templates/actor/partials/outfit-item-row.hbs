@@ -10,8 +10,8 @@
 		{{/each}}
 	</span>
 	<span class="stonetop-inv-label">{{name}}
-		{{#if tags}}<span class="stonetop-inv-tags">{{{md tags}}}</span>{{/if}}
-		{{#if note}}<span class="stonetop-inv-note">({{{note}}})</span>{{/if}}
+		{{#if tags.raw}}<span class="stonetop-inv-tags">{{rich tags}}</span>{{/if}}
+		{{#if note.raw}}<span class="stonetop-inv-note">({{rich note}})</span>{{/if}}
 	</span>
 	{{#if resource}}
 	<span class="stonetop-inv-resources">
@@ -19,6 +19,6 @@
 	</span>
 	{{/if}}
 	{{#if isCustom}}
-	<a class="stonetop-inv-delete" data-owned-id="{{ownedId}}" title="{{localize 'stonetop.inventory.removeItem'}}"><i class="fas fa-times"></i></a>
+	<a class="stonetop-inv-delete" data-owned-id="{{ownedId}}" data-name="{{name}}" title="{{localize 'stonetop.inventory.removeItem'}} — {{localize 'stonetop.confirm.deleteHint'}}"><i class="fas fa-times"></i></a>
 	{{/if}}
 </div>

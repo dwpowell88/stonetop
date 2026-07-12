@@ -4,8 +4,7 @@
 	"name": "Wild Soul",
 	"type": "move",
 	"system": {
-		"playbook": "The Blessed",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "Each time you take this move, gain a Ranger move of your choice for which you qualify. You can't pick Improved Stat or Superior Stat.",
 		"repeatMax": 2,
 		"requirement": {

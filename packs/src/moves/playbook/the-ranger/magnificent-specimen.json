@@ -4,8 +4,7 @@
 	"name": "Magnificent Specimen",
 	"type": "move",
 	"system": {
-		"playbook": "The Ranger",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "Each time you take this move, your companion gains 2 additional options of your choice.",
 		"repeatMax": 2,
 		"requirement": {

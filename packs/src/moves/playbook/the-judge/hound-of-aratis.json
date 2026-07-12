@@ -4,8 +4,7 @@
 	"name": "Hound of Aratis",
 	"type": "move",
 	"system": {
-		"playbook": "The Judge",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Seek Insight_**, you can always ask \"What here is tainted by chaos?\" for free, even **on a 6-**.",
 		"slug": "hound-of-aratis"
 	},

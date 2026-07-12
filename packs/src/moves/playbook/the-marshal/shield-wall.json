@@ -4,8 +4,7 @@
 	"name": "Shield Wall",
 	"type": "move",
 	"system": {
-		"playbook": "The Marshal",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_have your crew form a shield wall_**, they Defend with advantage and **_on a 7+_** they hold +2 Readiness (instead of the usual +1 for shields). As long as they maintain formation, they can go on the offensive without losing Readiness.",
 		"slug": "shield-wall"
 	},

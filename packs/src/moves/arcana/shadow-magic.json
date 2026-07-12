@@ -1,0 +1,27 @@
+{
+	"_id": "03978f2b812e73ac",
+	"_key": "!items!03978f2b812e73ac",
+	"name": "Shadow Magic",
+	"type": "move",
+	"system": {
+		"slug": "shadow-magic",
+		"moveType": null,
+		"description": "When you **_hold a Whispering Rock and call out the shadows within_**, choose one thing which you wish to do:\n- Cloak yourself in shadows and silence, moving unseen and unnoticed as long as you draw no attention to yourself and avoid the sun or sacred light\n- Name someone you know or to whom you have an arcane link (hair, clothing, or the like); you can see them, hear them, and whisper to them as if from a nearby shadow\n- Name someone you can see; the nearby shadows ensnare them, doing no harm but hampering their sight and movement Then, roll +CON: **on a 10+**, the effect lasts as long as you wish, but you have disadvantage on all rolls while you maintain it; **on a 7-9**, either mark a consequence and the effect lasts as on a 10+, or the effect flickers out after mere moments (your choice which); **on a 6-**, ask the GM what happens (which may or may not involve marking a consequence).",
+		"rollStat": "con",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "or the effect flickers out after mere moments (your choice which)"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "either mark a consequence and the effect lasts as"
+			},
+			"failure": {
+				"label": "6-",
+				"value": "ask the GM what happens (which may or may not involve marking a consequence)."
+			}
+		}
+	},
+	"folder": "ArcanaMoves00001"
+}

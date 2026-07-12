@@ -3,7 +3,7 @@
   "_key": "!actors!cj7QFDm8yUWIrBis",
   "name": "Novice",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "novice",
     "reference": "barrier-pass",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "",
-    "damage": "staff d8 with disadvantage (close)",
+    "damage": "staff d8 with disadvantage (_close_)",
     "specialQuality": "unreliable spirit sight",
     "instinct": {
       "selected": [

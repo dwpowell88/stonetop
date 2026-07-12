@@ -3,7 +3,7 @@
   "_key": "!actors!lDWX9IDiocyh4pzo",
   "name": "Cavalry",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "cavalry",
     "reference": "lygos-and-the-south",
@@ -23,7 +23,7 @@
       "max": 10
     },
     "armor": "2 (shield, iron scale)",
-    "damage": "iron-tipped long spear d6+4 (reach, forceful), or sword d6+4 (close, forceful), or bow d6 (far)",
+    "damage": "iron-tipped long spear d6+4 (_reach_, _forceful_), or sword d6+4 (_close_, _forceful_), or bow d6 (_far_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

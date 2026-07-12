@@ -2,7 +2,7 @@
 	"_id": "q6rtLEUNcSqqcEbC",
 	"_key": "!items!q6rtLEUNcSqqcEbC",
 	"name": "The Mighty Servant",
-	"type": "npc",
+	"type": "follower",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
 		"slug": "the-mighty-servant",
@@ -36,7 +36,7 @@
 		"moves": "- living stone, tireless",
 		"cost": {
 			"selected": [
-				"wonder, excitement, joy, discovery (Loyalty ◯◯◯)"
+				"wonder, excitement, joy, discovery"
 			],
 			"options": [],
 			"multi": false,

@@ -3,7 +3,7 @@
   "_key": "!actors!6yuIWlaZaMAWqW0o",
   "name": "Kleztigr",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "kleztigr",
     "reference": "the-steplands",
@@ -25,7 +25,7 @@
       "max": 16
     },
     "armor": "1 (reflexes)",
-    "damage": "huge saber-like fangs d10+3 w/ advantage (hand, grabby, messy, 1 piercing), claws or pounce d10+1 w/ advantage (close)",
+    "damage": "huge saber-like fangs d10+3 w/ advantage (_hand_, _grabby_, _messy_, 1 piercing), claws or pounce d10+1 w/ advantage (_close_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

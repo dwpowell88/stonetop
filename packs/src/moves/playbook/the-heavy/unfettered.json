@@ -4,8 +4,7 @@
 	"name": "Unfettered",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_are subject to physical or mental restraint_**, you may mark a debility to immediately break free of that restraint.",
 		"slug": "unfettered"
 	},

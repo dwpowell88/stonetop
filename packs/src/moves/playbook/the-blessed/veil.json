@@ -4,8 +4,7 @@
   "name": "Veil",
   "type": "move",
   "system": {
-    "playbook": "The Blessed",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_wrap yourself or another in a subtle veil_**, spend 1 Stock and choose 1:\n\n- A type of being you name (including \"people\") will tend to ignore your presence\n- People will perceive you as someone else, though you must wear something of an individual's in order to impersonate them\nWhen **_your deception comes under scrutiny_**, roll +INT.",
     "moveResults": {
       "success": {

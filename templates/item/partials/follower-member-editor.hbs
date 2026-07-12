@@ -1,0 +1,33 @@
+{{!-- Editor for one group-follower member. Fields save through the .follower-member-field change
+      handler (data-index + data-field, dotted e.g. "hp.max"); the members array is rewritten whole.
+      tags/traits are comma-separated free text (parsed to arrays on save). Params: member, index,
+      editable. --}}
+<div class="follower-member-row" data-index="{{index}}">
+	<div class="follower-member-top">
+		<input type="text" class="follower-member-field" data-index="{{index}}" data-field="name"
+		       value="{{member.name}}" placeholder="{{localize 'stonetop.followers.memberName'}}"
+		       {{#unless editable}}disabled{{/unless}}>
+		<span class="stonetop-follower-label">{{localize "stonetop.followers.hp"}}</span>
+		<input type="number" min="0" class="follower-member-field" data-index="{{index}}" data-field="hp.value"
+		       value="{{member.hp.value}}" {{#unless editable}}disabled{{/unless}}>
+		<span>/</span>
+		<input type="number" min="0" class="follower-member-field" data-index="{{index}}" data-field="hp.max"
+		       value="{{member.hp.max}}" {{#unless editable}}disabled{{/unless}}>
+		{{#if editable}}
+		<button type="button" class="follower-member-up"     data-index="{{index}}" title="↑">↑</button>
+		<button type="button" class="follower-member-down"   data-index="{{index}}" title="↓">↓</button>
+		<button type="button" class="follower-member-remove" data-index="{{index}}"
+		        title="{{localize 'stonetop.followers.removeMember'}}">✕</button>
+		{{/if}}
+	</div>
+	<label class="follower-member-line">
+		<span class="stonetop-follower-label">{{localize "stonetop.followers.tags"}}</span>
+		<input type="text" class="follower-member-field" data-index="{{index}}" data-field="tags"
+		       value="{{member.tagsText}}" {{#unless editable}}disabled{{/unless}}>
+	</label>
+	<label class="follower-member-line">
+		<span class="stonetop-follower-label">{{localize "stonetop.followers.traits"}}</span>
+		<input type="text" class="follower-member-field" data-index="{{index}}" data-field="traits"
+		       value="{{member.traitsText}}" {{#unless editable}}disabled{{/unless}}>
+	</label>
+</div>

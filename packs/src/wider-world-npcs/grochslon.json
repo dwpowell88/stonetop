@@ -3,7 +3,7 @@
   "_key": "!actors!9m2KDpalZE4CBx6l",
   "name": "Grochslon",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "grochslon",
     "reference": "the-steplands",
@@ -22,8 +22,8 @@
       "max": 12
     },
     "armor": "0",
-    "damage": "outer jaws d10 (close, grabby), inner jaws d10+2 (hand, messy, 1 piercing)",
-    "specialQuality": "blind senses prey by scent, hearing, vibrations",
+    "damage": "outer jaws d10 (_close_, _grabby_), inner jaws d10+2 (_hand_, _messy_, 1 piercing)",
+    "specialQuality": "blind; senses prey by scent, hearing, vibrations",
     "instinct": {
       "selected": [
         "to feed on the unwary, then flee"
@@ -32,7 +32,7 @@
       "multi": false,
       "allowCustom": true
     },
-    "moves": "- Lurk unseen in a dark, sheltered spot\n- Spring forward without warning, chomping down\n- Hold tight with outer jaws while tearing away with the inner\n- Squirm through a narrow opening\n\nPale, eyeless things that spawn in the lightless lakes below the Steplands.  Like a great big pale salamander or snake with two stubby, muscular legs. As they grow, they find food down there sparse, and make their way to the surface. Mostly they stick to cave mouths, but sometimes—sometimes—they get bold enough to leave their sheltered holes of rock, and they find other places to lurk, places where you’d never expect them.",
+    "moves": "- Lurk unseen in a dark, sheltered spot\n- Spring forward without warning, chomping down\n- Hold tight with outer jaws while tearing away with the inner\n- Squirm through a narrow opening\n\nPale, eyeless things that spawn in the lightless lakes below the Steplands. Like a great big pale salamander or snake with two stubby, muscular legs. As they grow, they find food down there sparse, and make their way to the surface. Mostly they stick to cave mouths, but sometimes—sometimes—they get bold enough to leave their sheltered holes of rock, and they find other places to lurk, places where you’d never expect them.",
     "description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.DBEagy54rlf52AOz]{The Steplands} (Book p.372-381)",
     "notes": ""
   },

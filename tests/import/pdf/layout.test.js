@@ -14,6 +14,31 @@ const article = (name, opts) => {
 	return { ...doc, body: renderHtml(doc) };
 };
 
+describe("extractArticle — an indented bullet does not absorb flush prose below it", () => {
+	// An arcanum's "◇ , magical" tags line is indented; the description prose sits flush at the column
+	// base just below it. The flush prose is a new paragraph, not a wrap of the indented bullet.
+	const mk = (text, x, y, font = "ACaslonPro-Regular", size = 9) =>
+		({ bbox: [x, y, x + 200, y + size], text, font, size, spans: [{ font, size, text }] });
+	const page = { width: 1224, height: 792, lines: [
+		mk("A test item", 80, 100, "Avara-Bold", 13),
+		mk("◇ , magical", 98, 112),
+		mk("Flush description prose that is its own paragraph.", 36, 124),
+		mk("It continues at the base.", 36, 135),
+	] };
+	const blocks = extractArticle([page], { title: "T" }).sections[0].left.flatMap((c) => c.blocks);
+
+	it("keeps the indented ◇ tags line as a one-item list (no prose merged in)", () => {
+		const list = blocks.find((b) => b.type === "list");
+		const text = list.items[0].map((l) => l.text).join(" ");
+		expect(list.items).toHaveLength(1);
+		expect(text).toContain("magical");
+		expect(text).not.toContain("Flush description");
+	});
+	it("keeps the flush prose as a separate paragraph", () => {
+		expect(blocks.some((b) => b.type === "para" && b.lines.some((l) => /Flush description/.test(l.text)))).toBe(true);
+	});
+});
+
 describe("extractArticle — The Crombil (prose + stat block)", () => {
 	const r = article("crombil", { title: "The Crombil" });
 

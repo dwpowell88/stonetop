@@ -1,0 +1,12 @@
+{
+	"_id": "f6b87b768b3e2cb2",
+	"_key": "!items!f6b87b768b3e2cb2",
+	"name": "Whispers",
+	"type": "move",
+	"system": {
+		"slug": "whispers",
+		"moveType": null,
+		"description": "When you **_grip the shaft of the Twisted Spear_**, you can ask the GM, \"What spirits are active here?\" and get an honest answer."
+	},
+	"folder": "ArcanaMoves00001"
+}

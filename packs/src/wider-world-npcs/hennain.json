@@ -3,7 +3,7 @@
   "_key": "!actors!TYLshFec1A0be6lO",
   "name": "Hennain",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "hennain",
     "reference": "spirits-of-the-wild",
@@ -27,7 +27,7 @@
       "max": 31
     },
     "armor": "4 (woody, no vital organs)",
-    "damage": "walloping branches d12+5 (close, reach, area, forceful)",
+    "damage": "walloping branches d12+5 (_close_, _reach_, _area_, _forceful_)",
     "specialQuality": "tethered to its tree",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!jOprn80MjqZvWrAP",
   "name": "Suarachan singers",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "suarachan-singers",
     "reference": "ferriers-fen",
@@ -21,7 +21,7 @@
       "max": 3
     },
     "armor": "0",
-    "damage": "fists and bite d6 w/ disadvantage (hand), snapping tongue d4 w/ disad- vantage (reach)",
+    "damage": "fists and bite d6 w/ disadvantage (_hand_), snapping tongue d4 w/ disad- vantage (_reach_)",
     "specialQuality": "excellent night vision, salt burns their skin, mutations",
     "instinct": {
       "selected": [

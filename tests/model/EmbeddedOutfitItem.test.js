@@ -43,12 +43,12 @@ describe("EmbeddedOutfitItemBuilder", () => {
 		expect(item.system.inventoryColumn).toBe("regular");
 	});
 
-	it("stores tags in system.tags", () => {
-		expect(makeItem({ tags: "hand, thrown" }).system.tags).toBe("hand, thrown");
+	it("stores tags in system.tagList", () => {
+		expect(makeItem({ tags: "hand, thrown" }).system.tagList).toBe("hand, thrown");
 	});
 
-	it("defaults tags to empty string", () => {
-		expect(makeItem().system.tags).toBe("");
+	it("defaults tagList to empty string", () => {
+		expect(makeItem().system.tagList).toBe("");
 	});
 
 	it("stores note in system.note", () => {

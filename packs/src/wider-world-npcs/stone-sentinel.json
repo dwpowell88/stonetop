@@ -3,7 +3,7 @@
   "_key": "!actors!O9kGJvh3w4NXFtH3",
   "name": "Stone sentinel",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "stone-sentinel",
     "reference": "stone-lords",
@@ -23,7 +23,7 @@
       "max": 24
     },
     "armor": "3 (made of stone)",
-    "damage": "crushing fists d10+3 (hand, close, grabby, messy, forceful, 3 piercing)",
+    "damage": "crushing fists d10+3 (_hand_, _close_, _grabby_, _messy_, _forceful_, 3 piercing)",
     "specialQuality": "can animate for only a few minutes at a time; dog-like mind; blind; tremorsense",
     "instinct": {
       "selected": [

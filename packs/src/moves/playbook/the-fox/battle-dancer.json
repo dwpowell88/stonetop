@@ -4,8 +4,7 @@
 	"name": "Battle Dancer",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_roll +DEX to Clash_**, on a 12+ you deal your damage, avoid your enemy's attack, and impress/embarrass/overawe your foes.",
 		"requirement": {
 			"level": 6,

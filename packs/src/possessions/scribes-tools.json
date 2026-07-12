@@ -11,7 +11,7 @@
 		"resource": null,
 		"outfitItems": [
 			{
-				"slug": "scribe-notebook",
+				"slug": "notebook",
 				"name": "Notebook",
 				"weight": 1,
 				"inventoryColumn": "regular"

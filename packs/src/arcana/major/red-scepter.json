@@ -8,12 +8,7 @@
 		"slug": "red-scepter",
 		"front": {
 			"title": "Red Scepter",
-			"item": {
-				"name": "Red Scepter",
-				"weight": 1,
-				"note": "magical",
-				"inventoryColumn": null
-			},
+			"item": null,
 			"description": "A bronze rod, tipped with a glowing red crystal and carved with openwork shapes of hungry, leering faces.",
 			"unlock": {
 				"slug": "red-scepter",
@@ -22,28 +17,46 @@
 						"type": "entry",
 						"content": {
 							"title": null,
-							"text": "When you **_hold the Scepter and wind blows through the openings in the crystal_**, It makes a soft howling noise."
+							"text": "When you **_hold the Scepter and wind blows through the openings in the crystal_**, it makes a soft howling noise."
 						}
 					},
 					{
 						"type": "entry",
 						"content": {
 							"title": null,
-							"text": "When you **_gesture at an open flame with the scepter_**, The flame flickers or flares as if blown by the wind."
+							"text": "When you **_gesture at an open flame with the scepter_**, the flame flickers or flares as if blown by the wind."
 						}
 					},
 					{
 						"type": "entry",
 						"content": {
 							"title": null,
-							"text": "When you **_bleed a helpless, living creature and dip the Scepter's crystal in their still-warm blood_**, Mark 1 charge as the crystal soaks up the blood (to a maximum of 3). ◇◇◇"
+							"text": "When you **_bleed a helpless, living creature and dip the Scepter’s crystal in their still-warm blood_**, mark 1 charge as the crystal soaks up the blood (to a maximum of 3):\n\n**INFLAME** When you **_wield the Scepter and incite an individual to violent action_**, you may erase 1 charge to roll +CHA: **on a 10+**, they must pick 1 from the list below; **on a 7-9**, they may choose to either lash out violently against a target of their choice or choose 1 from the list below.\n- Act as you suggest, without doubt or fear, dealing +1d4 damage while they do so\n- Resist, but suffer painful burns (2d4 damage, ignores armor)."
 						}
 					},
 					{
 						"type": "entry",
 						"content": {
 							"title": null,
-							"text": "When you **_inflame_**, When you **wield the Scepter and incite an individual to violent action**, you may erase 1 charge to roll +CHA: **on a 10+**, they must pick 1 from the list below; **on a 7-9**, they may choose to either lash out violently against a target of their choice or choose 1 from the list below.\n\n- Act as you suggest, without doubt or fear, dealing +1d4 damage while they do so\n- Resist, but suffer painful burns (2d4 damage, ignores armor).\nWhen you **Inflame someone and they kill one or more living beings as a result**, mark 1."
+							"text": "When you **_Inflame someone and they kill one or more living beings as a result_**, mark 1:"
+						}
+					},
+					{
+						"type": "entry",
+						"content": {
+							"title": null,
+							"text": "When you **_make the last mark_**, you unlock the Scepter’s mysteries and gain Burning Hatred (see reverse)."
+						}
+					},
+					{
+						"type": "entry",
+						"content": {
+							"title": null,
+							"text": "*, magical*"
+						},
+						"slug": "magical",
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -62,22 +75,14 @@
 		},
 		"back": {
 			"title": "Mysteries of the Red Scepter",
+			"item": null,
 			"description": null,
 			"resource": null,
 			"itemSameAsFront": true,
 			"choices": null,
-			"moves": [
-				{
-					"id": "burning-hatred",
-					"name": "Burning Hatred",
-					"subtitle": "near, magical, reload",
-					"text": "When you **point the Red Scepter at an object of your hatred and erase 1 charge**, roll +CHA: **on a 10+**, the Scepter deals 2d4 damage (*messy*, ignores armor), manifested as blistering burns; **on a 7-9**, as a 10+ but pick 1:\n\n- Mark a consequence\n- Spend a few seconds chanting and muttering before dealing damage\n- Cause any exposed, combustible items in range to burst into flames\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence).\n\nWhen you **mark 3 Consequences**, you gain Fanning the Flames."
-				},
-				{
-					"id": "fanning-the-flames",
-					"name": "Fanning the Flames",
-					"text": "When you **use Inflame**, you can incite everyone who can hear you into violent action, not just an individual. If you do, roll once for the entire crowd, but each target makes their own choices. **On a 7-9**, you must also choose a Consequence; **on a 6-**, the GM chooses a Consequence for you in addition to whatever else happens.\n\nWhen you **use Burning Hatred**, you can mark a consequence to target not just the person or thing you hate but also everything near them. Roll +CHA once but roll damage for each victim. Any combustibles on your targets also erupt into flame."
-				}
+			"moveSlugs": [
+				"burning-hatred",
+				"fanning-the-flames"
 			],
 			"consequences": {
 				"slug": "consequences",
@@ -87,7 +92,10 @@
 						"slug": "scepter-c1",
 						"content": {
 							"title": null,
-							"text": "Your skin becomes feverish. You always feel hot and can't bear to wear *warm* gear."
+							"text": "Your skin becomes feverish. You always feel hot and can’t bear to wear *warm* gear."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -96,6 +104,9 @@
 						"content": {
 							"title": null,
 							"text": "Your eyes change, glowing like fiery embers. They flare with your temper."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -103,7 +114,10 @@
 						"slug": "scepter-c3",
 						"content": {
 							"title": null,
-							"text": "The crystal tip of the Scepter cracks, and you cannot use the Scepter's powers until you have \"fed\" the Scepter another chunk of red crystal, one at least the size of your fist."
+							"text": "The crystal tip of the Scepter cracks, and you cannot use the Scepter’s powers until you have \"fed\" the Scepter another chunk of red crystal, one at least the size of your fist."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -112,6 +126,9 @@
 						"content": {
 							"title": null,
 							"text": "To gain any future charge, the victim you bleed must be awake and terrified."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -120,6 +137,9 @@
 						"content": {
 							"title": null,
 							"text": "To gain any future charge, the blood-letting must be brutal, messy, and wanton."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -127,7 +147,10 @@
 						"slug": "scepter-c6",
 						"content": {
 							"title": null,
-							"text": "Henceforth, when you **incite someone to violence with the Scepter and they act as you suggest**, they lose themselves to primal bloodlust. They feel no pain and revel in carnage until they are killed, restrained, or crippled."
+							"text": "Henceforth, when you **_incite someone to violence with the Scepter and they act as you suggest_**, they lose themselves to primal bloodlust. They feel no pain and revel in carnage until they are killed, restrained, or crippled."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -135,7 +158,10 @@
 						"slug": "scepter-c7",
 						"content": {
 							"title": null,
-							"text": "When you **use Burning Hatred**, something on your person or within reach also catches fire."
+							"text": "When you **_use Burning Hatred_**, something on your person or within reach also catches fire."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -144,6 +170,9 @@
 						"content": {
 							"title": null,
 							"text": "You always hear a dim howling in the back of your mind. When the wind blows, the howling grows in volume, making it difficult to hear anything other than insults or plans to commit violence."
+						},
+						"track": {
+							"max": 1
 						}
 					},
 					{
@@ -151,12 +180,15 @@
 						"slug": "scepter-c9",
 						"content": {
 							"title": null,
-							"text": "When you **Persuade using anything other than threats, pain, or violence**, the best you can get is a 7-9."
+							"text": "When you **_Persuade using anything other than threats, pain, or violence_**, the best you can get is a 7-9."
+						},
+						"track": {
+							"max": 1
 						}
 					}
 				]
 			},
-			"unlockAt": null
+			"unlockAt": 4
 		},
 		"major": true
 	},

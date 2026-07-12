@@ -1,7 +1,7 @@
 {
   "_id": "y3RtRdOWxLinZu5e",
   "_key": "!items!y3RtRdOWxLinZu5e",
-  "img": "stonetop-art/playbooks/the-judge.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-judge.png",
   "name": "The Judge",
   "type": "playbook",
   "flags": {},
@@ -94,15 +94,15 @@
       }
     ],
     "specialPossessions": {
-      "pickNote": "Pick 1, in addition to your symbol of authority and scribe's kit",
+      "pickNote": "Pick 1, in addition to your symbol of authority and scribe's tools",
       "pickCount": 1,
       "preselected": [
         "symbol-of-authority",
-        "scribes-kit"
+        "scribes-tools"
       ],
       "slugs": [
         "symbol-of-authority",
-        "scribes-kit",
+        "scribes-tools",
         "aviary",
         "carpenters-tools",
         "engineers-tools",
@@ -646,6 +646,39 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "a-bundle-of-sticks-unbroken",
+      "a-mighty-rampart",
+      "aegis-of-faith",
+      "armistice",
+      "armored",
+      "bear-witness",
+      "binding-arbitration",
+      "break-bread",
+      "bulwark",
+      "castigate",
+      "censure",
+      "chronicler-of-stonetop",
+      "condemn",
+      "for-the-greater-good",
+      "hound-of-aratis",
+      "improved-stat",
+      "knowledge-is-power",
+      "like-a-dog-with-a-bone",
+      "many-hands-make-light-work",
+      "mirrorshield",
+      "proclamation",
+      "superior-stat",
+      "the-hammer-and-the-book",
+      "the-tower-eternal",
+      "truth-or-consequences",
+      "vision-unclouded",
+      "well-read"
+    ],
+    "startingMoves": [
+      "censure",
+      "chronicler-of-stonetop"
+    ]
   }
 }

@@ -3,7 +3,7 @@
   "_key": "!actors!BLZ2vmyHSoctJXyg",
   "name": "Anan Gllo",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "anan-gllo",
     "reference": "death-and-the-undying",
@@ -25,7 +25,7 @@
       "max": 11
     },
     "armor": "5 (resilience, armor), 1 vs. bronze or fire",
-    "damage": "weapon d6 (tags by weapon) or crushing grip d4 (hand, grabby)",
+    "damage": "weapon d6 (tags by weapon) or crushing grip d4 (_hand_, _grabby_)",
     "specialQuality": "weaken over time (see below)",
     "instinct": {
       "selected": [

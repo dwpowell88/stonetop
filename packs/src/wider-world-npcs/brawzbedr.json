@@ -3,7 +3,7 @@
   "_key": "!actors!3HAcBrTg7IuP3RqP",
   "name": "Brawzbedr",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "brawzbedr",
     "reference": "the-steplands",
@@ -23,8 +23,8 @@
       "max": 24
     },
     "armor": "3 (thick hide, boney nodules)",
-    "damage": "tree-rending claws d10+7 w/ disadvantage (reach, close, forceful, messy, 1 piercing)",
-    "specialQuality": "poor vision and hearing  excellent sense of smell",
+    "damage": "tree-rending claws d10+7 w/ disadvantage (_reach_, _close_, _forceful_, _messy_, 1 piercing)",
+    "specialQuality": "poor vision and hearing; excellent sense of smell",
     "instinct": {
       "selected": [
         "to overreact"

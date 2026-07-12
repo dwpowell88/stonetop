@@ -1,0 +1,12 @@
+{
+	"_id": "a65ec7d2ea4e7ffd",
+	"_key": "!items!a65ec7d2ea4e7ffd",
+	"name": "We Are as One",
+	"type": "move",
+	"system": {
+		"slug": "we-are-as-one",
+		"moveType": null,
+		"description": "You can sense, speak, and even work magic through the effigy as though it were an extension of yourself. (It remains inanimate.)"
+	},
+	"folder": "ArcanaMoves00001"
+}

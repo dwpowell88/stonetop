@@ -3,7 +3,7 @@
   "_key": "!actors!I500LCdBq0tqKuQz",
   "name": "Singing sword",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "singing-sword",
     "reference": "forge-lords",
@@ -24,7 +24,7 @@
       "max": 19
     },
     "armor": "4 (quick, made of metal)",
-    "damage": "cut, thrust, slash d10 w/advantage (hand, messy, 2 piercing)",
+    "damage": "cut, thrust, slash d10 w/advantage (_hand_, _messy_, 2 piercing)",
     "specialQuality": "flies, fireproof, blind, heat-sense, bound to its hall",
     "instinct": {
       "selected": [

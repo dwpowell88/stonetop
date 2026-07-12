@@ -4,8 +4,7 @@
 	"name": "Big Magic",
 	"type": "move",
 	"system": {
-		"playbook": "The Blessed",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "Each time you take this move, choose an additional remarkable trait for your sacred pouch and increase your max Stock by 2.",
 		"repeatMax": 2,
 		"slug": "big-magic"

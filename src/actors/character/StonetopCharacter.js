@@ -32,11 +32,11 @@ export class StonetopCharacter {
 		this._background  = new CharacterBackgrounds(actor, factory, this._resourceController);
 		this._moves       = new CharacterMoves(repos.moves, actor, new ResourceController(actor, "moveResources"), factory);
 		this._playbook    = new CharacterPlaybook(actor, this._background, factory, this._origin);
-		this._possessions = new CharacterPossessions(actor, this._moves, outfitItems, repos.possessions);
+		this._possessions = new CharacterPossessions(actor, this._moves, outfitItems, repos.possessions, factory);
 		this._inventory   = new CharacterInventory(actor, repos.inventory, outfitItems, this._resourceController, repos.steading);
 		this._vitals      = new CharacterVitals(actor);
 		this._debilities  = new CharacterDebilities(actor);
-		this._arcana      = new CharacterArcana(actor, repos.arcana, this._stats, outfitItems, this._followers, factory);
+		this._arcana      = new CharacterArcana(actor, repos.arcana, this._stats, outfitItems, this._followers, factory, this._moves);
 		this._inserts     = new CharacterInserts(actor, factory, this._moves, repos.inserts);
 		this._playbook.setVitals(this._vitals);
 		this._playbook.setMoves(this._moves);
@@ -136,6 +136,10 @@ export class StonetopCharacter {
 		await this._moves.setMoveResourceCurrent(moveSlug, current);
 	}
 
+	async setMoveResourceText(moveSlug, value) {
+		await this._moves.setMoveResourceText(moveSlug, value);
+	}
+
 	async addCustomInventoryItem(name, weight) {
 		await this._inventory.addCustomItem(name, weight);
 	}
@@ -197,9 +201,10 @@ export class StonetopCharacter {
 			const existing = [...this._actor.items].find(i => i.type === "playbook");
 			if (existing) await this._actor.deleteEmbeddedDocuments("Item", [existing._id]);
 		}
-		const followers = items.filter(i => i.type === "npc");
+		// "npc" tolerated alongside "follower" for a dropped pre-migration follower item.
+		const followers = items.filter(i => i.type === "follower" || i.type === "npc");
 		const moves = items.filter(i => i.type === "move");
-		const others = items.filter(i => i.type !== "move" && i.type !== "npc");
+		const others = items.filter(i => i.type !== "move" && i.type !== "follower" && i.type !== "npc");
 		let anyAdded = false;
 		for (const item of followers) {
 			const slug = item.system?.slug;
@@ -294,16 +299,27 @@ export class StonetopCharacter {
 		await this._arcana.unflipArcanum(slug);
 	}
 
-	async setArcanumBackChoiceValue(arcanumSlug, optionSlug, count) {
-		await this._arcana.setBackChoiceValue(arcanumSlug, optionSlug, count);
+	// Generic arcana choice-group writes: the sheet routes every arcanum choice row here off the
+	// `.stonetop-arcanum-card` wrapper (like inserts route off `data-insert-item-id`), passing the
+	// group's own slug — no per-group context strings.
+	async setArcanumChoiceCount(arcanumSlug, groupSlug, optionSlug, count) {
+		await this._arcana.setChoiceCount(arcanumSlug, groupSlug, optionSlug, count);
 	}
 
-	async setArcanumUnlockPick(arcanumSlug, optionSlug, siblingsCsv) {
-		await this._arcana.setUnlockPick(arcanumSlug, optionSlug, siblingsCsv);
+	async selectArcanumChoice(arcanumSlug, groupSlug, optionSlug, siblingsCsv) {
+		await this._arcana.selectChoice(arcanumSlug, groupSlug, optionSlug, siblingsCsv);
 	}
 
-	async setArcanumUnlockText(arcanumSlug, optionSlug, text) {
-		await this._arcana.setUnlockText(arcanumSlug, optionSlug, text);
+	async setArcanumChoiceText(arcanumSlug, groupSlug, optionSlug, text) {
+		await this._arcana.setChoiceText(arcanumSlug, groupSlug, optionSlug, text);
+	}
+
+	async setArcanumBlank(arcanumSlug, key, text) {
+		await this._arcana.setBlankValue(arcanumSlug, key, text);
+	}
+
+	getArcanumBlanks(arcanumSlug) {
+		return this._arcana.getBlanks(arcanumSlug);
 	}
 
 	async setBackgroundResource(slug, count) {
@@ -312,8 +328,6 @@ export class StonetopCharacter {
 
 	async setChoiceCount(context, group, option, count) {
 		switch (context) {
-			case "arcana-unlock":
-				return await this._arcana.setUnlockCount(group, option, count);
 			case "playbook-choice":
 			case "lore":
 			case "intro-npc":
@@ -339,8 +353,6 @@ export class StonetopCharacter {
 				return await this._followers.setChoiceValue(group, "choices", option, siblingsCsv);
 			case "background":
 				return this._background.setChoiceValue(group, option, checked ? 1 : 0);
-			case "arcana-unlock":
-				return await this._arcana.setUnlockPick(group, option, siblingsCsv);
 		}
 	}
 
@@ -355,8 +367,6 @@ export class StonetopCharacter {
 				return await this._followers.setChoiceText(group, option, value);
 			case "move":
 				return await this._moves.setMoveChoiceText(group, option, value);
-			case "arcana-unlock":
-				return await this._arcana.setUnlockText(group, option, value);
 		}
 	}
 
@@ -492,6 +502,14 @@ export class StonetopCharacter {
 
 	async setFollowerNotes(slug, notes) {
 		await this._followers.setNotes(slug, notes);
+	}
+
+	async setFollowerSpecialQuality(slug, specialQuality) {
+		await this._followers.setSpecialQuality(slug, specialQuality);
+	}
+
+	async setFollowerDescription(slug, description) {
+		await this._followers.setDescription(slug, description);
 	}
 
 	async setFollowerDamage(slug, damage) {

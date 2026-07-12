@@ -3,7 +3,7 @@
   "_key": "!actors!lOdWFqQAxh5x5p0v",
   "name": "Coedwaig",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "coedwaig",
     "reference": "spirits-of-the-wild",
@@ -23,7 +23,7 @@
       "max": 5
     },
     "armor": "2 (bark, no vital organs)",
-    "damage": "nasty thorns d6 (hand, grabby)",
+    "damage": "nasty thorns d6 (_hand_, _grabby_)",
     "specialQuality": "thorns all over, to touch them is to bleed",
     "instinct": {
       "selected": [

@@ -14,6 +14,10 @@ const SAMPLES = [
 	{ name: "aratis", range: "12-13" },
 	{ name: "crombil", range: "32" },
 	{ name: "marshedge", range: "138-140" },
+	// Minor-arcana spreads with follower stat blocks: a messy one (tulpa/unliving — cost bleeds into a
+	// track, multi-instinct, a personality line) and a clean one (bronze-protector). For follower tests.
+	{ name: "arcana-unliving-tulpa", range: "263-264" },
+	{ name: "arcana-bronze-protector", range: "267" },
 ];
 
 for (const { name, range } of SAMPLES) {

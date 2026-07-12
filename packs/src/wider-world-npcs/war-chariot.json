@@ -3,7 +3,7 @@
   "_key": "!actors!hCyaQbTgdzVj1hro",
   "name": "War-chariot",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "war-chariot",
     "reference": "north-manmarch",
@@ -22,7 +22,7 @@
       "max": 13
     },
     "armor": "1 (wood/iron construction)",
-    "damage": "trample and wheel-scythes d8+5 (hand, close, forceful, messy, 1 piercing), or iron battleaxe d8+3 (close, messy, forceful), or long bow d8 (far)",
+    "damage": "trample and wheel-scythes d8+5 (_hand_, _close_, _forceful_, _messy_, 1 piercing), or iron battleaxe d8+3 (_close_, _messy_, _forceful_), or long bow d8 (_far_)",
     "specialQuality": "pulled by two tonner- horns; carries a driver, two warriors",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!86iSeHyXE0JX8cTV",
   "name": "Fanatic",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "fanatic",
     "reference": "helior-the-daybringer",

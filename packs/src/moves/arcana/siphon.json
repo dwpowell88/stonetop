@@ -1,0 +1,27 @@
+{
+	"_id": "cbd4510ea81d793c",
+	"_key": "!items!cbd4510ea81d793c",
+	"name": "Siphon",
+	"type": "move",
+	"system": {
+		"slug": "siphon",
+		"moveType": null,
+		"description": "When you **_raise your ringed hand and will the ring to consume someone’s life-force_** (at up to *reach* range), roll +CON: **on a 10+**, deal 1d10 damage (*grabby*, ignores armor); **on a 7-9**, deal 1d10 damage (ignores armor) but choose one:\n- The ring eats at your life-force, too—lose 1d10 HP and mark a debility\n- Mark a consequence\n\n**On a 6-**, the GM says what happens (which may or may not involve marking a consequence).",
+		"rollStat": "con",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "deal 1d10 damage (*grabby*, ignores armor)"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "deal 1d10 damage (ignores armor) but choose one:"
+			},
+			"failure": {
+				"label": "6-",
+				"value": "the GM says what happens (which may or may not involve marking a consequence)."
+			}
+		}
+	},
+	"folder": "ArcanaMoves00001"
+}

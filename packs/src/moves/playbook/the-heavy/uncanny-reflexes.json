@@ -4,9 +4,7 @@
 	"name": "Uncanny Reflexes",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
-		"isStartingMove": false,
+		"moveType": null,
 		"description": "When you **_are unarmored and carrying a normal or light load_**, you impose disadvantage on any damage you take that you could dodge or roll with.",
 		"slug": "uncanny-reflexes"
 	},

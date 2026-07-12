@@ -12,19 +12,6 @@ export class FakeMoveRepository {
 
 	addWorld(item) { this._worldStore.add(item); return this; }
 
-	async getPlaybookMoves(playbookName) {
-		const world = await this._worldStore.filterEntries(
-			e => e.system?.moveType === "playbook" && e.system?.playbook === playbookName
-		);
-		return [...this._playbookMoves, ...world].map(m => new Move(m));
-	}
-
-	async getPlaybookMoveDocument(id) {
-		return this._playbookMoves.find(m => m._id === id)
-			?? await this._worldStore.getDocument(id)
-			?? null;
-	}
-
 	async getMovesByType(moveType) {
 		const world = await this._worldStore.filterEntries(e => e.system?.moveType === moveType);
 		return [...this._basicMoves, ...world]
@@ -36,22 +23,14 @@ export class FakeMoveRepository {
 		return this.getMovesByType("basic");
 	}
 
-	async getBasicMoveDocument(id) {
-		return this._basicMoves.find(m => m._id === id)
-			?? await this._worldStore.getDocument(id)
-			?? null;
-	}
-
 	addBasic(move) {
 		this._basicMoves.push(move);
+		return this;
 	}
 
 	addPlaybook(move) {
 		this._playbookMoves.push(move);
-	}
-
-	async getInsertMoves() {
-		return this._insertMoves.map(m => new Move(m));
+		return this;
 	}
 
 	async getMovesBySlugs(slugs = []) {
@@ -60,7 +39,7 @@ export class FakeMoveRepository {
 		return slugs.map(s => index.get(s)).filter(Boolean);
 	}
 
-	async getInsertMoveDocument(id) {
+	async getReferencedMoveDocument(id) {
 		return this._insertMoves.find(m => m._id === id)
 			?? this._playbookMoves.find(m => m._id === id)
 			?? this._basicMoves.find(m => m._id === id)
@@ -70,12 +49,21 @@ export class FakeMoveRepository {
 
 	addInsertMove(move) {
 		this._insertMoves.push(move);
+		return this;
 	}
 
 	async buildSlugIndex() {
 		const world = await this._worldStore.getAll();
 		const all   = [...this._playbookMoves, ...this._basicMoves, ...this._insertMoves, ...world];
 		return new Map(all.map(m => new Move(m)).map(m => [m.slug, m]));
+	}
+
+	// Slugs of fixture moves flagged `.asStarting()` — lets tests build a container's startingMoves.
+	async startingSlugs() {
+		const world = await this._worldStore.getAll();
+		return [...this._playbookMoves, ...this._basicMoves, ...this._insertMoves, ...world]
+			.filter(m => m._starting)
+			.map(m => m.system?.slug);
 	}
 }
 

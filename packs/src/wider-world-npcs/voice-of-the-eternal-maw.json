@@ -3,7 +3,7 @@
   "_key": "!actors!BNHdXVtOP12ndFM2",
   "name": "Voice of the Eternal Maw",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-water.png",
   "system": {
     "slug": "voice-of-the-eternal-maw",
     "reference": "the-things-below",
@@ -25,7 +25,7 @@
       "max": 19
     },
     "armor": "4 (resilience), 0 vs. bronze",
-    "damage": "scream d10 (near, area, reload, ignores armor) or unnaturally large and toothy maw d10+2 (hand, messy, 3 piercing)",
+    "damage": "scream d10 (_near_, _area_, _reload_, ignores armor) or unnaturally large and toothy maw d10+2 (_hand_, _messy_, 3 piercing)",
     "specialQuality": "tethered to the vortex, unable to leave the mountain",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!EO4CeJao8uLZkSMX",
   "name": "Hand of Daagon",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-water.png",
   "system": {
     "slug": "hand-of-daagon",
     "reference": "the-things-below",
@@ -25,8 +25,8 @@
       "max": 23
     },
     "armor": "4 (resilience), 0 vs. bronze",
-    "damage": "many hands d12+1 (hand, close, grabby, ignores armor)",
-    "specialQuality": "blind tremorsense  reaches through matter like it was water",
+    "damage": "many hands d12+1 (_hand_, _close_, _grabby_, ignores armor)",
+    "specialQuality": "blind; tremorsense; reaches through matter like it was water",
     "instinct": {
       "selected": [
         "to feed the Mouth"

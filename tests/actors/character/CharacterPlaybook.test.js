@@ -6,13 +6,13 @@ import { IntroductionsSnapshot } from "../../../src/model/snapshot/character/Pla
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
 import { FakeMoves } from "../../fakes/FakeMoves.js";
 import { FakeVitals } from "../../fakes/FakeVitals.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { TestPlaybookItemBuilder } from "../../fakes/TestPlaybookItemBuilder.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makeActor(playbookSlug = "the-blessed", items = []) {
-	return new FakeActorBuilder().withPlaybook(playbookSlug).withItems(items).build();
+	return new FakeCharacterActorBuilder().withPlaybook(playbookSlug).withItems(items).build();
 }
 
 class FakeBackground {
@@ -80,7 +80,7 @@ const PLAYBOOK_DATA = { ...PLAYBOOK_ITEM.system, name: PLAYBOOK_ITEM.name, img: 
 
 describe("CharacterPlaybook.getData", () => {
 	it("returns null when actor has no playbook item in actor.items", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		expect(await makePlaybook(actor).getData()).toBeNull();
 	});
 
@@ -109,7 +109,7 @@ describe("CharacterPlaybook.getData", () => {
 
 describe("CharacterPlaybook.buildPlaybookSnapshot", () => {
 	it("returns null when no playbook item in actor.items", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		expect(await makePlaybook(actor).buildPlaybookSnapshot()).toBeNull();
 	});
 
@@ -123,7 +123,7 @@ describe("CharacterPlaybook.buildPlaybookSnapshot", () => {
 		expect(snap.slug).toBe("the-blessed");
 		expect(snap.name).toBe("The Blessed");
 		expect(snap.img).toBe("img.webp");
-		expect(snap.description).toBe("<p>A healer.</p>");
+		expect(snap.description.raw).toBe("<p>A healer.</p>");
 		expect(snap.statsNote).toBe("Assign +2/+1/+1/0/0/-1");
 	});
 
@@ -222,7 +222,7 @@ describe("CharacterPlaybook.buildPlaybookSnapshot", () => {
 	it("snapshot.introductions.step3 holds the playbook-specific text", async () => {
 		const item = new TestPlaybookItemBuilder().withIntroductions(INTRO).build();
 		const snap = await makePlaybook(makeActor("the-blessed", [item])).buildPlaybookSnapshot();
-		expect(snap.introductions.step3).toBe("On your third turn, describe your sacred pouch.");
+		expect(snap.introductions.step3.raw).toBe("On your third turn, describe your sacred pouch.");
 	});
 
 	it("snapshot.introductions.npcGroup is a ChoiceGroup with slug intro-npc", async () => {
@@ -373,7 +373,7 @@ describe("CharacterPlaybook.getBackgroundMoveNames", () => {
 	});
 
 	it("returns empty Set when no playbook item is in actor.items", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		const pb = makePlaybook(actor);
 		expect(await pb.getBackgroundMoveNames("herbalist")).toEqual(new Set());
 	});
@@ -412,7 +412,7 @@ describe("CharacterPlaybook.selectBackground", () => {
 	it("does not increment or decrement moves when no playbook item is in actor.items", async () => {
 		const bg    = new FakeBackground("");
 		const moves = new FakeMoves();
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		const pb = makePlaybook(actor, { background: bg });
 		pb.setMoves(moves);
 		await pb.selectBackground("herbalist");

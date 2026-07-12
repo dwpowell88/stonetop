@@ -10,6 +10,7 @@ import { loadOutline, articleRanges } from "./outline.js";
 import { extractArticle } from "./layout.js";
 import { loadArticlePages } from "./load.js";
 import { parseStatBlock, toNpcDoc, MONSTER_PACK } from "./creatures.js";
+import { markerImg, NPC_DEFAULT_IMG } from "./markers.js";
 import { formatPageRange } from "./pages.js";
 import { toSlug } from "../../../src/utils/slug.js";
 
@@ -35,7 +36,7 @@ for (const f of readdirSync(OUT).filter((n) => n.endsWith(".json"))) rmSync(path
 
 const seen = new Map(); // slug -> source article (to flag cross-article name collisions)
 const flags = [];
-let written = 0;
+let written = 0, iconMatched = 0;
 
 for (const r of ranges) {
 	const slug = toSlug(r.title);
@@ -49,14 +50,18 @@ for (const r of ranges) {
 	for (const sb of statBlocks(art)) {
 		const creature = parseStatBlock(sb.lines);
 		if (!creature.name) { flags.push(`? ${r.title}: stat block with no detected name (hp=${creature.hp.value}) — skipped`); continue; }
-		const doc = toNpcDoc(creature, { article: { slug, title: r.title, page } });
+		// The creature's marker icon (a creature-type glyph) is shipped trade dress; resolve it to that
+		// asset by hash, falling back to the npc default when the stat block has no icon or an unknown one.
+		const marker = markerImg(sb.icon?.file);
+		const doc = toNpcDoc(creature, { article: { slug, title: r.title, page }, img: marker || NPC_DEFAULT_IMG });
 		if (seen.has(doc.system.slug)) { flags.push(`? duplicate "${creature.name}" in ${r.title} (also ${seen.get(doc.system.slug)}) — keeping first`); continue; }
 		seen.set(doc.system.slug, r.title);
 		writeFileSync(path.join(OUT, `${doc.system.slug}.json`), JSON.stringify(doc, null, 2) + "\n");
 		written++;
+		if (marker) iconMatched++;
 	}
 }
 rmSync(tmp, { recursive: true, force: true });
 
-console.log(`\nwrote ${written} npc(s) to ${OUT}/`);
+console.log(`\nwrote ${written} npc(s) to ${OUT}/ (${iconMatched} with a marker icon, ${written - iconMatched} using the npc default)`);
 if (flags.length) console.log(`\n${flags.length} note(s) for review:\n` + flags.join("\n"));

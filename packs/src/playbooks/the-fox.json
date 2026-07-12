@@ -1,7 +1,7 @@
 {
   "_id": "msKRM8oHy6qghCF9",
   "_key": "!items!msKRM8oHy6qghCF9",
-  "img": "stonetop-art/playbooks/the-fox.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-fox.png",
   "name": "The Fox",
   "type": "playbook",
   "flags": {},
@@ -675,6 +675,33 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "all-in-the-wrist",
+      "ambush",
+      "battle-dancer",
+      "burgle",
+      "catlike",
+      "cheap-shot",
+      "dabbler",
+      "danger-sense",
+      "eye-on-the-door",
+      "free-running",
+      "improved-stat",
+      "irresistible",
+      "laugh-at-danger",
+      "light-fingers",
+      "pants-on-fire",
+      "parry-riposte",
+      "perceptive",
+      "rapier-wit",
+      "second-intent",
+      "silver-tongued",
+      "skill-at-arms",
+      "slippery",
+      "superior-stat",
+      "under-your-skin"
+    ],
+    "startingMoves": []
   }
 }

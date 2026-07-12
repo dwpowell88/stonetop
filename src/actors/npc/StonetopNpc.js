@@ -1,5 +1,4 @@
 import { NpcSnapshotBuilder } from "../../model/snapshot/NpcSnapshot.js";
-import { enrichGameText } from "../../utils/enrichGameText.js";
 import { Selection } from "../../model/data/Selection.js";
 
 export class StonetopNpc {
@@ -33,7 +32,9 @@ export class StonetopNpc {
 	async setMoves(value)          { await this._actor.update({ "system.moves": value }); }
 
 	async buildSnapshot() {
-		const snap = new NpcSnapshotBuilder()
+		// Game-text fields are RichText on the snapshot; the sheet's enrichRichTextTree pass enriches
+		// them (one render path). No bespoke enrichHTML here.
+		return new NpcSnapshotBuilder()
 			.withHp(this.hp)
 			.withHpMax(this.maxHp)
 			.withArmor(this.armor)
@@ -47,10 +48,5 @@ export class StonetopNpc {
 			.withTags(this._actor.system?.tagList ?? null)
 			.withMoves(this.moves)
 			.build();
-		const rollData = this._actor.getRollData?.() ?? {};
-		const enrich = raw => enrichGameText(raw, { rollData });
-		[snap.damageHtml, snap.armorHtml, snap.specialQualityHtml, snap.instinctHtml, snap.descriptionHtml, snap.movesHtml] =
-			await Promise.all([this.damage, this.armor, this.specialQuality, this.instinct, this.description, this.moves].map(enrich));
-		return snap;
 	}
 }

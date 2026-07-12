@@ -4,8 +4,7 @@
 	"name": "And Behold a Pale Horse",
 	"type": "move",
 	"system": {
-		"playbook": "The Lightbearer",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_spend the night gazing into a flame_**, ask the GM to reveal an impending doom or grim portent that will come to pass unless you intervene, and how you might yet do so.",
 		"slug": "and-behold-a-pale-horse"
 	},

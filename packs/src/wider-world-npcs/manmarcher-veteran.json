@@ -3,7 +3,7 @@
   "_key": "!actors!YBvEuvDsCu0IVBdh",
   "name": "Manmarcher veteran",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "manmarcher-veteran",
     "reference": "north-manmarch",
@@ -22,7 +22,7 @@
       "max": 3
     },
     "armor": "2 (thick hides, shield)",
-    "damage": "iron battleaxe d6 (close, messy), knife d6 (hand), or javelins d6 (thrown)",
+    "damage": "iron battleaxe d6 (_close_, _messy_), knife d6 (_hand_), or javelins d6 (_thrown_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

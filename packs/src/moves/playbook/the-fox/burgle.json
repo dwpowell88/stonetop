@@ -4,8 +4,7 @@
   "name": "Burgle",
   "type": "move",
   "system": {
-    "playbook": "The Fox",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_sneak off on your own into a dangerous place_**, roll +INT: **_on a 7+_**, you make it back, and the GM says where you got to and what you learned. Then, **on a 10+**, also pick 2; **_on a 7-9_**, also pick 1:\n\n- You got away clean, rousing no suspicion\n- You swiped something valuable (GM's choice)\n- You set something up to exploit on your return\n- Ask a Seek Insight question about what you saw\nOn a 6-, you either make it back but with trouble in tow, or you're missing in action (your call).",
     "moveResults": {
       "success": {

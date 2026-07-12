@@ -3,7 +3,7 @@
   "_key": "!actors!ewUCo5m7rbR2NjvC",
   "name": "Morgais",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "morgais",
     "reference": "the-things-below",
@@ -26,7 +26,7 @@
       "max": 19
     },
     "armor": "1 (lacks organs)",
-    "damage": "watery tendril 1d8 (close, reach, grabby)",
+    "damage": "watery tendril 1d8 (_close_, _reach_, _grabby_)",
     "specialQuality": "tethered to a skull or trinket, deep in its pond",
     "instinct": {
       "selected": [

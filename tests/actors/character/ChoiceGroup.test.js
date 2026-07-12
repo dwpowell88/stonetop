@@ -129,7 +129,7 @@ describe("ChoiceGroup — entry rows (current shape; legacy is handled by migrat
 			list: [{ type: "entry", slug: "my-row", content: { text: "a heading" } }],
 		});
 		expect(group.list[0].type).toBe("entry");
-		expect(group.list[0].content.text).toBe("a heading");
+		expect(group.list[0].content.text.raw).toBe("a heading");
 		expect(group.list[0].followers).toEqual([]);
 	});
 
@@ -149,9 +149,39 @@ describe("ChoiceGroup — entry rows (current shape; legacy is handled by migrat
 			list: [{ type: "entry", slug: "cost", content: { subtitle: "S", subtitleNote: "(p1)", titleNote: "(p2)" }, input: { type: "inline" } }],
 		});
 		const row = group.list[0];
-		expect(row.content.subtitle).toBe("S");
-		expect(row.content.subtitleNote).toBe("(p1)");
-		expect(row.content.titleNote).toBe("(p2)");
+		expect(row.content.subtitle.raw).toBe("S");
+		expect(row.content.subtitleNote.raw).toBe("(p1)");
+		expect(row.content.titleNote.raw).toBe("(p2)");
 		expect(row.input.type).toBe("inline");
+	});
+});
+
+// Drives a choice group's content text from raw pack data through the single enrichRichTextTree pass
+// (the same pass the character/arcanum/steading sheets run) and proves a markdown @UUID link comes
+// out as a real anchor. Only the Foundry enrichHTML boundary is mocked.
+describe("ChoiceGroup — rich-text enrichment (integration)", () => {
+	it("enriches content.{title,text} @UUID/markdown through the one pass", async () => {
+		const { enrichRichTextTree } = await import("../../../src/utils/enrichRichText.js");
+		const group = ChoiceGroup.fromPackData({
+			slug: "ns",
+			list: [{ type: "entry", slug: "row", content: {
+				title: "**Choose**",
+				text:  "see @UUID[JournalEntry.x]{the Barrow}",
+			} }],
+		});
+		const content = group.list[0].content;
+		expect(content.text.raw).toContain("@UUID");   // stored as RichText, not enriched yet
+
+		const orig = foundry.applications.ux.TextEditor.implementation.enrichHTML;
+		foundry.applications.ux.TextEditor.implementation.enrichHTML =
+			async html => html.replace(/@UUID\[[^\]]+\]\{([^}]+)\}/g, '<a class="content-link">$1</a>');
+		try {
+			await enrichRichTextTree(group, {});
+		} finally {
+			foundry.applications.ux.TextEditor.implementation.enrichHTML = orig;
+		}
+
+		expect(content.title.render()).toContain("<strong>Choose</strong>");
+		expect(content.text.render()).toContain('<a class="content-link">the Barrow</a>');
 	});
 });

@@ -91,7 +91,7 @@ export class CharacterInventory {
 				.withSlug(sys.slug ?? i._id)
 				.withName(i.name)
 				.withWeight(sys.weight ?? 1)
-				.withTags(sys.tags ?? "")
+				.withTags(sys.tagList ?? "")
 				.withNote(sys.note ?? null)
 				.withInventoryColumn(sys.inventoryColumn ?? "regular")
 				.withResource(sys.resource ?? null)

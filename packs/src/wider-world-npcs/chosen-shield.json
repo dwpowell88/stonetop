@@ -3,7 +3,7 @@
   "_key": "!actors!PLzOnY4BxpmsJZFE",
   "name": "Chosen shield",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "chosen-shield",
     "reference": "north-manmarch",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "3 (iron hauberk, shield)",
-    "damage": "iron battleaxe d8 (close, messy, 1 piercing), spear d8 (close, thrown, 1 piercing), knife d6 (hand, 1 piercing)",
+    "damage": "iron battleaxe d8 (_close_, _messy_, 1 piercing), spear d8 (_close_, _thrown_, 1 piercing), knife d6 (_hand_, 1 piercing)",
     "specialQuality": "",
     "instinct": {
       "selected": [

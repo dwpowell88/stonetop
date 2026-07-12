@@ -3,7 +3,7 @@
   "_key": "!actors!jscnbPRnQ5h4DWAe",
   "name": "Grwgnach",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "grwgnach",
     "reference": "spirits-of-the-wild",
@@ -24,7 +24,7 @@
       "max": 27
     },
     "armor": "2 (reflexes, swarm)",
-    "damage": "whirlwind of pecks, claws, buffets d8+3 (hand, area, disadvantage)",
+    "damage": "whirlwind of pecks, claws, buffets d8+3 (_hand_, _area_, disadvantage)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { CharacterDebilities } from "../../../src/actors/character/CharacterDebilities.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 
 // -- helpers -------------------------------------------------------------------
 
 function makeDebilityActor({ weakened = false, dazed = false, miserable = false } = {}) {
-	return new FakeActorBuilder()
+	return new FakeCharacterActorBuilder()
 		.withDebility("weakened", weakened)
 		.withDebility("dazed", dazed)
 		.withDebility("miserable", miserable)
@@ -16,13 +16,13 @@ function makeDebilityActor({ weakened = false, dazed = false, miserable = false 
 
 describe("CharacterDebilities.setDebility", () => {
 	it("sets weakened to true", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await new CharacterDebilities(actor).setDebility("weakened", true);
 		expect(actor.system.attributes.debilities.options.weakened.value).toBe(true);
 	});
 
 	it("sets weakened back to false", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		const debilities = new CharacterDebilities(actor);
 		await debilities.setDebility("weakened", true);
 		await debilities.setDebility("weakened", false);
@@ -30,20 +30,20 @@ describe("CharacterDebilities.setDebility", () => {
 	});
 
 	it("sets dazed independently of weakened", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await new CharacterDebilities(actor).setDebility("dazed", true);
 		expect(actor.system.attributes.debilities.options.dazed.value).toBe(true);
 		expect(actor.system.attributes.debilities.options.weakened.value).toBe(false);
 	});
 
 	it("sets miserable independently", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await new CharacterDebilities(actor).setDebility("miserable", true);
 		expect(actor.system.attributes.debilities.options.miserable.value).toBe(true);
 	});
 
 	it("multiple debilities can be active simultaneously", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		const debilities = new CharacterDebilities(actor);
 		await debilities.setDebility("weakened", true);
 		await debilities.setDebility("dazed", true);

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { migrateStaleItemTypes } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 function makeItem(id, type) {
@@ -24,6 +24,7 @@ describe("migrateStaleItemTypes", () => {
 			makeItem("p1", "playbook"),
 			makeItem("pos1", "possession"),
 			makeItem("arc1", "arcanum"),
+			makeItem("fol1", "follower"),
 			makeItem("npc1", "npc"),
 			makeItem("ins1", "insert"),
 		]);

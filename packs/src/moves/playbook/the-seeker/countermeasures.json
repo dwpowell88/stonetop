@@ -4,8 +4,7 @@
 	"name": "Countermeasures",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_witness a magical effect_**, you may ask the GM, \"How can this be countered or interrupted?\" and get an honest answer. You or an ally gain advantage on your next roll to act on the answer.",
 		"slug": "countermeasures"
 	},

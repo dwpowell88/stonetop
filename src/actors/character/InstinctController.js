@@ -1,3 +1,5 @@
+import { rich } from "../../model/snapshot/RichText.js";
+
 export class InstinctController {
 	constructor(ctrl) { this._ctrl = ctrl; }
 
@@ -18,7 +20,12 @@ export class InstinctController {
 
 	static computeSelected(instinctGroup, choiceValues) {
 		const checked = instinctGroup?.list[0]?.options?.find(o => o.checked) ?? null;
-		if (checked) return checked.description ? `${checked.text} — ${checked.description}` : checked.text;
+		// option.description may be a RichText or a bare string; rich() normalizes either to its raw
+		// markdown for this computed display label.
+		if (checked) {
+			const desc = rich(checked.description).raw;
+			return desc ? `${checked.text} — ${desc}` : checked.text;
+		}
 		return choiceValues.toRaw()?.instinct?.__custom || null;
 	}
 }

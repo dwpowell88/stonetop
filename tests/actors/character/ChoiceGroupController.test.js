@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
 import { FollowerSideEffectHandler, OutfitItemSideEffectHandler } from "../../../src/actors/character/SideEffectHandler.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeFollowers } from "../../fakes/FakeFollowers.js";
 import { FakeOutfitItems } from "../../fakes/FakeOutfitItems.js";
 
@@ -9,7 +9,7 @@ import { FakeOutfitItems } from "../../fakes/FakeOutfitItems.js";
 
 function makeCtrl(choices = [], { followers = null, outfitItems = null } = {}) {
 	const item   = { _id: "i1", type: "test", system: { choiceValues: {}, choices } };
-	const actor  = new FakeActorBuilder().withItems([item]).build();
+	const actor  = new FakeCharacterActorBuilder().withItems([item]).build();
 	const factory = new ChoiceGroupFactory(actor);
 	if (followers)   factory.register(new FollowerSideEffectHandler(followers));
 	if (outfitItems) factory.register(new OutfitItemSideEffectHandler(outfitItems.prefix, outfitItems.items));

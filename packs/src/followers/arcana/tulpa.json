@@ -1,22 +1,59 @@
 {
+	"_id": "U1SAvkDiUzITqaNe",
+	"_key": "!items!U1SAvkDiUzITqaNe",
 	"name": "Tulpa",
-	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"type": "follower",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-triskele.png",
 	"system": {
 		"slug": "tulpa",
+		"reference": null,
 		"arcanaSlug": "beautiful-scroll",
+		"tagList": {
+			"selected": [
+				"Spirit",
+				"construct",
+				"tiny",
+				"naive"
+			],
+			"options": [
+				"Spirit",
+				"construct",
+				"tiny",
+				"naive",
+				"eager",
+				"fierce",
+				"kind",
+				"sly",
+				"timid",
+				"willful"
+			],
+			"multi": true,
+			"allowCustom": true
+		},
 		"hp": {
 			"value": 0,
 			"max": 8
 		},
 		"armor": "0",
-		"damage": "d4",
+		"damage": "[[/r 1d4]] (if that)",
 		"specialQuality": "",
 		"instinct": {
-			"selected": [
-				"to play / to learn / to flaunt"
+			"selected": [],
+			"options": [
+				"to play",
+				"to learn",
+				"to flaunt"
 			],
-			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"cost": {
+			"selected": [],
+			"options": [
+				"respect given",
+				"new experiences",
+				"comfort/compassion"
+			],
 			"multi": false,
 			"allowCustom": true
 		},
@@ -27,36 +64,58 @@
 		"choices": [
 			{
 				"slug": "choices",
-				"list": []
+				"list": [
+					{
+						"type": "entry",
+						"slug": "produce-light-area-reach",
+						"content": {
+							"title": null,
+							"text": "Produce light (area, reach)"
+						},
+						"track": {
+							"max": 1
+						}
+					},
+					{
+						"type": "entry",
+						"slug": "carry-manipulate-a-item",
+						"content": {
+							"title": null,
+							"text": "Carry/manipulate a item"
+						},
+						"track": {
+							"max": 1
+						}
+					},
+					{
+						"type": "entry",
+						"slug": "deliver-a-message",
+						"content": {
+							"title": null,
+							"text": "Deliver a message"
+						},
+						"track": {
+							"max": 1
+						}
+					},
+					{
+						"type": "entry",
+						"slug": "spy-on-someone-something",
+						"content": {
+							"title": null,
+							"text": "Spy on someone/something"
+						},
+						"track": {
+							"max": 1
+						}
+					}
+				]
 			}
 		],
+		"moves": "- Manifest a form of dust/snow/vapor",
 		"description": "",
-		"moves": "- Manifest a form of dust/snow/vapor\n- Produce light (area, reach)\n- Carry/manipulate a ◇ item\n- Deliver a message\n- Spy on someone/something",
-		"cost": {
-			"selected": [
-				"respect given / new experiences / comfort/compassion (Loyalty ◯◯◯)"
-			],
-			"options": [],
-			"multi": false,
-			"allowCustom": true
-		},
-		"notes": "",
-		"reference": null,
-		"tagList": {
-			"selected": [
-				"spirit",
-				"construct",
-				"tiny",
-				"naive",
-				"eager"
-			],
-			"options": [],
-			"multi": true,
-			"allowCustom": true
-		}
+		"notes": ""
 	},
 	"flags": {},
-	"folder": "BNaYX2Y4eMe7EOPK",
-	"_id": "U1SAvkDiUzITqaNe",
-	"_key": "!items!U1SAvkDiUzITqaNe"
+	"folder": "BNaYX2Y4eMe7EOPK"
 }

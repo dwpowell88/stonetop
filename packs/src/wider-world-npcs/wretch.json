@@ -3,7 +3,7 @@
   "_key": "!actors!2XjyN4COnOzWtm6E",
   "name": "Wretch",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "wretch",
     "reference": "the-things-below",
@@ -23,7 +23,7 @@
       "max": 7
     },
     "armor": "4 (resilience), 0 vs. bronze",
-    "damage": "malformed appendages d6 (hand, close, grabby)",
+    "damage": "malformed appendages d6 (_hand_, _close_, _grabby_)",
     "specialQuality": "horribly misshapen, bound to their prison, burnt by bronze (+1d6 damage)",
     "instinct": {
       "selected": [

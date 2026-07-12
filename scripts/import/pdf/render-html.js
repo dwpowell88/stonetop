@@ -1,5 +1,6 @@
 import { escapeHtml } from "../html.js";
 import { isAvara, isItalic, isBoldBody, isDingbat } from "./fonts.js";
+import { segmentSettlement } from "./settlement.js";
 
 // Renders the structured article document produced by `extractArticle` (layout.js) to HTML. The
 // document is renderer-agnostic — assets are referenced by an opaque ref and resolved here via
@@ -127,6 +128,17 @@ function renderListItem(lines) {
 	let html = joinLines(lines).replace(/^(?:[•◦‣▪]\s*)/, "");
 	// A leading "ä" is the book's stylized arrow bullet → strip it and mark the item.
 	if (/^ä\s/.test(html)) { cls = "arrow"; html = html.replace(/^ä\s*/, ""); }
+	// A leading square marker (□/◻, from the vector layer) is a pick/track checkbox → render it as a
+	// checkbox bullet (CSS ::before) instead of leaving the glyph inline.
+	if (/^[□◻]/.test(html)) { cls = "checkbox"; html = html.replace(/^[□◻]+\s*/, ""); }
+	// A steading-improvement call-out's title item (stamped by build-journal): turn its bold name run
+	// into a content link to the generated improvement item, leaving the flavor text in place.
+	if (lines.improvementUuid) {
+		html = html.replace(/^((?:<strong>[\s\S]*?<\/strong>\s*)+)/, (run) => {
+			const label = run.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+			return `@UUID[${lines.improvementUuid}]{${label}} `;
+		});
+	}
 	return { cls, html };
 }
 
@@ -143,24 +155,15 @@ function listBullet(items) {
 const renderList = (items) => { const cls = listBullet(items); return `<ul>${items.map((it) => `<li${cls ? ` class="${cls}"` : ""}>${it.html}</li>`).join("")}</ul>`; };
 
 /**
- * Render a settlement (steading) stat block as one bordered card. The block's lines fall into three
- * indents off the leftmost field column: flush fields/sub-headings (Size, Population, Prosperity,
- * Resources, Defenses) each on their own line; bullet items one step in; their wraps a further step
- * in. Fields break any open list, so Resources and Defenses keep their own bullets.
+ * Render a settlement (steading) stat block as one bordered card. segmentSettlement splits the lines
+ * into flush fields/sub-headings (Size, Population, Prosperity, Resources, Defenses) — each on its own
+ * line — and bullet items with their wraps; fields break any open list, so Resources and Defenses keep
+ * their own bullets.
  */
 function renderSettlementBlock(lines) {
-	const fieldX = Math.min(...lines.map((l) => l.bbox[0]));
-	const segs = []; // { field:[lines] } | { items:[[lines]] }
-	let cur = null;
-	for (const l of lines) {
-		const hasBullet = /^swirl/.test(l.spans?.[0]?.font || "") || /^ä\s/.test(l.text.trim());
-		if (l.bbox[0] <= fieldX + 4 && !hasBullet) segs.push(cur = { field: [l] });            // a field / sub-heading line
-		else if (hasBullet || l.bbox[0] <= fieldX + 10) { if (!cur?.items) segs.push(cur = { items: [] }); cur.items.push([l]); } // a bullet item
-		else if (cur?.items) cur.items[cur.items.length - 1].push(l);                          // a wrapped bullet line
-		else if (cur?.field) cur.field.push(l);                                                // a wrapped field line
-		else segs.push(cur = { field: [l] });
-	}
-	const body = segs.map((s) => s.field ? `<div>${joinLines(s.field)}</div>` : renderList(s.items.map(renderListItem))).join("");
+	const body = segmentSettlement(lines)
+		.map((s) => s.field ? `<div>${joinLines(s.field)}</div>` : renderList(s.items.map(renderListItem)))
+		.join("");
 	return `<aside class="statblock settlement">${body}</aside>`;
 }
 

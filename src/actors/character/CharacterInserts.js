@@ -1,6 +1,7 @@
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
 import { InsertSnapshotBuilder } from "../../model/snapshot/character/InsertSnapshot.js";
 import { InstinctController } from "./InstinctController.js";
+import { rich } from "../../model/snapshot/RichText.js";
 
 export class CharacterInserts {
 	constructor(actor, factory, moves, insertRepo = null) {
@@ -12,7 +13,7 @@ export class CharacterInserts {
 
 	async onInsertDropped(item) {
 		const slug = item.system?.slug ?? null;
-		await this._moves.addCategory(`insert-${slug}`, item.name, slug, item.system?.moves ?? []);
+		await this._moves.addCategory(`insert-${slug}`, item.name, item.system?.moves ?? [], item.system?.startingMoves ?? []);
 	}
 
 	// Grant the inserts a playbook declares (follower-data-architecture §4): remove the previous
@@ -37,7 +38,7 @@ export class CharacterInserts {
 			data.type  = "insert";
 			data.flags = { ...(data.flags ?? {}), stonetop: { ...(data.flags?.stonetop ?? {}), grantedByPlaybook: playbookSlug } };
 			await this._actor.createEmbeddedDocuments("Item", [data]);
-			await this._moves.addCategory(`insert-${slug}`, data.name, slug, data.system?.moves ?? []);
+			await this._moves.addCategory(`insert-${slug}`, data.name, data.system?.moves ?? [], data.system?.startingMoves ?? []);
 		}
 	}
 
@@ -91,7 +92,7 @@ export class CharacterInserts {
 			.withSlug(slug)
 			.withName(item.name)
 			.withImg(item.img ?? null)
-			.withDescription(item.system?.description ?? null)
+			.withDescription(rich(item.system?.description ?? null))
 			.withInstinctGroup(instinctGroup)
 			.withInstinctSelected(instinctSelected)
 			.withChoices(choices)

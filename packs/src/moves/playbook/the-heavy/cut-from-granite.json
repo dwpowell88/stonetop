@@ -4,8 +4,7 @@
 	"name": "Cut from Granite",
 	"type": "move",
 	"system": {
-		"playbook": "The Heavy",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "Gain +1 armor (stacks with other sources) and increase your max HP by another 2 (+6 HP total from both moves).",
 		"requirement": {
 			"level": 6,

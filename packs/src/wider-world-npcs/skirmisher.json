@@ -3,7 +3,7 @@
   "_key": "!actors!wAUmmVutiKyDfFYw",
   "name": "Skirmisher",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "skirmisher",
     "reference": "lygos-and-the-south",
@@ -22,7 +22,7 @@
       "max": 3
     },
     "armor": "0",
-    "damage": "long bow d6 (far), or sling d6 (near, reload), or short swords (hand, close)",
+    "damage": "long bow d6 (_far_), or sling d6 (_near_, _reload_), or short swords (_hand_, _close_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

@@ -3,7 +3,7 @@
   "_key": "!actors!1EUhsCnfYUyAIPW9",
   "name": "Antiquarian",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-person.png",
   "system": {
     "slug": "antiquarian",
     "reference": "lygos-and-the-south",
@@ -24,7 +24,7 @@
       "max": 12
     },
     "armor": "0",
-    "damage": "iron mattock d8 w/disadvantage (close, messy, awkward) or knife d6 w/disadvantage (hand)",
+    "damage": "iron mattock d8 w/disadvantage (_close_, _messy_, _awkward_) or knife d6 w/disadvantage (_hand_)",
     "specialQuality": "often in possession of arcana (page 508) and willing to use them",
     "instinct": {
       "selected": [

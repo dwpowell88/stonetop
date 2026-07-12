@@ -1,0 +1,12 @@
+{
+	"_id": "40f048ef33e45488",
+	"_key": "!items!40f048ef33e45488",
+	"name": "Unquenched",
+	"type": "move",
+	"system": {
+		"slug": "unquenched",
+		"moveType": null,
+		"description": "When you **_Clash with a living, bleeding foe with the Blood-quenched Sword_**, you may mark a Consequence to shift the result up one step (a 6- becomes a 7-9; a 7-9 becomes a 10-11; a 10-11 becomes 12+). You can do this only once per roll.\n\nWhen you **_have marked 3 consequences_**, you gain A Flickering Flame."
+	},
+	"folder": "ArcanaMoves00001"
+}

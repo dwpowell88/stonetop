@@ -3,7 +3,7 @@
   "_key": "!actors!AhnVyOi0LrUk9NRA",
   "name": "Cougar",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "cougar",
     "reference": "the-great-wood",
@@ -23,7 +23,7 @@
       "max": 12
     },
     "armor": "",
-    "damage": "bite d10 (hand, grabby)",
+    "damage": "bite d10 (_hand_, _grabby_)",
     "specialQuality": "keen night vision and sense of smell",
     "instinct": {
       "selected": [

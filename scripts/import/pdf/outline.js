@@ -39,6 +39,22 @@ export function articleRanges(entries, totalPages) {
 	return out;
 }
 
+/**
+ * The Minor/Major Arcana appendix page ranges (excluded from `articleRanges` via SKIP_APPENDIX,
+ * but needed by the arcana builder). Returns `[{ tier:"minor"|"major", title, pdfPage, endPage }]`.
+ */
+export function arcanaAppendixRanges(entries, totalPages) {
+	const top = entries.filter((e) => e.depth === 1);
+	const out = [];
+	for (let i = 0; i < top.length; i++) {
+		const m = top[i].title.match(/^APPENDIX (C|D):/i);
+		if (!m) continue;
+		const endPage = i + 1 < top.length ? top[i + 1].pdfPage - 1 : totalPages;
+		out.push({ tier: m[1].toUpperCase() === "C" ? "minor" : "major", title: top[i].title, pdfPage: top[i].pdfPage, endPage });
+	}
+	return out;
+}
+
 /** Run mutool and parse the outline. */
 export function loadOutline(pdfPath) {
 	const raw = execFileSync("mutool", ["show", pdfPath, "outline"], { encoding: "utf8", maxBuffer: 1 << 24 });

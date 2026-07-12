@@ -3,7 +3,7 @@
   "_key": "!actors!ykqSwBu5CbNHtHeF",
   "name": "Screech eel",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "screech-eel",
     "reference": "three-coven-lake",
@@ -24,7 +24,7 @@
       "max": 3
     },
     "armor": "1 (speed), 2 vs. attacks from above the water",
-    "damage": "tearing bite d6 (hand, messy, 1 piercing)",
+    "damage": "tearing bite d6 (_hand_, _messy_, 1 piercing)",
     "specialQuality": "",
     "instinct": {
       "selected": [

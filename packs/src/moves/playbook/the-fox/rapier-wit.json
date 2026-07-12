@@ -4,8 +4,7 @@
 	"name": "Rapier Wit",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_pierce an NPC's pride with a well-placed quip_**, they must do 1 (their choice):\n\n- Attack, doing +1d4 damage if they hit but giving you advantage on your next roll against them\n- Stoop to your level and respond in kind\n- Spend a few moments fuming, sputtering, or controlling their temper",
 		"slug": "rapier-wit"
 	},

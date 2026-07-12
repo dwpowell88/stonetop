@@ -3,7 +3,7 @@
   "_key": "!actors!IsyswfQxOL5G57kL",
   "name": "Suarachan hunters",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "suarachan-hunters",
     "reference": "ferriers-fen",
@@ -24,7 +24,7 @@
       "max": 6
     },
     "armor": "1 (scaly hide)",
-    "damage": "cudgel d8 (close, crude), snapping tongue d6 (reach), poison blowgun needles d6 (near)",
+    "damage": "cudgel d8 (_close_, _crude_), snapping tongue d6 (_reach_), poison blowgun needles d6 (_near_)",
     "specialQuality": "excellent night vision, salt burns their skin",
     "instinct": {
       "selected": [

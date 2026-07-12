@@ -1,5 +1,5 @@
 // Integration tests that run INSIDE Foundry (via the Quench module), against real Actor/Item
-// documents and the real NpcItemData data model — so they exercise Foundry's actual update +
+// documents and the real FollowerData data model — so they exercise Foundry's actual update +
 // re-prepare cycle, which the node fakes can't replicate. Install the "Quench" module, open a
 // world using this system, reload, then run: quench.runBatches("stonetop.group-followers")
 //
@@ -23,7 +23,7 @@ globalThis.Hooks?.on?.("quenchReady", (quench) => {
 				async function makeFollower() {
 					actor = await Actor.create({ name: "QTest", type: "character" });
 					const [item] = await actor.createEmbeddedDocuments("Item", [{
-						name: "Crew", type: "npc",
+						name: "Crew", type: "follower",
 						system: {
 							slug: "crew",
 							tagList: { selected: ["group"], options: ["group", "brave"], multi: true, allowCustom: true },
@@ -85,7 +85,7 @@ globalThis.Hooks?.on?.("quenchReady", (quench) => {
 					actor = await Actor.create({ name: "Real Marshal", type: "character" });
 					const tc = actor.typedActor; // StonetopCharacter with the real FoundryFollowerRepository
 					await tc._followers.addFollower("crew");
-					const findCrew = () => actor.items.find(i => i.type === "npc" && i.system?.slug === "crew");
+					const findCrew = () => actor.items.find(i => i.type === "follower" && i.system?.slug === "crew");
 
 					assert.ok(findCrew(), "crew embedded");
 					assert.deepEqual(findCrew().system.tagList.selected, ["group"], "crew has the group tag right after add");

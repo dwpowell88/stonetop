@@ -3,7 +3,7 @@
   "_key": "!actors!3BJ5kIUnNFjgMDhs",
   "name": "Rhagedn",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "rhagedn",
     "reference": "green-lords",
@@ -22,7 +22,7 @@
       "max": 3
     },
     "armor": "2 (woody hide)",
-    "damage": "talons, antlers d6+2 (hand, messy, 1 piercing)",
+    "damage": "talons, antlers d6+2 (_hand_, _messy_, 1 piercing)",
     "specialQuality": "clumsy fliers",
     "instinct": {
       "selected": [

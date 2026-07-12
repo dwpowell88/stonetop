@@ -3,7 +3,7 @@
   "_key": "!actors!qVdv4XgHfGfBD3yr",
   "name": "Pack drake",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "pack-drake",
     "reference": "the-flats",
@@ -24,7 +24,7 @@
       "max": 3
     },
     "armor": "1 (quick reflexes)",
-    "damage": "sawtooth teeth d6 (hand, grabby)",
+    "damage": "sawtooth teeth d6 (_hand_, _grabby_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

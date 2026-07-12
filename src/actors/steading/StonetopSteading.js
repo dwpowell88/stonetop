@@ -10,6 +10,7 @@ import {SteadingContent} from "./SteadingContent.js";
 import {SteadingAssets} from "./SteadingAssets.js";
 import {SteadingImprovements} from "./SteadingImprovements.js";
 import {SteadingMoves} from "./SteadingMoves.js";
+import {startingAttributeNote} from "./startingAttributeNote.js";
 
 export class StonetopSteading {
 	constructor(actor, improvementsRepo, movesRepo) {
@@ -39,24 +40,18 @@ export class StonetopSteading {
 	}
 
 	getRollableStats() {
-		const attr = this._actor.system.attributes;
 		return [
-			{ key: "population", name: "Population", value: attr.population?.current ?? 0 },
-			{ key: "prosperity", name: "Prosperity", value: attr.prosperity?.current ?? 0 },
-			{ key: "defenses",   name: "Defenses",   value: attr.defenses?.current   ?? 0 },
-			{ key: "fortunes",   name: "Fortunes",   value: this._actor.system.fortunes ?? 0 },
+			{ key: "population", name: "Population", value: this.resolveBonus("population") ?? 0 },
+			{ key: "prosperity", name: "Prosperity", value: this.resolveBonus("prosperity") ?? 0 },
+			{ key: "defenses",   name: "Defenses",   value: this.resolveBonus("defenses")   ?? 0 },
+			{ key: "fortunes",   name: "Fortunes",   value: this.resolveBonus("fortunes")   ?? 0 },
 		];
 	}
 
+	// Ratings are stored as their actual value now (fortunes +1, prosperity +0, …), so the roll bonus
+	// is just the stored value. Surplus is a raw count in the same attributes block.
 	resolveBonus(rollStat) {
-		const sys  = this._actor.system;
-		const attr = sys.attributes;
-		if (rollStat === "fortunes")   return sys.fortunes                  ?? null;
-		if (rollStat === "surplus")    return sys.surplus                   ?? null;
-		if (rollStat === "population") return attr.population?.current ?? null;
-		if (rollStat === "prosperity") return attr.prosperity?.current ?? null;
-		if (rollStat === "defenses")   return attr.defenses?.current   ?? null;
-		return null;
+		return this._actor.system.attributes?.[rollStat] ?? null;
 	}
 
 	applyRollMode(rollStat, rollMode) {
@@ -64,23 +59,23 @@ export class StonetopSteading {
 	}
 
 	get fortunesCurrent() {
-		return this._actor.system.fortunes ?? SteadingDefaults.fortunes.current;
+		return this._actor.system.attributes?.fortunes ?? 0;
 	}
 
 	get surplusCurrent() {
-		return this._actor.system.surplus ?? SteadingDefaults.surplus.current;
+		return this._actor.system.attributes?.surplus ?? 0;
 	}
 
 	get notes() {
 		return this._actor.system.notes ?? "";
 	}
 
-	async setFortunes(index) {
-		await this._actor.update({"system.fortunes": index});
+	async setFortunes(value) {
+		await this._actor.update({"system.attributes.fortunes": value});
 	}
 
 	async setSurplus(value) {
-		await this._actor.update({"system.surplus": value});
+		await this._actor.update({"system.attributes.surplus": value});
 	}
 
 	async setNotes(value) {
@@ -89,13 +84,16 @@ export class StonetopSteading {
 
 
 	async buildSnapshot() {
+		// Homefront moves seed onto the steading as embedded items (idempotent) the same way basic moves
+		// seed onto a character — must run before the moves snapshot reads them back.
+		await this.moves.seedHomefrontMoves();
 		return new SteadingSnapshot({
 			fortunes: new FortunesSnapshot(
-				SteadingDefaults.fortunes.title, SteadingDefaults.fortunes.note,
-				this.fortunesCurrent, SteadingDefaults.fortunes.options,
+				SteadingDefaults.fortunes.title, startingAttributeNote(this._actor, "fortunes"),
+				this.fortunesCurrent, SteadingDefaults.fortunes.options, SteadingDefaults.fortunes.bonuses,
 			),
 			surplus: new SurplusSnapshot(
-				SteadingDefaults.surplus.title, SteadingDefaults.surplus.note, this.surplusCurrent,
+				SteadingDefaults.surplus.title, startingAttributeNote(this._actor, "surplus"), this.surplusCurrent,
 			),
 			attributes:         this.attributes.buildSnapshot(),
 			debilities:         this.debilities.buildSnapshot(),
@@ -110,8 +108,8 @@ export class StonetopSteading {
 			content:            this.content.buildSnapshot(),
 			assets:             this.assets.buildSnapshot(),
 			improvements:       await this.improvements.buildSnapshot(),
-			residentNames:      this._actor.system.residentNames,
-			residentTraits:     this._actor.system.residentTraits,
+			residentNames:      this._actor.system.residents?.names ?? "",
+			residentTraits:     this._actor.system.residents?.traits ?? [],
 			moves:              await this.moves.buildSnapshot(),
 			rollMode:           this.rollMode,
 		});

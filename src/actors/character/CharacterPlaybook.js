@@ -2,6 +2,7 @@ import {PlaybookSnapshotBuilder} from "../../model/snapshot/character/CharacterS
 import {IntroductionsSnapshot} from "../../model/snapshot/character/PlaybookSnapshot.js";
 import {ChoiceGroup, ChoiceValues} from "../../model/snapshot/character/ChoiceGroup.js";
 import {InstinctController} from "./InstinctController.js";
+import {rich} from "../../model/snapshot/RichText.js";
 
 export class CharacterPlaybook {
 	constructor(actor, background, factory, origin) {
@@ -97,7 +98,7 @@ export class CharacterPlaybook {
 		const loreGroups = choices;
 		const introData = data.introductions && !Array.isArray(data.introductions) && data.introductions.step4 ? data.introductions : null;
 		const introductions = introData ? new IntroductionsSnapshot(
-			introData.step3 ?? null,
+			rich(introData.step3 ?? null),
 			introData.step4 ? ChoiceGroup.fromPackData(introData.step4, choiceValues) : null,
 			introData.step6 ? ChoiceGroup.fromPackData(introData.step6, choiceValues) : null,
 		) : null;
@@ -106,7 +107,7 @@ export class CharacterPlaybook {
 			.withSlug(data.slug)
 			.withName(data.name)
 			.withImg(data.img ?? null)
-			.withDescription(data.description ?? null)
+			.withDescription(rich(data.description ?? null))
 			.withStatsNote(data.statsNote ?? null)
 			.withChoices(choices)
 			.withInstinctGroup(instinctGroup)

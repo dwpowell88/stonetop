@@ -17,7 +17,7 @@ export class EmbeddedOutfitItemBuilder {
 				slug:            this._slug            ?? null,
 				inventoryColumn: this._inventoryColumn ?? "regular",
 				weight:          this._weight          ?? 0,
-				tags:            this._tags            ?? "",
+				tagList:         this._tags            ?? "",
 				note:            this._note            ?? null,
 				resource:        this._resource        ?? null,
 				twoCol:          this._twoCol          ?? false,

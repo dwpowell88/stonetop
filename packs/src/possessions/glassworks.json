@@ -7,9 +7,27 @@
 	"system": {
 		"slug": "glassworks",
 		"label": "Glassworks",
-		"description": "sand, ash, ◇ crucibles, ◇ blowpipes; bottles, flasks, lenses, lantern glass, etc.",
+		"description": "vials, charms, lenses, sand, marbles, bellows, crucible, ◇ lanterns (○○○○○ _hours_, _close_, _area_), etc.",
 		"resource": null,
-		"outfitItems": [],
+		"outfitItems": [
+			{
+				"slug": "lantern",
+				"name": "Lantern",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tags": "close, area",
+				"resource": {
+					"max": 5,
+					"labels": [
+						"",
+						"",
+						"",
+						"",
+						"hours"
+					]
+				}
+			}
+		],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null

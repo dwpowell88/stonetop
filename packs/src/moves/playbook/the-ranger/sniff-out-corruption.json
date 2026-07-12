@@ -4,8 +4,7 @@
 	"name": "Sniff Out Corruption",
 	"type": "move",
 	"system": {
-		"playbook": "The Ranger",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Seek Insight_**, you can ask, \"What here stinks of the unnatural?\" for free, even **on a 6-**.",
 		"slug": "sniff-out-corruption"
 	},

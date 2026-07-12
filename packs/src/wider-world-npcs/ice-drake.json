@@ -3,7 +3,7 @@
   "_key": "!actors!2MMNn9gKaG1gHZIm",
   "name": "Ice drake",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "ice-drake",
     "reference": "the-whitefang-mountains",
@@ -23,7 +23,7 @@
       "max": 3
     },
     "armor": "0",
-    "damage": "claws, beak, or wing-buffet d4 (hand)",
+    "damage": "claws, beak, or wing-buffet d4 (_hand_)",
     "specialQuality": "cold-proof, camouflaged, winged",
     "instinct": {
       "selected": [

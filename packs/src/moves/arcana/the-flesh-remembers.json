@@ -1,0 +1,27 @@
+{
+	"_id": "d6d92e7487db70cc",
+	"_key": "!items!d6d92e7487db70cc",
+	"name": "The Flesh Remembers",
+	"type": "move",
+	"system": {
+		"slug": "the-flesh-remembers",
+		"moveType": null,
+		"description": "When you **_first encounter a demon and search the Cloak’s memories for its like_**, roll +nothing: **on a 10+**, the flesh of such a creature is present in the Cloak—you receive a vision of how it was defeated; **on a** **7-9**, choose 1 from the list below.\n- The flesh of such a creature is present in the Cloak—you receive a vision of how it was defeated, but mark a Consequence\n- The flesh of such a creature is not present in the cloak; you learn nothing\n\nWhen you **_have marked 3 Consequences_**, you gain the following move:",
+		"rollStat": "prompt",
+		"moveResults": {
+			"success": {
+				"label": "10+",
+				"value": "the flesh of such a creature is present in the Cloak—you receive a vision of how it was defeated"
+			},
+			"partial": {
+				"label": "7-9",
+				"value": "choose 1 from the list below."
+			},
+			"failure": {
+				"label": "6-",
+				"value": ""
+			}
+		}
+	},
+	"folder": "ArcanaMoves00001"
+}

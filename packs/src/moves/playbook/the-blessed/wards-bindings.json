@@ -4,8 +4,7 @@
   "name": "Wards & Bindings",
   "type": "move",
   "system": {
-    "playbook": "The Blessed",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_mark a boundary with sacred signs_**, spend 1 Stock and describe who or what they affect (using no more words than your level). Also, choose whether the affected beings are repelled or trapped by the signs.\n\nWhen **_your wards or bindings are first tested_**, roll +INT.",
     "moveResults": {
       "success": {

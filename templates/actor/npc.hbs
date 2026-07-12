@@ -8,12 +8,12 @@
 		<div class="stonetop-creature-statrow__fields">
 			<div class="stonetop-creature-line">
 				<span class="stonetop-follower-label">{{localize "stonetop.followers.armor"}}</span>
-				{{> "stonetop.editable-field" html=stonetop.armorHtml value=stonetop.armor slug=slug
+				{{> "stonetop.editable-field" field=stonetop.armor slug=slug
 					inputId="npc-armor" inputClass="stonetop-follower-armor"}}
 			</div>
 			<div class="stonetop-creature-line">
 				<span class="stonetop-follower-label">{{localize "stonetop.followers.damage"}}</span>
-				{{> "stonetop.editable-field" html=stonetop.damageHtml value=stonetop.damage slug=slug
+				{{> "stonetop.editable-field" field=stonetop.damage slug=slug
 					inputId="npc-damage" inputClass="stonetop-follower-damage"}}
 			</div>
 			<div class="stonetop-creature-line">
@@ -33,26 +33,14 @@
 
 	<div class="stonetop-creature-line">
 		<span class="stonetop-follower-label">{{localize "stonetop.followers.specialQuality"}}</span>
-		{{> "stonetop.editable-field" html=stonetop.specialQualityHtml value=stonetop.specialQuality slug=slug
+		{{> "stonetop.editable-field" field=stonetop.specialQuality slug=slug
 			inputId="npc-special-qualities" inputClass="stonetop-follower-special-quality"}}
 	</div>
 
-	<div class="stonetop-creature-moves stonetop-editable">
-		<div class="stonetop-creature-moves-head">
-			<span class="stonetop-follower-label">{{localize "stonetop.followers.moves"}}</span>
-			<button type="button" class="stonetop-edit-toggle" title="Edit"><img src="systems/stonetop/assets/ui/controls/edit-icon.png" alt="edit"></button>
-		</div>
-		<div class="stonetop-editable__display">{{{stonetop.movesHtml}}}</div>
-		<textarea id="npc-moves" class="stonetop-editable__edit" data-slug="{{slug}}">{{stonetop.moves}}</textarea>
-	</div>
+	{{> "stonetop.editable-rich-block" label=(localize "stonetop.followers.moves")
+		field=stonetop.moves textareaId="npc-moves" slug=slug}}
 
-	<div class="stonetop-creature-moves stonetop-editable">
-		<div class="stonetop-creature-moves-head">
-			<span class="stonetop-follower-label">{{localize "stonetop.followers.description"}}</span>
-			<button type="button" class="stonetop-edit-toggle" title="Edit"><img src="systems/stonetop/assets/ui/controls/edit-icon.png" alt="edit"></button>
-		</div>
-		<div class="stonetop-editable__display">{{{stonetop.descriptionHtml}}}</div>
-		<textarea class="stonetop-editable__edit stonetop-follower-description-textarea" data-slug="{{slug}}">{{stonetop.description}}</textarea>
-	</div>
+	{{> "stonetop.editable-rich-block" label=(localize "stonetop.followers.description")
+		field=stonetop.description textareaClass="stonetop-follower-description-textarea" slug=slug}}
 
 </form>

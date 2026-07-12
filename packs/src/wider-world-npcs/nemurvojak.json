@@ -3,7 +3,7 @@
   "_key": "!actors!cOcBjoksYfljeF2f",
   "name": "Nemurvojak",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "nemurvojak",
     "reference": "vor-svetelik",
@@ -24,8 +24,8 @@
       "max": 11
     },
     "armor": "4 (resilience), 0 vs. bronze",
-    "damage": "iron-wood spears d6 w/advantage (close, messy, 1 piercing) or bare-hand- ed rending d4 with advantage (hand, grabby, messy, 1 piercing)",
-    "specialQuality": "bound by its last orders  shuns the sun or holy light",
+    "damage": "iron-wood spears d6 w/advantage (_close_, _messy_, 1 piercing) or bare-hand- ed rending d4 with advantage (_hand_, _grabby_, _messy_, 1 piercing)",
+    "specialQuality": "bound by its last orders; shuns the sun or holy light",
     "instinct": {
       "selected": [
         "to revel in their prey’s fear and suffering"

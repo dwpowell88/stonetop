@@ -4,8 +4,7 @@
 	"name": "Resourceful",
 	"type": "move",
 	"system": {
-		"playbook": "The Would-Be Hero",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Defy Danger and roll a 6-_**, ask the GM a question from Seek Insight after they describe what happens. Gain advantage on your next roll to act on the answer.",
 		"slug": "resourceful"
 	},

@@ -3,6 +3,7 @@ import {
 	BackgroundSection,
 } from "../../model/snapshot/character/CharacterSnapshot.js";
 import { ChoiceGroup, ChoiceValues } from "../../model/snapshot/character/ChoiceGroup.js";
+import { rich } from "../../model/snapshot/RichText.js";
 import { toSlug } from "../../utils/slug.js";
 
 export class CharacterBackgrounds {
@@ -40,8 +41,8 @@ export class CharacterBackgrounds {
 			const choices = b.choices ? ChoiceGroup.fromPackData(b.choices, values) : null;
 			options.push(new BackgroundOptionSnapshotBuilder()
 				.withSlug(b.slug)
-				.withLabel(b.label)
-				.withDescription(b.description ?? "")
+				.withLabel(rich(b.label))
+				.withDescription(rich(b.description ?? ""))
 				.withSelected(b.slug === savedSlug)
 				.withMoves((b.moves ?? []).map(toSlug))
 				.withChoices(choices)

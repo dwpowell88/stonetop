@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { migratePlaybookChoices } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakePlaybookRepository } from "../fakes/FakePlaybookRepository.js";
 import { TestPlaybookItemBuilder } from "../fakes/TestPlaybookItemBuilder.js";
 
@@ -9,7 +9,7 @@ const GROUP_B = { slug: "group-b", list: [{ slug: "opt-b", type: "entry", conten
 
 function makeActor(choices = []) {
 	const item = new TestPlaybookItemBuilder().withChoices(choices).build();
-	return new FakeActorBuilder().withItems([item]).build();
+	return new FakeCharacterActorBuilder().withItems([item]).build();
 }
 
 function makeRepo(choices = []) {
@@ -20,7 +20,7 @@ function makeRepo(choices = []) {
 
 describe("migratePlaybookChoices", () => {
 	it("does nothing when actor has no playbook item", async () => {
-		const actor = new FakeActorBuilder().build();
+		const actor = new FakeCharacterActorBuilder().build();
 		await migratePlaybookChoices(actor, makeRepo([GROUP_A]));
 		expect(actor.updatedDocs).toHaveLength(0);
 	});

@@ -4,8 +4,7 @@
   "name": "Light Fingers",
   "type": "move",
   "system": {
-    "playbook": "The Fox",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_perform sleight of hand on an unwary mark_**, you succeed and no one's the wiser. If you're being watched, roll +DEX: **on a 10+**, you succeed and no one's the wiser; **_on a 7-9_**, you succeed OR no one's the wiser (your choice).",
     "moveResults": {
       "success": {

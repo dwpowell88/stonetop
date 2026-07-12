@@ -3,7 +3,7 @@
   "_key": "!actors!ZlI7kK1ZEFS506Oq",
   "name": "The Pale Hunter",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/icons/npc.png",
   "system": {
     "slug": "the-pale-hunter",
     "reference": "the-pale-hunter",
@@ -27,8 +27,8 @@
       "max": 26
     },
     "armor": "4 (resilience)",
-    "damage": "silver spear d12+3 w/advantage (close, reach, thrown, forceful, messy, 2 piercing) or silver antlers d12+5 w/ad- vantage (close, forceful) or grapple d10+3 w/advantage (hand, grabby, forceful)",
-    "specialQuality": "surrounded by mist can grab/grapple undead spirits; keen senses; uncanny reflexes",
+    "damage": "silver spear d12+3 w/advantage (_close_, _reach_, _thrown_, _forceful_, _messy_, 2 piercing) or silver antlers d12+5 w/ad- vantage (_close_, _forceful_) or grapple d10+3 w/advantage (_hand_, _grabby_, _forceful_)",
+    "specialQuality": "surrounded by mist; can grab/grapple undead spirits; keen senses; uncanny reflexes",
     "instinct": {
       "selected": [
         "to revel in the hunt, to claim undead souls"

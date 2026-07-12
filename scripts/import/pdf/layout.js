@@ -61,7 +61,7 @@ const isValueHeaderRow = (row) => row.cells.length >= 2 && /^value$/i.test(row.c
 // A check-marker cell (◇/○) injected from the vector layer (load.js). In a value table these are the
 // per-item checkbox glyphs; they sometimes land on their own row (a y-quantisation split) or as the
 // leading cell of an item row, so they must be skipped/stripped when reading the table.
-const isMarkerCell = (c) => c.font === "marker" || /^[◇○]+$/.test((c.text || "").trim());
+const isMarkerCell = (c) => c.font === "marker" || /^[◇○□◻]+$/.test((c.text || "").trim());
 const rowContentCells = (row) => row.cells.filter((c) => !isMarkerCell(c));
 // First value row at/after `from`, skipping lone ◇/○ checkbox-marker rows; -1 if the next content
 // row isn't a value row. Lets the value-table branch start past markers (Barrier Pass arms-and-armor).
@@ -78,7 +78,7 @@ const leadSpaces = (l) => (l.text.match(/^ */)[0].length);
 // (see joinLines), kept under its prompt rather than turned into a separate <li>.
 const isItemStart = (l) =>
 	(l.spans.length > 0 && (isDingbat(l.spans[0].font) || /^swirl/.test(l.spans[0].font)))
-	|| /^[•◦‣▪○◇●◆]/.test(l.text.trim()) || /^ä\s/.test(l.text.trim()) || leadSpaces(l) === 2;
+	|| /^[•◦‣▪○◇●◆□◻]/.test(l.text.trim()) || /^ä\s/.test(l.text.trim()) || leadSpaces(l) === 2;
 // A short, fully-AVARA line standing alone is a run-in sub-heading, e.g. "Various treasures" or the
 // Impressions seasons ("Spring"). The display (Avara) face is the signal: a bold BODY line
 // (ACaslonPro-Bold) is a lead-in label or a bolded sentence, not a heading — e.g. Barrow's "Everyone
@@ -396,7 +396,11 @@ function segmentColumn(rows, base) {
 				const gap = rows[i].y0 - prevY;
 				if (l.rule || l.image || l.boxStart || l.boxEnd || isHead(l) || isBoldRunIn(l) || isFellRunIn(l)) break;
 				if (isItemStart(l)) items.push([l]);
-				else if (items.length && (l.bbox[0] > base + 3 || gap <= l.size * 1.7)) items[items.length - 1].push(l);
+				// A continuation hangs under its item — it may be indented past the base or just tight
+				// under it, but it is never far LEFT of the item's own start. A flush body line below an
+				// *indented* bullet (e.g. an arcanum's "◇ tags" line sitting above flush description
+				// prose) is a new block, not a wrap of the bullet.
+				else if (items.length && (l.bbox[0] > base + 3 || gap <= l.size * 1.7) && l.bbox[0] >= items[items.length - 1][0].bbox[0] - 8) items[items.length - 1].push(l);
 				else break;
 				prevY = rows[i].y0; i++;
 			}
@@ -437,6 +441,18 @@ function segmentColumn(rows, base) {
 	// separate icon-led paragraphs (the icon was attached above) rather than merging into one flowing
 	// block — the book lays them out as distinct entries.
 	return blocks;
+}
+
+/**
+ * Turn one column's raw stext lines (plus its dividers/images) into typed blocks — the exact
+ * `groupRows → insertRuleRows → segmentColumn` pipeline `extractArticle` runs per column, exposed for
+ * callers that carve their own regions out of a page (e.g. the minor-arcana card grid, whose cards
+ * the generic column clusterer can't see). `base` seeds settlement-block indentation; it defaults to
+ * the region's left edge.
+ */
+export function linesToBlocks(lines, { rules = [], images = [], base } = {}) {
+	const b = base ?? (lines.length ? Math.min(...lines.map((l) => l.bbox[0])) : 0);
+	return segmentColumn(insertRuleRows(groupRows(lines), rules, images), b);
 }
 
 /**

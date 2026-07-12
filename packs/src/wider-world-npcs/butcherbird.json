@@ -3,7 +3,7 @@
   "_key": "!actors!HCdso0ZiBgbXd12J",
   "name": "Butcherbird",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "butcherbird",
     "reference": "the-great-wood",
@@ -22,7 +22,7 @@
       "max": 1
     },
     "armor": "1 (tiny)",
-    "damage": "peck d6-2 (hand, messy, 2 piercing)",
+    "damage": "peck d6-2 (_hand_, _messy_, 2 piercing)",
     "specialQuality": "",
     "instinct": {
       "selected": [

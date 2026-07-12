@@ -1,4 +1,24 @@
 export class ArcanumData extends foundry.abstract.TypeDataModel {
+	// Legacy arcana kept two per-group value stores (`unlockValues`, `backChoiceValues`), both keyed by
+	// the arcanum slug — which is also each group's own slug (see pack data + migrateArcanumChoiceGroupSlugs).
+	// Every choice group now reads/writes the ONE `choiceValues` store by its own slug (the generic path
+	// inserts use), so fold the legacy stores into it. Runs on raw source before schema cleaning; guarded on
+	// the legacy keys being present, so it never clobbers a plain `choiceValues` edit diff.
+	static migrateData(source) {
+		if (source && (source.unlockValues !== undefined || source.backChoiceValues !== undefined)) {
+			const merged = { ...(source.choiceValues ?? {}) };
+			for (const store of [source.unlockValues, source.backChoiceValues]) {
+				for (const [groupSlug, opts] of Object.entries(store ?? {})) {
+					merged[groupSlug] = { ...(merged[groupSlug] ?? {}), ...(opts ?? {}) };
+				}
+			}
+			source.choiceValues = merged;
+			delete source.unlockValues;
+			delete source.backChoiceValues;
+		}
+		return super.migrateData(source);
+	}
+
 	static defineSchema() {
 		const f = foundry.data.fields;
 		return {
@@ -10,8 +30,7 @@ export class ArcanumData extends foundry.abstract.TypeDataModel {
 			front:            new f.ObjectField({ nullable: true, initial: null }),
 			back:             new f.ObjectField({ nullable: true, initial: null }),
 			flipped:          new f.BooleanField({ initial: false }),
-			unlockValues:     new f.ObjectField({ initial: {} }),
-			backChoiceValues: new f.ObjectField({ initial: {} }),
+			choiceValues:     new f.ObjectField({ initial: {} }),
 		};
 	}
 }

@@ -1,74 +1,40 @@
-# stonetop-art — copyrighted book illustrations (not committed)
+# stonetop-art — illustrations from the Stonetop books
 
-The compendium packs reference illustrations from this folder using paths like
-`stonetop-art/arcana/mindgem.png` and `stonetop-art/wonders/<hash>.png`. Those paths resolve to
-**`Data/stonetop-art/...`** in a Foundry install (i.e. a top-level folder under Foundry's user
-data dir, *outside* the system install, so it survives manifest re-installs of the system).
+The Stonetop compendium can show the artwork from the books, but that art is copyrighted, so it
+can't be shipped with the system. This folder is where it goes. It starts empty — if you own the
+books, you can fill it from your own PDFs. If you don't, no problem: the game works normally, the
+pictures are just missing.
 
-These images are extracted from the copyrighted Stonetop books and **are not redistributable**, so
-everything in this folder except this README is git-ignored and never shipped. The shipped system
-contains only "trade dress" (UI chrome and the small marker glyphs under
-`assets/content/wonders/markers/`).
+## Generating the art
 
-## What goes here
+You need the book PDFs. Then run one command:
 
-| Subfolder            | Source                          | How to get it                                              |
-| -------------------- | ------------------------------- | ---------------------------------------------------------- |
-| `wonders/<hash>.png` | Book II articles                | `node scripts/import/pdf/build-journal.js` (see below)     |
-| `book-i/<hash>.png`  | Book I chapters                 | `node scripts/import/pdf/build-book1-journal.js`           |
-| `maps/<slug>.png`    | Setting/handout PDFs            | `node scripts/import/pdf/build-maps.js`                    |
-| `arcana/<slug>.png`  | Book II (manual crop)           | supply manually, named by item slug                        |
-| `playbooks/<slug>.png` | Book I pp. 105–137 (manual crop) | supply manually, named by playbook slug                  |
-| `steading/*.png`     | Book I                          | supply manually                                            |
+```sh
+npm run extract-art -- path/to/Book_II.pdf path/to/Book_I.pdf
+```
 
-The importers shell out to `mutool` (MuPDF) and poppler's `pdfimages`/`pdftoppm`; install those
-first (`dnf install mupdf poppler-utils`, `apt install mupdf-tools poppler-utils`, or similar).
-Point them at your own PDFs with `BOOK_PDF=/path/to/book.pdf`.
+That fills this folder with the illustrations — the wonders, the arcana, and the steading residents.
+Book I is optional: leave it off and you only miss the steading illustrations. (If your PDFs already sit
+in the `helper/` folder, plain `npm run extract-art` finds them.)
 
-## The content-addressing caveat (read before extracting)
+You can re-run it any time; it just refreshes the files.
 
-Hashed filenames (`wonders/`, `book-i/`) cover the **final encoded PNG bytes**, and the encoder's
-zlib deflate step produces different bytes on different zlib builds — pixel-identical images,
-different hashes. Consequences:
+## Using it in Foundry
 
-- **You cannot reproduce someone else's committed hashes** (including the ones shipped in this
-  repo's pack source). This has been verified the hard way: an exhaustive deflate parameter sweep
-  and a pako fallback both fail to match across toolchains.
-- Therefore art files and the pack refs that point at them must come from the **same importer run
-  on the same machine**. Don't run `extract-art.js` alone and expect shipped refs to resolve;
-  run the full journal build (`build-journal.js` / `build-book1-journal.js`), which extracts the
-  art *and* rewrites the pack source refs together, then recompile packs (`npm run pack`).
-- Recurring marker glyphs (trade dress, shipped in `assets/`) are recognized and routed *out* of
-  this folder by sha256 via `scripts/import/pdf/trade-dress.json`. On a new toolchain your marker
-  hashes won't be listed there yet — if small swirl/marker glyphs start appearing under
-  `wonders/`, add your toolchain's hashes to that routing table (keep the existing entries; it is
-  a merged, multi-toolchain list).
+Copy this whole folder into Foundry's data directory as **`Data/stonetop-art/`** — next to the
+system, not inside it, so updating Stonetop never wipes your art. Re-copy it whenever you regenerate.
+That's all; Foundry picks up the pictures on its own.
 
-Slug-named categories (`arcana/`, `maps/`, `playbooks/`, `steading/`) have none of these problems:
-any correctly-named file resolves, whatever produced it. Arcana and playbook portraits are manual
-crops — raw PDF extraction does not reproduce them — sized to taste; the slug is the item's/
-playbook's slug in the pack source.
 
-## Fresh-machine checklist
+## Fork extras (personal branch)
 
-1. Install `mupdf` + `poppler-utils`; `npm install`.
-2. `BOOK_PDF=/path/to/Book_II.pdf node scripts/import/pdf/build-journal.js` — populates
-   `wonders/` and rewrites the wider-world pack refs in the same run.
-3. (Fork extras, if you use them) `build-book1-journal.js` for `book-i/`, `build-maps.js` for
-   `maps/` — both take `MODULE_DIR=` for where the companion module lives.
-4. Copy your manual art (`arcana/`, `playbooks/`, `steading/`) from your previous machine — being
-   slug-named, it needs no regeneration. Hash-named art can be copied too, as long as you copy the
-   matching regenerated pack source with it.
-5. `npm run pack`, then check every `stonetop-art/...` ref in `packs/src/**` resolves to a file
-   here before deploying.
+The companion module's importers add two more categories here, same deal as the wonders:
 
-## Using it on a Foundry server
+| Path                | Source              | Regenerate with                                          |
+| ------------------- | ------------------- | -------------------------------------------------------- |
+| `book-i/<hash>.png` | Book I chapters     | `node scripts/import/pdf/build-book1-journal.js`          |
+| `maps/<slug>.png`   | Setting/handout PDFs| `node scripts/import/pdf/build-maps.js`                   |
 
-1. Populate this folder locally (steps above).
-2. Copy it to your server's data dir as **`Data/stonetop-art/`**, and re-sync after re-imports.
-
-For local development, `scripts/development/link.sh` also symlinks `Data/stonetop-art` → this
-folder so a linked dev world resolves the art with no copying.
-
-Players/GMs who don't own the books simply won't have these files; the system still works, those
-illustrations just show as missing images.
+Both take `MODULE_DIR=` pointing at the companion module. After regenerating anything, run the
+companion repo's `node tools/verify-art.mjs` — every `stonetop-art/...` ref in both pack trees
+must resolve before deploying.

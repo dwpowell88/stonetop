@@ -2,7 +2,7 @@
 	"_id": "9410O8O9uaLDj4SZ",
 	"_key": "!items!9410O8O9uaLDj4SZ",
 	"name": "Enfys, the Acolyte",
-	"type": "npc",
+	"type": "follower",
 	"img": "icons/svg/item-bag.svg",
 	"system": {
 		"slug": "enfys",

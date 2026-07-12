@@ -4,8 +4,7 @@
 	"name": "Mirrorshield",
 	"type": "move",
 	"system": {
-		"playbook": "The Judge",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Defend with a shield_**, you can spend 1 Readiness to intercept a magical force and redirect it to a different target (or none).",
 		"requirement": {
 			"level": 6,

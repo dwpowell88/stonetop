@@ -3,7 +3,7 @@
   "_key": "!actors!vbnXbITijaEo7BN2",
   "name": "Nerth serpent",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
   "system": {
     "slug": "nerth-serpent",
     "reference": "spirits-of-the-wild",
@@ -23,7 +23,7 @@
       "max": 20
     },
     "armor": "4 (resilience), or 0 against bare hands",
-    "damage": "bite and constrict d10+3 (hand, close, reach, forceful, grabby)",
+    "damage": "bite and constrict d10+3 (_hand_, _close_, _reach_, _forceful_, _grabby_)",
     "specialQuality": "tethered to the Nerth Tree",
     "instinct": {
       "selected": [

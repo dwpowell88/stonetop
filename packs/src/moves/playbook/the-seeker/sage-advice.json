@@ -4,8 +4,7 @@
 	"name": "Sage Advice",
 	"type": "move",
 	"system": {
-		"playbook": "The Seeker",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When **_another PC asks you for guidance_**, they get advantage on their next roll to follow your advice.",
 		"slug": "sage-advice"
 	},

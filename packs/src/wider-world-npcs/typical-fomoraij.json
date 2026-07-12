@@ -3,7 +3,7 @@
   "_key": "!actors!BXverLMvcOjCoPYN",
   "name": "“Typical” Fomoraij",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-creature.png",
   "system": {
     "slug": "typical-fomoraij",
     "reference": "fomoraij",
@@ -25,7 +25,7 @@
       "max": 26
     },
     "armor": "4 (resilience), 0 vs. bronze",
-    "damage": "mighty blows d12+3 (hand, close, forceful)",
+    "damage": "mighty blows d12+3 (_hand_, _close_, _forceful_)",
     "specialQuality": "can sense anything that happens in its lair (but might not think to)",
     "instinct": {
       "selected": [

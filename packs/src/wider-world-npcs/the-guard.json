@@ -3,7 +3,7 @@
   "_key": "!actors!w59J0ug7CjFPieoV",
   "name": "The Guard",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "the-guard",
     "reference": "marshedge",
@@ -21,7 +21,7 @@
       "max": 6
     },
     "armor": "2 (iron scales)",
-    "damage": "steel-tipped spear d8 (close, thrown, 2 piercing) Ex-Claw instinct to lord over others.",
+    "damage": "steel-tipped spear d8 (_close_, _thrown_, 2 piercing) Ex-Claw instinct to lord over others.",
     "specialQuality": "",
     "instinct": {
       "selected": [],

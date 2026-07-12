@@ -3,7 +3,7 @@
   "_key": "!actors!E0T4lBBLBNmqVkwb",
   "name": "Kyakaara",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-creature.png",
   "system": {
     "slug": "kyakaara",
     "reference": "the-whitefang-mountains",
@@ -26,7 +26,7 @@
       "max": 10
     },
     "armor": "1 (toughness)",
-    "damage": "from bronze, see only in shades of red",
+    "damage": "from bronze, see only in shades advantage (_hand_, _grabby_, _forceful_, _messy_, 1 piercing), or crude weapons d6 w/ advantage (tags by weapon) of red",
     "specialQuality": "inured to cold, take +1d4",
     "instinct": {
       "selected": [

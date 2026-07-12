@@ -3,7 +3,7 @@
   "_key": "!actors!9VzwXsSZil4Ox4d0",
   "name": "Specter",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "specter",
     "reference": "death-and-the-undying",
@@ -25,8 +25,8 @@
       "max": 23
     },
     "armor": "1 (lacks vitals)",
-    "damage": "telekinesis d10+2 (hand, close, near, grabby, forceful)",
-    "specialQuality": "bound to its tether one or more weaknesses (page 76)",
+    "damage": "telekinesis d10+2 (_hand_, _close_, _near_, _grabby_, _forceful_)",
+    "specialQuality": "bound to its tether; one or more weaknesses (page 76)",
     "instinct": {
       "selected": [
         "to torment the living"

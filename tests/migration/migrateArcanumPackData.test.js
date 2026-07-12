@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { migrateArcanumPackData } from "../../src/migration/migrateCharacter.js";
-import { FakeActorBuilder } from "../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../fakes/FakeCharacterActorBuilder.js";
 import { FakeArcanaRepository } from "../fakes/FakeArcanaRepository.js";
 
 const FRONT = { title: "Front", item: null, description: "desc", unlock: null };
@@ -17,14 +17,13 @@ function makeArcanumItem(slug, overrides = {}) {
 			front:            overrides.front ?? {},
 			back:             overrides.back  ?? {},
 			flipped:          false,
-			unlockValues:     {},
-			backChoiceValues: {},
+			choiceValues:     {},
 		},
 	};
 }
 
 function makeActor(items = []) {
-	return new FakeActorBuilder().withItems(items).build();
+	return new FakeCharacterActorBuilder().withItems(items).build();
 }
 
 function makeRepo(arcana = []) {
@@ -38,10 +37,13 @@ describe("migrateArcanumPackData", () => {
 		expect(actor.updatedDocs).toHaveLength(0);
 	});
 
-	it("skips arcanum items that already have front data", async () => {
-		const actor = makeActor([makeArcanumItem("maw", { front: FRONT, back: BACK })]);
+	it("refreshes a populated arcanum's front/back from the pack (so pack fixes reach characters)", async () => {
+		const STALE = { title: "Old", item: null, description: "stale", unlock: null };
+		const actor = makeActor([makeArcanumItem("maw", { front: STALE, back: { title: "Old back" } })]);
 		await migrateArcanumPackData(actor, makeRepo([{ slug: "maw", front: FRONT, back: BACK }]));
-		expect(actor.updatedDocs).toHaveLength(0);
+		const updated = actor.updatedDocs.find(d => d._id === "maw");
+		expect(updated?.system?.front).toEqual(FRONT);
+		expect(updated?.system?.back).toEqual(BACK);
 	});
 
 	it("updates front and back when front is empty object", async () => {
@@ -51,6 +53,18 @@ describe("migrateArcanumPackData", () => {
 		const updated = actor.updatedDocs.find(d => d._id === "maw");
 		expect(updated?.system?.front).toEqual(FRONT);
 		expect(updated?.system?.back).toEqual(BACK);
+	});
+
+	it("preserves player state — the update touches only front/back, never flipped/choiceValues", async () => {
+		const item = makeArcanumItem("maw", { front: FRONT, back: BACK });
+		item.system.flipped = true;
+		item.system.choiceValues = { maw: { "some-pick": { max: 3, value: 2 } } };
+		const actor = makeActor([item]);
+		await migrateArcanumPackData(actor, makeRepo([{ slug: "maw", front: FRONT, back: BACK }]));
+		const updated = actor.updatedDocs.find(d => d._id === "maw");
+		expect(Object.keys(updated.system)).toEqual(["front", "back"]);
+		expect(updated.system).not.toHaveProperty("flipped");
+		expect(updated.system).not.toHaveProperty("choiceValues");
 	});
 
 	it("skips items with no slug", async () => {

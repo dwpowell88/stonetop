@@ -3,7 +3,7 @@
   "_key": "!actors!aCqbeSD9T9UCO4mG",
   "name": "Cave bear",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "cave-bear",
     "reference": "the-great-wood",
@@ -22,7 +22,7 @@
       "max": 16
     },
     "armor": "1 (fur, hide)",
-    "damage": "claws, bite, hug d10+4 (hand, close, forceful, messy, 1 piercing)",
+    "damage": "claws, bite, hug d10+4 (_hand_, _close_, _forceful_, _messy_, 1 piercing)",
     "specialQuality": "",
     "instinct": {
       "selected": [

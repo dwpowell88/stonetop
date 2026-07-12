@@ -4,8 +4,7 @@
 	"name": "Dabbler",
 	"type": "move",
 	"system": {
-		"playbook": "The Fox",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "Each time you take this move, choose a move from the Heavy, Marshal, Ranger, or Seeker playbooks for which you otherwise qualify. (You can't take Improved Stat or Superior Stat.)",
 		"repeatMax": 3,
 		"requirement": {

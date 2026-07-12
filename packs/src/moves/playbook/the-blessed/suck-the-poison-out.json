@@ -4,8 +4,7 @@
   "name": "Suck the Poison Out",
   "type": "move",
   "system": {
-    "playbook": "The Blessed",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_draw a malady from a patient's body, mind, or soul_**, spend 1 Stock and roll +WIS.",
     "requirement": {
       "level": 6,

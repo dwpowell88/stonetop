@@ -4,8 +4,7 @@
   "name": "Alpha",
   "type": "move",
   "system": {
-    "playbook": "The Ranger",
-    "moveType": "playbook",
+    "moveType": null,
     "description": "When you **_assert dominance over another (beast, spirit, Fae, or person)_**, roll +WIS: **_on a 7+_**, they must pick 1 from the list below; **on a 10+**, you also have advantage on your next roll against them.\n\n- Accept your authority, at least for now\n- Slink away or flee, then avoid you\n- Fight you for dominance",
     "requirement": {
       "level": 6,

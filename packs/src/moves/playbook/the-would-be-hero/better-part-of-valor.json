@@ -4,8 +4,7 @@
 	"name": "Better Part of Valor",
 	"type": "move",
 	"system": {
-		"playbook": "The Would-Be Hero",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_are outnumbered or facing a foe bigger than you_**, you have advantage to hide from, escape from, or sneak past them.",
 		"slug": "better-part-of-valor"
 	},

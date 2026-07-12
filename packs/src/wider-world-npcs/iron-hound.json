@@ -3,7 +3,7 @@
   "_key": "!actors!EvPGTTnLuC13bx8f",
   "name": "Iron hound",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "iron-hound",
     "reference": "forge-lords",
@@ -25,7 +25,7 @@
       "max": 10
     },
     "armor": "4 (metal, lacks organs)",
-    "damage": "bite d6+2 (hand, grabby)",
+    "damage": "bite d6+2 (_hand_, _grabby_)",
     "specialQuality": "fireproof, heat-sensing",
     "instinct": {
       "selected": [

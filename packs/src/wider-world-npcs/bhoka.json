@@ -3,7 +3,7 @@
   "_key": "!actors!6yIzxYeSzJbuGZ5l",
   "name": "Bhoka",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-creature.png",
   "system": {
     "slug": "bhoka",
     "reference": "the-whitefang-mountains",
@@ -24,7 +24,7 @@
       "max": 16
     },
     "armor": "1 (hide)",
-    "damage": "talons 1d10+3 (hand, close, grabby, forceful)",
+    "damage": "talons 1d10+3 (_hand_, _close_, _grabby_, _forceful_)",
     "specialQuality": "blinded by full daylight or holy light, takes +1d4 damage from bronze",
     "instinct": {
       "selected": [

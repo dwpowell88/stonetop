@@ -1,0 +1,12 @@
+{
+	"_id": "1f7b4aad8b014357",
+	"_key": "!items!1f7b4aad8b014357",
+	"name": "Gather",
+	"type": "move",
+	"system": {
+		"slug": "gather",
+		"moveType": null,
+		"description": "Name an unliving object in your presence. If you speak this Word forward, the object is drawn forcefully towards you, possibly flying through the air and into your hand. If you speak backward, the object is flung away from you. If the object weighs more than you, or is secured by something that does, it is you that moves instead."
+	},
+	"folder": "ArcanaMoves00001"
+}

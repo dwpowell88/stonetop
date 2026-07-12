@@ -3,7 +3,7 @@
   "_key": "!actors!pAaHzD8H7BYKvnKJ",
   "name": "Alley cutthroats",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "alley-cutthroats",
     "reference": "gordins-delve",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "0",
-    "damage": "wicked knife d8 (hand)",
+    "damage": "wicked knife d8 (_hand_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

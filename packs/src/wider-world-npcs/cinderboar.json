@@ -3,7 +3,7 @@
   "_key": "!actors!EVqrxHQAhB9y8syg",
   "name": "Cinderboar",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "cinderboar",
     "reference": "the-things-below",
@@ -24,8 +24,8 @@
       "max": 14
     },
     "armor": "4 (resilience), 0 vs. bronze",
-    "damage": "gore d8+2 (hand, forceful, messy, 1 piercing)",
-    "specialQuality": "fireproof hot as banked coals; bleeds oily, choking smoke",
+    "damage": "gore d8+2 (_hand_, _forceful_, _messy_, 1 piercing)",
+    "specialQuality": "fireproof; hot as banked coals; bleeds oily, choking smoke",
     "instinct": {
       "selected": [
         "to destroy, especially the most stable people/things"

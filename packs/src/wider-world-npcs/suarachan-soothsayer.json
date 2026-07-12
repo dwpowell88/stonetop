@@ -3,7 +3,7 @@
   "_key": "!actors!e95ZBEeZivt1PHYN",
   "name": "Suarachan soothsayer",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "suarachan-soothsayer",
     "reference": "ferriers-fen",
@@ -24,7 +24,7 @@
       "max": 12
     },
     "armor": "0",
-    "damage": "poisonous skin d10 (hand), snapping tongue d4 (reach)",
+    "damage": "poisonous skin d10 (_hand_), snapping tongue d4 (_reach_)",
     "specialQuality": "excellent night vision, salt burns their skin, marked by the Things Below (page 432)",
     "instinct": {
       "selected": [

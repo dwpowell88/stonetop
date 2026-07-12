@@ -1,4 +1,5 @@
 import {vi} from "vitest";
+import {fakeI18n} from "./foundry/FakeI18n.js";
 
 export class FakeGameBuilder {
 	_packs = {};
@@ -17,7 +18,9 @@ export class FakeGameBuilder {
 				get: (id) => worldItems.find(i => i._id === id) ?? null,
 			},
 			actors: this._worldActors,
-			i18n: { localize: (key) => this._translations[key] ?? key },
+			// fakeI18n's format/has read the real en.json; localize still honors withTranslation()
+			// overrides (used by the tooltip tests) and falls back to the key like fakeI18n does.
+			i18n: { ...fakeI18n(), localize: (key) => this._translations[key] ?? key },
 		});
 	}
 

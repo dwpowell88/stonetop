@@ -3,7 +3,7 @@
   "_key": "!actors!kLzi4mM6tkcjhq12",
   "name": "Klezln",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "klezln",
     "reference": "the-flats",
@@ -22,7 +22,7 @@
       "max": 16
     },
     "armor": "3 (carapace)",
-    "damage": "pincers d10+3 (hand, close, grabby)",
+    "damage": "pincers d10+3 (_hand_, _close_, _grabby_)",
     "specialQuality": "senses vibrations, strong burrower",
     "instinct": {
       "selected": [

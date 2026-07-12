@@ -3,7 +3,7 @@
   "_key": "!actors!bQGEHqqIP26KSrIH",
   "name": "Hillfolk rider",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-folk.png",
   "system": {
     "slug": "hillfolk-rider",
     "reference": "hillfolk",
@@ -23,7 +23,7 @@
       "max": 6
     },
     "armor": "0 to 2 (thick hides, shield)",
-    "damage": "flint-tipped spear d8 (close, thrown, crude), cudgel d8 (close, crude), adz d8 (hand, crude), or bow d8 (near)",
+    "damage": "flint-tipped spear d8 (_close_, _thrown_, _crude_), cudgel d8 (_close_, _crude_), adz d8 (_hand_, _crude_), or bow d8 (_near_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

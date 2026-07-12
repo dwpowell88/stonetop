@@ -3,7 +3,7 @@
   "_key": "!actors!BmPgxQO4rvPr0KwO",
   "name": "False adept",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-skull.png",
   "system": {
     "slug": "false-adept",
     "reference": "rime-lords",
@@ -25,8 +25,8 @@
       "max": 19
     },
     "armor": "1 (lacks organs)",
-    "damage": "life-draining touch d8 (hand, ignores armor)",
-    "specialQuality": "tethered to some object  telepathic; powerful will",
+    "damage": "life-draining touch d8 (_hand_, ignores armor)",
+    "specialQuality": "tethered to some object; telepathic; powerful will",
     "instinct": {
       "selected": [
         "to amass more followers, more power"

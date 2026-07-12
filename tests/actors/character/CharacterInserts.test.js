@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { CharacterInserts } from "../../../src/actors/character/CharacterInserts.js";
 import { ChoiceGroupFactory } from "../../../src/actors/character/ChoiceGroupFactory.js";
-import { FakeActorBuilder } from "../../fakes/FakeActorBuilder.js";
+import { FakeCharacterActorBuilder } from "../../fakes/FakeCharacterActorBuilder.js";
 import { FakeMoves } from "../../fakes/FakeMoves.js";
 import { FakeInsertRepository } from "../../fakes/FakeInsertRepository.js";
 import { TestInsertItemBuilder } from "../../fakes/TestInsertItemBuilder.js";
@@ -12,7 +12,7 @@ const REVENANT = new TestInsertItemBuilder().withSlug("revenant").withName("Reve
 const GHOST    = new TestInsertItemBuilder().withId("insert-item-2").withSlug("ghost").withName("Ghost").build();
 
 function makeInserts({ items = [], moves = new FakeMoves(), repo = null } = {}) {
-	const actor = new FakeActorBuilder().withItems(items).build();
+	const actor = new FakeCharacterActorBuilder().withItems(items).build();
 	return { actor, inserts: new CharacterInserts(actor, new ChoiceGroupFactory(actor), moves, repo) };
 }
 
@@ -24,7 +24,7 @@ describe("CharacterInserts.onInsertDropped", () => {
 		const { inserts } = makeInserts({ moves });
 		await inserts.onInsertDropped(REVENANT);
 		expect(moves.addedCategories).toContainEqual({
-			type: "insert-revenant", name: "Revenant", slug: "revenant", moveSlugs: [],
+			type: "insert-revenant", name: "Revenant", moveSlugs: [],
 		});
 	});
 
@@ -120,7 +120,7 @@ describe("CharacterInserts.buildSnapshot", () => {
 	it("snapshot.description comes from item.system.description", async () => {
 		const item = new TestInsertItemBuilder().withDescription("<p>When you die…</p>").build();
 		const { inserts } = makeInserts({ items: [item] });
-		expect((await inserts.buildSnapshot())[0].description).toBe("<p>When you die…</p>");
+		expect((await inserts.buildSnapshot())[0].description.raw).toBe("<p>When you die…</p>");
 	});
 
 	it("snapshot.instinctGroup is a ChoiceGroup built from item.system.instinct", async () => {
@@ -225,7 +225,7 @@ describe("CharacterInserts.syncPlaybookInserts", () => {
 		expect(doc).toBeDefined();
 		expect(doc.type).toBe("insert");
 		expect(doc.flags?.stonetop?.grantedByPlaybook).toBe("the-lightbearer");
-		expect(moves.addedCategories).toContainEqual({ type: "insert-invoc", name: "Invocations", slug: "invoc", moveSlugs: [] });
+		expect(moves.addedCategories).toContainEqual({ type: "insert-invoc", name: "Invocations", moveSlugs: [] });
 	});
 
 	it("does not duplicate an already-embedded granted insert", async () => {

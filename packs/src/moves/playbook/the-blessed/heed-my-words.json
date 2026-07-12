@@ -4,8 +4,7 @@
 	"name": "Heed My Words",
 	"type": "move",
 	"system": {
-		"playbook": "The Blessed",
-		"moveType": "playbook",
+		"moveType": null,
 		"description": "When you **_Persuade by talking sense or warning against foolishness_**, you have advantage.",
 		"slug": "heed-my-words"
 	},

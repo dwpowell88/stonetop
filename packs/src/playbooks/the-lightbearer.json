@@ -1,7 +1,7 @@
 {
   "_id": "8OTE4Z7HMG1Os7C8",
   "_key": "!items!8OTE4Z7HMG1Os7C8",
-  "img": "stonetop-art/playbooks/the-lightbearer.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-lightbearer.png",
   "name": "The Lightbearer",
   "type": "playbook",
   "flags": {},
@@ -9,7 +9,9 @@
     "slug": "the-lightbearer",
     "actorType": "character",
     "followers": [],
-    "inserts": ["lightbearer-invocations-insert"],
+    "inserts": [
+      "lightbearer-invocations-insert"
+    ],
     "description": "Imagine yourself and your kin in a cave lit by a single torch, entranced by shadow puppet stories. Imagine realizing there is a greater truth, and stepping out of the cave into the true Light of day. Would you not bring that Light back into the darkness, to set your people free?",
     "startingMovesNote": "You start with Consecrated Flame and Invoke the Sun God, plus 1 more of your choice.",
     "damage": {
@@ -747,6 +749,36 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "a-candle-against-the-dark",
+      "all-is-illuminated",
+      "and-behold-a-pale-horse",
+      "burn-twice-as-bright",
+      "consecrated-flame",
+      "empowered-invocations",
+      "fire-within",
+      "glorious-servant",
+      "guiding-light",
+      "heliors-unblinking-eye",
+      "hungry-flames",
+      "improved-stat",
+      "invoke-the-sun-god",
+      "keep-the-home-fires-burning",
+      "lamplighter",
+      "light-more-light",
+      "luminous-shield",
+      "piety",
+      "purifying-flames",
+      "radiant-countenance",
+      "rise-like-the-sun",
+      "springs-first-thaw",
+      "superior-stat",
+      "wielder-of-the-white-flame"
+    ],
+    "startingMoves": [
+      "consecrated-flame",
+      "invoke-the-sun-god"
+    ]
   }
 }

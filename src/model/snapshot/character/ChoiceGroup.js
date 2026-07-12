@@ -1,3 +1,5 @@
+import { rich } from "../RichText.js";
+
 export class ChoiceOption {
 	constructor(slug, {text = null, description = null, checked = false, checks = null, requires = null, type = null, fillValue = ""} = {}) {
 		this.slug        = slug;
@@ -100,11 +102,11 @@ export class ChoiceGroup {
 			: null;
 		const c = item.content ?? {};
 		const content = {
-			title:        c.title ?? null,
-			titleNote:    c.titleNote ?? null,
-			subtitle:     c.subtitle ?? null,
-			subtitleNote: c.subtitleNote ?? null,
-			text:         c.text ?? null,
+			title:        rich(c.title),
+			titleNote:    rich(c.titleNote),
+			subtitle:     rich(c.subtitle),
+			subtitleNote: rich(c.subtitleNote),
+			text:         rich(c.text),
 		};
 
 		const followers = (item.followers ?? []).map(s => followersBySlug[s] ?? null).filter(Boolean);
@@ -127,7 +129,7 @@ export class ChoiceGroup {
 		return new ChoiceRow(
 			(item.options ?? []).map(o => new ChoiceOption(o.slug, {
 				text:        o.content?.title ?? o.text ?? null,
-				description: o.content?.text  ?? o.description ?? null,
+				description: rich(o.content?.text ?? o.description ?? null),
 				checked:     values.getCount(es, o.slug) > 0,
 				type:        o.type ?? null,
 				fillValue:   o.type === "input" ? values.getText(es, o.slug + "-fill") : "",

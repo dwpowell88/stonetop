@@ -3,7 +3,7 @@
   "_key": "!actors!2GD8UUc3NUkwTtvH",
   "name": "Mosaic swarm",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-pyramid.png",
   "system": {
     "slug": "mosaic-swarm",
     "reference": "stone-lords",
@@ -24,8 +24,8 @@
       "max": 24
     },
     "armor": "3 (made of thousands of ceramic tiles)",
-    "damage": "jagged fists of ceramic d10+3 (hand, close, forceful)",
-    "specialQuality": "externally powered bug- like mind; blind; tremorsense; unharmed by piercing weapons; half damage from cutting weapons; vulnerable to attacks that are blunt and forceful or area",
+    "damage": "jagged fists of ceramic d10+3 (_hand_, _close_, _forceful_)",
+    "specialQuality": "externally powered; bug- like mind; blind; tremorsense; unharmed by piercing weapons; half damage from cutting weapons; vulnerable to attacks that are blunt and forceful or area",
     "instinct": {
       "selected": [
         "to destroy intruders"

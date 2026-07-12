@@ -1,7 +1,7 @@
 {
   "_id": "RbcwUiSxq1sgau7L",
   "_key": "!items!RbcwUiSxq1sgau7L",
-  "img": "stonetop-art/playbooks/the-blessed.png",
+  "img": "systems/stonetop/assets/content/playbooks/the-blessed.png",
   "name": "The Blessed",
   "type": "playbook",
   "flags": {},
@@ -741,6 +741,35 @@
           ]
         }
       ]
-    }
+    },
+    "moves": [
+      "amulets-talismans",
+      "barkskin",
+      "big-magic",
+      "borrow-power",
+      "call-the-spirits",
+      "danus-grasp",
+      "healers-arts",
+      "heed-my-words",
+      "improved-stat",
+      "into-the-lions-den",
+      "lightning-rod",
+      "natures-wrath",
+      "potent-workings",
+      "rites-of-the-land",
+      "shared-souls",
+      "spirit-tongue",
+      "suck-the-poison-out",
+      "superior-stat",
+      "trackless-step",
+      "veil",
+      "voice-of-the-earth-mother",
+      "wards-bindings",
+      "wild-soul"
+    ],
+    "startingMoves": [
+      "call-the-spirits",
+      "spirit-tongue"
+    ]
   }
 }

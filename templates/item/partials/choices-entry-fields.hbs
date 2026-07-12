@@ -22,10 +22,13 @@
 	       data-choices-target="{{_target}}" data-choices-row-index="{{_rowIndex}}" {{#if _hasOptionIndex}}data-choices-option-index="{{_optionIndex}}"{{/if}} data-choices-field="content.subtitleNote"
 	       value="{{content.subtitleNote}}">
 </label>
-<label class="choices-field">
+<label class="choices-field choices-field--rich">
 	<span>Text</span>
-	<textarea
-	       data-choices-target="{{_target}}" data-choices-row-index="{{_rowIndex}}" {{#if _hasOptionIndex}}data-choices-option-index="{{_optionIndex}}"{{/if}} data-choices-field="content.text">{{content.text}}</textarea>
+	{{!-- Rich body text: seeded with HTML (content.textHtml = md→HTML) and saved back as HTML through
+	      the choiceGroupEditorMixin change handler (whole-group atomic write). --}}
+	<prose-mirror class="choices-rich-text"
+	       data-choices-target="{{_target}}" data-choices-row-index="{{_rowIndex}}" {{#if _hasOptionIndex}}data-choices-option-index="{{_optionIndex}}"{{/if}} data-choices-field="content.text"
+	       value="{{content.textHtml}}"></prose-mirror>
 </label>
 <div class="choices-field">
 	<span>Followers</span>

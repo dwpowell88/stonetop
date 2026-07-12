@@ -7,7 +7,33 @@ import {
 	ArcanumBackSnapshotBuilder, ArcanumFrontSnapshotBuilder, ArcanumSnapshotBuilder,
 	ChoiceGroup, ChoiceValues,
 } from "../../model/snapshot/character/CharacterSnapshot.js";
+import { MoveSnapshotBuilder, ValueMax } from "../../model/snapshot/character/MoveSnapshot.js";
+import { rich } from "../../model/snapshot/RichText.js";
 import { ResourceController } from "./ResourceController.js";
+
+// Shape a major-arcanum back "mystery move" ({id, name, text, subtitle?}) as a MoveSnapshot so it
+// renders through the SAME move-item partial as the moves tab. This is the fallback for minor/custom
+// arcana that carry inline back.moves (no owned move item), so it's always active ({1,1}, checkbox
+// suppressed) and non-rollable (no ownedId/rollStat). MAJOR arcana bypass this: their mystery moves are
+// real owned move items resolved via CharacterMoves (moveSnapshots), which carry ownedId + rollStat.
+export function buildArcanumMoveSnapshot(move) {
+	return new MoveSnapshotBuilder()
+		.withId(move.id ?? null)
+		.withOwnedId(null)
+		.withSlug(move.id ?? null)
+		.withName(move.name ?? "")
+		.withDescription(rich(move.text ?? ""))
+		.withRollStat(null)
+		.withSource({ type: "arcanum" })
+		.withSourceLabel(move.subtitle || null)
+		.withSelection(new ValueMax(1, 1))
+		.withSelectable(false)
+		.withRequirement(null)
+		.withRequiresLabel(null)
+		.withResource(null)
+		.withChoices(null)
+		.build();
+}
 
 // Shape an arcanum side's item like an OutfitItemSnapshot so it renders through the shared
 // outfit-item-row partial. `slug` is the ARCANUM slug (the checkbox/resource toggle the character's
@@ -18,8 +44,8 @@ export function buildArcanumOutfitItem(slug, itemData, resolvedResource = undefi
 		slug,
 		name:            itemData.name,
 		weight:          itemData.weight ?? null,
-		tags:            itemData.tags ?? null,
-		note:            itemData.note ?? null,
+		tags:            rich(itemData.tags ?? null),
+		note:            rich(itemData.note ?? null),
 		inventoryColumn: itemData.inventoryColumn ?? null,
 		twoCol:          itemData.twoCol ?? false,
 		resource:        resolvedResource !== undefined ? resolvedResource : (itemData.resource ?? null),
@@ -31,28 +57,28 @@ export function buildArcanumOutfitItem(slug, itemData, resolvedResource = undefi
 
 export function buildArcanumSnapshot(arcanum, {
 	flipped          = false,
-	unlockValues     = new ChoiceValues({}),
-	backChoiceValues = new ChoiceValues({}),
+	choiceValues     = new ChoiceValues({}),
 	followersBySlug  = {},
 	stats            = new Map(),   // empty Map is safe for both `.get(x)` and `[x]?.value` access
 	current          = 0,
 	checked          = false,
 	owned            = true,
+	moveSnapshots    = null,        // major arcana: real `move`-item snapshots resolved by the caller
 } = {}) {
 	const item = arcanum;
 
-	// Unlock/back-choice VALUES are keyed by the ARCANUM slug (see migrateArcana + the card's
-	// cgGroup=slug writes). Canonical packs author the group slug == arcanum slug so it lines up,
-	// but a custom arcanum's group keeps its literal slug ("unlock"/"choices"); force the namespace
-	// to the arcanum slug so reads match the writer regardless of how the group was authored.
+	// Every choice group on the arcanum (front.unlock, back.choices, back.consequences) reads and
+	// writes the ONE `choiceValues` store by its OWN slug — the same generic path inserts use. No
+	// forced namespaces, no per-group stores.
 	const unlock = item.front.unlock
-		? ChoiceGroup.fromPackData({ ...item.front.unlock, slug: item.slug }, unlockValues)
+		? ChoiceGroup.fromPackData(item.front.unlock, choiceValues)
 		: null;
 
 	const front = new ArcanumFrontSnapshotBuilder()
-		.withTitle(item.front.title)
+		.withTitle(rich(item.front.title))
 		.withItem(buildArcanumOutfitItem(item.slug, item.front.item, undefined, checked))
-		.withDescription(item.front.description)
+		.withTags(item.front.tags)
+		.withDescription(rich(item.front.description))
 		.withUnlock(unlock)
 		.build();
 
@@ -73,20 +99,22 @@ export function buildArcanumSnapshot(arcanum, {
 		: null;
 
 	const backChoices = item.back.choices
-		? ChoiceGroup.fromPackData({ ...item.back.choices, slug: item.slug }, backChoiceValues, followersBySlug)
+		? ChoiceGroup.fromPackData(item.back.choices, choiceValues, followersBySlug)
 		: null;
 
 	const consequences = item.back.consequences
-		? ChoiceGroup.fromPackData(item.back.consequences, new ChoiceValues({}))
+		? ChoiceGroup.fromPackData(item.back.consequences, choiceValues)
 		: null;
 
 	const back = new ArcanumBackSnapshotBuilder()
-		.withTitle(item.back.title)
+		.withTitle(rich(item.back.title))
 		.withItem(buildArcanumOutfitItem(item.slug, item.back.item, backItemResource, checked))
-		.withDescription(item.back.description)
+		.withDescription(rich(item.back.description))
 		.withResource(backResource)
 		.withChoices(backChoices)
-		.withMoves(item.back.moves)
+		// Major arcana render their mystery moves as real `move` items (passed in as moveSnapshots);
+		// minor/custom arcana fall back to the inline back.moves shape.
+		.withMoves(moveSnapshots ?? (item.back.moves ?? []).map(buildArcanumMoveSnapshot))
 		.withConsequences(consequences)
 		.withUnlockAt(item.back.unlockAt)
 		.build();

@@ -3,7 +3,7 @@
   "_key": "!actors!CpCwnfUua4WOF4A2",
   "name": "Tonnerhorn",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/icons/npc.png",
   "system": {
     "slug": "tonnerhorn",
     "reference": "north-manmarch",
@@ -24,7 +24,7 @@
       "max": 7
     },
     "armor": "0",
-    "damage": "butt/gore d6+2 (hand, close, forceful)",
+    "damage": "butt/gore d6+2 (_hand_, _close_, _forceful_)",
     "specialQuality": "",
     "instinct": {
       "selected": [

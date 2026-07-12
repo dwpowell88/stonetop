@@ -1,20 +1,42 @@
 {
+	"_id": "3z1iQ7P9QK4vMuog",
+	"_key": "!items!3z1iQ7P9QK4vMuog",
 	"name": "The Spirit in the Cloak",
-	"type": "npc",
-	"img": "icons/svg/item-bag.svg",
+	"type": "follower",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-wind.png",
 	"system": {
 		"slug": "spirit-in-the-cloak",
+		"reference": null,
 		"arcanaSlug": "cloak-richly-embroidered",
+		"tagList": {
+			"selected": [
+				"Spirit",
+				"magical",
+				"proud",
+				"mute"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
 		"hp": {
 			"value": 0,
 			"max": 13
 		},
-		"armor": "1",
-		"damage": "d6",
+		"armor": "1 (amorphous)",
+		"damage": "lashing wind, rain, debris [[/r d6]] (_near, area_)",
 		"specialQuality": "",
 		"instinct": {
 			"selected": [
 				"to \"not hear\" your commands"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"cost": {
+			"selected": [
+				"flying about for hours"
 			],
 			"options": [],
 			"multi": false,
@@ -30,32 +52,10 @@
 				"list": []
 			}
 		],
-		"description": "",
 		"moves": "- Bear its master aloft on a cushion of swirling winds\n- Manifest a storm as it flies\n- Wreak havoc on its surroundings\n- Fling lightning from a raging storm, d10+3 (far, forceful, reload)",
-		"cost": {
-			"selected": [
-				"flying about for hours (Loyalty ◯◯◯)"
-			],
-			"options": [],
-			"multi": false,
-			"allowCustom": true
-		},
-		"notes": "",
-		"reference": null,
-		"tagList": {
-			"selected": [
-				"spirit",
-				"magical",
-				"proud",
-				"mute"
-			],
-			"options": [],
-			"multi": true,
-			"allowCustom": true
-		}
+		"description": "",
+		"notes": ""
 	},
 	"flags": {},
-	"folder": "BNaYX2Y4eMe7EOPK",
-	"_id": "3z1iQ7P9QK4vMuog",
-	"_key": "!items!3z1iQ7P9QK4vMuog"
+	"folder": "BNaYX2Y4eMe7EOPK"
 }

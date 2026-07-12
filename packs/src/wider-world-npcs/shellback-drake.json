@@ -3,7 +3,7 @@
   "_key": "!actors!GYvLHmG7iAaHEO3D",
   "name": "Shellback drake",
   "type": "npc",
-  "img": "icons/svg/mystery-man.svg",
+  "img": "systems/stonetop/assets/content/wonders/markers/marker-beast.png",
   "system": {
     "slug": "shellback-drake",
     "reference": "the-flats",
@@ -23,11 +23,11 @@
       "max": 16
     },
     "armor": "3 (carapace, scales)",
-    "damage": "snapping, bone-crushing bite d10 (hand, close, grabby, messy, 1 piercing)",
+    "damage": "snapping, bone-crushing bite d10 (_hand_, _close_, _grabby_, _messy_, 1 piercing)",
     "specialQuality": "nearly blind, senses vibrations",
     "instinct": {
       "selected": [
-        "to lash out at “food” in range"
+        "to lash out at \"food\" in range"
       ],
       "options": [],
       "multi": false,
