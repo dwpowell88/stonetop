@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { linkArcana } from "../../../scripts/import/pdf/arcana.js";
+import { linkArcana, linkArtifactHeadings } from "../../../scripts/import/pdf/arcana.js";
+import { deterministicId } from "../../../scripts/import/ids.js";
 
 const index = [
 	{ name: "Ring of Daagon", uuid: "Compendium.stonetop.arcana.Item.aaaaaaaaaaaaaaaa" },
@@ -57,5 +58,35 @@ describe("linkArcana — descriptive Minor Arcana (page-gated)", () => {
 	it("tolerates a closing emphasis tag between the name and the citation", () => {
 		const { linked } = linkArcana("<em>A gold ring</em> (page 374)", descIndex);
 		expect(linked).toBe(1);
+	});
+});
+
+describe("linkArtifactHeadings", () => {
+	const braceletId = deterministicId("possessions", "artifact:a-lead-bracelet");
+
+	it("links a bare artifact heading to its possession item (deterministic id)", () => {
+		const { html, linked } = linkArtifactHeadings(
+			'<h3>A lead bracelet</h3><p class="artifact-tags"><em>magical</em>, Value 1</p><p>A torc.</p>');
+		expect(linked).toBe(1);
+		expect(html).toContain(`<h3>@UUID[Compendium.stonetop.possessions.Item.${braceletId}]{A lead bracelet}</h3>`);
+	});
+
+	it("keeps the heading's marker icon outside the link", () => {
+		const { html } = linkArtifactHeadings(
+			'<h3><img class="icon" src="x.png">A lead bracelet</h3><p class="artifact-tags">Value 1</p>');
+		expect(html).toContain('<h3><img class="icon" src="x.png">@UUID[');
+	});
+
+	it("skips NPC-shaped blocks (spirits/followers share the markup)", () => {
+		const { linked } = linkArtifactHeadings(
+			'<h3>Hearth spirit</h3><p class="artifact-tags">Solitary, spirit, friendly</p>');
+		expect(linked).toBe(0);
+	});
+
+	it("skips headings linkArcana already wrapped (no double link)", () => {
+		const input = '<h3>@UUID[Compendium.stonetop.possessions.Item.abcdefabcdefabcd]{Crystal knife}</h3><p class="artifact-tags">Value 2</p>';
+		const { html, linked } = linkArtifactHeadings(input);
+		expect(linked).toBe(0);
+		expect(html).toBe(input);
 	});
 });

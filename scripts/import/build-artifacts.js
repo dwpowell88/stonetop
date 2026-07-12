@@ -28,7 +28,7 @@ const PACK = "possessions";
 const FOLDER_NAME = "Artifacts";
 
 // NPC-shaped tag lines: spirits and followers share the artifact markup but are not items.
-const NPC_TAGS = /\b(spirit|solitary|group|horde|primordial)\b|instinct/i;
+export const NPC_TAGS = /\b(spirit|solitary|group|horde|primordial)\b|instinct/i;
 
 /** Minimal HTML → the markdown dialect used by existing pack descriptions. */
 export function htmlToMarkdown(html) {

@@ -4,6 +4,9 @@
 // Conservative by design (the user's call): exact proper-noun match only, arcana pack only.
 import { readdirSync, readFileSync } from "fs";
 import path from "path";
+import { deterministicId } from "../ids.js";
+import { toSlug } from "../../../src/utils/slug.js";
+import { htmlToMarkdown, NPC_TAGS } from "../build-artifacts.js";
 
 const SYSTEM = "stonetop";
 export const ARCANA_PACK = "arcana";
@@ -83,5 +86,28 @@ export function linkArcana(html, index) {
 			return `@UUID[${byLower.get(key)}]{${name}}`;
 		});
 	}
+	return { html: out, linked };
+}
+
+/**
+ * Link each artifact stat-block heading to its possession item. linkArcana already wraps the
+ * proper-noun artifact headings (their heading is the name's first mention), but descriptive
+ * names ("A lead bracelet") only mention-link next to a page citation — their headings stay
+ * plain. Every artifact block heading should open the item, so wrap whatever linkArcana left
+ * bare; the ids are deterministic (same recipe as build-artifacts), so no pack lookup is needed.
+ * NPC-shaped blocks (spirits/followers share the markup) are left alone. Run AFTER linkArcana —
+ * an already-wrapped heading contains "@" and is skipped, avoiding a double link.
+ */
+export function linkArtifactHeadings(html) {
+	let linked = 0;
+	const out = html.replace(
+		/(<h3>)((?:<img[^>]*>)?)\s*([^<@]+?)\s*(<\/h3>\s*<p class="artifact-tags">)(.*?)(<\/p>)/g,
+		(m, h3, icon, name, mid, tags, end) => {
+			if (NPC_TAGS.test(htmlToMarkdown(tags))) return m;
+			const label = htmlToMarkdown(name);
+			const id = deterministicId("possessions", `artifact:${toSlug(label)}`);
+			linked++;
+			return `${h3}${icon}@UUID[${itemUuid("possessions", id)}]{${label}}${mid}${tags}${end}`;
+		});
 	return { html: out, linked };
 }

@@ -15,7 +15,7 @@ import { renderHtml } from "./render-html.js";
 import { loadArticlePages } from "./load.js";
 import { annotateTables } from "./tables.js";
 import { buildPageMap, linkPageRefs } from "./crossref.js";
-import { loadArcanaIndex, linkArcana } from "./arcana.js";
+import { loadArcanaIndex, linkArcana, linkArtifactHeadings } from "./arcana.js";
 import { extractImprovements, improvementUuid } from "./improvements.js";
 import { applyManualEdits } from "./manual-edits.js";
 import { extractChrome, extractSwirls } from "./images.js";
@@ -136,10 +136,11 @@ for (const { i, r, slug, body, page } of built) {
 	const id = deterministicId(JOURNAL_PACK, slug);
 	const pageLinked = linkPageRefs(body, pageMap, { selfSlug: slug });
 	const arc = linkArcana(pageLinked.html, arcanaIndex);
-	const edited = applyManualEdits(arc.html, slug); // one-off per-article corrections (see manual-edits.js)
+	const heads = linkArtifactHeadings(arc.html); // descriptive-named artifact headings linkArcana skips
+	const edited = applyManualEdits(heads.html, slug); // one-off per-article corrections (see manual-edits.js)
 	for (const m of edited.misses) flags.push(`? ${r.title}: manual edit matched nothing — ${m}`);
 	links += pageLinked.linked;
-	arcanaLinks += arc.linked;
+	arcanaLinks += arc.linked + heads.linked;
 	const ref = page ? `<p class="wonder-pageref">Book of the Wider World — p.${page}</p>` : "";
 	const content = `<div class="stonetop-wonder">${ref}${edited.html}</div>`;
 
