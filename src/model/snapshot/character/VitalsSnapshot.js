@@ -12,6 +12,7 @@ export class ValueMax {
  * @property {number} armor
  * @property {number} level
  * @property {ValueMax} xp  - max = 6 + level * 2
+ * @property {boolean} canLevelUp - Level Up's trigger (p. 81): XP equal to (or greater than) the threshold
  */
 export class VitalsSnapshot {
 	constructor(b) {
@@ -20,6 +21,7 @@ export class VitalsSnapshot {
 		this.armor  = b._armor;
 		this.level  = b._level;
 		this.xp     = b._xp;
+		this.canLevelUp = !!b._xp && b._xp.max > 0 && b._xp.value >= b._xp.max;
 	}
 }
 

@@ -85,6 +85,12 @@ export function createStonetopCharacterSheetClass(Base) {
 				this._stonetopCharacter.setLevel(input.value);
 			}, true);
 
+			html[0].addEventListener("click", ev => {
+				const btn = ev.target.closest(".stonetop-level-up");
+				if (!btn) return;
+				this._onLevelUp();
+			}, true);
+
 			html.find("[name=stonetop-roll-mode]").on("change", ev => {
 				this._stonetopCharacter.setRollMode(ev.currentTarget.value);
 			});
@@ -637,6 +643,39 @@ export function createStonetopCharacterSheetClass(Base) {
 			const fSlug = this._followerInvSlug(el);
 			if (fSlug) return this._stonetopCharacter.setFollowerInvResource(fSlug, slug, newVal);
 			await this._stonetopCharacter.setInventoryResource(slug, newVal);
+		}
+
+		async _onLevelUp() {
+			const snap = await this._stonetopCharacter.buildSnapshot();
+			const { xp, level, canLevelUp } = snap.vitals;
+			if (!canLevelUp) return;
+			const L = (k, data) => game.i18n.format(`stonetop.character.levelUp.${k}`, data);
+			const slug = this._stonetopCharacter.playbookSlug;
+			const lines = [
+				`<p>${L("prompt", { spent: xp.max, level: level + 1, xp: xp.value, remaining: xp.value - xp.max })}</p>`,
+				`<p>${L("pickMove")}</p>`,
+			];
+			if (slug === "the-blessed")     lines.push(`<p><em>${L("blessedExtra")}</em></p>`);
+			if (slug === "the-lightbearer") lines.push(`<p><em>${L("lightbearerExtra")}</em></p>`);
+			new Dialog({
+				title: L("title"),
+				content: lines.join(""),
+				buttons: {
+					levelUp: {
+						label: L("confirm"),
+						callback: async () => {
+							const result = await this._stonetopCharacter.levelUp();
+							if (!result) return;
+							ChatMessage.create({
+								speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+								content: L("chat", { name: this.actor.name, ...result }),
+							});
+						},
+					},
+					cancel: { label: game.i18n.localize("Cancel") },
+				},
+				default: "levelUp",
+			}).render(true);
 		}
 
 		async _onAddInventoryItem(ev) {
