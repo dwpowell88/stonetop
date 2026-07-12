@@ -29,7 +29,7 @@
 			"max": 8
 		},
 		"armor": "1 (leather cuirass)",
-		"damage": "knife d8 (hand), sling d6 (near, reload)",
+		"damage": "knife d8 (_hand_), sling d6 (_near_, _reload_)",
 		"specialQuality": "",
 		"instinct": {
 			"selected": [

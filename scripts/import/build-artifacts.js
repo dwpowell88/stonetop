@@ -55,8 +55,12 @@ export function extractBlocks(html) {
 	const re = /<h3>(?:<img[^>]*>)?\s*([^<]+?)\s*<\/h3>\s*<p class="artifact-tags">(.*?)<\/p>/g;
 	let m;
 	while ((m = re.exec(html))) {
-		const name = htmlToMarkdown(m[1]);
-		const tags = htmlToMarkdown(m[2]);
+		// The journal build cross-links artifact headings to their arcana items, so the heading
+		// text can arrive as @UUID[...]{Name} — the item's name (and slug) want the bare label.
+		const name = htmlToMarkdown(m[1]).replace(/@UUID\[[^\]]*\]\{([^}]*)\}/g, "$1");
+		// The book prints a tracking checkbox before some tags (□ magical); the glyph is page
+		// furniture, not part of the tag.
+		const tags = htmlToMarkdown(m[2]).replace(/□\s*/g, "");
 		// Body: everything up to the next heading (any level). Column/page wrappers inside the
 		// span are structural noise that htmlToMarkdown strips.
 		const rest = html.slice(re.lastIndex);
