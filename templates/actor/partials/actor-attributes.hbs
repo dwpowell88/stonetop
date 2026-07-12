@@ -32,6 +32,11 @@
 			<span>/</span>
 			<span class="stonetop-resource__max">{{stonetop.vitals.xp.max}}</span>
 		</div>
+		{{#if stonetop.vitals.canLevelUp}}
+		<button type="button" class="stonetop-level-up" title="{{localize "stonetop.character.levelUp.title"}}">
+			{{localize "stonetop.character.levelUp.button"}}
+		</button>
+		{{/if}}
 	</div>
 
 	<div class="stonetop-resource stonetop-resource--small">

@@ -245,3 +245,46 @@ describe("CharacterVitals.unmarkXp", () => {
 		expect(snap.xp.value).toBe(2);
 	});
 });
+
+// -- levelUp ---------------------------------------------------------------------
+
+describe("CharacterVitals.levelUp", () => {
+	it("spends 6 + 2×level XP, raises the level, and carries the excess over", async () => {
+		const vitals = makeVitals({ level: 1, xp: { value: 14 } });
+		const result = await vitals.levelUp();
+		expect(result).toEqual({ level: 2, spent: 8, remaining: 6 });
+		const snap = await vitals.buildVitalsSnapshot();
+		expect(snap.level).toBe(2);
+		expect(snap.xp.value).toBe(6);
+		expect(snap.xp.max).toBe(10); // next threshold: 6 + 2×2
+	});
+
+	it("triggers at exactly the threshold, leaving 0 XP", async () => {
+		const vitals = makeVitals({ level: 1, xp: { value: 8 } });
+		expect(await vitals.levelUp()).toEqual({ level: 2, spent: 8, remaining: 0 });
+	});
+
+	it("is a no-op below the threshold", async () => {
+		const vitals = makeVitals({ level: 1, xp: { value: 7 } });
+		expect(await vitals.levelUp()).toBeNull();
+		const snap = await vitals.buildVitalsSnapshot();
+		expect(snap.level).toBe(1);
+		expect(snap.xp.value).toBe(7);
+	});
+
+	it("uses the current level's threshold (level 3 needs 12)", async () => {
+		const vitals = makeVitals({ level: 3, xp: { value: 12 } });
+		expect(await vitals.levelUp()).toEqual({ level: 4, spent: 12, remaining: 0 });
+	});
+});
+
+describe("VitalsSnapshot.canLevelUp", () => {
+	it("is true at or above the threshold", async () => {
+		expect((await makeVitals({ level: 1, xp: { value: 8 } }).buildVitalsSnapshot()).canLevelUp).toBe(true);
+		expect((await makeVitals({ level: 1, xp: { value: 14 } }).buildVitalsSnapshot()).canLevelUp).toBe(true);
+	});
+
+	it("is false below the threshold", async () => {
+		expect((await makeVitals({ level: 1, xp: { value: 7 } }).buildVitalsSnapshot()).canLevelUp).toBe(false);
+	});
+});
