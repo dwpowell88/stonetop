@@ -1,4 +1,4 @@
-// Extract the artifact stat blocks embedded in the Wider World articles into arcanum items.
+// Extract the artifact stat blocks embedded in the Wider World articles into possession items.
 //
 //   node scripts/import/build-artifacts.js
 //
@@ -8,13 +8,12 @@
 // markup also carries spirit/follower stat blocks, which are filtered out by their tag lines
 // (Solitary/Group/Horde/spirit/Instinct — those are NPCs, not items).
 //
-// Output: packs/src/arcana/artifacts/<slug>.json — arcanum cards following the pack's existing
-// convention: the front is the object as found (physical description, no unlock section — the
-// sheet renders it as optional), the back is the revealed item with its powers. The split is at
-// the first "When you …" move paragraph; move text stays inside the back description as
-// bold-italic markdown, matching how existing arcana render it. Ids are deterministic, so
-// regeneration never breaks links. TODO once upstream's checkable arcanum moves land (0.13.0):
-// emit structured moves entries as well.
+// Output: packs/src/possessions/artifacts/<slug>.json — possession items in an Artifacts
+// compendium folder. Artifacts don't share the arcanum front/back model, so the whole block is
+// one description: the tag line, the body (move text as bold-italic markdown, matching how
+// possessions render it), and a source link back to the article. Each carries one outfit entry
+// (weight 1, tag line as the note) so selecting it lands the object in the inventory. Ids are
+// deterministic, so regeneration never breaks links.
 
 import fs from "fs";
 import path from "path";
@@ -23,15 +22,15 @@ import { deterministicId, documentKey } from "./ids.js";
 import { toSlug } from "../../src/utils/slug.js";
 
 const WONDERS_SRC = "packs/src/wider-world-and-other-wonders";
-const OUT_DIR = "packs/src/arcana/artifacts";
-const FOLDER_DIR = "packs/src/arcana/_folders";
-const PACK = "arcana";
+const OUT_DIR = "packs/src/possessions/artifacts";
+const FOLDER_DIR = "packs/src/possessions/_folders";
+const PACK = "possessions";
 const FOLDER_NAME = "Artifacts";
 
 // NPC-shaped tag lines: spirits and followers share the artifact markup but are not items.
 const NPC_TAGS = /\b(spirit|solitary|group|horde|primordial)\b|instinct/i;
 
-/** Minimal HTML → the markdown dialect used by existing arcana descriptions. */
+/** Minimal HTML → the markdown dialect used by existing pack descriptions. */
 export function htmlToMarkdown(html) {
 	let s = html;
 	s = s.replace(/<img[^>]*>/g, "");                       // icons, decor — never content
@@ -55,8 +54,8 @@ export function extractBlocks(html) {
 	const re = /<h3>(?:<img[^>]*>)?\s*([^<]+?)\s*<\/h3>\s*<p class="artifact-tags">(.*?)<\/p>/g;
 	let m;
 	while ((m = re.exec(html))) {
-		// The journal build cross-links artifact headings to their arcana items, so the heading
-		// text can arrive as @UUID[...]{Name} — the item's name (and slug) want the bare label.
+		// The journal build cross-links artifact headings to their items, so the heading text can
+		// arrive as @UUID[...]{Name} — the item's name (and slug) want the bare label.
 		const name = htmlToMarkdown(m[1]).replace(/@UUID\[[^\]]*\]\{([^}]*)\}/g, "$1");
 		// The book prints a tracking checkbox before some tags (□ magical); the glyph is page
 		// furniture, not part of the tag.
@@ -95,31 +94,21 @@ function main() {
 				const id = deterministicId(PACK, `artifact:${slug}`);
 				// Tag lines arrive with <em> already converted to stars; only wrap bare tags.
 				const note = tags.split(/,\s*/).map((t) => (/^\*|^value \d/i.test(t) ? t : `*${t}*`)).join(", ");
-				// Front = the object as found; back = its revealed powers. Split at the first
-				// move paragraph; an artifact that opens with a move keeps its lead paragraph
-				// on both faces so neither is empty.
-				const paras = body.split("\n\n");
-				let cut = paras.findIndex((p) => /\*\*_|^When /.test(p));
-				if (cut <= 0) cut = 1;
 				const source =
 					`*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.${entry._id}]{${entry.name}}.*`;
-				const cardItem = { name, weight: 1, note, inventoryColumn: "regular" };
 				const item = {
 					_id: id, _key: documentKey("Item", id),
-					name, type: "arcanum",
+					name, type: "possession",
+					img: "icons/svg/item-bag.svg",
 					system: {
 						slug,
-						front: {
-							title: name,
-							item: { ...cardItem },
-							description: [...paras.slice(0, cut), source].join("\n\n"),
-						},
-						back: {
-							title: name,
-							item: { ...cardItem },
-							description: [...paras.slice(cut), source].join("\n\n"),
-							resource: null,
-						},
+						description: [note, body, source].filter(Boolean).join("\n\n"),
+						resource: null,
+						outfitItems: [{ slug, name, weight: 1, note, inventoryColumn: "regular" }],
+						choices: null,
+						scaling: null,
+						sortOrder: null,
+						playbookSlug: null,
 					},
 					flags: {},
 					folder: folderId,

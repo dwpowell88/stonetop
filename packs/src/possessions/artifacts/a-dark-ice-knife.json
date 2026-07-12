@@ -1,0 +1,27 @@
+{
+	"_id": "5kAVbtmCFan8R61q",
+	"_key": "!items!5kAVbtmCFan8R61q",
+	"name": "A dark ice knife",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-dark-ice-knife",
+		"description": "*hand*, *magical*, *crude*\n\nA hilt of bone, with a spike of dark ice tapering to a sharp point. The ice is hard as stone, and not especially sharp.\n\nWhen you **_stab an undead entity with the_** **_knife_**, ask the GM whether it is driven by obsession, hunger, and/or vengeance. If the answer is “yes,” then deal +1d4 damage (ignores armor), and leave the entity briefly disoriented. Should this reduce the entity to 0 HP, the dark ice knife melts away along with whatever bound the entity to this world.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.DeWQFy1cWoLRvoU5]{Rime Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-dark-ice-knife",
+				"name": "A dark ice knife",
+				"weight": 1,
+				"note": "*hand*, *magical*, *crude*",
+				"inventoryColumn": "regular"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

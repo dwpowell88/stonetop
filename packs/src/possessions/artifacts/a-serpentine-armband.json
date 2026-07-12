@@ -1,0 +1,27 @@
+{
+	"_id": "HTCrhMpTUN0hIG5T",
+	"_key": "!items!HTCrhMpTUN0hIG5T",
+	"name": "A serpentine armband",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-serpentine-armband",
+		"description": "*magical*, *beautiful*, Value 3\n\nCast from silver that never seems to tarnish, with what appear to be two small rubies in its eye sockets. It seems like it might not fit—but what do you know, it does.\n\nWhen you **_wear the serpentine arm_****_band openly for all to see_**, NPCs find you magnetic, becoming jealous and possessive of your attention. Tempers flare quickly, and you might need to Defy Danger or Persuade others in order to take your leave. Ask each PC you encounter how the armband affects them.\n\nWhen you **_remove the armband after_** **_wearing it and basking in the regard of_** **_others_**, you find yourself pining for that feeling of being adored. Roll +CON: **on a** **10+**, you’ll get over it; **on a 7-9**, either put the armband back on (and keep it there) or mark a debility; **on a 6-**, you cannot sleep until you put the armband on and wear it openly around others.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HurhcWKZBn60Vcq3]{The Things Below}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-serpentine-armband",
+				"name": "A serpentine armband",
+				"weight": 1,
+				"note": "*magical*, *beautiful*, Value 3",
+				"inventoryColumn": "regular"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

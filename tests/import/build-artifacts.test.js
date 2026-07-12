@@ -45,6 +45,20 @@ describe("extractBlocks", () => {
 		expect(blocks[2].body).toContain("- First");
 		expect(blocks[2].body).toContain("- Second");
 	});
+
+	it("unwraps a cross-linked heading to its bare label", () => {
+		const linked = extractBlocks(
+			'<h3>@UUID[Compendium.stonetop.possessions.Item.abc]{A lead bracelet}</h3>' +
+			'<p class="artifact-tags"><em>magical</em>, Value 1</p><p>A heavy torc.</p>');
+		expect(linked[0].name).toBe("A lead bracelet");
+	});
+
+	it("drops the book's tracking checkbox from tag lines", () => {
+		const boxed = extractBlocks(
+			'<h3>The Three-star Crown</h3>' +
+			'<p class="artifact-tags">□ <em>magical</em>, <em>beautiful</em>, Value 4</p><p>A circlet.</p>');
+		expect(boxed[0].tags).toBe("*magical*, *beautiful*, Value 4");
+	});
 });
 
 describe("htmlToMarkdown", () => {
