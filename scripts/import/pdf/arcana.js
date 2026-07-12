@@ -7,7 +7,11 @@ import path from "path";
 
 const SYSTEM = "stonetop";
 export const ARCANA_PACK = "arcana";
-const arcanaUuid = (id) => `Compendium.${SYSTEM}.${ARCANA_PACK}.Item.${id}`;
+// The Wider World's embedded artifacts live in the possessions pack (not arcana — no front/back
+// model), but their names deserve the same mention-linking as arcana.
+export const ARTIFACTS_DIR = "packs/src/possessions/artifacts";
+const itemUuid = (pack, id) => `Compendium.${SYSTEM}.${pack}.Item.${id}`;
+const arcanaUuid = (id) => itemUuid(ARCANA_PACK, id);
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -18,20 +22,21 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  * are distinctive proper nouns ("Mindgem", "Ring of Daagon"), matched on the name alone. Sorted
  * longest-first so a multi-word name matches before any shorter name contained within it.
  */
-export function loadArcanaIndex(dir = "packs/src/arcana") {
+export function loadArcanaIndex(dir = "packs/src/arcana", artifactsDir = ARTIFACTS_DIR) {
 	const out = [];
-	const walk = (d) => {
+	const walk = (d, type, pack) => {
 		for (const e of readdirSync(d, { withFileTypes: true })) {
-			if (e.isDirectory()) { if (!e.name.startsWith("_")) walk(path.join(d, e.name)); }
+			if (e.isDirectory()) { if (!e.name.startsWith("_")) walk(path.join(d, e.name), type, pack); }
 			else if (e.name.endsWith(".json")) {
 				const it = JSON.parse(readFileSync(path.join(d, e.name), "utf8"));
 				const name = it.name?.trim();
-				if (it.type === "arcanum" && name)
-					out.push({ name, uuid: arcanaUuid(it._id), descriptive: /^(a|an|the)\b/i.test(name) || name.length < 5 });
+				if (it.type === type && name)
+					out.push({ name, uuid: itemUuid(pack, it._id), descriptive: /^(a|an|the)\b/i.test(name) || name.length < 5 });
 			}
 		}
 	};
-	walk(dir);
+	walk(dir, "arcanum", ARCANA_PACK);
+	try { walk(artifactsDir, "possession", "possessions"); } catch { /* no artifacts pack — fine */ }
 	out.sort((a, b) => b.name.length - a.name.length);
 	return out;
 }
