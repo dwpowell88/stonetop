@@ -103,7 +103,9 @@ const isFellRunIn = (l) => {
 const isStatName = (l) => isAvara(l.font) && l.size < HEAD_MIN;
 const isItalicLine = (l) => l.spans.length > 0 && l.spans.every((s) => isItalic(s.font) || !s.text.trim());
 const isFieldLine = (l) => /^(HP\b|Armor\b|Damage\b|Instinct\b|Special qualit)/i.test(l.text.trim());
-const isHpLine = (l) => /^HP\b/i.test(l.text.trim());
+// A real HP field carries its value right after the label ("HP 26; Armor 3 (…)"); prose that merely
+// starts with "HP" (Book I's harm chapter: "HP. Good for them!…") must not anchor a stat block.
+const isHpLine = (l) => /^HP\s*:?\s*\d/i.test(l.text.trim());
 const hpAhead = (rows, i) => {
 	// Look a few rows ahead for the HP line — a name can be followed by an icon and one or two
 	// wrapped tag lines before HP (e.g. Bronze colossus, Iron hound, Draventao).
@@ -265,18 +267,25 @@ function segmentColumn(rows, base) {
 		if (c0?.boxEnd) { blocks.push({ type: "boxend" }); i++; continue; }
 
 		// STAT BLOCK — anchored on an HP line; capture name/tags through the moves.
+		// If the collector consumes nothing (its anchor row is itself a break condition — e.g. Book I's
+		// "Armor" section heading matches the field-line anchor), fall through to the branches below
+		// instead of spinning on this row forever.
 		if (looksStatStart(rows, i)) {
 			const { endIdx, lines, icon } = collectStatBlock(rows, i);
-			blocks.push({ type: "statblock", lines, icon });
-			i = endIdx;
-			continue;
+			if (endIdx > i) {
+				blocks.push({ type: "statblock", lines, icon });
+				i = endIdx;
+				continue;
+			}
 		}
 		// SETTLEMENT BLOCK — anchored on the "Size … / Population" fields; one bordered card.
 		if (looksSettlementStart(rows, i)) {
 			const { endIdx, lines } = collectSettlementBlock(rows, i, base);
-			blocks.push({ type: "settlement", lines });
-			i = endIdx;
-			continue;
+			if (endIdx > i) {
+				blocks.push({ type: "settlement", lines });
+				i = endIdx;
+				continue;
+			}
 		}
 		// TABLE — roll/result rows, optionally preceded by a dice header. The header is either one
 		// Avara cell ("1d12 theme") or a split "1d6" + small-caps name (the d6 site/sign tables).
