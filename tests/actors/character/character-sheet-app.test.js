@@ -126,7 +126,13 @@ describe("StonetopCharacterSheet delete confirmation", () => {
 
 	function stubConfirm(result) {
 		const confirm = vi.fn(async () => result);
-		vi.stubGlobal("Dialog", { confirm });
+		vi.stubGlobal("foundry", {
+			...globalThis.foundry,
+			applications: {
+				...globalThis.foundry?.applications,
+				api: { DialogV2: { confirm } },
+			},
+		});
 		vi.stubGlobal("game", { i18n: { localize: k => k, format: k => k } });
 		return confirm;
 	}
