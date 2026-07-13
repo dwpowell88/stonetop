@@ -380,8 +380,17 @@ function segmentColumn(rows, base) {
 		// line is regular text" guard distinguishes it from a multi-item diamond list and from italic
 		// example prose (which stays italic). Must run before the list branch since ◇ is item-start.
 		const startsItalic = (l) => { const s = l.spans.find((x) => x.text.trim() && x.font !== "marker"); return s && isItalic(s.font); };
+		// A weight-pip tag line puts roman text before the first italic tag — a bare comma ("◇◇,
+		// magical") or a lone lowercase count word ("◇ each, magical"). Accept those only behind a
+		// leading marker glyph; a sentence-cased or multi-word roman lead is a list item, not tags.
+		const startsTags = (l) => {
+			if (startsItalic(l)) return true;
+			if (!/^[◇□◻○]/.test(l.text.trim())) return false;
+			const s = l.spans.filter((x) => x.text.trim() && x.font !== "marker");
+			return s.length >= 2 && isItalic(s[1].font) && /^(?:,|[a-z][a-z-]*,?)$/.test(s[0].text.trim());
+		};
 		const plainTags = (l) => !startsItalic(l) && !/^[◇○]/.test(l.text.trim());
-		if (row.cells.length === 1 && startsItalic(c0) && blocks[blocks.length - 1]?.type === "heading"
+		if (row.cells.length === 1 && startsTags(c0) && blocks[blocks.length - 1]?.type === "heading"
 			&& c0.text.trim().length < 60 && rows[i + 1]?.cells.length === 1 && plainTags(rows[i + 1].cells[0])) {
 			blocks.push({ type: "para", lines: [c0], tags: true });
 			i++; continue;

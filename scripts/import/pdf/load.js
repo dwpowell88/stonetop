@@ -63,12 +63,16 @@ export function loadArticlePages(pdf, r, { imgDir, imgPrefix = "art", mapFile = 
 				const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[0] >= mk.x - 2 && Math.abs(l.bbox[1] - mk.y) < 8);
 				line = cand.sort((a, b) => Math.abs(a.bbox[1] - mk.y) - Math.abs(b.bbox[1] - mk.y))[0];
 			} else {
-				// Circle ○ / diamond ◇: match by vertical center. A diamond is a leading bullet (precedes
-				// its item); a circle can be inline (potency dots in "(○○○ uses)"), so it keeps the wider match.
+				// Circle ○ / diamond ◇: match by vertical center. A diamond either leads its line (the
+				// text starts just right of it) or sits inline within it (the line spans across its x) —
+				// both are column-local, so a nearer-centred line in the neighbouring column never wins.
+				// A circle can be inline anywhere on the row ("(○○○ uses)"), so it keeps the wider match.
 				const cy = mk.y - mk.h / 2;
 				const cand = pg.lines.filter((l) => l.font !== "marker" && l.text.trim() && l.bbox[1] - 3 <= cy && l.bbox[3] + 3 >= cy && Math.abs(l.bbox[0] - mk.x) < 200);
-				const pool = mk.kind === "diamond" ? cand.filter((l) => l.bbox[0] >= mk.x - 2) : cand;
-				line = (pool.length ? pool : cand).sort((a, b) => Math.abs(mid(a) - cy) - Math.abs(mid(b) - cy))[0];
+				const pool = mk.kind === "diamond"
+					? cand.filter((l) => (l.bbox[0] >= mk.x - 2 && l.bbox[0] < mk.x + 60) || (l.bbox[0] <= mk.x && mk.x <= l.bbox[2]))
+					: cand;
+				line = (mk.kind === "diamond" ? pool : (pool.length ? pool : cand)).sort((a, b) => Math.abs(mid(a) - cy) - Math.abs(mid(b) - cy))[0];
 			}
 			const y0 = line ? line.bbox[1] : mk.y;
 			const g = mk.kind === "circle" ? "○" : mk.kind === "square" ? "□" : "◇";
