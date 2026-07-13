@@ -1,0 +1,28 @@
+{
+	"_id": "ysI6Di76EfJdEamF",
+	"_key": "!items!ysI6Di76EfJdEamF",
+	"name": "Bloodshot amber",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "bloodshot-amber",
+		"description": "◇ each, *magical*\n\n1d4 fist-sized gems, riddled with red-black intrusions.\n\nWhen you **_drip blood onto an amber_**, name a manifest spirit in your presence and roll +CHA. If the spirit has an intact **tether** (page @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{358}), roll with disadvantage. **On a** **10+**, the spirit is imprisoned in the amber; **on a 7-9**, the amber starts to suck the spirit in, but it may yet fight back; **on a 6-**, the spirit wrests free and the amber shatters.\n\nWhen you **_imprison a spirit in a bloodshot_** **_amber_**, it is wracked with pain and cannot manifest. Only one spirit can be imprisoned at a time. When you **_touch the amber with_** **_bare skin_**, you can communicate with the spirit within and release it if you want (even if you weren’t the one who imprisoned it).\n\nWhen a bloodshot amber is found, it likely contains a spirit that has been trapped in agony for centuries.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.z8rAsGkDl5lJd8GG]{Fomoraij}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "bloodshot-amber",
+				"name": "Bloodshot amber",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": "each"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

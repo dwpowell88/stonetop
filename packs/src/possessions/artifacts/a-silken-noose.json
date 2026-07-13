@@ -8,15 +8,7 @@
 		"slug": "a-silken-noose",
 		"description": "*magical*\n\nA length of fine cord, tied into a noose with a few feet hanging free. It’s remarkably tough, but a bronze blade will slice right through it. If untied and left unattended, it re-ties itself into a noose.\n\nWhen you **_slip the noose around someone’s_** **_neck_**, it cinches tight—snug and uncomfortable, but the victim can breathe.\n\nWhen **_your victim lies or refuses to answer_** **_a question_**, the noose tightens and strangles them until they die or gasp out the truth.\n\nWhen you (or anyone else) **_tries to remove_** **_or loosen the noose_**, it starts to strangle the victim. If you (or they) stop, it relaxes. If you (or they) persist, it quickly crushes the victim’s windpipe.\n\nWhen **_the victim dies_**, the noose slackens and can be removed.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HurhcWKZBn60Vcq3]{The Things Below}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "a-silken-noose",
-				"name": "A silken noose",
-				"weight": 1,
-				"note": "*magical*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

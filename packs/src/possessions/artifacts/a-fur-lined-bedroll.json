@@ -1,0 +1,28 @@
+{
+	"_id": "bSExpdILBxxKLHDW",
+	"_key": "!items!bSExpdILBxxKLHDW",
+	"name": "A fur-lined bedroll",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-fur-lined-bedroll",
+		"description": "◇ *magical*\n\nThis bedroll is decorated with Forest Folk beadwork and lined with the softest rabbit fur. It tethers a nurturing, protective spirit, one that is quiet and comforting.\n\nWhen you **_Make Camp in the fur-lined_** **_bedroll_**, you regain 1d6 (extra) HP and gain advantage on your next roll.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the Wild}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-fur-lined-bedroll",
+				"name": "A fur-lined bedroll",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

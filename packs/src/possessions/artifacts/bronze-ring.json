@@ -1,0 +1,28 @@
+{
+	"_id": "jmcBJksMh8mLcJv9",
+	"_key": "!items!jmcBJksMh8mLcJv9",
+	"name": "Bronze ring",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "bronze-ring",
+		"description": "◇ *magical*, *fireproof*, hours\n\nAbout 8 inches in diameter, an inch thick throughout, scorched and smeared with ash. A button protrudes, with a Tempest Lord glyph that might mean “stubborn.”\n\nWhen you **_find the ring_**, it has enough power to run for 1d4-1 hours.\n\nWhen you **_press the button_**, the ring fixes in place, defying gravity. It simply will not budge. The effect ends if the ring is bent or broken, or when it runs out of power. There’s no obvious way to end the effect early. When **_the ring runs out of power_**, the button pops out and the effect ends.\n\nWhen **_you heat the ring in a forge or kiln_** for about eight hours, it gains an hour of use (up to 3 hours).\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.3UhyCbr1XGkhX6SO]{Tempest Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "bronze-ring",
+				"name": "Bronze ring",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical, fireproof",
+				"note": "hours"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

@@ -8,15 +8,7 @@
 		"slug": "a-lead-bracelet",
 		"description": "*magical*, Value 1\n\nThis heavy, black metal torc is set with a red gem. It feels good upon your wrist. Makes you feel important.\n\nWhen you **_wear the torc and threaten_** **_someone that you consider beneath you_**, lose HP equal to the torc’s current Cost (1d4 to start). They are filled with fear; the craven will flee, cower, or grovel, and even the brave will flinch and hesitate. Each time you use the torc, the Cost increases by 1 die size (max 1d10).\n\nWhen you **_wear the torc for a week without_** **_anyone questioning your authority_**, decrease the Cost by one step (min 1d4).\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.Qir4rs4BUipTSyFQ]{Barrow Builders}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "a-lead-bracelet",
-				"name": "A lead bracelet",
-				"weight": 1,
-				"note": "*magical*, Value 1",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

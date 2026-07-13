@@ -1,0 +1,28 @@
+{
+	"_id": "lJJQQox1m7AlEeIQ",
+	"_key": "!items!lJJQQox1m7AlEeIQ",
+	"name": "Self-burning lamp",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "self-burning-lamp",
+		"description": "◇ *reach*, *area*, hours, Value 2\n\nA bronze oil-lamp with a small valve on the top. When you screw the nozzle open, a hot blue flame pops out of the nozzle. When you screw the nozzle shut, the flame snuffs out. The lamp itself gets blisteringly hot while running, and once empty of fuel, only the Ustrina know how to refill it.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "self-burning-lamp",
+				"name": "Self-burning lamp",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "reach, area",
+				"note": "hours, Value 2"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

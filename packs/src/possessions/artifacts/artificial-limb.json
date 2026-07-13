@@ -8,15 +8,7 @@
 		"slug": "artificial-limb",
 		"description": "*crude*, *magical* (?), Value 3\n\nA clockwork hand, foot, arm, or leg, with straps and buckles to attach it. Impossibly intricate, and with practice it’s nearly as functional as the real thing. It cannot feel, though, and is prone to jamming up and needing repairs.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "artificial-limb",
-				"name": "Artificial limb",
-				"weight": 1,
-				"note": "*crude*, *magical* (?), Value 3",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

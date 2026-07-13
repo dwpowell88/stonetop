@@ -8,15 +8,7 @@
 		"slug": "an-old-bronze-dagger",
 		"description": "*hand*, *magical*\n\nTinged green, but sharp and sturdy. In the chaotic days after the Makers fell, it was the weapon of a desperate father. He killed his own brother with it, to protect his children’s food. He killed others, too, to make sure his family had enough. So many, many others.\n\nThe dagger holds a shard of that father’s desperate will. When you **_Seek Insight_** **_about someone while carrying the dagger_**, add the following to the list of questions you can ask. If **_your hand is on the hilt_**, you can ask one of these questions for free, even on a 6-.\n\n- What of mine do they most want?\n- How am I most vulnerable to them?\n- What do they carry that is useful to me?\n\nIf a PC keeps the dagger, treat it as a threat (a *MacGuffin*; **Instinct** to cause paranoia).\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.Qir4rs4BUipTSyFQ]{Barrow Builders}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "an-old-bronze-dagger",
-				"name": "An old bronze dagger",
-				"weight": 1,
-				"note": "*hand*, *magical*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

@@ -1,0 +1,28 @@
+{
+	"_id": "TijP0bx5Ae88gZdk",
+	"_key": "!items!TijP0bx5Ae88gZdk",
+	"name": "A sealed amphora",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-sealed-amphora",
+		"description": "◇◇ *fragile*, *magical*, 3 uses\n\nA ceramic, two-armed jug with a wax seal. Inside is water of life, the quintessence of water, so pure that it washes away all impurity, corruption, poison, or disease from any living thing. It becomes sullied and loses its potency when used, or if left unsealed for more than a minute or so.\n\nThe amphora itself is a perfect vessel: as long as it is sealed, no substance within will rot, putrefy, or otherwise spoil.\n<figure class=\"art\"></figure>\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YxQdXyd9EDRJyEKv]{Primordial powers}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-sealed-amphora",
+				"name": "A sealed amphora",
+				"weight": 2,
+				"inventoryColumn": "regular",
+				"tagList": "fragile, magical",
+				"note": "3 uses"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

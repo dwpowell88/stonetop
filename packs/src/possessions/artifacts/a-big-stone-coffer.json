@@ -8,15 +8,7 @@
 		"slug": "a-big-stone-coffer",
 		"description": "*immobile*, *magical*\n\nCarved from serpentine, 4 feet by 2 feet by 2, with a heavy stone lid. When found, it’s likely half-full with soil. To those sensitive to such things, it thrums with the power of fertility and growth.\n\nWhen you **_add fresh soil to the coffer, plant_** **_seeds in it, and close the lid_**, the seeds will germinate and sprout overnight. Each seed will sprout only once, and the sprouts henceforth grow at a regular rate, regardless of whether they stay in the coffer or are planted elsewhere.\n\nWith coordination, this could lead to a boom in Stonetop’s gardens and +1 Surplus each summer. In the hands of a skilled herbalist, this can greatly improve an herb garden and allow the cultivation of rare or difficult plants. The herbalists of Marshedge would kill over this—or even start a war.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.gnP4Q10EDePdvgqz]{Green Lords}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "a-big-stone-coffer",
-				"name": "A big stone coffer",
-				"weight": 1,
-				"note": "*immobile*, *magical*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

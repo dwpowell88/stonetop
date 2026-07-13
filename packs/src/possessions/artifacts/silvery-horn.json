@@ -1,0 +1,28 @@
+{
+	"_id": "aTjRUnpCzDpSKJ0W",
+	"_key": "!items!aTjRUnpCzDpSKJ0W",
+	"name": "Silvery horn",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "silvery-horn",
+		"description": "◇ *magical*, *loud*\n\nWhen you **_blow the horn outside, at night,_** **_in the presence of the undead_**, the horn crumbles and a mist rises. The undead flee, and the Pale Hunter and his hounds soon appear to chase them.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.MCe2YgHD24ptZJrG]{The Pale Hunter}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "silvery-horn",
+				"name": "Silvery horn",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical, loud",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

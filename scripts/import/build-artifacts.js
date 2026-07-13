@@ -11,9 +11,11 @@
 // Output: packs/src/possessions/artifacts/<slug>.json — possession items in an Artifacts
 // compendium folder. Artifacts don't share the arcanum front/back model, so the whole block is
 // one description: the tag line, the body (move text as bold-italic markdown, matching how
-// possessions render it), and a source link back to the article. Each carries one outfit entry
-// (weight 1, tag line as the note) so selecting it lands the object in the inventory. Ids are
-// deterministic, so regeneration never breaks links.
+// possessions render it), and a source link back to the article. The book marks carried gear
+// with ◇ weight pips on the tag line (the same convention as the arcana call-outs) — those
+// artifacts carry an outfit entry (weight = pip count, italic qualities as the tagList, plain
+// extras as the note); pipless artifacts (immobile, wearable-weightless) are possession-only.
+// Ids are deterministic, so regeneration never breaks links.
 
 import fs from "fs";
 import path from "path";
@@ -92,8 +94,13 @@ function main() {
 				if (NPC_TAGS.test(tags)) { skipped++; continue; }
 				const slug = toSlug(name);
 				const id = deterministicId(PACK, `artifact:${slug}`);
-				// Tag lines arrive with <em> already converted to stars; only wrap bare tags.
-				const note = tags.split(/,\s*/).map((t) => (/^\*|^value \d/i.test(t) ? t : `*${t}*`)).join(", ");
+				// The tag line: ◇ weight pips (the carried-gear marker), italic qualities (already
+				// star-wrapped by htmlToMarkdown), and plain extras ("+1 damage", "Value 4", "3 uses").
+				const pips = (tags.match(/◇/g) || []).length;
+				const parts = tags.replace(/◇/g, "").split(/,\s*/).map((t) => t.trim()).filter(Boolean);
+				const quals = parts.filter((t) => /^\*.*\*$/.test(t));
+				const extras = parts.filter((t) => !/^\*.*\*$/.test(t));
+				const tagLine = ["◇".repeat(pips), parts.join(", ")].filter(Boolean).join(" ");
 				const source =
 					`*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.${entry._id}]{${entry.name}}.*`;
 				const item = {
@@ -102,9 +109,13 @@ function main() {
 					img: "icons/svg/item-bag.svg",
 					system: {
 						slug,
-						description: [note, body, source].filter(Boolean).join("\n\n"),
+						description: [tagLine, body, source].filter(Boolean).join("\n\n"),
 						resource: null,
-						outfitItems: [{ slug, name, weight: 1, note, inventoryColumn: "regular" }],
+						outfitItems: pips ? [{
+							slug, name, weight: pips, inventoryColumn: "regular",
+							tagList: quals.map((t) => t.replace(/^\*|\*$/g, "")).join(", "),
+							note: extras.join(", "),
+						}] : [],
 						choices: null,
 						scaling: null,
 						sortOrder: null,

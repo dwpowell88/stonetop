@@ -1,0 +1,28 @@
+{
+	"_id": "G8DrgxDwZ8MMvCbQ",
+	"_key": "!items!G8DrgxDwZ8MMvCbQ",
+	"name": "The Red Pennant",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "the-red-pennant",
+		"description": "◇◇ *magical*, Blood\n\nA woolen flag hanging from a crossbar at the end of a sturdy long spear. It’s tattered, crimson, with a crudely embroidered boot for a device. It hangs heavy. Like it’s wet.\n\nWhen you **_fly the Red Pennant in battle_**, all who fight on your side feel bloodlust boil within them. Hold 3 Blood. While the battle rages, you can spend Blood 1-for-1 to will your allies to:\n\n- Rush forward, driving back their foes\n- Hold fast, making their foes pay for every inch\n- Fight savagely, giving no quarter\nIf spending Blood results in you Ordering Followers or Deploying, or another PC Clashing, the roll has advantage. Each time you spend Blood, those affected gain some small, animalistic or stony trait (little horns, weird eyes, crag-like wrinkles, etc.).\n\nWhen you **_spend the last Blood or the battle_** **_ends_**, the Red Pennant’s color fades and a few (~1 in 6) of those manifested traits will linger, especially in those who fought hardest. It will not function again until you soak it in the blood of fallen foes.\n\nThis is the battle standard of the **Bloody** **Boots** (page 112), their most sacred relic. Don’t expect them to just let it go.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YMV8KIodnoZL71Jl]{Fae}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "the-red-pennant",
+				"name": "The Red Pennant",
+				"weight": 2,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": "Blood"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

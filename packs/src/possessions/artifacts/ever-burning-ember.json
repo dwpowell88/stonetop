@@ -1,0 +1,28 @@
+{
+	"_id": "dVNdiiIlrpND0SN0",
+	"_key": "!items!dVNdiiIlrpND0SN0",
+	"name": "Ever-burning ember",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "ever-burning-ember",
+		"description": "◇ *fragile*, *magical*, Value 3\n\nThis ceramic pot has a number of thin slits along its shoulder and a ring of rune-etched brass around its neck. The pot is always hot, painful to touch, but it won’t cause blisters outright. Inside is a glowing ember of redwood with a fire spirit bound inside. The ember will smolder forever as long it stays in the pot and isn’t completely submerged.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "ever-burning-ember",
+				"name": "Ever-burning ember",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "fragile, magical",
+				"note": "Value 3"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

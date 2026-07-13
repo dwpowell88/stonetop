@@ -1,0 +1,28 @@
+{
+	"_id": "K5QQxGxdCxXsuFFT",
+	"_key": "!items!K5QQxGxdCxXsuFFT",
+	"name": "A pale wooden sword",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-pale-wooden-sword",
+		"description": "◇ *close*, *crude*, *magical*\n\nCarved from a dool tree with a silver knife, and polished with oils infused with moonlight. The grip is worn smooth but the “blade” is chipped and notched, unlikely to stand up to iron or bronze.\n\nWhen you **_wield the sword against a_** **_manifest undead spirit_**, you can hurt it (deal damage normally). If you reduce it to 0 HP, the manifest form dissipates but the spirit can reform at its tether normally.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.sNLYfvJEFM1v463y]{Death and the undying}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-pale-wooden-sword",
+				"name": "A pale wooden sword",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "close, crude, magical",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

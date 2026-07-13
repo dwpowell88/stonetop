@@ -8,15 +8,7 @@
 		"slug": "storm-cloud-potion",
 		"description": "*magical*, *fragile*\n\nA glass vial of dark-grey liquid, roiling and shot through with sparks.\n\nWhen you **_drink a storm-cloud potion_**, lightning courses through you. Take 1d10 damage (ignores armor) and mark a debility. Should you survive, hold 3 Storm.\n\nWhile you **_hold any Storm_**, you cannot feel pain or fear, tell friend from foe, speak coherently, or exercise patience or care. Add your Storm to your Armor, and your melee and thrown attacks do +Storm damage (+*loud*, +*forceful*).\n\nWhen you **_reduce someone or something to 0_** **_HP_**, lose 1 Storm.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.3UhyCbr1XGkhX6SO]{Tempest Lords}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "storm-cloud-potion",
-				"name": "Storm-cloud potion",
-				"weight": 1,
-				"note": "*magical*, *fragile*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,
