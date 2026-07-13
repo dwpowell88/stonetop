@@ -56,7 +56,7 @@ export function createStonetopPossessionSheetClass(Base) {
 			super.activateListeners(html);
 			if (!this.isEditable) return;
 
-			activateChoiceGroupEditors(this, html); // entry/pick row editing for the single choices group
+			activateChoiceGroupEditors(this, html[0]); // entry/pick row editing for the single choices group
 
 			// Choices group lifecycle — a single group at system.choices (null when absent).
 			html.find(".possession-choices-add-group").on("click", () =>

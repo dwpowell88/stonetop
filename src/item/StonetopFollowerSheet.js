@@ -114,7 +114,7 @@ export function createStonetopFollowerSheetClass(Base) {
 			const numAttr = (el, name) => Number(el.dataset[name]); // one int-off-a-data-attr reader
 
 			// ── Choices group (system.choices.0) — reuse the shared editor + lifecycle buttons ──
-			activateChoiceGroupEditors(this, html);
+			activateChoiceGroupEditors(this, html[0]);
 			html.find(".follower-choices-add").on("click", () => item.update({ "system.choices": [CG.newGroup("choices")] }));
 			html.find(".follower-choices-remove").on("click", () => item.update({ "system.choices": [] }));
 

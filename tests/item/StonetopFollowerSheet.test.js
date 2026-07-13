@@ -38,9 +38,12 @@ function makeSheet(item, { editable = true } = {}) {
 }
 
 // Minimal jQuery-ish collector: records handlers by selector, replays one with a fake event.
+// `[0]` is a real (empty) element — activateChoiceGroupEditors takes the native root now and
+// finds no editor controls there, which is fine: these tests drive the sheet's own handlers.
 function fakeHtml() {
 	const handlers = {};
 	return {
+		0: document.createElement("div"),
 		find(sel) { return { on(event, fn) { (handlers[sel] ??= {})[event] = fn; return this; } }; },
 		fire(sel, event, currentTarget = {}) {
 			const fn = handlers[sel]?.[event];

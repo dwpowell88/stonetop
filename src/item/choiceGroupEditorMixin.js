@@ -1,11 +1,16 @@
 // Wires the choice-group editor markup (templates/item/partials/choice-group-editor.hbs) for an
 // item sheet. Every editable group container carries `data-cg-path` (e.g. "system.choices.0" or
 // "system.instinct"); each handler resolves that path, mutates the group via the pure helpers in
-// choiceGroupEdit.js, and saves `item.update({ [path]: group })`. Shared by the move + insert sheets.
+// choiceGroupEdit.js, and saves `item.update({ [path]: group })`. Shared by the item sheets with
+// choice-group editors (insert, arcanum, possession, follower, improvement).
+//
+// Takes a native root element and binds directly to the current editor controls, so it must re-run
+// after every render — which both sheet generations do naturally: V1 replaces the whole DOM,
+// V2 replaces the part content (the bound elements themselves). Safe on either base.
 
 import * as CG from "../utils/choiceGroupEdit.js";
 
-export function activateChoiceGroupEditors(sheet, html) {
+export function activateChoiceGroupEditors(sheet, root) {
 	const pathOf = el => el.closest("[data-cg-path]")?.dataset.cgPath ?? null;
 	const group  = path => foundry.utils.getProperty(sheet.item, path) ?? CG.newGroup();
 	// Foundry ArrayFields are atomic — a dotted `system.choices.0` update won't set one element.
@@ -20,11 +25,15 @@ export function activateChoiceGroupEditors(sheet, html) {
 		return sheet.item.update({ [path]: g });
 	};
 
-	const onClick = (sel, fn) => html.find(sel).on("click", ev => {
-		const path = pathOf(ev.currentTarget);
-		if (!path) return;
-		return save(path, fn(group(path), ev.currentTarget.dataset));
-	});
+	const onClick = (sel, fn) => {
+		for (const el of root.querySelectorAll(sel)) {
+			el.addEventListener("click", () => {
+				const path = pathOf(el);
+				if (!path) return;
+				return save(path, fn(group(path), el.dataset));
+			});
+		}
+	};
 
 	const ri  = d => Number(d.rowIndex);
 	const oiOf = d => (d.optionIndex != null ? Number(d.optionIndex) : null);
@@ -42,8 +51,7 @@ export function activateChoiceGroupEditors(sheet, html) {
 
 	// Field changes (text/number/checkbox/select inputs AND the content.text <prose-mirror> editor,
 	// which fires `change` on blur with its HTML in `.value`) → coerce, then whole-group atomic write.
-	html.find("[data-choices-field]").on("change", ev => {
-		const el   = ev.currentTarget;
+	for (const el of root.querySelectorAll("[data-choices-field]")) el.addEventListener("change", () => {
 		const path = pathOf(el);
 		if (!path) return;
 		let value;

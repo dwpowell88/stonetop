@@ -57,7 +57,7 @@ export function createStonetopInsertSheetClass(Base) {
 			super.activateListeners(html);
 			if (!this.isEditable) return;
 
-			activateChoiceGroupEditors(this, html); // entry/pick row editing for instinct + each choices group
+			activateChoiceGroupEditors(this, html[0]); // entry/pick row editing for instinct + each choices group
 
 			// Instinct — edited as a plain list of strings (round-tripped through the choice group).
 			const setInstinct = strings => this.item.update({ "system.instinct": CG.instinctFromStrings(strings) });

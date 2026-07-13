@@ -44,11 +44,14 @@ img.stonetop-broken-img {
 
 .stonetop.sheet .sheet-tabs,
 .stonetop.sheet .sheet-tabs .item,
-.stonetop.sheet h1,
+.stonetop.sheet h1:not(.window-title),
 .stonetop.sheet h2,
 .stonetop.sheet h3,
 .stonetop.sheet h4,
-.stonetop.sheet button,
+/* :not() guards — V2 sheets carry .stonetop.sheet on the window ROOT, so without them this rule
+   would restyle the window chrome: .header-control buttons hold their Font Awesome glyph classes
+   on the button element itself, and StonetopUI has no glyphs at FA codepoints (blank buttons). */
+.stonetop.sheet button:not(.header-control):not(.control),
 .stonetop.sheet .stonetop-stat-roll,
 .stonetop.sheet .stonetop-resource__label,
 .stonetop.sheet .stonetop-damage-roll,
@@ -104,10 +107,15 @@ img.stonetop-broken-img {
 }
 
 /* Use default font  */
+/* V2 note: scope to .window-content — V2 header controls are <button> elements carrying the
+   Font Awesome classes THEMSELVES (V1 used anchors), so a bare `button` font rule would wipe
+   the close/copy-id/etc. glyphs. */
 body,
 .vtt .window-header,
 .vtt .window-app button,
-.vtt .window-app .button {
+.vtt .window-app .button,
+.vtt .application.stonetop .window-content button,
+.vtt .application.stonetop .window-content .button {
 	font-family: var(--font-primary);
 }
 
@@ -148,6 +156,20 @@ body,
 
 
 .vtt :not(.application,.image-popout,.journal-sheet,.sidebar-popout) .window-content {
+	background: var(--stonetop-bg) url(/systems/stonetop/assets/ui/decor/sheet-bg.png);
+	background-position: center;
+	background-size: cover;
+	background-attachment: scroll;
+	scrollbar-width: none;
+}
+
+/* ApplicationV2 sheets (migration in progress — docs/appv2-migration.md): the rule above
+   deliberately excludes `.application` so core V2 windows keep their native look; our own V2
+   sheets opt back into the parchment here. Text/input/prosemirror colors come from core's own
+   light theme: the V2 sheet bases declare `themed theme-light` in DEFAULT_OPTIONS.classes, which
+   both blocks the client dark theme (core skips sheets already "themed") and resolves every
+   core form variable to its light value. Only the parchment art is ours. */
+.application.stonetop.sheet .window-content {
 	background: var(--stonetop-bg) url(/systems/stonetop/assets/ui/decor/sheet-bg.png);
 	background-position: center;
 	background-size: cover;
@@ -4887,6 +4909,16 @@ form.stonetop.sheet.steading {
    The rendered view shares improvement-group.hbs with the steading; its tracks are a read-only
    preview of the improvement's structure (real track state lives on each steading), so disable them. */
 .stonetop-improvement-preview input { pointer-events: none; }
+
+/* V2 part root: single wrapper element (HandlebarsApplicationMixin requirement) that stacks the
+   header + body and owns the sheet's scrolling (PARTS marks it scrollable). */
+.stonetop-improvement-sheet {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	height: 100%;
+	overflow-y: auto;
+}
 
 /* -- Possession item sheet (StonetopPossessionSheet) — reuses .stonetop-insert-sheet-* layout -- */
 .stonetop-possession-outfit-list,

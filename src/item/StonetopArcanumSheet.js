@@ -127,7 +127,7 @@ export function createStonetopArcanumSheetClass(Base) {
 
 			if (!this.isEditable) return;
 
-			activateChoiceGroupEditors(this, html); // edits front.unlock / back.choices / back.consequences
+			activateChoiceGroupEditors(this, html[0]); // edits front.unlock / back.choices / back.consequences
 
 			// Choice-group lifecycle (create / remove a whole group at a given path).
 			const setGroup = (path, group) => this.item.update({ [path]: group });
