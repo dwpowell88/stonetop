@@ -402,6 +402,14 @@ export class StonetopCharacter {
 		await this._vitals.setXP(xp);
 	}
 
+	async markXp() {
+		return this._vitals.markXp();
+	}
+
+	async unmarkXp() {
+		return this._vitals.unmarkXp();
+	}
+
 	async setLevel(level) {
 		await this._vitals.setLevel(level);
 	}

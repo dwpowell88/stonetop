@@ -1,6 +1,7 @@
 import {RollDisplay} from "../utils/rollDisplay.js";
 import {renderRollCard} from "../utils/rollCard.js";
 import {rich} from "../model/snapshot/RichText.js";
+import {buildXpLine} from "../chat/xpMarkControl.js";
 
 export class ActorRolling {
 	constructor(actor) {
@@ -52,6 +53,13 @@ export class ActorRolling {
 					"stonetop.rollResults.miss"
 		);
 
+		// The book's XP rule — mark XP on a 6-, unless the move says otherwise (request.xpOnMiss) —
+		// is offered, not automated: players roll moves for fun or by accident, so the card carries
+		// a Mark XP button instead of ticking the track on its own. Only actors with an XP track
+		// (characters) get the offer.
+		const xpOffer = resultKey === "failure" && request.xpOnMiss
+			&& typeof this._actor.typedActor.markXp === "function";
+
 		const card = {
 			name: request.buildDisplayName(statKey, resultLabel, request.stat === "prompt"),
 			dice: this._display.build(roll, {
@@ -62,8 +70,14 @@ export class ActorRolling {
 			resultKey,
 			description: rich(request.description),
 			resultText:  rich(request.resultText(resultKey)),
+			xpLine: xpOffer ? buildXpLine(false, k => game.i18n.localize(k)) : null,
 		};
-		return ChatMessage.create({speaker, content: await renderRollCard(card, this._rollData), rolls: [roll]});
+		return ChatMessage.create({
+			speaker,
+			content: await renderRollCard(card, this._rollData),
+			rolls: [roll],
+			...(xpOffer ? {flags: {stonetop: {xpMark: {marked: false}}}} : {}),
+		});
 	}
 
 	async _postDescription(speaker, request) {

@@ -45,6 +45,25 @@ export class CharacterVitals {
 		await this._actor.update({ "system.attributes.xp.value": Math.max(0, toInt(xp)) });
 	}
 
+	/** Mark 1 XP (the book's tick mark). The track has no ceiling: Level Up triggers at XP
+	 *  "equal to (or greater than)" 6 + level × 2 and SUBTRACTS that amount (p. 81), so excess
+	 *  accumulates and carries over — and feeds Burn Brightly. Returns whether a mark landed
+	 *  (always true; boolean is the contract the chat toggle checks). */
+	async markXp() {
+		const current = this._actor.system?.attributes?.xp?.value ?? 0;
+		await this._actor.update({ "system.attributes.xp.value": current + 1 });
+		return true;
+	}
+
+	/** Remove 1 XP tick (undoing an auto-mark). Returns whether a tick was removed —
+	 *  false when the track is already empty. */
+	async unmarkXp() {
+		const current = this._actor.system?.attributes?.xp?.value ?? 0;
+		if (current <= 0) return false;
+		await this._actor.update({ "system.attributes.xp.value": current - 1 });
+		return true;
+	}
+
 	async setLevel(level) {
 		await this._actor.update({ "system.attributes.level": Math.max(1, toInt(level)) });
 	}
