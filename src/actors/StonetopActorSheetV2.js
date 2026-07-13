@@ -23,7 +23,9 @@ export function createStonetopActorSheetV2Class() {
 
 	return class StonetopActorSheetV2 extends withSheetSizeMemoryV2(HandlebarsApplicationMixin(ActorSheetV2)) {
 		static DEFAULT_OPTIONS = {
-			classes: ["stonetop", "sheet", "actor"],
+			// "themed theme-light": parchment sheets are always light. Core sees "themed" already
+			// present and skips imposing the client theme (see the item base for details).
+			classes: ["stonetop", "sheet", "actor", "themed", "theme-light"],
 			window: { resizable: true },
 			form: { submitOnChange: true },
 		};

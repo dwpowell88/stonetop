@@ -44,7 +44,8 @@ describe("StonetopActorSheetV2 base", () => {
 
 	it("declares the V1-matching defaults: stonetop classes, resizable, submitOnChange", () => {
 		const Sheet = createStonetopActorSheetV2Class();
-		expect(Sheet.DEFAULT_OPTIONS.classes).toEqual(["stonetop", "sheet", "actor"]);
+		// "themed theme-light" keeps core from imposing the client dark theme on the parchment.
+		expect(Sheet.DEFAULT_OPTIONS.classes).toEqual(["stonetop", "sheet", "actor", "themed", "theme-light"]);
 		expect(Sheet.DEFAULT_OPTIONS.window.resizable).toBe(true);
 		expect(Sheet.DEFAULT_OPTIONS.form.submitOnChange).toBe(true);
 	});
