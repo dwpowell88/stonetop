@@ -1,0 +1,19 @@
+{
+	"_id": "jxXZzcVSpGMHx2Xl",
+	"_key": "!items!jxXZzcVSpGMHx2Xl",
+	"name": "Floating sash",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "floating-sash",
+		"description": "*magical*\n\nA length of bluish-white lamé, maybe 6 inches wide by 6 feet long, snaking about in the air. Like a belt, but for someone far larger than you.\n\nWhen you **_wrap the sash securely around_** **_your waist_**, it buoys you against falls—you never fall faster than if you had fallen your own height.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.3UhyCbr1XGkhX6SO]{Tempest Lords}.*",
+		"resource": null,
+		"outfitItems": [],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

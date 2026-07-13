@@ -21,6 +21,7 @@ const KEY_PREFIX = {
 	Actor:        "!actors",
 	Item:         "!items",
 	JournalEntry: "!journal",
+	Folder:       "!folders",
 	Macro:        "!macros",
 };
 

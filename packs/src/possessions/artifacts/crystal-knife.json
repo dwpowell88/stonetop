@@ -1,0 +1,19 @@
+{
+	"_id": "bxuNlAmV6km53bKY",
+	"_key": "!items!bxuNlAmV6km53bKY",
+	"name": "Crystal knife",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "crystal-knife",
+		"description": "*hand*, *crude*, *magical*\n\nA blade of knapped quartz, with the hilt wrapped in glyph-covered leather. It gleams to those with the forest eyes.\n\nWhen you **_wield the crystal knife as a_** **_weapon_**, you can harm the manifest form of any spirit, ignoring armor and dealing +1d4 damage. If the 1d4 comes up a 4, though, the knife shatters into useless shards.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.GaDYK1VEJEi6tHDa]{Forest Folk}.*",
+		"resource": null,
+		"outfitItems": [],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

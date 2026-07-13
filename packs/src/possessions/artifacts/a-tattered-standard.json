@@ -1,0 +1,28 @@
+{
+	"_id": "2yPqAKEhkgtj2Wbg",
+	"_key": "!items!2yPqAKEhkgtj2Wbg",
+	"name": "A tattered standard",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-tattered-standard",
+		"description": "◇◇ *magical*\n\nThreadbare, ancient, but remarkably well-preserved. Embroidered with a stylized aurochs whose horns encompass the sun. It fills you with hope and pride to look upon it, as well it should. For this was the standard of the Heol-Tarv, a heroic band who gave their lives in hopeless battle against the **Anan Gllo** (page 81), securing their people’s escape.\n\nWhen you **_unfurl the tattered standard and_** **_hold it aloft for all to see_**, you and your allies are immune to supernatural fear and unshaken by undead or otherwise unnatural foes.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.sNLYfvJEFM1v463y]{Death and the undying}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-tattered-standard",
+				"name": "A tattered standard",
+				"weight": 2,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

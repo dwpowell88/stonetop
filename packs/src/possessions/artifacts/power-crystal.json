@@ -1,0 +1,28 @@
+{
+	"_id": "viLahIiEprsKCsPA",
+	"_key": "!items!viLahIiEprsKCsPA",
+	"name": "Power-crystal",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "power-crystal",
+		"description": "◇ *magical*, *dangerous*\n\nA chunk of crystal the size of a clenched fist. If charged, it thrums or crackles with power. If depleted, it fills you with a sense of emptiness and longing.\n\nWhen you **_brandish the depleted power_****_crystal at a source of elemental energy_**, roll +CON: **on a 10+**, the crystal absorbs the energy fully and as safely as possible (it is now charged); **on a 7-9**, the crystal absorbs the energy (it’s now charged) but pick 1:\n\n- You are harmed by the coursing energy, taking damage as the GM sees fit\n- The power stored in the crystal is extremely unstable, likely to discharge without warning\n- The crystal cracks; henceforth, treat a 10+ on this move as a 7-9, and you can’t pick this option again.\n\nIn the hands of a skilled arcanist, a charged power-crystal can fuel or empower a magical effect (though this is dangerous). In the hands of the incautious, the reckless, or the desperate, it can split or crack, leading to a violent explosion.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.UyUHhvUYqOaGERlu]{Stone Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "power-crystal",
+				"name": "Power-crystal",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical, dangerous",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

@@ -58,7 +58,10 @@ function hullArea(pts) {
  *   • **circle** ○ and **diamond** ◇ — curved outlines (≥3 arcs, no straight sides), told apart by
  *     how much of their bounding box the shape fills (a circle ≈ 0.9, a diamond ≈ 0.5).
  *   • **square** □ — a straight-sided, roughly-square box (the choice-group pick/track checkbox,
- *     e.g. the Blackwater "Getting there" list and the arcana tracks).
+ *     e.g. the Blackwater "Getting there" list and the arcana tracks). The artifact weight pips
+ *     are also straight-sided but drawn as a *rotated* square (vertices at the bbox edge
+ *     midpoints, so the hull fills ~50% of the bbox where an upright box fills ~100%) — the same
+ *     hull-ratio test that separates circles from curved diamonds separates these too.
  * Everything else — filled swirls and the swirl+triangle/arrow list bullets — is left alone (the
  * lists detect themselves). Returns `[{x, y, w, h, kind}]` in page coordinates.
  */
@@ -80,7 +83,8 @@ export function parseMarkers(xml) {
 		const lines = (body.match(/lineto/g) || []).length;
 		let kind;
 		if (curves >= 3 && lines === 0) kind = hullArea(pts) / (w * h) < 0.7 ? "diamond" : "circle"; // curved outline
-		else if (lines >= 3 && Math.abs(w - h) <= Math.max(w, h) * 0.35) kind = "square";            // straight-sided box
+		else if (lines >= 3 && Math.abs(w - h) <= Math.max(w, h) * 0.35)                             // straight-sided box
+			kind = hullArea(pts) / (w * h) < 0.7 ? "diamond" : "square";                             // upright □ vs rotated ◇
 		else continue;
 		out.push({ x: +t[1], y: +t[2], w, h, kind });
 	}

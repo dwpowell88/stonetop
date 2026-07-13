@@ -1,0 +1,19 @@
+{
+	"_id": "jGgznrsaGyml4Vk0",
+	"_key": "!items!jGgznrsaGyml4Vk0",
+	"name": "A fang-dagger",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-fang-dagger",
+		"description": "*hand*, *magical*, +1 damage\n\nAn 8-inch fang, bound to a wooden hilt by fiber that never rots. A cruel-looking thing, with strange carvings along the blade.\n\n**Something interesting:** The fang looks like it came from a **cynddaraig** (page @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.JjyXyicr58qim0bV]{206}), and the markings are definitely some sort of spell related to blood and soil.\n\n**Something useful:** When you **_bury the_** **_fang-dagger and water the soil with blood_**, the ground buckles and bulges. A minute later, a full-grown cynddaraig bursts from the soil—angry, confused, and hungry. The spell grants no control over the beast and provides no way to dismiss it. The dagger is gone, now a tooth in the rage-drake’s maw.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.gnP4Q10EDePdvgqz]{Green Lords}.*",
+		"resource": null,
+		"outfitItems": [],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

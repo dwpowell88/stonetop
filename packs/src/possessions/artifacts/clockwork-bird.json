@@ -1,0 +1,28 @@
+{
+	"_id": "fu5AbfQH6NJWE6ww",
+	"_key": "!items!fu5AbfQH6NJWE6ww",
+	"name": "Clockwork bird",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "clockwork-bird",
+		"description": "◇ *fragile*, *magical*, Value 3\n\nMade of tin and set with agate eyes. When you wind it up and let it run, it will dance and chirp loudly for a few minutes. When you wind it up and twist one of its feathers just so, it will sit and wait, only starting to dance and chirp when a creature enters its line of sight.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "clockwork-bird",
+				"name": "Clockwork bird",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "fragile, magical",
+				"note": "Value 3"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

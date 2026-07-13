@@ -1,0 +1,19 @@
+{
+	"_id": "XywPIVk6nM09dTga",
+	"_key": "!items!XywPIVk6nM09dTga",
+	"name": "Moonlight raiment",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "moonlight-raiment",
+		"description": "*magical*, *beautiful*, *fragile*\n\nA gossamer robe, a joy against your skin. When you **_wear the raiment in dim light_**, you become more pleasing to the eye. If normally ugly, you become plain. If plain, you become beautiful. If beautiful, you become luminous, breathtaking, magnificent.\n\nAlas, when **_the moonlight raiment is soiled_** **_or torn while you wear it_**, mark a debility. The debility cannot be cleared until the raiment is cleaned or repaired using Fae magic, or you burn it away into silvery ash.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YMV8KIodnoZL71Jl]{Fae}.*",
+		"resource": null,
+		"outfitItems": [],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

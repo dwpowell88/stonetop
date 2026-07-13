@@ -1,0 +1,28 @@
+{
+	"_id": "4jxma5lTq8RtrcyV",
+	"_key": "!items!4jxma5lTq8RtrcyV",
+	"name": "A hunk of amber",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-hunk-of-amber",
+		"description": "◇ *magical*, Value 2\n\nIt’s about the size of two fists, with a mass of blood-sucking insects floating in its center. It tethers an ambitious spirit of insects, blight, and disease. Treat it as a threat (type: *magical entity*, **Instinct** to foster worship) with the following moves:\n\n- Demand a blood sacrifice, poured over the amber\n- Shield someone from sickness, vermin, and poison\n- Blight an enemy with sickness, vermin, or both\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the Wild}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-hunk-of-amber",
+				"name": "A hunk of amber",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": "Value 2"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

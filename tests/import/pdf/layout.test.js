@@ -39,6 +39,49 @@ describe("extractArticle — an indented bullet does not absorb flush prose belo
 	});
 });
 
+describe("extractArticle — artifact tag lines with weight pips", () => {
+	// A carried artifact's tag line leads with vector ◇ pips (injected as marker-font lines that
+	// merge into the row) and puts roman text — a bare comma, or a count word like "each" — before
+	// the first italic quality. It must classify as the artifact-tags line, not a list item.
+	const mk = (text, x, y, font = "ACaslonPro-Regular", size = 9) =>
+		({ bbox: [x, y, x + 150, y + size], text, font, size, spans: [{ font, size, text }] });
+	const pip = (x, y) => ({ bbox: [x, y, x + 6.6, y + 8], text: "◇", font: "marker", size: 7, spans: [{ font: "marker", size: 7, text: "◇" }] });
+	const tag = (x, y, lead, quals) =>
+		({ bbox: [x, y, x + 100, y + 9], text: lead + quals, font: "ACaslonPro-Regular", size: 9, spans: [
+			{ font: "ACaslonPro-Regular", size: 9, text: lead },
+			{ font: "ACaslonPro-Italic", size: 9, text: quals },
+		] });
+	const page = (lines) => ({ width: 1224, height: 792, lines });
+	const html = (lines) => renderHtml(extractArticle([page(lines)], { title: "T" }));
+
+	it("renders a comma-led pip tag line as artifact-tags with tight pips", () => {
+		const body = html([
+			mk("A pot of gold", 58, 100, "Avara-Bold", 9),
+			pip(49, 112), pip(56.5, 112), tag(66, 112, ", ", "magical"),
+			mk("A small bronze cauldron, full of glittering", 36, 124),
+		]);
+		expect(body).toContain('<p class="artifact-tags">◇◇, <em>magical</em></p>');
+	});
+
+	it("renders a count-word pip tag line (\"◇ each, magical\") as artifact-tags", () => {
+		const body = html([
+			mk("Bloodshot amber", 58, 100, "Avara-Bold", 9),
+			pip(49, 112), tag(58, 112, "each, ", "magical"),
+			mk("Beads of amber, warm to the touch.", 36, 124),
+		]);
+		expect(body).toContain('<p class="artifact-tags">◇ each, <em>magical</em></p>');
+	});
+
+	it("keeps a pip-led treasure list item a list, not a tag line", () => {
+		const body = html([
+			mk("Various treasures", 58, 100, "Avara-Bold", 9),
+			pip(49, 112), pip(56.5, 112), mk("A spinning wheel from your youth (how", 66, 112),
+			mk("do you know?) that was lost in a fire", 66, 124),
+		]);
+		expect(body).not.toContain("artifact-tags");
+	});
+});
+
 describe("extractArticle — The Crombil (prose + stat block)", () => {
 	const r = article("crombil", { title: "The Crombil" });
 

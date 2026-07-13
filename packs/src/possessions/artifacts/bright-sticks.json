@@ -1,0 +1,19 @@
+{
+	"_id": "rO72ZTze03ihPzGV",
+	"_key": "!items!rO72ZTze03ihPzGV",
+	"name": "Bright-sticks",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "bright-sticks",
+		"description": "*fragile*, *dangerous*, Value 1\n\nA small box containing 3d4 stiff metal rods, about the size of incense sticks. Snap one, and each piece bursts into a blindingly bright, blisteringly hot flame (d8 damage, *messy*) for a few seconds while it burns away to ash.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
+		"resource": null,
+		"outfitItems": [],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}
