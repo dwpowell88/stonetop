@@ -3,7 +3,6 @@ import { mkdirSync, readdirSync, readFileSync, renameSync, copyFileSync, rmSync,
 import path from "path";
 import { blackTransparent, whiteTransparent, inkFraction, rasterKey } from "./png.js";
 import { loadBullets } from "./rules.js";
-import { Raster } from "../../../src/art/Raster.js";
 
 // `renameSync` fails with EXDEV across filesystems (e.g. a /tmp scratch dir → the repo); fall back to copy+delete.
 function moveFile(src, dest) {
@@ -121,93 +120,6 @@ export function extractPageArt(pdf, page, outDir, slug, { minW = 40, minH = 40, 
 	}
 	rmSync(tmp, { recursive: true, force: true });
 	return out;
-}
-
-/**
- * Merge illustrations split across a facing-page pair back into one image. 1-up printings of
- * the book cut spread-spanning art at the gutter — the left half runs flush to its (even) page's
- * right edge, the right half starts flush at the next page's left edge, in the same vertical
- * band. 2-up printings embed the whole painting as a single image, so figure counts (and the
- * art itself) only match across printings once the halves are rejoined. Each piece bleeds ~1pt
- * past its page edge; that overhang duplicates the seam, so it's trimmed before joining.
- *
- * Mutates `pageImages` in place: the composite replaces the left piece (width spanning both
- * halves) and the right piece is dropped. `pages`/`pageImages` are the parallel per-page arrays
- * of `loadArticlePages`; dedup routing matches `extractPageArt`.
- */
-export function stitchSpreads(startPage, pages, pageImages, dedup, mapFile = (f) => f) {
-	const MIN = 40; // pts — ignore marker/icon glyphs
-	for (let i = 0; i + 1 < pageImages.length; i++) {
-		if ((startPage + i) % 2 !== 0) continue; // left page of a facing pair is even
-		const pageW = pages[i].width;
-		for (const a of pageImages[i]) {
-			if (a.w < MIN || a.h < MIN || a.x + a.w < pageW - 3) continue;
-			const bIdx = pageImages[i + 1].findIndex(
-				(b) => b.w >= MIN && b.h >= MIN && b.x <= 3 && Math.abs(b.y - a.y) <= 3 && Math.abs(b.h - a.h) <= 3,
-			);
-			if (bIdx < 0) continue;
-			const b = pageImages[i + 1][bIdx];
-			const comp = stitchPair(a, b, pageW);
-			if (!comp) continue;
-			let dest;
-			if (dedup) {
-				const hash = rasterKey(Buffer.from(comp));
-				dest = dedup.index.get(hash);
-				if (!dest) {
-					mkdirSync(dedup.dir, { recursive: true });
-					dest = path.join(dedup.dir, `${hash}.png`);
-					writeFileSync(dest, comp);
-					dedup.index.set(hash, dest);
-				}
-			} else {
-				dest = path.join(path.dirname(a.disk ?? a.file), `${path.basename(a.disk ?? a.file, ".png")}-spread.png`);
-				writeFileSync(dest, comp);
-			}
-			// A half can fall under the thin-frame ink threshold on its own; the joined
-			// painting is art, never a frame.
-			Object.assign(a, { disk: dest, file: mapFile(dest), w: a.w + b.w, box: false });
-			pageImages[i + 1].splice(bIdx, 1);
-		}
-	}
-}
-
-/** Join a spread's two halves horizontally (trimming the page-edge bleed overhang); returns
- *  PNG bytes, or null when the halves' pixel geometry can't line up. */
-function stitchPair(a, b, pageW) {
-	let A, B;
-	try {
-		A = Raster.fromPng(readFileSync(a.disk ?? a.file));
-		B = Raster.fromPng(readFileSync(b.disk ?? b.file));
-	} catch { return null; } // unreadable or non-PNG piece — leave the pair alone
-	if (A.height !== B.height) return null;
-	const trimA = Math.max(0, Math.round((a.x + a.w - pageW) * (A.width / a.w)));
-	const trimB = Math.max(0, Math.round(-b.x * (B.width / b.w)));
-	if (trimA + trimB >= A.width + B.width) return null;
-	const ch = Math.max(A.channels, B.channels);
-	const [pa, pb] = [promote(A, ch), promote(B, ch)];
-	const wa = pa.width - trimA, wb = pb.width - trimB;
-	const W = wa + wb, H = pa.height;
-	const px = new Uint8Array(W * H * ch);
-	for (let y = 0; y < H; y++) {
-		px.set(pa.px.subarray(y * pa.width * ch, (y * pa.width + wa) * ch), y * W * ch);
-		px.set(pb.px.subarray((y * pb.width + trimB) * ch, (y + 1) * pb.width * ch), (y * W + wa) * ch);
-	}
-	return new Raster(W, H, ch, px).toPng();
-}
-
-/** Widen a raster to `ch` channels (gray→RGB replication, opaque alpha). */
-function promote(r, ch) {
-	if (r.channels === ch) return r;
-	const n = r.width * r.height;
-	const px = new Uint8Array(n * ch);
-	for (let i = 0; i < n; i++) {
-		const [rr, gg, bb] = r.channels === 1
-			? [r.px[i], r.px[i], r.px[i]]
-			: [r.px[i * r.channels], r.px[i * r.channels + 1], r.px[i * r.channels + 2]];
-		px[i * ch] = rr; px[i * ch + 1] = gg; px[i * ch + 2] = bb;
-		if (ch === 4) px[i * ch + 3] = r.channels === 4 ? r.px[i * 4 + 3] : 255;
-	}
-	return new Raster(r.width, r.height, ch, px);
 }
 
 /**

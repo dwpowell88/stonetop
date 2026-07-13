@@ -1,6 +1,6 @@
 import { loadStext } from "./stext.js";
 import { loadDividers, loadMarkers, loadBullets } from "./rules.js";
-import { extractPageArt, stitchSpreads } from "./images.js";
+import { extractPageArt } from "./images.js";
 
 // Shared per-article page loader: turns an outline range into the `{ pages, pageRules, pageImages }`
 // that `extractArticle` consumes — stext lines with the swirl/marker glyphs injected, vector
@@ -79,9 +79,7 @@ export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f
 		pg.lines.push({ bbox: [mk.x, y0, mk.x + mk.w, y0 + 8], text: g, font: "marker", size: 7, spans: [{ font: "marker", size: 7, text: g }] });
 	}
 	const rules = loadDividers(pdf, p);
-	// `disk` keeps the extracted file's real path — `file` may be remapped to the path Foundry
-	// serves it from, but the stitch pass still has to read the pixels from disk.
-	const images = extractPageArt(pdf, p, imgDir, `${imgPrefix}-p${p}`, { dedup }).map((im) => ({ ...im, disk: im.file, file: mapFile(im.file) }));
+	const images = extractPageArt(pdf, p, imgDir, `${imgPrefix}-p${p}`, { dedup }).map((im) => ({ ...im, file: mapFile(im.file) }));
 	return { pg, rules, images };
 }
 
@@ -95,8 +93,5 @@ export function loadArticlePages(pdf, r, opts = {}) {
 		if (p === endPage && endLeft) { pg.lines = pg.lines.filter((l) => l.bbox[0] < mid); rules = rules.filter((x) => x.x < mid); imgs = imgs.filter((im) => im.x < mid); }
 		pages.push(pg); pageRules.push(rules); pageImages.push(imgs);
 	}
-	// 1-up printings split spread-spanning art at the page gutter; rejoin the halves so the
-	// figure set matches the book's actual illustrations (and 2-up printings' extraction).
-	stitchSpreads(startPage, pages, pageImages, opts.dedup, opts.mapFile);
 	return { pages, pageRules, pageImages, startPage, endPage };
 }
