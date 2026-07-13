@@ -14,11 +14,15 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 export const BUILDERS = [
 	"scripts/import/pdf/build-arcana.js",
 	"scripts/import/pdf/build-npcs.js",
+	"scripts/import/build-spirits.js",
 	"scripts/import/pdf/build-journal.js",
 	"scripts/import/build-artifacts.js",
 	"scripts/import/pdf/build-tables.js",
 	"scripts/import/pdf/build-improvements.js",
 	"scripts/import/pdf/build-steadfasts.js",
+	// Companion-module builders — need BOOK_PDF/MODULE_DIR pointing at stonetop_foundry.
+	"scripts/import/pdf/build-book1-journal.js",
+	"scripts/import/pdf/build-maps.js",
 ];
 
 function main() {
