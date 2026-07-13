@@ -4867,6 +4867,10 @@ form.stonetop.sheet.steading {
 .stonetop-insert-sheet-section { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--color-border-light-2, #c9c7b8); padding-top: 8px; }
 .stonetop-insert-sheet-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .stonetop-insert-sheet-section .editor-content { min-height: 120px; border: 1px solid var(--color-border-light-2, #c9c7b8); border-radius: 3px; padding: 4px 6px; resize: vertical; overflow: auto; }
+/* Active ProseMirror: core pins .editor-content absolutely (inset: 0) inside the
+   .editor-container it injects, so the drag-resize must live on the container. */
+.stonetop-insert-sheet-section .editor-container { height: 220px; min-height: 120px; resize: vertical; overflow: hidden; }
+.stonetop-insert-sheet-section .editor-container .editor-content { min-height: 0; resize: none; }
 .stonetop-insert-sheet-instinct-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .stonetop-insert-sheet-instinct-row { display: flex; align-items: center; gap: 6px; }
 .stonetop-insert-sheet-instinct-row .insert-instinct-string { flex: 1 1 auto; }
@@ -5297,4 +5301,55 @@ form.stonetop.sheet.steading {
 	top: 8px;
 	right: 8px;
 	z-index: 1;
+}
+
+/* ===== Install Book Artwork (settings screen) ===== */
+.stonetop-art-installer .art-installer-body {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 4px 2px;
+}
+
+.stonetop-art-installer .art-intro {
+	font-size: var(--fs-note);
+	margin: 0;
+}
+
+.stonetop-art-installer .art-file-row {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.stonetop-art-installer .art-file-row label {
+	font-weight: bold;
+}
+
+.stonetop-art-installer progress {
+	width: 100%;
+}
+
+.stonetop-art-installer .art-progress-status {
+	font-size: var(--fs-note);
+	text-align: center;
+	margin: 0;
+}
+
+.stonetop-art-installer .art-note {
+	font-size: var(--fs-note);
+	margin: 0;
+}
+
+.stonetop-art-installer .art-note-installed i {
+	color: var(--color-level-success, #2e7d32);
+}
+
+.stonetop-art-installer .art-note-error i {
+	color: var(--color-level-error, #b71c1c);
+}
+
+.stonetop-art-installer .art-actions {
+	display: flex;
+	gap: 8px;
 }
