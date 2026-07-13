@@ -244,69 +244,58 @@ describe("ActorRolling.execute — XP on a 6-", () => {
 		});
 	}
 
-	it("marks 1 XP when the roll totals 6-", async () => {
+	it("offers the Mark XP button when the roll totals 6-, without marking on its own", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		FakeRoll.setNextTotal(6);
 		await rolling.execute(moveRequest());
-		expect(rolling._actor.typedActor.xpMarks).toBe(1);
-		expect(FakeChatMessage.lastCreated.content).toContain("stonetop.rollResults.xpMarked");
+		expect(rolling._actor.typedActor.xpMarks).toBe(0);
+		expect(FakeChatMessage.lastCreated.content).toContain("stonetop.rollResults.xpMark");
+		expect(FakeChatMessage.lastCreated.content).toContain("stonetop-xp-toggle");
 	});
 
-	it("marks nothing on a 7-9 or 10+", async () => {
+	it("offers nothing on a 7-9 or 10+", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		for (const total of [7, 10]) {
 			FakeRoll.setNextTotal(total);
 			await rolling.execute(moveRequest());
 		}
-		expect(rolling._actor.typedActor.xpMarks).toBe(0);
-		expect(FakeChatMessage.lastCreated.content).not.toContain("xpMarked");
+		expect(FakeChatMessage.lastCreated.content).not.toContain("xpMark");
 	});
 
-	it("skips the mark when the move says otherwise (xpOnMiss: false)", async () => {
+	it("offers nothing when the move says otherwise (xpOnMiss: false)", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		FakeRoll.setNextTotal(3);
 		await rolling.execute(moveRequest({ xpOnMiss: false }));
-		expect(rolling._actor.typedActor.xpMarks).toBe(0);
+		expect(FakeChatMessage.lastCreated.content).not.toContain("xpMark");
 	});
 
-	it("marks on a bare stat-prompt roll too (rolling a stat is still rolling for a move)", async () => {
+	it("offers on a bare stat-prompt roll too (rolling a stat is still rolling for a move)", async () => {
 		const rolling = makeRolling({ bonuses: { wis: 1 } });
 		FakeRoll.setNextTotal(5);
 		await rolling.execute(statRequest("wis"));
-		expect(rolling._actor.typedActor.xpMarks).toBe(1);
+		expect(FakeChatMessage.lastCreated.content).toContain("stonetop.rollResults.xpMark");
 	});
 
-	it("stamps the card with the xpMark flag and undo toggle when the mark lands", async () => {
+	it("stamps the card with the unmarked xpMark flag alongside the offer", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		FakeRoll.setNextTotal(6);
 		await rolling.execute(moveRequest());
-		expect(FakeChatMessage.lastCreated.flags).toEqual({ stonetop: { xpMark: { undone: false } } });
-		expect(FakeChatMessage.lastCreated.content).toContain("stonetop-xp-toggle");
+		expect(FakeChatMessage.lastCreated.flags).toEqual({ stonetop: { xpMark: { marked: false } } });
 	});
 
-	it("stamps no flag when nothing was marked", async () => {
+	it("stamps no flag when there is no offer", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		FakeRoll.setNextTotal(10);
 		await rolling.execute(moveRequest());
 		expect(FakeChatMessage.lastCreated.flags).toBeUndefined();
 	});
 
-	it("keeps marking past the level-up threshold (no ceiling on the track)", async () => {
-		const rolling = makeRolling({ bonuses: { str: 0 } });
-		for (let i = 0; i < 9; i++) { // 9 misses at level 1 — one past the 8-XP threshold
-			FakeRoll.setNextTotal(4);
-			await rolling.execute(moveRequest());
-		}
-		expect(rolling._actor.typedActor.xpMarks).toBe(9);
-		expect(FakeChatMessage.lastCreated.content).toContain("stonetop.rollResults.xpMarked");
-	});
-
-	it("tolerates actors without an XP track (no markXp on the typed actor)", async () => {
+	it("offers nothing to actors without an XP track (no markXp on the typed actor)", async () => {
 		const rolling = makeRolling({ bonuses: { str: 0 } });
 		delete rolling._actor.typedActor.markXp; // instance shadow-delete falls back to the class method
 		rolling._actor.typedActor.markXp = undefined;
 		FakeRoll.setNextTotal(2);
 		await rolling.execute(moveRequest());
-		expect(FakeChatMessage.lastCreated.content).not.toContain("xpMarked");
+		expect(FakeChatMessage.lastCreated.content).not.toContain("xpMark");
 	});
 });

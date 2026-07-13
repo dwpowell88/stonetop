@@ -46,9 +46,13 @@ export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f
 		const font = sw.kind === "point" ? "swirl-point" : "swirl";
 		pg.lines.push({ bbox: [sw.x - 3, y0, sw.x, y0 + 8], text: "", font, size: 7, spans: [{ font, size: 7, text: "" }] });
 	}
-	// Drop the resource/outfit check markers (small vector circles/squares/diamonds) inline as
-	// glyphs. Align each to the text line it overlaps and merge it into that row; ordering by x
-	// then places it.
+	// Drop the resource/outfit check markers (small vector circles/diamonds) inline as glyphs.
+	// Align each to the text line it overlaps and merge it into that row; ordering by x then
+	// places it. Match by the nearest vertical centre (a marker sits between two rows, so the
+	// closest baseline wins, not the closest left-edge). A diamond is always a *leading* bullet —
+	// it precedes its item and never sits at a line's end — so it only attaches to a line that
+	// starts at/right of it. Circles can be inline (potency dots inside "(○○○ uses)"), so they
+	// keep the wider match.
 	for (const mk of loadMarkers(pdf, p)) {
 		const mid = (l) => (l.bbox[1] + l.bbox[3]) / 2;
 		let line;
