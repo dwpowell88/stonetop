@@ -288,7 +288,7 @@
 		},
 		"artInstaller": {
 			"title": "Install Book Artwork",
-			"intro": "The compendium can show the illustrations from the Stonetop books, but the illustrations are copyrighted and aren't shipped with the system. If you own the PDFs, select them below — Book II: The Wider World and Other Wonders and Book I: Stonetop.",
+			"intro": "The compendium can show the illustrations from the Stonetop books, but the illustrations are copyrighted and aren't shipped with the system. If you own the PDFs, select them below — Book II: The Wider World and Other Wonders and Book I: Stonetop. Use the \"spreads\" (two-page) editions of the PDFs: the single-page versions split the artwork that spans facing pages, so much of it can't be recognized.",
 			"chooseLabel": "Book PDF(s)",
 			"install": "Install Artwork",
 			"noFiles": "Select at least one Stonetop book PDF first.",
