@@ -1,0 +1,28 @@
+{
+	"_id": "FwYTuCQDtdyB7x9E",
+	"_key": "!items!FwYTuCQDtdyB7x9E",
+	"name": "Pale metal gauntlets",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "pale-metal-gauntlets",
+		"description": "◇ *fireproof*, *magical*, Value 3\n\nMade of a pale metal, lighter than it should be, and intricately carved with geometric patterns. The insides are an impossibly fine chainmail of the same metal. They seem to absorb heat, and are often damp.\n\nWhen you **_wear the pale metal gauntlets_**, you can pick up and manipulate even white-hot steel without harming your hands (the rest of you, though, has no special protection from heat).\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "pale-metal-gauntlets",
+				"name": "Pale metal gauntlets",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "fireproof, magical",
+				"note": "Value 3"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

@@ -8,15 +8,7 @@
 		"slug": "small-clay-jars",
 		"description": "*fragile*, *magical*\n\nA number of earthenware jars, about the size of a pinecone, sealed with wax and seemingly empty. When opened (or broken) a fine cloud of dust puffs out. The dust is, in fact, chogor spores.\n\nWhen **_someone is exposed to chogor spores_**, the spores quickly start to grow on them in masses of vine-like ferns. They will—in a matter of seconds—ensnare and restrain their victim. After about an hour, the ferns die and rapidly dry out, but until then, it’s like being bound up in twine.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.gnP4Q10EDePdvgqz]{Green Lords}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "small-clay-jars",
-				"name": "Small clay jars",
-				"weight": 1,
-				"note": "*fragile*, *magical*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

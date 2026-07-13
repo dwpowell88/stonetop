@@ -53,6 +53,13 @@ describe("extractBlocks", () => {
 		expect(linked[0].name).toBe("A lead bracelet");
 	});
 
+	it("keeps the ◇ weight pips in the tag line", () => {
+		const piped = extractBlocks(
+			'<h3>A pot of “gold”</h3>' +
+			'<p class="artifact-tags">◇◇, <em>magical</em></p><p>A small bronze cauldron.</p>');
+		expect(piped[0].tags).toBe("◇◇, *magical*");
+	});
+
 	it("drops the book's tracking checkbox from tag lines", () => {
 		const boxed = extractBlocks(
 			'<h3>The Three-star Crown</h3>' +

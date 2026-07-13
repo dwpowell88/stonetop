@@ -1,0 +1,28 @@
+{
+	"_id": "VKIX8fABVJeNYVWx",
+	"_key": "!items!VKIX8fABVJeNYVWx",
+	"name": "Aetherium urn",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "aetherium-urn",
+		"description": "◇ *magical*, *dangerous*\n\nThe lid is held fast by no apparent means. It takes some effort to pry open and eagerly snaps back into place.\n\nWhen **_the urn is open and empty_**, it draws raw elemental force into it like a lodestone draws iron. With the lid in place, the force is safely stored. If the urn is damaged or dented (not hard), any stored force escapes, violently.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.3UhyCbr1XGkhX6SO]{Tempest Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "aetherium-urn",
+				"name": "Aetherium urn",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical, dangerous",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

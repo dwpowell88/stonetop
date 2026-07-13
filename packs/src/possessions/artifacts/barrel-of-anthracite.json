@@ -8,15 +8,7 @@
 		"slug": "barrel-of-anthracite",
 		"description": "*immobile*, *dangerous*, Value 3\n\nLumps of lustrous, gray-black stone, like coal but drier and much more useful. A small lump catches fire as readily as dry wood and burns all night with the heat of a good cook-fire. It casts only dim light (*close*, *area*) and there’s almost no smoke, but the smell is something awful.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "barrel-of-anthracite",
-				"name": "Barrel of anthracite",
-				"weight": 1,
-				"note": "*immobile*, *dangerous*, Value 3",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

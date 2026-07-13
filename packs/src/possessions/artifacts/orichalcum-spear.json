@@ -1,0 +1,28 @@
+{
+	"_id": "bwYqsGcEvjoZt8FT",
+	"_key": "!items!bwYqsGcEvjoZt8FT",
+	"name": "Orichalcum spear",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "orichalcum-spear",
+		"description": "◇ *close*, *thrown*, *magical*, *beautiful*\n\n1 piercing The haft needs replacing, but the spearhead itself is pristine, beautiful, sharp as hot flame. When you **_strike a perversion of_** **_nature with the spear_**, deal +1d4 damage. When you **_strike a perversion of nature and_** **_roll max damage_** (including any bonus dice), deal another +1d4 damage as the spearhead flares and melts into worthless slag.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.7CqkDvDTCiCWTus2]{Forge Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "orichalcum-spear",
+				"name": "Orichalcum spear",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "close, thrown, magical, beautiful",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

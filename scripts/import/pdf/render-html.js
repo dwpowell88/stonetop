@@ -192,8 +192,9 @@ function renderColumn(blocks, ctx) {
 			}
 			case "para":    {
 				const icon = (im) => im ? `<img class="icon" src="${escapeHtml(ctx.asset(im.file))}">` : "";
-				// An artifact's qualities/tags line, kept on its own line under the title.
-				if (b.tags) { out.push(`<p class="artifact-tags">${(b.icons || []).map(icon).join("")}${joinLines(b.lines)}</p>`); break; }
+				// An artifact's qualities/tags line, kept on its own line under the title. The weight
+				// pips arrive as separate marker spans ("◇ ◇ , magical") — set them tight, as printed.
+				if (b.tags) { out.push(`<p class="artifact-tags">${(b.icons || []).map(icon).join("")}${joinLines(b.lines).replace(/([◇□◻○])\s+(?=[◇□◻○,])/g, "$1")}</p>`); break; }
 				// A merged "people" paragraph: each entry (icon + text) flows inline, no breaks.
 				if (b.entries) { out.push(`<p>${b.entries.map((e) => icon(e.icon) + joinLines(e.lines)).join(" ")}</p>`); break; }
 				out.push(`<p>${(b.icons || []).map(icon).join("")}${joinLines(b.lines)}</p>`);

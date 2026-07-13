@@ -1,0 +1,28 @@
+{
+	"_id": "8PtGXYG26eXGYZ7M",
+	"_key": "!items!8PtGXYG26eXGYZ7M",
+	"name": "A fossilized horn",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-fossilized-horn",
+		"description": "◇ *magical*\n\nA spiral thing, maybe 2’ long, the remnant of some long-gone **incarnation** (page 300). Those sensitive to the spirit world can sense its lingering, radiant power.\n\nWhen you **_bear the fossilized horn_**, you have advantage on any move to impress, intimidate, or threaten a spirit (though it grants no special ability to communicate with spirits in the first place). Should you roll a 6- on any such roll, the spirit can choose to destroy the horn and end its effect, in addition to whatever else the GM says.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YxQdXyd9EDRJyEKv]{Primordial powers}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-fossilized-horn",
+				"name": "A fossilized horn",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

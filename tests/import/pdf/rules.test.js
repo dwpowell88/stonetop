@@ -48,6 +48,15 @@ describe("parseMarkers", () => {
 		expect(parseMarkers(diamond)[0].kind).toBe("diamond");
 	});
 
+	it("classifies a rotated straight-sided square (the artifact weight pip) as diamond", () => {
+		// Vertices at the bbox edge midpoints — the hull fills ~half the bbox, unlike an upright
+		// checkbox whose corners fill it entirely. Shape taken from a Book II artifact tag line.
+		const pip = `<stroke_path color="0 0 0" transform="1 0 0 -1 49.48 302.69">` +
+			`<moveto x="0" y="0"/><lineto x="3.309" y="-3.309"/><lineto x="6.618" y="0"/>` +
+			`<lineto x="3.309" y="3.309"/><lineto x="0" y="0"/></stroke_path>`;
+		expect(parseMarkers(pip)[0].kind).toBe("diamond");
+	});
+
 	it("ignores white markers and oblong (non-square) straight shapes", () => {
 		expect(parseMarkers(square.replace('color="0 0 0"', 'color="1 1 1"'))).toEqual([]);
 		const oblong = `<stroke_path color="0 0 0" transform="1 0 0 -1 600 313">` +

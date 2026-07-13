@@ -8,15 +8,7 @@
 		"slug": "silvery-tuning-fork",
 		"description": "*magical*, *loud*\n\nWhen you **_strike this tuning fork against a_** **_hard surface_**, it emits a loud tone for about a minute. Nearby (*reach*, *area*) magical effects and creatures become visible: shaking, vibrating, distorted. The noise draws the attention of any spirits or magically attuned beings for miles around.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.3UhyCbr1XGkhX6SO]{Tempest Lords}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "silvery-tuning-fork",
-				"name": "Silvery tuning fork",
-				"weight": 1,
-				"note": "*magical*, *loud*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

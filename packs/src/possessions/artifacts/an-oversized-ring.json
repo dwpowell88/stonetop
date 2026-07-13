@@ -1,0 +1,28 @@
+{
+	"_id": "PvDg68sBt3WJ4Btn",
+	"_key": "!items!PvDg68sBt3WJ4Btn",
+	"name": "An oversized ring",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "an-oversized-ring",
+		"description": "◇ *beautiful*, *magical*, Value 4\n\nA fist-sized signet, large even by the Makers’ standards, made of orichalcum. It glows like a dying ember, but is cool to the touch. When anyone lies in the ring’s presence, their tongue blisters and burns. The greater the lie, the more damage is done.\n\n**Something interesting:** This was the signet ring of a Forge Lord, one of great wealth and importance; the **Ustrina** (page @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{464}) often show keen interest in such things.\n\n**Something useful:** This was the signet ring of Omelor Xonane, a storied artificer. Many of their works were said to be keyed to this signet ring. Who knows what wonders it could unlock?\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.7CqkDvDTCiCWTus2]{Forge Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "an-oversized-ring",
+				"name": "An oversized ring",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "beautiful, magical",
+				"note": "Value 4"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

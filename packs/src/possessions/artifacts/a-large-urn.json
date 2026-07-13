@@ -8,15 +8,7 @@
 		"slug": "a-large-urn",
 		"description": "*immobile*, *magical*\n\nWhen the **_urn is unoccupied and a Fae looks_** **_inside_**, it is compelled to crawl in (it can always fit). If you **_then close the lid_**, the Fae is trapped and the urn slowly and painfully peels away its knowledge, essence, and sense of self. In time, nothing remains but a pile of pearls (Value 2).\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.gnP4Q10EDePdvgqz]{Green Lords}.*",
 		"resource": null,
-		"outfitItems": [
-			{
-				"slug": "a-large-urn",
-				"name": "A large urn",
-				"weight": 1,
-				"note": "*immobile*, *magical*",
-				"inventoryColumn": "regular"
-			}
-		],
+		"outfitItems": [],
 		"choices": null,
 		"scaling": null,
 		"sortOrder": null,

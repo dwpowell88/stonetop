@@ -1,0 +1,28 @@
+{
+	"_id": "5iZUbMPtNXvgS6mY",
+	"_key": "!items!5iZUbMPtNXvgS6mY",
+	"name": "A vine in a rune-carved pot",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "a-vine-in-a-rune-carved-pot",
+		"description": "◇ *magical*\n\nIt’s about as thick as your finger and maybe 30 feet long stretched out, with skinny little tendrils. It looks rather dried out, but moves slightly if you touch it or its pot. If you water it, it twitches excitedly.\n\nA plant spirit is bound to the vine and pot. If you befriend it and carry its pot, it will animate and act as a follower: *grabby*, *clever*, *playful*; **HP** 3; **Damage** 0; **Instinct** to not let go; **Cost** affection, play time.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.gnP4Q10EDePdvgqz]{Green Lords}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "a-vine-in-a-rune-carved-pot",
+				"name": "A vine in a rune-carved pot",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": ""
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}

@@ -1,0 +1,28 @@
+{
+	"_id": "SBr0CHaFkkHtCIEU",
+	"_key": "!items!SBr0CHaFkkHtCIEU",
+	"name": "Brass sphere",
+	"type": "possession",
+	"img": "icons/svg/item-bag.svg",
+	"system": {
+		"slug": "brass-sphere",
+		"description": "◇ *magical*, Value 2\n\nA heavy lump of smooth metal that fits in one’s hand. When you touch the sphere with bare flesh, it glows with an orange light (*reach*, *area*, hours). It recharges an hour of light for every hour that it sits in a hot fire or coals.\n\n*An artifact of the wider world — see @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.IAapou8FwQPQCJ4W]{Ustrina}.*",
+		"resource": null,
+		"outfitItems": [
+			{
+				"slug": "brass-sphere",
+				"name": "Brass sphere",
+				"weight": 1,
+				"inventoryColumn": "regular",
+				"tagList": "magical",
+				"note": "Value 2"
+			}
+		],
+		"choices": null,
+		"scaling": null,
+		"sortOrder": null,
+		"playbookSlug": null
+	},
+	"flags": {},
+	"folder": "RFMHDMtJKEsTRTHB"
+}
