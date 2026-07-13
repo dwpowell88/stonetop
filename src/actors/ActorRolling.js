@@ -53,10 +53,12 @@ export class ActorRolling {
 					"stonetop.rollResults.miss"
 		);
 
-		// The book's XP rule: mark XP on a 6- roll, unless the move says otherwise (request.xpOnMiss)
-		// or the actor has no XP track (NPCs, steadings).
-		const xpMarked = resultKey === "failure" && request.xpOnMiss
-			&& (await this._actor.typedActor.markXp?.()) === true;
+		// The book's XP rule — mark XP on a 6-, unless the move says otherwise (request.xpOnMiss) —
+		// is offered, not automated: players roll moves for fun or by accident, so the card carries
+		// a Mark XP button instead of ticking the track on its own. Only actors with an XP track
+		// (characters) get the offer.
+		const xpOffer = resultKey === "failure" && request.xpOnMiss
+			&& typeof this._actor.typedActor.markXp === "function";
 
 		const card = {
 			name: request.buildDisplayName(statKey, resultLabel, request.stat === "prompt"),
@@ -68,13 +70,13 @@ export class ActorRolling {
 			resultKey,
 			description: rich(request.description),
 			resultText:  rich(request.resultText(resultKey)),
-			xpLine: xpMarked ? buildXpLine(false, k => game.i18n.localize(k)) : null,
+			xpLine: xpOffer ? buildXpLine(false, k => game.i18n.localize(k)) : null,
 		};
 		return ChatMessage.create({
 			speaker,
 			content: await renderRollCard(card, this._rollData),
 			rolls: [roll],
-			...(xpMarked ? {flags: {stonetop: {xpMark: {undone: false}}}} : {}),
+			...(xpOffer ? {flags: {stonetop: {xpMark: {marked: false}}}} : {}),
 		});
 	}
 

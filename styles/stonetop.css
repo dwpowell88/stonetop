@@ -2067,18 +2067,21 @@ body,
 	font-variant: small-caps;
 }
 
-.stonetop-roll-xp--undone {
-	font-weight: normal;
-	opacity: 0.75;
-}
-
-.stonetop-xp-toggle {
+a.stonetop-xp-toggle {
 	font-weight: normal;
 	font-variant: normal;
 	font-size: 0.85em;
 	opacity: 0.8;
 	text-decoration: underline;
 	cursor: pointer;
+}
+
+button.stonetop-xp-toggle {
+	width: auto;
+	font-variant: normal;
+	font-size: 0.9em;
+	line-height: 1.5;
+	padding: 0 12px;
 }
 
 /* ── Roll mode picker (inventory/equipment tabs) ── */

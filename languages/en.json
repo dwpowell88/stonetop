@@ -284,8 +284,7 @@
 			"strongHit": "Strong Hit!",
 			"xpMarked": "You mark XP.",
 			"xpUndo": "Undo",
-			"xpUndone": "XP mark undone.",
-			"xpRemark": "Re-mark"
+			"xpMark": "Mark XP"
 		},
 		"npc": {
 			"hitPoints": "Hit Points",

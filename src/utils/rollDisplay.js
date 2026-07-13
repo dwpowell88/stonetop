@@ -1,5 +1,3 @@
-import {buildXpLine} from "../chat/xpMarkControl.js";
-
 export class RollDisplay {
 	constructor(localize) {
 		this._localize = localize;

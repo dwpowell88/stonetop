@@ -263,5 +263,5 @@ Hooks.on("preCreateActor", onPreCreateActor);
 Hooks.on("createActor", onCreateActor);
 
 // -- RENDER CHAT MESSAGE ---------------------------------------
-// Binds the "Undo XP mark" toggle on roll cards that auto-marked XP.
+// Binds the "Mark XP" control on 6- roll cards.
 Hooks.on("renderChatMessageHTML", onRenderChatMessage);
