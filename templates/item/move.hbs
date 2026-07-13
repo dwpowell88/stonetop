@@ -1,9 +1,10 @@
-<form class="stonetop sheet item move" autocomplete="off">
+{{!-- V2 part: single root element; the sheet root form + classes come from DEFAULT_OPTIONS. --}}
+<div class="stonetop-item-sheet-part">
 
 	<header class="move-sheet-header">
-		<img class="move-sheet-icon" src="{{data.img}}" data-edit="img" title="{{data.name}}" alt="">
+		<img class="move-sheet-icon" src="{{item.img}}" data-edit="img" data-action="editImage" title="{{item.name}}" alt="">
 		<div class="move-sheet-title-block">
-			<input class="move-sheet-name" type="text" name="name" value="{{data.name}}"
+			<input class="move-sheet-name" type="text" name="name" value="{{item.name}}"
 			       placeholder="{{localize "stonetop.item.move.namePlaceholder"}}"
 			       {{#unless editable}}disabled{{/unless}}>
 			<div class="move-sheet-selects">
@@ -29,7 +30,9 @@
 
 		<section class="move-sheet-description editor">
 			{{#if editable}}
-			<div class="editor-content" data-edit="system.description">{{{system.description}}}</div>
+			{{!-- V2 doesn't auto-activate editors on [data-edit] divs; a named <prose-mirror> saves
+			      through the form's submitOnChange on blur. --}}
+			<prose-mirror class="stonetop-item-description-editor" name="system.description" value="{{system.description}}"></prose-mirror>
 			{{else}}
 			<div class="editor-content">{{rich rich.description}}</div>
 			{{/if}}
@@ -177,4 +180,4 @@
 		</section>
 
 	</div>
-</form>
+</div>

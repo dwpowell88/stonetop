@@ -1,8 +1,9 @@
-<form class="stonetop sheet item follower" autocomplete="off">
+{{!-- V2 part: single root element; the sheet root form + classes come from DEFAULT_OPTIONS. --}}
+<div class="stonetop-item-sheet-part">
 
 	<header class="stonetop-insert-sheet-header">
-		<img class="stonetop-insert-sheet-icon" src="{{data.img}}" data-edit="img" title="{{data.name}}" alt="">
-		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{data.name}}"
+		<img class="stonetop-insert-sheet-icon" src="{{item.img}}" data-edit="img" data-action="editImage" title="{{item.name}}" alt="">
+		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{item.name}}"
 		       placeholder="{{localize 'stonetop.follower.namePlaceholder'}}"
 		       {{#unless editable}}disabled{{/unless}}>
 	</header>
@@ -12,7 +13,7 @@
 	<div class="stonetop-follower-view">
 		{{#if editable}}
 		<div class="stonetop-follower-view-head">
-			<button type="button" class="follower-edit-toggle" data-mode="edit">{{localize "stonetop.follower.edit"}}</button>
+			<button type="button" class="follower-edit-toggle" data-action="toggleEditMode" data-mode="edit">{{localize "stonetop.follower.edit"}}</button>
 		</div>
 		{{/if}}
 		<div class="stonetop-follower-preview">{{> "stonetop.follower-card" preview}}</div>
@@ -144,11 +145,11 @@
 		<aside class="stonetop-follower-preview-pane">
 			<div class="stonetop-follower-preview-head">
 				<span>{{localize "stonetop.follower.preview"}}</span>
-				<button type="button" class="follower-edit-toggle" data-mode="view">{{localize "stonetop.follower.done"}}</button>
+				<button type="button" class="follower-edit-toggle" data-action="toggleEditMode" data-mode="view">{{localize "stonetop.follower.done"}}</button>
 			</div>
 			<div class="stonetop-follower-preview">{{> "stonetop.follower-card" preview}}</div>
 		</aside>
 
 	</div>
 	{{/unless}}
-</form>
+</div>

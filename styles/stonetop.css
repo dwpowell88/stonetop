@@ -4911,7 +4911,10 @@ form.stonetop.sheet.steading {
 .stonetop-improvement-preview input { pointer-events: none; }
 
 /* V2 part root: single wrapper element (HandlebarsApplicationMixin requirement) that stacks the
-   header + body and owns the sheet's scrolling (PARTS marks it scrollable). */
+   header + body and owns the sheet's scrolling (PARTS marks it scrollable).
+   .stonetop-item-sheet-part is the shared wrapper for all migrated item sheets;
+   .stonetop-improvement-sheet predates it (the pilot) and keeps identical behavior. */
+.stonetop-item-sheet-part,
 .stonetop-improvement-sheet {
 	display: flex;
 	flex-direction: column;

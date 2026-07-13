@@ -24,5 +24,15 @@ export function createStonetopItemSheetV2BaseClass() {
 			window: { resizable: true },
 			form: { submitOnChange: true },
 		};
+
+		// V2 disables every form element on a non-editable sheet (a locked compendium item).
+		// Controls marked data-view-state are pure view state (card flip, edit/view toggle), not
+		// edits — keep them clickable so a locked item can still be browsed. (V2 home of the old
+		// arcanum `_render` re-enable hack.)
+		_toggleDisabled(disabled) {
+			super._toggleDisabled(disabled);
+			if (!disabled) return;
+			for (const el of this.element.querySelectorAll("[data-view-state]")) el.disabled = false;
+		}
 	};
 }

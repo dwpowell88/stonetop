@@ -18,6 +18,7 @@ Ring of daagon's, rune-laden scale consequences have tabbed in check boxes to sh
 * Fix parsing of artifacts in Book II (outfit items aren't parsed well)
 * Art uploader should grab the maps as well (and give a good way for the GM to set them as a background image in foundry)
 * Extend steading improvement parsing to parse the diamonds as well -- golden sapling for example
+* Improvement drop on the steading sheet: StonetopSteadingSheet._onDropItem branch for type "improvement" — add item.system.slug to system.improvements (deduped, via a named SteadingImprovements method, no embed). Today only the steadfast sheet accepts improvement drops; the steading schema already anticipates "wonder improvements dropped later".
 
 == Nice to have
 * toggle to turn off non-selected character options

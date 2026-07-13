@@ -1,10 +1,10 @@
-{{!-- The `steading` class is intentional: it opts this item sheet into the shared steading profile
-      styling (panels, rating options, resource/asset lists) so the steadfast renders the same as a
-      live steading. Steadfast-only layout tweaks live under `.stonetop.sheet.steadfast`. --}}
-<form class="stonetop sheet item steadfast steading" autocomplete="off">
+{{!-- V2 part: single root element; the sheet root form + classes (including the intentional
+      `steading` class, which opts this item sheet into the shared steading profile styling) come
+      from DEFAULT_OPTIONS. Steadfast-only layout tweaks live under `.stonetop.sheet.steadfast`. --}}
+<div class="stonetop-item-sheet-part">
 
 	<header class="stonetop-insert-sheet-header">
-		<img class="stonetop-insert-sheet-icon" src="{{stonetop.img}}" data-edit="img" title="{{stonetop.name}}" alt="">
+		<img class="stonetop-insert-sheet-icon" src="{{stonetop.img}}" data-edit="img" data-action="editImage" title="{{stonetop.name}}" alt="">
 		<h1 class="charname stonetop-insert-sheet-name">
 			<input type="text" name="name" value="{{stonetop.name}}"
 			       placeholder="{{localize 'stonetop.steadfast.namePlaceholder'}}"
@@ -110,4 +110,4 @@
 		</section>
 
 	</div>
-</form>
+</div>

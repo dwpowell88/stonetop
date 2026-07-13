@@ -5,10 +5,10 @@
 // group `members`, and the animal-`companion` catalog.
 //
 // The rendered card + live preview use the SAME buildFollowerSnapshot + follower-card.hbs the
-// character sheet uses (one render path). Foundry's ItemSheet auto-saves `name` + scalar `name="system.*"`
-// inputs; everything with a bespoke shape (Selection round-trips, whole-array members, whole-object
-// companion) saves through the pure helpers in followerSelectionEdit / followerMemberEdit /
-// followerCompanionEdit. A locked (compendium) follower is always view-only.
+// character sheet uses (one render path). The V2 form's submitOnChange auto-saves `name` + scalar
+// `name="system.*"` inputs; everything with a bespoke shape (Selection round-trips, whole-array
+// members, whole-object companion) saves through the pure helpers in followerSelectionEdit /
+// followerMemberEdit / followerCompanionEdit. A locked (compendium) follower is always view-only.
 
 import * as CG from "../utils/choiceGroupEdit.js";
 import * as SE from "../utils/followerSelectionEdit.js";
@@ -16,6 +16,7 @@ import * as ME from "../utils/followerMemberEdit.js";
 import * as CE from "../utils/followerCompanionEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
 import { activateComboBoxes } from "../utils/comboBox.js";
+import { bindAll } from "../utils/bindAll.js";
 import { buildFollowerSnapshot } from "../model/snapshot/character/buildFollowerSnapshot.js";
 import { enrichRichTextTree } from "../utils/enrichRichText.js";
 import { Selection } from "../model/data/Selection.js";
@@ -39,21 +40,31 @@ function isFollowerBlank(sys) {
 
 export function createStonetopFollowerSheetClass(Base) {
 	return class StonetopFollowerSheet extends Base {
-		static get defaultOptions() {
-			return foundry.utils.mergeObject(super.defaultOptions, {
-				classes: ["stonetop", "sheet", "item", "follower"],
-				width:  940,
-				height: 760,
-				resizable: true,
-			});
+		static DEFAULT_OPTIONS = {
+			classes: ["follower"],
+			position: { width: 940, height: 760 },
+			actions: {
+				toggleEditMode: StonetopFollowerSheet.#onToggleEditMode,
+			},
+		};
+
+		static PARTS = {
+			form: {
+				template: "systems/stonetop/templates/item/follower.hbs",
+				scrollable: [""],
+			},
+		};
+
+		// Edit/view toggle — only rendered when editable, so it needs no isEditable guard.
+		static #onToggleEditMode(_event, target) {
+			this._editMode = target.dataset.mode === "edit";
+			this.render();
 		}
 
-		get template() {
-			return "systems/stonetop/templates/item/follower.hbs";
-		}
-
-		async getData() {
-			const context = await super.getData();
+		async _prepareContext(options) {
+			const context = await super._prepareContext(options);
+			context.item     = this.item;
+			context.editable = this.isEditable;
 			// Followers are referenced by a stable slug (playbook/arcana grants list them), so it must
 			// survive a rename. Generate one once if missing (not name-derived), mirroring the other sheets.
 			if (!this.item.system.slug) {
@@ -95,28 +106,24 @@ export function createStonetopFollowerSheetClass(Base) {
 			return context;
 		}
 
-		activateListeners(html) {
-			super.activateListeners(html);
+		// Direct bindings to the current editor controls — re-run per render (part content is replaced).
+		_onRender(context, options) {
+			super._onRender(context, options);
 
 			// The preview pane renders follower-card.hbs, whose tag/instinct/cost combo dropdowns are
 			// driven by the global (document-delegated, idempotent) combobox handler. The actor sheet
 			// installs it, but a follower Item opened on its own never would — so install it here too.
 			activateComboBoxes();
 
-			// Edit/view toggle — only rendered when editable, so it needs no isEditable guard.
-			html.find(".follower-edit-toggle").on("click", ev => {
-				this._editMode = ev.currentTarget.dataset.mode === "edit";
-				this.render(false);
-			});
-
 			if (!this.isEditable) return;
+			const root = this.element;
 			const item = this.item;
 			const numAttr = (el, name) => Number(el.dataset[name]); // one int-off-a-data-attr reader
 
 			// ── Choices group (system.choices.0) — reuse the shared editor + lifecycle buttons ──
-			activateChoiceGroupEditors(this, html[0]);
-			html.find(".follower-choices-add").on("click", () => item.update({ "system.choices": [CG.newGroup("choices")] }));
-			html.find(".follower-choices-remove").on("click", () => item.update({ "system.choices": [] }));
+			activateChoiceGroupEditors(this, root);
+			bindAll(root, ".follower-choices-add", "click", () => item.update({ "system.choices": [CG.newGroup("choices")] }));
+			bindAll(root, ".follower-choices-remove", "click", () => item.update({ "system.choices": [] }));
 
 			// ── Selection fields (tagList/instinct/cost): options list + default → Selection raw ──
 			const multiOf  = field => !!SELECTION_MULTI[field];
@@ -124,16 +131,16 @@ export function createStonetopFollowerSheetClass(Base) {
 			const saveSel  = (field, raw) => item.update({ [`system.${field}`]: raw });
 			const selField = el => el.closest("[data-selection-field]")?.dataset.selectionField;
 			const strIdx   = el => numAttr(el, "stringIndex");
-			html.find(".follower-option-add").on("click", ev => {
+			bindAll(root, ".follower-option-add", "click", ev => {
 				const f = selField(ev.currentTarget); if (f) saveSel(f, SE.addOption(selOf(f), multiOf(f)));
 			});
-			html.find(".follower-option-remove").on("click", ev => {
+			bindAll(root, ".follower-option-remove", "click", ev => {
 				const f = selField(ev.currentTarget); if (f) saveSel(f, SE.removeOption(selOf(f), strIdx(ev.currentTarget), multiOf(f)));
 			});
-			html.find(".follower-option-input").on("change", ev => {
+			bindAll(root, ".follower-option-input", "change", ev => {
 				const f = selField(ev.currentTarget); if (f) saveSel(f, SE.setOption(selOf(f), strIdx(ev.currentTarget), ev.currentTarget.value, multiOf(f)));
 			});
-			html.find(".follower-selection-selected").on("change", ev => {
+			bindAll(root, ".follower-selection-selected", "change", ev => {
 				const f = ev.currentTarget.dataset.selectionField;
 				if (f) saveSel(f, SE.setSelected(selOf(f), SE.parseCsv(ev.currentTarget.value), multiOf(f)));
 			});
@@ -142,15 +149,15 @@ export function createStonetopFollowerSheetClass(Base) {
 			const suggKey  = el => el.closest("[data-suggest-key]")?.dataset.suggestKey;
 			const suggOf   = key => [...(item.system.memberSuggestions?.[key] ?? [])];
 			const saveSugg = (key, list) => item.update({ [`system.memberSuggestions.${key}`]: list });
-			html.find(".follower-suggest-add").on("click", ev => {
+			bindAll(root, ".follower-suggest-add", "click", ev => {
 				const k = suggKey(ev.currentTarget); if (!k) return;
 				const l = suggOf(k); l.push(""); saveSugg(k, l);
 			});
-			html.find(".follower-suggest-remove").on("click", ev => {
+			bindAll(root, ".follower-suggest-remove", "click", ev => {
 				const k = suggKey(ev.currentTarget); if (!k) return;
 				const l = suggOf(k); l.splice(strIdx(ev.currentTarget), 1); saveSugg(k, l);
 			});
-			html.find(".follower-suggest-input").on("change", ev => {
+			bindAll(root, ".follower-suggest-input", "change", ev => {
 				const k = suggKey(ev.currentTarget); if (!k) return;
 				const l = suggOf(k); l[strIdx(ev.currentTarget)] = ev.currentTarget.value; saveSugg(k, l);
 			});
@@ -161,14 +168,14 @@ export function createStonetopFollowerSheetClass(Base) {
 			const idx        = ev => numAttr(ev.currentTarget, "index");
 			// Adding a member makes this a group follower — write the members array AND ensure the
 			// "group" tag is set on tagList (FollowerSnapshot derives isGroup from it).
-			html.find(".follower-member-add").on("click", () => item.update({
+			bindAll(root, ".follower-member-add", "click", () => item.update({
 				"system.members": ME.addMember(members(), item.system.hp?.max ?? 0),
 				"system.tagList": Selection.fromStored(item.system.tagList, { multi: true }).select("group").toRaw(),
 			}));
-			html.find(".follower-member-remove").on("click", ev => setMembers(ME.removeMember(members(), idx(ev))));
-			html.find(".follower-member-up").on("click", ev => setMembers(ME.moveMember(members(), idx(ev), -1)));
-			html.find(".follower-member-down").on("click", ev => setMembers(ME.moveMember(members(), idx(ev), 1)));
-			html.find(".follower-member-field").on("change", ev => {
+			bindAll(root, ".follower-member-remove", "click", ev => setMembers(ME.removeMember(members(), idx(ev))));
+			bindAll(root, ".follower-member-up", "click", ev => setMembers(ME.moveMember(members(), idx(ev), -1)));
+			bindAll(root, ".follower-member-down", "click", ev => setMembers(ME.moveMember(members(), idx(ev), 1)));
+			bindAll(root, ".follower-member-field", "change", ev => {
 				const el = ev.currentTarget, field = el.dataset.field, index = numAttr(el, "index");
 				// tags/traits are multi Selections (stored as raws); scalars (name, hp.*) write directly.
 				if (field === "tags" || field === "traits") {
@@ -182,10 +189,10 @@ export function createStonetopFollowerSheetClass(Base) {
 			// ── Animal companion — whole-object writes via helper ──
 			const companion    = () => item.system.companion ?? {};
 			const setCompanion = c => item.update({ "system.companion": c });
-			html.find(".follower-companion-enable").on("change", ev => setCompanion(CE.setEnabled(companion(), ev.currentTarget.checked)));
-			html.find(".follower-companion-add-type").on("click", () => setCompanion(CE.addType(companion())));
-			html.find(".follower-companion-remove-type").on("click", ev => setCompanion(CE.removeType(companion(), idx(ev))));
-			html.find(".follower-comp-field").on("change", ev => {
+			bindAll(root, ".follower-companion-enable", "change", ev => setCompanion(CE.setEnabled(companion(), ev.currentTarget.checked)));
+			bindAll(root, ".follower-companion-add-type", "click", () => setCompanion(CE.addType(companion())));
+			bindAll(root, ".follower-companion-remove-type", "click", ev => setCompanion(CE.removeType(companion(), idx(ev))));
+			bindAll(root, ".follower-comp-field", "change", ev => {
 				const el = ev.currentTarget;
 				const value = el.type === "number" ? (el.value ? Number(el.value) : 0) : el.value;
 				setCompanion(CE.setTypeField(companion(), { index: numAttr(el, "index"), field: el.dataset.field, value }));
@@ -201,9 +208,9 @@ export function createStonetopFollowerSheetClass(Base) {
 				mutate(list);
 				setCompanion(CE.setTypeField(c, { index: ti, field, value: list }));
 			};
-			html.find(".follower-comp-list-add").on("click",    ev => saveComp(ev, list => list.push("")));
-			html.find(".follower-comp-list-remove").on("click", ev => saveComp(ev, list => list.splice(strIdx(ev.currentTarget), 1)));
-			html.find(".follower-comp-list-input").on("change", ev => saveComp(ev, list => { list[strIdx(ev.currentTarget)] = ev.currentTarget.value; }));
+			bindAll(root, ".follower-comp-list-add", "click",    ev => saveComp(ev, list => list.push("")));
+			bindAll(root, ".follower-comp-list-remove", "click", ev => saveComp(ev, list => list.splice(strIdx(ev.currentTarget), 1)));
+			bindAll(root, ".follower-comp-list-input", "change", ev => saveComp(ev, list => { list[strIdx(ev.currentTarget)] = ev.currentTarget.value; }));
 		}
 	};
 }

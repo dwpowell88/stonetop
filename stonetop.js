@@ -13,7 +13,6 @@ import { createStonetopFollowerSheetClass } from "./src/item/StonetopFollowerShe
 import { createStonetopImprovementSheetClass } from "./src/item/StonetopImprovementSheet.js";
 import { createStonetopItemSheetV2BaseClass } from "./src/item/StonetopItemSheetV2.js";
 import { createStonetopSteadfastSheetClass } from "./src/item/StonetopSteadfastSheet.js";
-import { withSheetSizeMemory } from "./src/utils/withSheetSizeMemory.js";
 import { onReady } from "./src/hooks/Ready.js";
 import { onRenderActorSheet } from "./src/hooks/RenderActorSheet.js";
 import { onRenderPause } from "./src/hooks/RenderPause.js";
@@ -141,47 +140,44 @@ Hooks.once("init", () => {
 		label: "Stonetop Steading Sheet",
 	});
 
-	// All item sheets share the size-memory mixin (actor sheets get it via StonetopActorSheet).
-	const ItemSheetBase = withSheetSizeMemory(foundry.appv1.sheets.ItemSheet);
+	// All item sheets share this ApplicationV2 base: size memory + submitOnChange + view-state
+	// handling (docs/appv2-migration.md). Actor sheets are still V1 pending Phases 3-5.
+	const ItemSheetV2Base = createStonetopItemSheetV2BaseClass();
 
-	const StonetopMoveSheet = createStonetopMoveSheetClass(ItemSheetBase);
+	const StonetopMoveSheet = createStonetopMoveSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopMoveSheet, {
 		types: ["move"],
 		makeDefault: true,
 		label: "Stonetop Move Sheet",
 	});
 
-	const StonetopInsertSheet = createStonetopInsertSheetClass(ItemSheetBase);
+	const StonetopInsertSheet = createStonetopInsertSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopInsertSheet, {
 		types: ["insert"],
 		makeDefault: true,
 		label: "Stonetop Insert Sheet",
 	});
 
-	const StonetopArcanumSheet = createStonetopArcanumSheetClass(ItemSheetBase);
+	const StonetopArcanumSheet = createStonetopArcanumSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopArcanumSheet, {
 		types: ["arcanum"],
 		makeDefault: true,
 		label: "Stonetop Arcanum Sheet",
 	});
 
-	const StonetopPossessionSheet = createStonetopPossessionSheetClass(ItemSheetBase);
+	const StonetopPossessionSheet = createStonetopPossessionSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopPossessionSheet, {
 		types: ["possession"],
 		makeDefault: true,
 		label: "Stonetop Possession Sheet",
 	});
 
-	const StonetopFollowerSheet = createStonetopFollowerSheetClass(ItemSheetBase);
+	const StonetopFollowerSheet = createStonetopFollowerSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopFollowerSheet, {
 		types: ["follower", "npc"], // "npc" = legacy items awaiting migration to "follower"
 		makeDefault: true,
 		label: "Stonetop Follower Sheet",
 	});
-
-	// First V2 sheet (the migration pilot — docs/appv2-migration.md). The rest migrate onto this
-	// base phase by phase; V1 ItemSheetBase goes away with the last of them.
-	const ItemSheetV2Base = createStonetopItemSheetV2BaseClass();
 
 	const StonetopImprovementSheet = createStonetopImprovementSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopImprovementSheet, {
@@ -190,7 +186,7 @@ Hooks.once("init", () => {
 		label: "Stonetop Steading Improvement Sheet",
 	});
 
-	const StonetopSteadfastSheet = createStonetopSteadfastSheetClass(ItemSheetBase);
+	const StonetopSteadfastSheet = createStonetopSteadfastSheetClass(ItemSheetV2Base);
 	foundry.documents.collections.Items.registerSheet("stonetop", StonetopSteadfastSheet, {
 		types: ["steadfast"],
 		makeDefault: true,

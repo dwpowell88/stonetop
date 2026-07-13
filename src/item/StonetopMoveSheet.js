@@ -1,4 +1,5 @@
 import { toSlug } from "../utils/slug.js";
+import { bindAll } from "../utils/bindAll.js";
 import { ChoiceGroup, ChoiceValues } from "../model/snapshot/character/ChoiceGroup.js";
 import { rich } from "../model/snapshot/RichText.js";
 import { enrichRichTextTree } from "../utils/enrichRichText.js";
@@ -52,21 +53,22 @@ function _blankOption(n) {
 
 export function createStonetopMoveSheetClass(Base) {
 	return class StonetopMoveSheet extends Base {
-		static get defaultOptions() {
-			return foundry.utils.mergeObject(super.defaultOptions, {
-				classes: ["stonetop", "sheet", "item", "move"],
-				width:  640,
-				height: 620,
-				resizable: true,
-			});
-		}
+		static DEFAULT_OPTIONS = {
+			classes: ["move"],
+			position: { width: 640, height: 620 },
+		};
 
-		get template() {
-			return "systems/stonetop/templates/item/move.hbs";
-		}
+		static PARTS = {
+			form: {
+				template: "systems/stonetop/templates/item/move.hbs",
+				scrollable: [""],
+			},
+		};
 
-		async getData() {
-			const context = await super.getData();
+		async _prepareContext(options) {
+			const context = await super._prepareContext(options);
+			context.item     = this.item;
+			context.editable = this.isEditable;
 			// Stamp a stable slug once so references to this move survive a later rename. Set from the
 			// name if possible, else a random id; never recomputed afterward.
 			if (!this.item.system.slug) {
@@ -101,32 +103,34 @@ export function createStonetopMoveSheetClass(Base) {
 			return context;
 		}
 
-		activateListeners(html) {
-			super.activateListeners(html);
+		// Direct bindings to the current editor controls — re-run per render (part content is replaced).
+		_onRender(context, options) {
+			super._onRender(context, options);
 			if (!this.isEditable) return;
+			const root = this.element;
 
-			html.find(".choices-add-group").click(() => this._addChoicesGroup());
-			html.find(".choices-remove-group").click(() => this._removeChoicesGroup());
-			html.find(".choices-add-row").click(ev => this._addChoicesRow(ev.currentTarget.dataset.type));
-			html.find(".choices-row-delete").click(ev => this._removeChoicesRow(Number(ev.currentTarget.dataset.rowIndex)));
-			html.find(".choices-row-up").click(ev => this._moveChoicesRow(Number(ev.currentTarget.dataset.rowIndex), -1));
-			html.find(".choices-row-down").click(ev => this._moveChoicesRow(Number(ev.currentTarget.dataset.rowIndex), 1));
-			html.find(".choices-row-toggle-track").click(ev => this._toggleHeadingTrack(Number(ev.currentTarget.dataset.rowIndex)));
-			html.find(".choices-row-toggle-input").click(ev => this._toggleHeadingInput(Number(ev.currentTarget.dataset.rowIndex)));
-			html.find(".choices-add-option").click(ev => this._addPickOption(Number(ev.currentTarget.dataset.rowIndex)));
-			html.find(".choices-option-delete").click(ev => this._removePickOption(Number(ev.currentTarget.dataset.rowIndex), Number(ev.currentTarget.dataset.optionIndex)));
-			html.find(".choices-add-outfit-item").click(ev => {
+			bindAll(root, ".choices-add-group", "click", () => this._addChoicesGroup());
+			bindAll(root, ".choices-remove-group", "click", () => this._removeChoicesGroup());
+			bindAll(root, ".choices-add-row", "click", ev => this._addChoicesRow(ev.currentTarget.dataset.type));
+			bindAll(root, ".choices-row-delete", "click", ev => this._removeChoicesRow(Number(ev.currentTarget.dataset.rowIndex)));
+			bindAll(root, ".choices-row-up", "click", ev => this._moveChoicesRow(Number(ev.currentTarget.dataset.rowIndex), -1));
+			bindAll(root, ".choices-row-down", "click", ev => this._moveChoicesRow(Number(ev.currentTarget.dataset.rowIndex), 1));
+			bindAll(root, ".choices-row-toggle-track", "click", ev => this._toggleHeadingTrack(Number(ev.currentTarget.dataset.rowIndex)));
+			bindAll(root, ".choices-row-toggle-input", "click", ev => this._toggleHeadingInput(Number(ev.currentTarget.dataset.rowIndex)));
+			bindAll(root, ".choices-add-option", "click", ev => this._addPickOption(Number(ev.currentTarget.dataset.rowIndex)));
+			bindAll(root, ".choices-option-delete", "click", ev => this._removePickOption(Number(ev.currentTarget.dataset.rowIndex), Number(ev.currentTarget.dataset.optionIndex)));
+			bindAll(root, ".choices-add-outfit-item", "click", ev => {
 				const ri = Number(ev.currentTarget.dataset.rowIndex);
 				const oi = ev.currentTarget.dataset.optionIndex != null ? Number(ev.currentTarget.dataset.optionIndex) : null;
 				this._addOutfitItem(ri, oi);
 			});
-			html.find(".choices-outfit-item-delete").click(ev => {
+			bindAll(root, ".choices-outfit-item-delete", "click", ev => {
 				const ri  = Number(ev.currentTarget.dataset.rowIndex);
 				const ofi = Number(ev.currentTarget.dataset.outfitItemIndex);
 				const oi  = ev.currentTarget.dataset.optionIndex != null ? Number(ev.currentTarget.dataset.optionIndex) : null;
 				this._removeOutfitItem(ri, ofi, oi);
 			});
-			html.find("[data-choices-field]").on("change", ev => this._onChoicesFieldChange(ev));
+			bindAll(root, "[data-choices-field]", "change", ev => this._onChoicesFieldChange(ev));
 		}
 
 		// ── Choices helpers ───────────────────────────────────────────────
