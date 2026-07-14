@@ -19,7 +19,7 @@ export class FakeGameBuilder {
 			},
 			actors: this._worldActors,
 			// fakeI18n's format/has read the real en.json; localize still honors withTranslation()
-			// overrides (used by the tooltip tests) and falls back to the key like fakeI18n does.
+			// overrides and falls back to the key like fakeI18n does.
 			i18n: { ...fakeI18n(), localize: (key) => this._translations[key] ?? key },
 		});
 	}
