@@ -2,6 +2,7 @@ import { registerSettings } from "./src/settings.js";
 import { createStonetopActorClass } from "./src/actors/StonetopActor.js";
 import { createStonetopItemClass } from "./src/item/StonetopItem.js";
 import { StonetopActorSheet } from "./src/actors/StonetopActorSheet.js";
+import { createStonetopActorSheetV2Class } from "./src/actors/StonetopActorSheetV2.js";
 import { createStonetopCharacterSheetClass } from "./src/actors/character/StonetopCharacterSheet.js";
 import { createStonetopSteadingSheetClass } from "./src/actors/steading/StonetopSteadingSheet.js";
 import { createStonetopNpcSheetClass } from "./src/actors/npc/StonetopNpcSheet.js";
@@ -126,7 +127,11 @@ Hooks.once("init", () => {
 		label: "Stonetop Character Sheet",
 	});
 
-	const StonetopNpcSheet = createStonetopNpcSheetClass(StonetopActorSheet);
+	// The shared ApplicationV2 actor base: size memory + submitOnChange + root-delegated listeners
+	// (docs match the item base). NPC is on it; character + steading are still V1.
+	const ActorSheetV2Base = createStonetopActorSheetV2Class();
+
+	const StonetopNpcSheet = createStonetopNpcSheetClass(ActorSheetV2Base);
 	foundry.documents.collections.Actors.registerSheet("stonetop", StonetopNpcSheet, {
 		types: ["npc"],
 		makeDefault: true,

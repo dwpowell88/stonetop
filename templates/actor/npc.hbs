@@ -1,4 +1,5 @@
-<form class="{{cssClass}} stonetop-follower-card stonetop-npc-card" autocomplete="off">
+{{!-- V2 part: single root element; the sheet root form + classes come from DEFAULT_OPTIONS. --}}
+<div class="stonetop-follower-card stonetop-npc-card">
 
 	{{> "stonetop.actor-header"}}
 
@@ -43,4 +44,4 @@
 	{{> "stonetop.editable-rich-block" label=(localize "stonetop.followers.description")
 		field=stonetop.description textareaClass="stonetop-follower-description-textarea" slug=slug}}
 
-</form>
+</div>
