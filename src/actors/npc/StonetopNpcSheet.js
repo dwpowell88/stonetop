@@ -16,8 +16,11 @@ export function createStonetopNpcSheetClass(Base) {
 
         static PARTS = {
             form: {
+                // No `scrollable`: the card's border frame is an inset:0 ::before, so the card
+                // itself must not scroll — .window-content is the scroll container instead, and
+                // it persists across V2 re-renders, so its scrollTop survives without part-level
+                // restore.
                 template: "systems/stonetop/templates/actor/npc.hbs",
-                scrollable: [""],
             },
         };
 
