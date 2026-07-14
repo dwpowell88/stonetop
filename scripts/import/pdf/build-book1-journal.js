@@ -72,6 +72,7 @@ const getPage = (p) => {
 		imgPrefix: `p${p}`,
 		dedup: { index: dedup, dir: SHARED_DIR },
 		mapFile: (f) => `${SHARED_URL}/${path.relative(SHARED_DIR, f)}`,
+		markers: { flattenedCurves: true },
 	}));
 	return pageCache.get(p);
 };
@@ -84,7 +85,15 @@ const getPage = (p) => {
 function resolveCuts(chapter) {
 	const cuts = [];
 	for (const sec of chapter.sections) {
-		if (!cuts.length) { cuts.push({ sec, page: sec.startPage, cut: null, merged: [] }); continue; }
+		if (!cuts.length) {
+			// Chapter openers are rectos, so on a 2-up spread the facing page belongs to whatever came
+			// before — front matter, or the previous chapter's last page. Clip the lead at the chapter
+			// title whenever anything reads before it; on a 1-up (and on the openers whose facing page
+			// is a full-bleed plate, which carries no text) the title is already at the page top.
+			const cut = findCut(getPage(sec.startPage).pg, sec.title);
+			cuts.push({ sec, page: sec.startPage, cut: cut && !cut.top ? cut : null, merged: [] });
+			continue;
+		}
 		const prev = cuts[cuts.length - 1];
 		const cut = findCut(getPage(sec.startPage).pg, sec.title);
 		if (cut && !cut.top) cuts.push({ sec, page: sec.startPage, cut, merged: [] });
@@ -125,7 +134,7 @@ for (const chapter of build) {
 		const key = `${chapterSlug}/${slug}`;
 		try {
 			const { pages, pageRules, pageImages } = sectionPages(start, next, chapter.endPage);
-			const art = extractArticle(pages, { title: start.sec.title, pageRules, pageImages });
+			const art = extractArticle(pages, { title: start.sec.title, pageRules, pageImages, splitSpread: true });
 			const body = renderHtml(art, { chrome: { chain: start.sec.lead ? chromeChain : null } });
 			sections.push({ key, slug, title: start.sec.title, merged: start.merged, body, pageNumbers: art.pageNumbers, page: formatPageRange(art.pageNumbers) });
 		} catch (e) { flags.push(`! ${chapter.title} / ${start.sec.title}: failed — ${e.message}`); }
