@@ -3696,9 +3696,15 @@ button.stonetop-xp-toggle {
 }
 
 .stonetop.sheet.steading .steading-residents-img {
-	width: 100%;
+	/* V2 dropped the legacy sheet flex bounds this decorative art relied on, so `width: 100%` now
+	   resolves against an unbounded column and the image grows without limit, burying the NPC-traits
+	   section below it. Cap it (like the NPC portrait) so it stays a modest footer illustration. */
+	display: block;
+	max-width: 100%;
+	max-height: 180px;
+	width: auto;
 	height: auto;
-	margin-top: 6px;
+	margin: 6px auto 0;
 	opacity: 0.85;
 	border: none;
 }
