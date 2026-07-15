@@ -3697,11 +3697,23 @@ button.stonetop-xp-toggle {
 
 /* ── Moves tab ───────────────────────────────────────────────────────────────
    Homefront moves are the steading's fixed reference set — every steading has them all, so the
-   acquisition checkbox the shared move row renders is meaningless here. Show it as the passive
-   greyed square bullet the old sheet used (non-interactive), not a live checkbox. */
+   acquisition checkbox the shared move row renders is meaningless here. In a V2 window core's own
+   checkbox styling overrides ours (it renders as a live native check, not our greyed square), so
+   rather than fight it, hide the input entirely and draw a passive greyed-square bullet before the
+   move name — non-interactive, can never look like a selectable checkmark. */
 .stonetop.sheet.steading .stonetop-move-check {
-	opacity: 0.35;
-	pointer-events: none;
+	display: none !important;
+}
+.stonetop.sheet.steading .stonetop-item-name::before {
+	content: "";
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	margin-right: 7px;
+	border-radius: 2px;
+	background: var(--color-text-dark-primary);
+	opacity: 0.4;
+	vertical-align: middle;
 }
 /* The selected resource pip is the same faint dark fill as everywhere else; on the steading's
    parchment it's hard to tell which is used. Give the used pip a clear deep-red fill. */
