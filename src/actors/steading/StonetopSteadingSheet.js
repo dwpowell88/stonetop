@@ -30,15 +30,6 @@ export function createStonetopSteadingSheetClass(Base) {
 			},
 		};
 
-		// First tabbed actor sheet on V2. static TABS seeds tabGroups + configures changeTab; the
-		// active-state records the template reads are built in _prepareContext (_getTabs).
-		static TABS = {
-			primary: {
-				tabs: STEADING_TABS.map(id => ({ id })),
-				initial: "overview",
-			},
-		};
-
 		_getTabs() {
 			const active = this.tabGroups.primary ?? "overview";
 			const tabs = {};
@@ -68,11 +59,18 @@ export function createStonetopSteadingSheetClass(Base) {
 			await super._onFirstRender(context, options);
 			const root = this.element;
 
-			// Tab navigation: changeTab toggles the active nav item + .tab body and records the
-			// choice in tabGroups (so _getTabs restores it on the next re-render).
+			// Tab navigation: toggle the active nav item + .tab body directly (self-contained, so it
+			// doesn't depend on core's tab machinery) and record the choice in tabGroups, so _getTabs
+			// restores it on the next re-render.
 			root.addEventListener("click", ev => {
 				const nav = ev.target.closest(".sheet-tabs [data-tab]");
-				if (nav) this.changeTab(nav.dataset.tab, "primary");
+				if (!nav) return;
+				const tab = nav.dataset.tab;
+				this.tabGroups.primary = tab;
+				for (const a of root.querySelectorAll(".sheet-tabs [data-tab]"))
+					a.classList.toggle("active", a.dataset.tab === tab);
+				for (const c of root.querySelectorAll('.tab[data-group="primary"]'))
+					c.classList.toggle("active", c.dataset.tab === tab);
 			});
 
 			// A steadfast dropped on the steading re-seeds its definition (same as picking one from
