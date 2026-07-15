@@ -2,7 +2,7 @@
 	{{> "stonetop.section-heading" title=title note=note}}
 	<ol class="items-list">
 	{{#each moves}}
-		{{> "stonetop.move-row" showCheck=true categoryKey=../categoryKey allowAdditional=../allowAdditional}}
+		{{> "stonetop.move-row" showCheck=true categoryKey=../categoryKey allowAdditional=../allowAdditional alwaysShowResource=../alwaysShowResource}}
 	{{/each}}
 	</ol>
 </div>

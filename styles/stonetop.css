@@ -3707,16 +3707,22 @@ button.stonetop-xp-toggle {
 .stonetop.sheet.steading .stonetop-item-name::before {
 	content: "";
 	display: inline-block;
-	width: 8px;
-	height: 8px;
+	width: 9px;
+	height: 9px;
 	margin-right: 7px;
 	border-radius: 2px;
-	background: var(--color-text-dark-primary);
-	opacity: 0.4;
+	/* currentColor (the move name's dark ink) — not --color-text-dark-primary, which core doesn't
+	   define on a V2 sheet, so it resolved to nothing and the bullet was invisible. */
+	background: currentColor;
+	opacity: 0.45;
 	vertical-align: middle;
 }
-/* The selected resource pip is the same faint dark fill as everywhere else; on the steading's
-   parchment it's hard to tell which is used. Give the used pip a clear deep-red fill. */
+/* Resource pips: the shared border color is --color-text-dark-primary, which core doesn't define on
+   a V2 sheet, so the empty pips outlined to nothing. Pin the outline to currentColor so they're
+   always visible, and give the used pip a clear deep-red fill so the selection reads at a glance. */
+.stonetop.sheet.steading .stonetop-item-resource-check {
+	border-color: currentColor !important;
+}
 .stonetop.sheet.steading .stonetop-item-resource-check.is-checked {
 	background-color: #7a1414 !important;
 	border-color: #7a1414 !important;
