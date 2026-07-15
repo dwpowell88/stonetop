@@ -3696,26 +3696,27 @@ button.stonetop-xp-toggle {
 }
 
 /* ── Moves tab ───────────────────────────────────────────────────────────────
-   Homefront moves are the steading's fixed reference set — every steading has them all, so the
-   acquisition checkbox the shared move row renders is meaningless here. In a V2 window core's own
-   checkbox styling overrides ours (it renders as a live native check, not our greyed square), so
-   rather than fight it, hide the input entirely and draw a passive greyed-square bullet before the
-   move name — non-interactive, can never look like a selectable checkmark. */
-.stonetop.sheet.steading .stonetop-move-check {
-	display: none !important;
+   The homefront-move acquisition checkbox is legitimate (v0.13 main shows it too — a black filled /
+   empty square). But in a V2 window core's own checkbox styling wins over our .stonetop-item-check
+   custom look and renders a bright native check instead. Re-assert the custom square at higher
+   specificity, with hardcoded ink (--color-text-dark-primary is undefined on a V2 sheet, so it
+   drew nothing), and neutralize any core check pseudo. */
+.stonetop.sheet.steading .stonetop-item-check {
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	width: 14px !important;
+	height: 14px !important;
+	flex: 0 0 14px !important;
+	border-radius: 2px !important;
+	border: 2px solid #1a1a1a !important;
+	background: transparent !important;
 }
-.stonetop.sheet.steading .stonetop-item-name::before {
-	content: "";
-	display: inline-block;
-	width: 9px;
-	height: 9px;
-	margin-right: 7px;
-	border-radius: 2px;
-	/* currentColor (the move name's dark ink) — not --color-text-dark-primary, which core doesn't
-	   define on a V2 sheet, so it resolved to nothing and the bullet was invisible. */
-	background: currentColor;
-	opacity: 0.45;
-	vertical-align: middle;
+.stonetop.sheet.steading .stonetop-item-check:checked {
+	background: #1a1a1a !important;
+}
+.stonetop.sheet.steading .stonetop-item-check::before,
+.stonetop.sheet.steading .stonetop-item-check::after {
+	content: none !important;
 }
 /* Resource pips: the shared border color is --color-text-dark-primary, which core doesn't define on
    a V2 sheet, so the empty pips outlined to nothing. Pin the outline to currentColor so they're
