@@ -3719,14 +3719,26 @@ button.stonetop-xp-toggle {
 	content: none !important;
 }
 /* Resource pips: the shared border color is --color-text-dark-primary, which core doesn't define on
-   a V2 sheet, so the empty pips outlined to nothing. Pin the outline to currentColor so they're
-   always visible, and give the used pip a clear deep-red fill so the selection reads at a glance. */
+   a V2 sheet, so the empty pips outlined to nothing. currentColor is no good either — a core-styled
+   V2 <button> inherits a light button text color, so an empty ring vanishes on the cream sheet
+   (this is why the pips rendered on the V1 character sheet but not the V2 steading). Pin BOTH the
+   ring and the fill to the same opaque deep red so the track reads at a glance regardless of what
+   core sets currentColor to: empty = red ring, used = solid red. */
 .stonetop.sheet.steading .stonetop-item-resource-check {
-	border-color: currentColor !important;
+	/* Set the FULL border, not just border-color: the shared rule above draws it via
+	   var(--color-text-dark-primary), which core leaves undefined on a V2 sheet, so that whole
+	   `border` shorthand is invalid-at-computed-value → border-style collapses to `none` and an
+	   empty ring never paints (it only flickered on :hover). Pin width+style+color right here. */
+	border: 2px solid #1a1a1a !important;                  /* black ring when unfilled */
+	background-color: rgba(122, 20, 20, 0.14) !important;  /* faint red wash inside the ring */
+}
+.stonetop.sheet.steading .stonetop-item-resource-check:hover {
+	border-color: #7a1414 !important;                      /* deep-red ring on hover */
+	background-color: rgba(122, 20, 20, 0.28) !important;
 }
 .stonetop.sheet.steading .stonetop-item-resource-check.is-checked {
-	background-color: #7a1414 !important;
-	border-color: #7a1414 !important;
+	background-color: #1a1a1a !important;                  /* black fill when selected */
+	border-color: #1a1a1a !important;
 }
 
 .stonetop.sheet.steading .steading-residents-img {
