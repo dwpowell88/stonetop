@@ -32,6 +32,9 @@ describe("bindConfirmedDeletes", () => {
 
 		expect(confirmDelete).toHaveBeenCalledWith("Cloak"); // shows the row's data-name
 		expect(run).toHaveBeenCalledTimes(1);
+		// The handler reads ev.currentTarget.dataset AFTER awaiting the confirm; a native event's
+		// currentTarget is null by then, so bindConfirmedDeletes must hand run the element itself.
+		expect(run.mock.calls[0][0].currentTarget.dataset.name).toBe("Cloak");
 	});
 
 	it("left-click does nothing when the confirm is declined", async () => {

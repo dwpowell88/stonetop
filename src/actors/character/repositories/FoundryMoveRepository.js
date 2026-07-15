@@ -20,6 +20,16 @@ export class FoundryMoveRepository {
 		return [...entries, ...worldEntries].map(e => new Move(e));
 	}
 
+	// Reference moves (basic/special/follower/homefront) are compendium content seeded onto every
+	// actor at creation. Read them from the pack ONLY: a world-item copy of a pack move (e.g. one
+	// dragged out of the compendium into the Items directory) is not a distinct move, and merging
+	// it in would seed the same slug twice. Homebrew/custom moves reach an actor through drag-drop,
+	// not this reference seed — so the pack is the single, slug-unique source of the starting set.
+	async getReferenceMovesByType(moveType) {
+		const entries = await this._moveStore.filterEntries(e => e.system?.moveType === moveType);
+		return entries.map(e => new Move(e));
+	}
+
 	async getBasicMoves() {
 		return this.getMovesByType("basic");
 	}

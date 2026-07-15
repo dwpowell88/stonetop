@@ -128,7 +128,7 @@ Hooks.once("init", () => {
 	});
 
 	// The shared ApplicationV2 actor base: size memory + submitOnChange + root-delegated listeners
-	// (docs match the item base). NPC is on it; character + steading are still V1.
+	// (docs match the item base). NPC + steading are on it; character is still V1.
 	const ActorSheetV2Base = createStonetopActorSheetV2Class();
 
 	const StonetopNpcSheet = createStonetopNpcSheetClass(ActorSheetV2Base);
@@ -138,7 +138,7 @@ Hooks.once("init", () => {
 		label: "Stonetop NPC Sheet",
 	});
 
-	const StonetopSteadingSheet = createStonetopSteadingSheetClass(StonetopActorSheet);
+	const StonetopSteadingSheet = createStonetopSteadingSheetClass(ActorSheetV2Base);
 	foundry.documents.collections.Actors.registerSheet("stonetop", StonetopSteadingSheet, {
 		types: ["steading"],
 		makeDefault: true,

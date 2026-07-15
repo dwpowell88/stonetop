@@ -387,21 +387,10 @@ describe("CharacterMoves.initBasicMoves", () => {
 		expect((await m.buildSnapshot()).categories[0].moves[0].selection.value).toBe(1);
 	});
 
-	it("incrementally adds new world move when basic category already exists", async () => {
-		const repo  = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
-		const actor = makeActor();
-		const m     = makeMoves({repo, actor});
-		await m.initBasicMoves();
-
-		repo.addWorld(new FakeCompendiumMoveBuilder().withName("Aid or Interfere").withMoveType("basic").asStarting().build());
-		await m.initBasicMoves();
-
-		const cat = (await m.buildSnapshot()).categories.find(c => c.key === "basic");
-		expect(cat.moves.some(mv => mv.name === "Aid or Interfere")).toBe(true);
-		expect(cat.moves.some(mv => mv.name === "Defy Danger")).toBe(true);
-	});
-
-	it("does not create duplicate docs for existing moves when called again with new world move", async () => {
+	// Reference seeding is pack-only: a same-type move sitting in the world's Items directory (e.g.
+	// dragged out of the compendium) is NOT part of the reference set and must not be auto-seeded.
+	// Custom/homebrew moves reach a character through drag-drop, not this seed.
+	it("ignores world-item moves — only the compendium reference set is seeded", async () => {
 		const repo  = new FakeMoveRepository([], [new FakeCompendiumMoveBuilder().withName("Defy Danger").asStarting().build()]);
 		const actor = makeActor();
 		const m     = makeMoves({repo, actor});
@@ -411,7 +400,10 @@ describe("CharacterMoves.initBasicMoves", () => {
 		repo.addWorld(new FakeCompendiumMoveBuilder().withName("Aid or Interfere").withMoveType("basic").asStarting().build());
 		await m.initBasicMoves();
 
-		expect(actor.createdDocs.length).toBe(docsAfterFirst + 1);
+		const cat = (await m.buildSnapshot()).categories.find(c => c.key === "basic");
+		expect(cat.moves.some(mv => mv.name === "Aid or Interfere")).toBe(false);
+		expect(cat.moves.some(mv => mv.name === "Defy Danger")).toBe(true);
+		expect(actor.createdDocs.length).toBe(docsAfterFirst);
 	});
 
 	it("also seeds special and follower moves as side-bar categories under basic", async () => {

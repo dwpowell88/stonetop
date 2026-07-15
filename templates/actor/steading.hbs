@@ -1,4 +1,5 @@
-<form class="{{cssClass}}" autocomplete="off">
+{{!-- V2 part: single root element; the sheet root form + classes come from DEFAULT_OPTIONS. --}}
+<div>
 
 	<header class="sheet-header steading-top">
 		<div class="steading-steadfast-row">
@@ -129,18 +130,18 @@
 
 	{{!-- Tab navigation --}}
 	<nav class="sheet-tabs tabs" data-group="primary">
-		<a class="item active" data-tab="overview">Overview</a>
-		<a class="item" data-tab="residents">Residents</a>
-		<a class="item" data-tab="neighbors">Neighbors</a>
-		<a class="item" data-tab="improvements">Improvements</a>
-		<a class="item" data-tab="moves">Moves</a>
-		<a class="item" data-tab="notes">Notes</a>
+		<a class="item {{tabs.overview.cssClass}}" data-tab="overview">Overview</a>
+		<a class="item {{tabs.residents.cssClass}}" data-tab="residents">Residents</a>
+		<a class="item {{tabs.neighbors.cssClass}}" data-tab="neighbors">Neighbors</a>
+		<a class="item {{tabs.improvements.cssClass}}" data-tab="improvements">Improvements</a>
+		<a class="item {{tabs.moves.cssClass}}" data-tab="moves">Moves</a>
+		<a class="item {{tabs.notes.cssClass}}" data-tab="notes">Notes</a>
 	</nav>
 
 	<section class="sheet-body">
 
 		{{!-- Overview tab --}}
-		<div class="tab active" data-group="primary" data-tab="overview">
+		<div class="tab {{tabs.overview.cssClass}}" data-group="primary" data-tab="overview">
 
 			<div class="steading-overview-grid">
 
@@ -165,7 +166,7 @@
 		</div>{{!-- /tab overview --}}
 
 		{{!-- Residents tab --}}
-		<div class="tab" data-group="primary" data-tab="residents">
+		<div class="tab {{tabs.residents.cssClass}}" data-group="primary" data-tab="residents">
 
 			<div class="steading-residents-grid">
 
@@ -250,7 +251,7 @@
 		</div>{{!-- /tab residents --}}
 
 		{{!-- Neighbors tab --}}
-		<div class="tab" data-group="primary" data-tab="neighbors">
+		<div class="tab {{tabs.neighbors.cssClass}}" data-group="primary" data-tab="neighbors">
 
 			<div class="steading-neighbors-grid">
 
@@ -299,7 +300,7 @@
 		</div>{{!-- /tab neighbors --}}
 
 		{{!-- Improvements tab --}}
-		<div class="tab" data-group="primary" data-tab="improvements">
+		<div class="tab {{tabs.improvements.cssClass}}" data-group="primary" data-tab="improvements">
 
 			<div class="steading-improvements-grid">
 
@@ -360,15 +361,18 @@
 		</div>{{!-- /tab improvements --}}
 
 		{{!-- Moves tab --}}
-		<div class="tab" data-group="primary" data-tab="moves">
+		<div class="tab {{tabs.moves.cssClass}}" data-group="primary" data-tab="moves">
 			<section class="sheet-tab">
 				{{#if stonetop.moves}}
+					{{!-- alwaysShowResource: homefront moves are the steading's fixed set, so their
+					      resource pips show whether or not the move reads as "acquired". --}}
 					{{> "stonetop.move-group"
 					    title=stonetop.moves.label
 					    note=stonetop.moves.note
 					    moves=stonetop.moves.moves
 					    categoryKey=stonetop.moves.key
-					    allowAdditional=false}}
+					    allowAdditional=false
+					    alwaysShowResource=true}}
 				{{else}}
 					<p class="stonetop-moves-empty">No homefront moves assigned to this steading.</p>
 				{{/if}}
@@ -376,7 +380,7 @@
 		</div>{{!-- /tab moves --}}
 
 		{{!-- Notes tab --}}
-		<div class="tab" data-group="primary" data-tab="notes">
+		<div class="tab {{tabs.notes.cssClass}}" data-group="primary" data-tab="notes">
 
 			<div class="steading-notes-grid">
 
@@ -426,4 +430,4 @@
 
 	</section>{{!-- /sheet-body --}}
 
-</form>
+</div>

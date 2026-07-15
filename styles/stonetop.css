@@ -3241,8 +3241,13 @@ button.stonetop-xp-toggle {
 
 /* ===== Steading Sheet (new panel-frame system) ===== */
 
-/* Base form layout */
-form.stonetop.sheet.steading {
+/* Base layout (ApplicationV2). The V1 sheet put this on `form.stonetop.sheet.steading`, but under
+   V2 that selector is the outer frame form (it wraps the window header too). Like the NPC card, the
+   layout + scroll live on .window-content instead: it persists across V2 re-renders, so its
+   scrollTop survives without part-level restore, and padding/scroll don't leak onto the header. The
+   part content (header, tab nav, sheet-body) stacks as its single flex-column child, exactly as the
+   V1 form did. */
+.stonetop.sheet.steading .window-content {
 	display: flex;
 	flex-direction: column;
 	gap: 0;
@@ -3690,10 +3695,62 @@ form.stonetop.sheet.steading {
 	overflow-y: auto;
 }
 
+/* ── Moves tab ───────────────────────────────────────────────────────────────
+   The homefront-move acquisition checkbox is legitimate (v0.13 main shows it too — a black filled /
+   empty square). But in a V2 window core's own checkbox styling wins over our .stonetop-item-check
+   custom look and renders a bright native check instead. Re-assert the custom square at higher
+   specificity, with hardcoded ink (--color-text-dark-primary is undefined on a V2 sheet, so it
+   drew nothing), and neutralize any core check pseudo. */
+.stonetop.sheet.steading .stonetop-item-check {
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	width: 14px !important;
+	height: 14px !important;
+	flex: 0 0 14px !important;
+	border-radius: 2px !important;
+	border: 2px solid #1a1a1a !important;
+	background: transparent !important;
+}
+.stonetop.sheet.steading .stonetop-item-check:checked {
+	background: #1a1a1a !important;
+}
+.stonetop.sheet.steading .stonetop-item-check::before,
+.stonetop.sheet.steading .stonetop-item-check::after {
+	content: none !important;
+}
+/* Resource pips: the shared border color is --color-text-dark-primary, which core doesn't define on
+   a V2 sheet, so the empty pips outlined to nothing. currentColor is no good either — a core-styled
+   V2 <button> inherits a light button text color, so an empty ring vanishes on the cream sheet
+   (this is why the pips rendered on the V1 character sheet but not the V2 steading). Pin BOTH the
+   ring and the fill to the same opaque deep red so the track reads at a glance regardless of what
+   core sets currentColor to: empty = red ring, used = solid red. */
+.stonetop.sheet.steading .stonetop-item-resource-check {
+	/* Set the FULL border, not just border-color: the shared rule above draws it via
+	   var(--color-text-dark-primary), which core leaves undefined on a V2 sheet, so that whole
+	   `border` shorthand is invalid-at-computed-value → border-style collapses to `none` and an
+	   empty ring never paints (it only flickered on :hover). Pin width+style+color right here. */
+	border: 2px solid #1a1a1a !important;                  /* black ring when unfilled */
+	background-color: rgba(122, 20, 20, 0.14) !important;  /* faint red wash inside the ring */
+}
+.stonetop.sheet.steading .stonetop-item-resource-check:hover {
+	border-color: #7a1414 !important;                      /* deep-red ring on hover */
+	background-color: rgba(122, 20, 20, 0.28) !important;
+}
+.stonetop.sheet.steading .stonetop-item-resource-check.is-checked {
+	background-color: #1a1a1a !important;                  /* black fill when selected */
+	border-color: #1a1a1a !important;
+}
+
 .stonetop.sheet.steading .steading-residents-img {
-	width: 100%;
+	/* V2 dropped the legacy sheet flex bounds this decorative art relied on, so `width: 100%` now
+	   resolves against an unbounded column and the image grows without limit, burying the NPC-traits
+	   section below it. Cap it (like the NPC portrait) so it stays a modest footer illustration. */
+	display: block;
+	max-width: 100%;
+	max-height: 180px;
+	width: auto;
 	height: auto;
-	margin-top: 6px;
+	margin: 6px auto 0;
 	opacity: 0.85;
 	border: none;
 }
