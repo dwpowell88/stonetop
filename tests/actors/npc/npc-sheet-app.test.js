@@ -125,6 +125,19 @@ describe("StonetopNpcSheet._onRender — direct bindings (V2 lifecycle)", () => 
 		expect(npc.toggleSelection).not.toHaveBeenCalled();
 	});
 
+	it("commits an Enter-added tag exactly once despite the paired change events", () => {
+		// Pressing Enter fires TWO change events (native value-commit + comboBox's synthetic one).
+		// Since toggleSelection *toggles*, firing it twice would add then remove the tag. The
+		// handler blanks the box on the first change so the second is guarded out — one net add.
+		const { sheet, npc } = renderSheet();
+		const add = sheet.element.querySelector(".stonetop-tag-add");
+		fire(add, "change");
+		fire(add, "change");
+		expect(npc.toggleSelection).toHaveBeenCalledTimes(1);
+		expect(npc.toggleSelection).toHaveBeenCalledWith("tagList", "sneaky");
+		expect(add.value).toBe("");
+	});
+
 	it("binds nothing when the sheet is not editable", () => {
 		const { sheet, npc } = renderSheet({ editable: false });
 		fire(sheet.element.querySelector("#npc-hp"), "change");

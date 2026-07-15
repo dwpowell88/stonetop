@@ -54,8 +54,16 @@ export function createStonetopNpcSheetClass(Base) {
                 return npc.toggleSelection(wrap?.dataset.field, ev.currentTarget.dataset.tag);
             });
             bindAll(root, ".stonetop-tag-add", "change", ev => {
-                const value = ev.currentTarget.value.trim();
-                if (value) return npc.toggleSelection(ev.currentTarget.dataset.field, value);
+                const input = ev.currentTarget;
+                const value = input.value.trim();
+                if (!value) return;
+                // Clear the box before toggling: pressing Enter fires TWO change events — the
+                // browser's native value-commit change AND comboBox's synthetic one — and a
+                // *toggle* handler that ran twice would add then immediately remove the tag
+                // (leaving the box blank, the tag uncommitted). Blanking the input makes the
+                // second change no-op via the guard above (matches the V1 character sheet).
+                input.value = "";
+                return npc.toggleSelection(input.dataset.field, value);
             });
             // Instinct (single-select input + dropdown, not chips)
             bindAll(root, ".stonetop-npc-instinct", "change", ev => npc.setInstinct(ev.currentTarget.value.trim()));
