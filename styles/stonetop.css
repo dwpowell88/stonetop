@@ -3241,8 +3241,13 @@ button.stonetop-xp-toggle {
 
 /* ===== Steading Sheet (new panel-frame system) ===== */
 
-/* Base form layout */
-form.stonetop.sheet.steading {
+/* Base layout (ApplicationV2). The V1 sheet put this on `form.stonetop.sheet.steading`, but under
+   V2 that selector is the outer frame form (it wraps the window header too). Like the NPC card, the
+   layout + scroll live on .window-content instead: it persists across V2 re-renders, so its
+   scrollTop survives without part-level restore, and padding/scroll don't leak onto the header. The
+   part content (header, tab nav, sheet-body) stacks as its single flex-column child, exactly as the
+   V1 form did. */
+.stonetop.sheet.steading .window-content {
 	display: flex;
 	flex-direction: column;
 	gap: 0;
