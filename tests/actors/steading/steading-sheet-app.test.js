@@ -24,7 +24,7 @@ function makeSheet(movesRepo) {
 
 describe("StonetopSteadingSheet.getData — rich-text enrichment (integration)", () => {
 	it("enriches a homefront move's @UUID and a default note through the one pass", async () => {
-		const movesRepo = new FakeMoveRepository().addWorld(
+		const movesRepo = new FakeMoveRepository().addBasic(
 			new FakeCompendiumMoveBuilder()
 				.withName("Trade")
 				.withMoveType("homefront")
@@ -32,6 +32,7 @@ describe("StonetopSteadingSheet.getData — rich-text enrichment (integration)",
 				.build()
 		);
 		const sheet = makeSheet(movesRepo);
+		await sheet.actor.typedActor.seedReferenceMoves();   // create-time seed (no longer on render)
 
 		const orig = foundry.applications.ux.TextEditor.implementation.enrichHTML;
 		foundry.applications.ux.TextEditor.implementation.enrichHTML =

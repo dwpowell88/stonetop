@@ -14,9 +14,11 @@ function homefront(name, opts = {}) {
 	return b.build();
 }
 
+// Homefront reference moves live in the compendium (pack), not the world — that's the set seeding
+// draws from. (`addBasic` stands in for the compendium in FakeMoveRepository.)
 function repoWith(...moves) {
 	const repo = new FakeMoveRepository();
-	moves.forEach(m => repo.addWorld(m));
+	moves.forEach(m => repo.addBasic(m));
 	return repo;
 }
 
@@ -46,6 +48,14 @@ describe("SteadingMoves.buildSnapshot", () => {
 		const { moves } = makeMoves(repoWith());
 		await moves.seedHomefrontMoves();
 		expect(await moves.buildSnapshot()).toBeNull();
+	});
+
+	// Regression guard: seeding happens once at actor creation, NOT on render. buildSnapshot must
+	// only READ embedded moves — reading it on an unseeded steading creates nothing and returns null.
+	it("does not seed — an unseeded steading yields null and no embedded moves", async () => {
+		const { moves, actor } = makeMoves(repoWith(homefront("Trade"), homefront("Stand Watch")));
+		expect(await moves.buildSnapshot()).toBeNull();
+		expect([...actor.items].filter(i => i.system?.categoryKey === "homefront")).toHaveLength(0);
 	});
 
 	it("builds a homefront category from the embedded items with an ownedId per move", async () => {

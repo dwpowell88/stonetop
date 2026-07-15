@@ -22,7 +22,9 @@ export class CharacterMoves {
 	setVitals(vitals) { this._vitals = vitals; }
 
 	// Reference moves are seeded onto every character and shown in the sidebar (not the moves
-	// tab): basic, plus the universal special moves and follower moves.
+	// tab): basic, plus the universal special moves and follower moves. Seeded once at actor
+	// creation (CreateActor hook), NOT on render — thereafter they are ordinary owned items the GM
+	// can edit, delete, or re-add via drag-drop.
 	async initBasicMoves() {
 		for (const moveType of ["basic", "special", "follower"]) {
 			await this._seedReferenceMoves(moveType);
@@ -30,7 +32,7 @@ export class CharacterMoves {
 	}
 
 	async _seedReferenceMoves(moveType) {
-		const entries = await this._moveRepo.getMovesByType(moveType);
+		const entries = await this._moveRepo.getReferenceMovesByType(moveType);
 		const existing = [...this._actor.items].filter(i => i.type === "move" && i.system?.categoryKey === moveType);
 		const existingSlugs = new Set(existing.map(i => toSlug(i.name)));
 		const newEntries = entries.filter(m => !existingSlugs.has(m.slug));

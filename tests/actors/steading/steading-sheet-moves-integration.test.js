@@ -44,12 +44,12 @@ class FakeBase {
 
 async function makeWiredSheet() {
 	const actor = new FakeSteadingBuilder().build();
-	const repo = new FakeMoveRepository().addWorld(
+	const repo = new FakeMoveRepository().addBasic(
 		new FakeCompendiumMoveBuilder().withName("Trade").withMoveType("homefront")
 			.withResource({ title: "Uses", labels: ["", "", ""] }).build()
 	);
 	actor.typedActor = new StonetopSteading(actor, { getBySlug: async () => null }, repo);
-	await actor.typedActor.buildSnapshot();   // seeds the homefront move as an embedded item
+	await actor.typedActor.seedReferenceMoves();   // create-time seed (no longer on render)
 
 	const Sheet = createStonetopSteadingSheetClass(FakeBase);
 	const sheet = new Sheet(actor);
