@@ -3695,6 +3695,21 @@ button.stonetop-xp-toggle {
 	overflow-y: auto;
 }
 
+/* ── Moves tab ───────────────────────────────────────────────────────────────
+   Homefront moves are the steading's fixed reference set — every steading has them all, so the
+   acquisition checkbox the shared move row renders is meaningless here. Show it as the passive
+   greyed square bullet the old sheet used (non-interactive), not a live checkbox. */
+.stonetop.sheet.steading .stonetop-move-check {
+	opacity: 0.35;
+	pointer-events: none;
+}
+/* The selected resource pip is the same faint dark fill as everywhere else; on the steading's
+   parchment it's hard to tell which is used. Give the used pip a clear deep-red fill. */
+.stonetop.sheet.steading .stonetop-item-resource-check.is-checked {
+	background-color: #7a1414 !important;
+	border-color: #7a1414 !important;
+}
+
 .stonetop.sheet.steading .steading-residents-img {
 	/* V2 dropped the legacy sheet flex bounds this decorative art relied on, so `width: 100%` now
 	   resolves against an unbounded column and the image grows without limit, burying the NPC-traits

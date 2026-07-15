@@ -71,6 +71,13 @@ describe("SteadingMoves.buildSnapshot", () => {
 		expect(move.selection.value).toBe(1);        // checked by default
 	});
 
+	it("lists the moves alphabetically by name, regardless of seed order", async () => {
+		const { moves } = makeMoves(repoWith(homefront("Trade"), homefront("Bolster"), homefront("Stand Watch")));
+		await moves.seedHomefrontMoves();
+		const names = (await moves.buildSnapshot()).moves.map(m => m.name);
+		expect(names).toEqual(["Bolster", "Stand Watch", "Trade"]);
+	});
+
 	it("leaves the description as an un-enriched RichText for the shared enrich pass", async () => {
 		const { moves } = makeMoves(repoWith(homefront("Trade", { description: "Gain **surplus** [[/r 2d6]]" })));
 		await moves.seedHomefrontMoves();

@@ -62,9 +62,12 @@ export class SteadingMoves {
 	// Description is left as a RichText for the shared enrichRichTextTree pass (run in the sheet's
 	// getData) — buildMoveSnapshot wraps it, no bespoke enrichHTML here.
 	async buildSnapshot() {
+		// Alphabetical by name: homefront moves are a fixed reference set, so the seed/sortOrder is
+		// meaningless to the reader (and can get scrambled by reseeds) — an A–Z list is what the
+		// sheet wants.
 		const items = [...this._actor.items]
 			.filter(i => i.type === "move" && i.system?.categoryKey === CATEGORY_KEY)
-			.sort((a, b) => (a.system?.sortOrder ?? 999) - (b.system?.sortOrder ?? 999));
+			.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
 		if (!items.length) return null;
 		const moves = await Promise.all(items.map(item =>
 			buildMoveSnapshot(item, CATEGORY_KEY, computeSelectable(item), true, this._resourceController)
