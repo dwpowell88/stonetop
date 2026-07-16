@@ -66,6 +66,7 @@ export function createStonetopNpcSheetClass(Base) {
             // Moves + description
             bindAll(root, "#npc-moves", "change", ev => npc.setMoves(ev.currentTarget.value));
             bindAll(root, ".stonetop-follower-description-textarea", "change", ev => npc.setDescription(ev.currentTarget.value));
+            bindAll(root, ".stonetop-npc-notes-textarea", "change", ev => npc.setNotes(ev.currentTarget.value));
         }
 
     };

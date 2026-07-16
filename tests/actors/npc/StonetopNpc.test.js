@@ -11,6 +11,7 @@ const SETTERS = {
 	specialQuality: (b, v) => b.withSpecialQuality(v),
 	instinct:       (b, v) => b.withInstinct(v),
 	description:    (b, v) => b.withDescription(v),
+	notes:          (b, v) => b.withNotes(v),
 	moves:          (b, v) => b.withMoves(v),
 	tagList:        (b, v) => b.withTagList(v),
 };
@@ -33,6 +34,7 @@ describe("StonetopNpc — getters return defaults", () => {
 	it("specialQuality defaults to empty string", () => expect(makeNpc().specialQuality).toBe(""));
 	it("instinct defaults to empty string", () => expect(makeNpc().instinct).toBe(""));
 	it("description defaults to empty string", () => expect(makeNpc().description).toBe(""));
+	it("notes defaults to empty string", () => expect(makeNpc().notes).toBe(""));
 });
 
 describe("StonetopNpc — getters reflect pre-seeded system values", () => {
@@ -43,6 +45,7 @@ describe("StonetopNpc — getters reflect pre-seeded system values", () => {
 	it("specialQuality returns system.specialQuality", () => expect(makeNpc({ specialQuality: "undead" }).specialQuality).toBe("undead"));
 	it("instinct returns system.instinct", () => expect(makeNpc({ instinct: "to feed" }).instinct).toBe("to feed"));
 	it("description returns system.description", () => expect(makeNpc({ description: "Horrible." }).description).toBe("Horrible."));
+	it("notes returns system.notes", () => expect(makeNpc({ notes: "Owes the party a favor." }).notes).toBe("Owes the party a favor."));
 	it("tags returns system.tagList", () => expect(makeNpc({ tagList: "fae, woodland" }).tags).toBe("fae, woodland"));
 	it("moves returns system.moves", () => expect(makeNpc({ moves: "- Bite" }).moves).toBe("- Bite"));
 });
@@ -90,6 +93,7 @@ describe("StonetopNpc — buildSnapshot wraps game text as RichText", () => {
 		expect(snap.specialQuality.raw).toBe("*blind*, tremorsense");
 		expect(snap.specialQuality.autoRoll).toBe(true);
 		expect(snap.description.raw).toBe("A **horror**.");
+		expect(snap.notes.raw).toBe("");
 		expect(snap.armor.raw).toBe("4 (resilience), 0 vs. bronze");
 		expect(snap.armor.autoRoll).toBe(false);
 	});
@@ -136,6 +140,12 @@ describe("StonetopNpc — setters update observable state", () => {
 		const npc = makeNpc();
 		await npc.setDescription("A shadow given form.");
 		expect(npc.description).toBe("A shadow given form.");
+	});
+
+	it("setNotes updates notes", async () => {
+		const npc = makeNpc();
+		await npc.setNotes("Last seen near the Barrow.");
+		expect(npc.notes).toBe("Last seen near the Barrow.");
 	});
 });
 

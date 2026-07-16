@@ -33,6 +33,7 @@ export class StonetopNpc {
 	get specialQuality() { return this._actor.system?.specialQuality ?? ""; }
 	get instinct()       { return Selection.fromStored(this._actor.system?.instinct).text; }
 	get description()    { return this._actor.system?.description    ?? ""; }
+	get notes()          { return this._actor.system?.notes          ?? ""; }
 	get tags()           { return Selection.fromStored(this._actor.system?.tagList).text; }
 	get moves()          { return this._actor.system?.moves          ?? ""; }
 
@@ -43,6 +44,7 @@ export class StonetopNpc {
 	async setSpecialQuality(value) { await this._actor.update({ "system.specialQuality": value }); }
 	async setInstinct(value)       { await this._actor.update({ "system.instinct": Selection.fromStored(value, { multi: false, options: this._actor.system?.instinct?.options ?? [] }).toRaw() }); }
 	async setDescription(value)    { await this._actor.update({ "system.description": value }); }
+	async setNotes(value)          { await this._actor.update({ "system.notes": value }); }
 	async setTags(value)           { await this._actor.update({ "system.tagList": Selection.fromStored(value, { options: this._actor.system?.tagList?.options ?? [] }).toRaw() }); }
 	async toggleSelection(field, value) { if (!field || !value) return; await this._actor.update({ [`system.${field}`]: Selection.fromStored(this._actor.system?.[field]).toggle(value).toRaw() }); }
 	async setMoves(value)          { await this._actor.update({ "system.moves": value }); }
@@ -61,6 +63,7 @@ export class StonetopNpc {
 			.withInstinct(this._actor.system?.instinct ?? "")
 			.withSpecialQuality(this.specialQuality)
 			.withDescription(this.description)
+			.withNotes(this.notes)
 			.withTags(this._actor.system?.tagList ?? null)
 			.withMoves(this.moves)
 			.build();

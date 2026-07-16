@@ -59,7 +59,7 @@ describe("StonetopNpcSheet._onRender — direct bindings (V2 lifecycle)", () => 
 		return {
 			setHp: vi.fn(), setMaxHp: vi.fn(), setArmor: vi.fn(), setDamage: vi.fn(),
 			setSpecialQuality: vi.fn(), toggleSelection: vi.fn(), setInstinct: vi.fn(),
-			setMoves: vi.fn(), setDescription: vi.fn(),
+			setMoves: vi.fn(), setDescription: vi.fn(), setNotes: vi.fn(),
 		};
 	}
 
@@ -78,7 +78,8 @@ describe("StonetopNpcSheet._onRender — direct bindings (V2 lifecycle)", () => 
 			</div>
 			<input class="stonetop-npc-instinct" value=" To skulk ">
 			<textarea id="npc-moves">bite</textarea>
-			<textarea class="stonetop-follower-description-textarea">a rat</textarea>`;
+			<textarea class="stonetop-follower-description-textarea">a rat</textarea>
+			<textarea class="stonetop-npc-notes-textarea">owes a debt</textarea>`;
 		sheet._onRender({}, {});
 		return { sheet, npc };
 	}
@@ -94,6 +95,7 @@ describe("StonetopNpcSheet._onRender — direct bindings (V2 lifecycle)", () => 
 		fire(el("#npc-special-qualities"), "change");
 		fire(el("#npc-moves"), "change");
 		fire(el(".stonetop-follower-description-textarea"), "change");
+		fire(el(".stonetop-npc-notes-textarea"), "change");
 
 		expect(npc.setHp).toHaveBeenCalledWith("3");
 		expect(npc.setMaxHp).toHaveBeenCalledWith("6");
@@ -102,6 +104,7 @@ describe("StonetopNpcSheet._onRender — direct bindings (V2 lifecycle)", () => 
 		expect(npc.setSpecialQuality).toHaveBeenCalledWith("flies");
 		expect(npc.setMoves).toHaveBeenCalledWith("bite");
 		expect(npc.setDescription).toHaveBeenCalledWith("a rat");
+		expect(npc.setNotes).toHaveBeenCalledWith("owes a debt");
 	});
 
 	it("toggles a chip by its wrapper's field, adds trimmed free-text tags, trims the instinct", () => {

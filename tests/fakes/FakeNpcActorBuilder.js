@@ -11,6 +11,7 @@ export class FakeNpcActorBuilder {
 	_specialQuality = "";
 	_instinct = "";
 	_description = "";
+	_notes = "";
 	_moves = "";
 	_tagList = "";
 
@@ -29,6 +30,7 @@ export class FakeNpcActorBuilder {
 	withSpecialQuality(v) { this._specialQuality = v; return this; }
 	withInstinct(instinct) { this._instinct = instinct; return this; }
 	withDescription(desc) { this._description = desc; return this; }
+	withNotes(notes)      { this._notes = notes; return this; }
 	withMoves(moves)      { this._moves = moves; return this; }
 	withTagList(tagList)  { this._tagList = tagList; return this; }
 
@@ -40,6 +42,7 @@ export class FakeNpcActorBuilder {
 			specialQuality: this._specialQuality,
 			instinct:       this._instinct,
 			description:    this._description,
+			notes:          this._notes,
 			moves:          this._moves,
 			tagList:        this._tagList,
 		};

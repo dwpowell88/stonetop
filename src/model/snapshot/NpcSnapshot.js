@@ -17,6 +17,7 @@ export class NpcSnapshot {
 		this.instinct         = this.instinctSelection.text;
 		this.moves            = rich(b._moves ?? "");
 		this.description      = rich(b._description ?? "");
+		this.notes            = rich(b._notes ?? "");
 		this.cost             = b._cost             ?? "";
 		this.loyalty          = b._loyalty          ?? 0;
 		this.isFollower       = b._isFollower       ?? false;
@@ -33,6 +34,7 @@ export class NpcSnapshotBuilder {
 	withInstinct(v)         { this._instinct         = v; return this; }
 	withMoves(v)            { this._moves            = v; return this; }
 	withDescription(v)      { this._description      = v; return this; }
+	withNotes(v)            { this._notes            = v; return this; }
 	withCost(v)             { this._cost             = v; return this; }
 	withLoyalty(v)          { this._loyalty          = v; return this; }
 	withIsFollower(v)       { this._isFollower       = v; return this; }
