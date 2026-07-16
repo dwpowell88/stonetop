@@ -2,8 +2,8 @@
 // PossessionData. Rich description, an optional resource pool/track, a single `choices` group, a
 // list of granted outfit items, and a uses-scaling rule (per-even-level / per-move). The choices
 // group reuses the shared choiceGroupEdit helpers + choiceGroupEditorMixin + choice-group-editor
-// partial; the resource block reuses the arcanum-resource partial (generic). Foundry's ItemSheet
-// auto-saves `name`/`system.*` form inputs and auto-activates the `data-edit` rich editor.
+// partial; the resource block reuses the arcanum-resource partial (generic). The V2 form's
+// submitOnChange auto-saves `name`/`system.*` inputs, including the <prose-mirror> description.
 //
 // `system.resource` / `system.scaling` are opaque ObjectFields: scalar `name=`-input writes (e.g.
 // resource.max, scaling.perEvenLevel) rely on Foundry's recursive merge to preserve siblings;
@@ -13,6 +13,7 @@
 
 import * as CG from "../utils/choiceGroupEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
+import { bindAll } from "../utils/bindAll.js";
 import { itemDescriptionRich } from "./itemDescriptionRich.js";
 import { enrichRichTextTree } from "../utils/enrichRichText.js";
 
@@ -23,21 +24,20 @@ const BLANK_PER_MOVE   = () => ({ moveSlug: "", amount: 1 });
 
 export function createStonetopPossessionSheetClass(Base) {
 	return class StonetopPossessionSheet extends Base {
-		static get defaultOptions() {
-			return foundry.utils.mergeObject(super.defaultOptions, {
-				classes: ["stonetop", "sheet", "item", "possession"],
-				width:  600,
-				height: 720,
-				resizable: true,
-			});
-		}
+		static DEFAULT_OPTIONS = {
+			classes: ["possession"],
+			position: { width: 600, height: 720 },
+		};
 
-		get template() {
-			return "systems/stonetop/templates/item/possession.hbs";
-		}
+		static PARTS = {
+			form: {
+				template: "systems/stonetop/templates/item/possession.hbs",
+				scrollable: [""],
+			},
+		};
 
-		async getData() {
-			const context = await super.getData();
+		async _prepareContext(options) {
+			const context = await super._prepareContext(options);
 			// Possessions are referenced by a stable slug — playbook grants list them and granted
 			// outfit items are sourced as `possession:<slug>`, so it must survive a rename. Generate a
 			// random one once if missing (not name-derived), mirroring the insert sheet.
@@ -45,6 +45,8 @@ export function createStonetopPossessionSheetClass(Base) {
 				await this.item.update({ "system.slug": `custom-possession-${foundry.utils.randomID(8)}` });
 			}
 			const sys = this.item.system;
+			context.item      = this.item;
+			context.editable  = this.isEditable;
 			context.system    = sys;
 			context.choicesRows = sys.choices ? CG.buildRows(sys.choices) : null;
 			context.rich = itemDescriptionRich(sys);
@@ -52,25 +54,27 @@ export function createStonetopPossessionSheetClass(Base) {
 			return context;
 		}
 
-		activateListeners(html) {
-			super.activateListeners(html);
+		// Direct bindings to the current editor controls — re-run per render (part content is replaced).
+		_onRender(context, options) {
+			super._onRender(context, options);
 			if (!this.isEditable) return;
+			const root = this.element;
 
-			activateChoiceGroupEditors(this, html); // entry/pick row editing for the single choices group
+			activateChoiceGroupEditors(this, root); // entry/pick row editing for the single choices group
 
 			// Choices group lifecycle — a single group at system.choices (null when absent).
-			html.find(".possession-choices-add-group").on("click", () =>
+			bindAll(root, ".possession-choices-add-group", "click", () =>
 				this.item.update({ "system.choices": CG.newGroup("choices") }));
-			html.find(".possession-choices-remove-group").on("click", () =>
+			bindAll(root, ".possession-choices-remove-group", "click", () =>
 				this.item.update({ "system.choices": null }));
 
 			// Optional resource (a pool / track) — toggle on/off + labels list (shared with arcanum).
-			html.find(".arcanum-resource-toggle").on("click", ev => {
+			bindAll(root, ".arcanum-resource-toggle", "click", ev => {
 				const path = ev.currentTarget.dataset.path;
 				const has  = foundry.utils.getProperty(this.item, path) != null;
 				this.item.update({ [path]: has ? null : BLANK_RESOURCE() });
 			});
-			html.find(".arcanum-resource-labels").on("change", ev => {
+			bindAll(root, ".arcanum-resource-labels", "change", ev => {
 				const path   = ev.currentTarget.dataset.path;
 				const labels = ev.currentTarget.value ? ev.currentTarget.value.split(",").map(s => s.trim()).filter(Boolean) : [];
 				this.item.update({ [`${path}.labels`]: labels });
@@ -81,13 +85,13 @@ export function createStonetopPossessionSheetClass(Base) {
 			// the ArrayField into a {0:…,1:…} object).
 			const outfit    = () => foundry.utils.deepClone(this.item.system.outfitItems ?? []);
 			const setOutfit = list => this.item.update({ "system.outfitItems": list });
-			html.find(".possession-outfit-add").on("click", () => {
+			bindAll(root, ".possession-outfit-add", "click", () => {
 				const list = outfit(); list.push(BLANK_OUTFIT_ITEM()); setOutfit(list);
 			});
-			html.find(".possession-outfit-remove").on("click", ev => {
+			bindAll(root, ".possession-outfit-remove", "click", ev => {
 				const list = outfit(); list.splice(Number(ev.currentTarget.dataset.index), 1); setOutfit(list);
 			});
-			html.find(".possession-outfit-field").on("change", ev => {
+			bindAll(root, ".possession-outfit-field", "change", ev => {
 				const el = ev.currentTarget;
 				const list = outfit();
 				const item = list[Number(el.dataset.index)];
@@ -97,19 +101,19 @@ export function createStonetopPossessionSheetClass(Base) {
 			});
 
 			// Uses-scaling — toggle on/off, plus a per-move list (whole-array writes).
-			html.find(".possession-scaling-toggle").on("click", () => {
+			bindAll(root, ".possession-scaling-toggle", "click", () => {
 				const has = this.item.system.scaling != null;
 				this.item.update({ "system.scaling": has ? null : BLANK_SCALING() });
 			});
 			const perMove    = () => foundry.utils.deepClone(this.item.system.scaling?.perMove ?? []);
 			const setPerMove = list => this.item.update({ "system.scaling.perMove": list });
-			html.find(".possession-scaling-move-add").on("click", () => {
+			bindAll(root, ".possession-scaling-move-add", "click", () => {
 				const list = perMove(); list.push(BLANK_PER_MOVE()); setPerMove(list);
 			});
-			html.find(".possession-scaling-move-remove").on("click", ev => {
+			bindAll(root, ".possession-scaling-move-remove", "click", ev => {
 				const list = perMove(); list.splice(Number(ev.currentTarget.dataset.index), 1); setPerMove(list);
 			});
-			html.find(".possession-scaling-move-field").on("change", ev => {
+			bindAll(root, ".possession-scaling-move-field", "change", ev => {
 				const el = ev.currentTarget;
 				const list = perMove();
 				const row = list[Number(el.dataset.index)];

@@ -1,8 +1,10 @@
-<form class="stonetop sheet item possession" autocomplete="off">
+{{!-- V2 part: single root element (HandlebarsApplicationMixin requirement); the sheet root form +
+      classes come from DEFAULT_OPTIONS. --}}
+<div class="stonetop-item-sheet-part">
 
 	<header class="stonetop-insert-sheet-header">
-		<img class="stonetop-insert-sheet-icon" src="{{data.img}}" data-edit="img" title="{{data.name}}" alt="">
-		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{data.name}}"
+		<img class="stonetop-insert-sheet-icon" src="{{item.img}}" data-edit="img" data-action="editImage" title="{{item.name}}" alt="">
+		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{item.name}}"
 		       placeholder="{{localize 'stonetop.possession.namePlaceholder'}}"
 		       {{#unless editable}}disabled{{/unless}}>
 	</header>
@@ -12,7 +14,9 @@
 		<section class="stonetop-insert-sheet-section editor">
 			<label class="stonetop-insert-sheet-label">{{localize "stonetop.possession.description"}}</label>
 			{{#if editable}}
-			<div class="editor-content" data-edit="system.description">{{{system.description}}}</div>
+			{{!-- V2 doesn't auto-activate editors on [data-edit] divs; a named <prose-mirror> saves
+			      through the form's submitOnChange on blur. --}}
+			<prose-mirror class="stonetop-item-description-editor" name="system.description" value="{{system.description}}"></prose-mirror>
 			{{else}}
 			<div class="editor-content">{{rich rich.description}}</div>
 			{{/if}}
@@ -122,4 +126,4 @@
 		</section>
 
 	</div>
-</form>
+</div>

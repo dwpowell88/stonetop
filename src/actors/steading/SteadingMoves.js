@@ -24,11 +24,13 @@ export class SteadingMoves {
 		this._resourceController = resourceController;
 	}
 
-	// Idempotent: only homefront moves whose slug isn't already embedded are added, so re-render (and
-	// re-open) never duplicates them. Seeded acquired → they render checked by default but stay
-	// toggleable (the same mechanism playbook starting moves use).
+	// Seeds the homefront reference moves onto the steading as owned `move` items. Called once, at
+	// actor creation (CreateActor hook) — NOT on render. After that the moves are ordinary owned
+	// items: the GM can edit, delete, or re-add them via drag-drop. Idempotent (skips slugs already
+	// embedded) so a re-seed can't duplicate. Seeded acquired → they render checked by default but
+	// stay toggleable (the same mechanism playbook starting moves use).
 	async seedHomefrontMoves() {
-		const entries = await this._repo.getMovesByType(CATEGORY_KEY);
+		const entries = await this._repo.getReferenceMovesByType(CATEGORY_KEY);
 		const existing = [...this._actor.items].filter(i => i.type === "move" && i.system?.categoryKey === CATEGORY_KEY);
 		const existingSlugs = new Set(existing.map(i => i.system?.slug ?? toSlug(i.name)));
 		const newEntries = entries.filter(m => !existingSlugs.has(m.slug));
@@ -60,9 +62,12 @@ export class SteadingMoves {
 	// Description is left as a RichText for the shared enrichRichTextTree pass (run in the sheet's
 	// getData) — buildMoveSnapshot wraps it, no bespoke enrichHTML here.
 	async buildSnapshot() {
+		// Alphabetical by name: homefront moves are a fixed reference set, so the seed/sortOrder is
+		// meaningless to the reader (and can get scrambled by reseeds) — an A–Z list is what the
+		// sheet wants.
 		const items = [...this._actor.items]
 			.filter(i => i.type === "move" && i.system?.categoryKey === CATEGORY_KEY)
-			.sort((a, b) => (a.system?.sortOrder ?? 999) - (b.system?.sortOrder ?? 999));
+			.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
 		if (!items.length) return null;
 		const moves = await Promise.all(items.map(item =>
 			buildMoveSnapshot(item, CATEGORY_KEY, computeSelectable(item), true, this._resourceController)

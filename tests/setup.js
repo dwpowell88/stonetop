@@ -37,6 +37,7 @@ global.foundry = {
 		mergeObject: (a, b) => ({ ...a, ...b }),
 		deepClone: (obj) => JSON.parse(JSON.stringify(obj)),
 		setProperty: (obj, path, value) => setPath(obj, path, value),
+		getProperty: (obj, path) => getPath(obj, path),
 		randomID: (len = 16) => Array.from({ length: len }, () => "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]).join(""),
 		debounce: (fn, delay) => {
 			let timeout;

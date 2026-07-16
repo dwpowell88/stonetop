@@ -1,8 +1,9 @@
-<form class="stonetop sheet item arcanum" autocomplete="off">
+{{!-- V2 part: single root element; the sheet root form + classes come from DEFAULT_OPTIONS. --}}
+<div class="stonetop-item-sheet-part">
 
 	<header class="stonetop-insert-sheet-header">
-		<img class="stonetop-insert-sheet-icon" src="{{data.img}}" data-edit="img" title="{{data.name}}" alt="">
-		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{data.name}}"
+		<img class="stonetop-insert-sheet-icon" src="{{item.img}}" data-edit="img" data-action="editImage" title="{{item.name}}" alt="">
+		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{item.name}}"
 		       placeholder="{{localize 'stonetop.arcanum.namePlaceholder'}}"
 		       {{#unless editable}}disabled{{/unless}}>
 	</header>
@@ -11,11 +12,11 @@
 	{{!-- ── VIEW (rendered card, with an Edit button) ─────────────── --}}
 	<div class="stonetop-arcanum-view">
 		<div class="stonetop-arcanum-view-head">
-			<button type="button" class="arcanum-preview-flip">
+			<button type="button" class="arcanum-preview-flip" data-action="flipPreview" data-view-state>
 				{{#if previewFlipped}}{{localize "stonetop.arcanum.showFront"}}{{else}}{{localize "stonetop.arcanum.showBack"}}{{/if}}
 			</button>
 			{{#if editable}}
-			<button type="button" class="arcanum-edit-toggle" data-mode="edit">{{localize "stonetop.arcanum.edit"}}</button>
+			<button type="button" class="arcanum-edit-toggle" data-action="toggleEditMode" data-view-state data-mode="edit">{{localize "stonetop.arcanum.edit"}}</button>
 			{{/if}}
 		</div>
 		<div class="stonetop-arcanum-preview">
@@ -53,7 +54,7 @@
 				<label class="stonetop-insert-sheet-label">{{localize "stonetop.arcanum.description"}}</label>
 				<div class="editor stonetop-arcanum-editor-box">
 				{{#if editable}}
-				<div class="editor-content" data-edit="system.front.description">{{{front.description}}}</div>
+				<prose-mirror class="stonetop-item-description-editor" name="system.front.description" value="{{front.description}}"></prose-mirror>
 				{{else}}
 				<div class="editor-content">{{rich previewCard.front.description}}</div>
 				{{/if}}
@@ -91,7 +92,7 @@
 				<label class="stonetop-insert-sheet-label">{{localize "stonetop.arcanum.description"}}</label>
 				<div class="editor stonetop-arcanum-editor-box">
 				{{#if editable}}
-				<div class="editor-content" data-edit="system.back.description">{{{back.description}}}</div>
+				<prose-mirror class="stonetop-item-description-editor" name="system.back.description" value="{{back.description}}"></prose-mirror>
 				{{else}}
 				<div class="editor-content">{{rich previewCard.back.description}}</div>
 				{{/if}}
@@ -142,10 +143,10 @@
 			<div class="stonetop-arcanum-preview-head">
 				<span>{{localize "stonetop.arcanum.preview"}}</span>
 				<span class="stonetop-arcanum-preview-actions">
-					<button type="button" class="arcanum-preview-flip">
+					<button type="button" class="arcanum-preview-flip" data-action="flipPreview" data-view-state>
 						{{#if previewFlipped}}{{localize "stonetop.arcanum.showFront"}}{{else}}{{localize "stonetop.arcanum.showBack"}}{{/if}}
 					</button>
-					<button type="button" class="arcanum-edit-toggle" data-mode="view">{{localize "stonetop.arcanum.done"}}</button>
+					<button type="button" class="arcanum-edit-toggle" data-action="toggleEditMode" data-view-state data-mode="view">{{localize "stonetop.arcanum.done"}}</button>
 				</span>
 			</div>
 			<div class="stonetop-arcanum-preview">
@@ -155,4 +156,4 @@
 
 	</div>
 	{{/unless}}
-</form>
+</div>

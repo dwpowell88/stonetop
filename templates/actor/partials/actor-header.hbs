@@ -3,7 +3,9 @@
 	<img class="profile-img stonetop-header-playbook-icon" src="{{stonetop.playbook.img}}"
 	     alt="{{stonetop.playbook.name}}" title="{{stonetop.playbook.name}}">
 	{{else}}
-	<img class="profile-img" src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" title="{{actor.name}}">
+	{{!-- data-edit: V1 core click binding; data-action: the V2 editImage action. Both present while
+	      the actor sheets straddle the migration. --}}
+	<img class="profile-img" src="{{actor.img}}" alt="{{actor.name}}" data-edit="img" data-action="editImage" title="{{actor.name}}">
 	{{/if}}
 	<div class="header-fields">
 		<h1 class="charname">

@@ -17,7 +17,7 @@
       },
       "failure": {
         "label": "6-",
-        "value": "Establish badness"
+        "value": "The GM makes a move."
       }
     },
     "rollStat": "population",
@@ -25,3 +25,5 @@
   },
   "folder": "PA4a369HV9WVxpI3"
 }
+
+

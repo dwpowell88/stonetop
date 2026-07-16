@@ -3,7 +3,13 @@ import { confirmDelete } from "../../src/utils/confirmDelete.js";
 
 function stubFoundry(confirmResult) {
 	const confirm = vi.fn(async () => confirmResult);
-	vi.stubGlobal("Dialog", { confirm });
+	vi.stubGlobal("foundry", {
+		...globalThis.foundry,
+		applications: {
+			...globalThis.foundry?.applications,
+			api: { DialogV2: { confirm } },
+		},
+	});
 	vi.stubGlobal("game", {
 		i18n: {
 			localize: k => k,
@@ -16,22 +22,27 @@ function stubFoundry(confirmResult) {
 describe("confirmDelete", () => {
 	afterEach(() => vi.unstubAllGlobals());
 
-	it("returns Dialog.confirm's resolved value", async () => {
+	it("resolves true when the dialog is confirmed", async () => {
 		stubFoundry(true);
 		expect(await confirmDelete("Cloak")).toBe(true);
 	});
 
-	it("returns false when the dialog is declined", async () => {
+	it("resolves false when the dialog is declined", async () => {
 		stubFoundry(false);
 		expect(await confirmDelete("Cloak")).toBe(false);
 	});
 
-	it("shows the item name in the prompt and defaults to No", async () => {
+	it("resolves false when the dialog is dismissed (DialogV2 resolves undefined)", async () => {
+		stubFoundry(undefined);
+		expect(await confirmDelete("Cloak")).toBe(false);
+	});
+
+	it("shows the item name in the prompt and the localized title", async () => {
 		const confirm = stubFoundry(true);
 		await confirmDelete("Cloak");
 		const cfg = confirm.mock.calls[0][0];
 		expect(cfg.content).toContain("Cloak");
-		expect(cfg.defaultYes).toBe(false);
+		expect(cfg.window.title).toBe("stonetop.confirm.deleteTitle");
 	});
 
 	it("uses the generic prompt when no name is given", async () => {

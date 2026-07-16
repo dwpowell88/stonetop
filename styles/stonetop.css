@@ -44,11 +44,14 @@ img.stonetop-broken-img {
 
 .stonetop.sheet .sheet-tabs,
 .stonetop.sheet .sheet-tabs .item,
-.stonetop.sheet h1,
+.stonetop.sheet h1:not(.window-title),
 .stonetop.sheet h2,
 .stonetop.sheet h3,
 .stonetop.sheet h4,
-.stonetop.sheet button,
+/* :not() guards — V2 sheets carry .stonetop.sheet on the window ROOT, so without them this rule
+   would restyle the window chrome: .header-control buttons hold their Font Awesome glyph classes
+   on the button element itself, and StonetopUI has no glyphs at FA codepoints (blank buttons). */
+.stonetop.sheet button:not(.header-control):not(.control),
 .stonetop.sheet .stonetop-stat-roll,
 .stonetop.sheet .stonetop-resource__label,
 .stonetop.sheet .stonetop-damage-roll,
@@ -104,10 +107,15 @@ img.stonetop-broken-img {
 }
 
 /* Use default font  */
+/* V2 note: scope to .window-content — V2 header controls are <button> elements carrying the
+   Font Awesome classes THEMSELVES (V1 used anchors), so a bare `button` font rule would wipe
+   the close/copy-id/etc. glyphs. */
 body,
 .vtt .window-header,
 .vtt .window-app button,
-.vtt .window-app .button {
+.vtt .window-app .button,
+.vtt .application.stonetop .window-content button,
+.vtt .application.stonetop .window-content .button {
 	font-family: var(--font-primary);
 }
 
@@ -148,6 +156,20 @@ body,
 
 
 .vtt :not(.application,.image-popout,.journal-sheet,.sidebar-popout) .window-content {
+	background: var(--stonetop-bg) url(/systems/stonetop/assets/ui/decor/sheet-bg.png);
+	background-position: center;
+	background-size: cover;
+	background-attachment: scroll;
+	scrollbar-width: none;
+}
+
+/* ApplicationV2 sheets (migration in progress — docs/appv2-migration.md): the rule above
+   deliberately excludes `.application` so core V2 windows keep their native look; our own V2
+   sheets opt back into the parchment here. Text/input/prosemirror colors come from core's own
+   light theme: the V2 sheet bases declare `themed theme-light` in DEFAULT_OPTIONS.classes, which
+   both blocks the client dark theme (core skips sheets already "themed") and resolves every
+   core form variable to its light value. Only the parchment art is ours. */
+.application.stonetop.sheet .window-content {
 	background: var(--stonetop-bg) url(/systems/stonetop/assets/ui/decor/sheet-bg.png);
 	background-position: center;
 	background-size: cover;
@@ -3227,8 +3249,13 @@ button.stonetop-xp-toggle {
 
 /* ===== Steading Sheet (new panel-frame system) ===== */
 
-/* Base form layout */
-form.stonetop.sheet.steading {
+/* Base layout (ApplicationV2). The V1 sheet put this on `form.stonetop.sheet.steading`, but under
+   V2 that selector is the outer frame form (it wraps the window header too). Like the NPC card, the
+   layout + scroll live on .window-content instead: it persists across V2 re-renders, so its
+   scrollTop survives without part-level restore, and padding/scroll don't leak onto the header. The
+   part content (header, tab nav, sheet-body) stacks as its single flex-column child, exactly as the
+   V1 form did. */
+.stonetop.sheet.steading .window-content {
 	display: flex;
 	flex-direction: column;
 	gap: 0;
@@ -3676,10 +3703,62 @@ form.stonetop.sheet.steading {
 	overflow-y: auto;
 }
 
+/* ── Moves tab ───────────────────────────────────────────────────────────────
+   The homefront-move acquisition checkbox is legitimate (v0.13 main shows it too — a black filled /
+   empty square). But in a V2 window core's own checkbox styling wins over our .stonetop-item-check
+   custom look and renders a bright native check instead. Re-assert the custom square at higher
+   specificity, with hardcoded ink (--color-text-dark-primary is undefined on a V2 sheet, so it
+   drew nothing), and neutralize any core check pseudo. */
+.stonetop.sheet.steading .stonetop-item-check {
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	width: 14px !important;
+	height: 14px !important;
+	flex: 0 0 14px !important;
+	border-radius: 2px !important;
+	border: 2px solid #1a1a1a !important;
+	background: transparent !important;
+}
+.stonetop.sheet.steading .stonetop-item-check:checked {
+	background: #1a1a1a !important;
+}
+.stonetop.sheet.steading .stonetop-item-check::before,
+.stonetop.sheet.steading .stonetop-item-check::after {
+	content: none !important;
+}
+/* Resource pips: the shared border color is --color-text-dark-primary, which core doesn't define on
+   a V2 sheet, so the empty pips outlined to nothing. currentColor is no good either — a core-styled
+   V2 <button> inherits a light button text color, so an empty ring vanishes on the cream sheet
+   (this is why the pips rendered on the V1 character sheet but not the V2 steading). Pin BOTH the
+   ring and the fill to the same opaque deep red so the track reads at a glance regardless of what
+   core sets currentColor to: empty = red ring, used = solid red. */
+.stonetop.sheet.steading .stonetop-item-resource-check {
+	/* Set the FULL border, not just border-color: the shared rule above draws it via
+	   var(--color-text-dark-primary), which core leaves undefined on a V2 sheet, so that whole
+	   `border` shorthand is invalid-at-computed-value → border-style collapses to `none` and an
+	   empty ring never paints (it only flickered on :hover). Pin width+style+color right here. */
+	border: 2px solid #1a1a1a !important;                  /* black ring when unfilled */
+	background-color: rgba(122, 20, 20, 0.14) !important;  /* faint red wash inside the ring */
+}
+.stonetop.sheet.steading .stonetop-item-resource-check:hover {
+	border-color: #7a1414 !important;                      /* deep-red ring on hover */
+	background-color: rgba(122, 20, 20, 0.28) !important;
+}
+.stonetop.sheet.steading .stonetop-item-resource-check.is-checked {
+	background-color: #1a1a1a !important;                  /* black fill when selected */
+	border-color: #1a1a1a !important;
+}
+
 .stonetop.sheet.steading .steading-residents-img {
-	width: 100%;
+	/* V2 dropped the legacy sheet flex bounds this decorative art relied on, so `width: 100%` now
+	   resolves against an unbounded column and the image grows without limit, burying the NPC-traits
+	   section below it. Cap it (like the NPC portrait) so it stays a modest footer illustration. */
+	display: block;
+	max-width: 100%;
+	max-height: 180px;
+	width: auto;
 	height: auto;
-	margin-top: 6px;
+	margin: 6px auto 0;
 	opacity: 0.85;
 	border: none;
 }
@@ -4853,6 +4932,59 @@ form.stonetop.sheet.steading {
 	color: #1a1a1a;
 }
 
+/* ── NPC sheet (ApplicationV2) ──────────────────────────────────────────────
+   The V1 sheet leaned on core's legacy AppV1 sheet CSS — 100px .profile-img, .charname
+   sizing, window-content scrolling. V2 windows ship none of that, so the sheet owns it
+   here. Scroll lives on .window-content (NOT the card: the card's border frame is an
+   inset:0 ::before and would scroll away with the content); .window-content persists
+   across V2 re-renders, so its scroll position survives without part-level restore. */
+.stonetop.sheet.actor.npc .window-content {
+	overflow-y: auto;
+	padding: 8px;
+}
+.stonetop.sheet.actor.npc .stonetop-npc-card {
+	flex: 0 0 auto; /* natural height; overflow scrolls in the window-content */
+}
+
+/* Header row: the shared actor-header stretches, the framed HP box is pinned right. */
+.stonetop-npc-card .stonetop-npc-header-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.stonetop-npc-card .stonetop-npc-header-row > .sheet-header {
+	flex: 1 1 auto;
+	min-width: 0; /* lets the name column shrink instead of pushing the HP box out */
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* Core legacy CSS capped the portrait at 100px; without that it renders at natural size
+   and grows without bound as the window widens. */
+.stonetop-npc-card .profile-img {
+	flex: 0 0 100px;
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+}
+.stonetop-npc-card .header-fields {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+/* One rem step below the character sheet's --fs-name: the card is half as wide, and the
+   larger size clips descenders and truncates names next to the portrait. */
+.stonetop-npc-card .charname {
+	margin: 0;
+	border: none; /* no legacy h1 underline */
+}
+.stonetop-npc-card .charname input {
+	width: 100%;
+	height: auto;
+	font-size: var(--fs-display);
+	line-height: 1.3;
+}
+
 /* Moves block: a standard enriched <ul> (same rendering as move descriptions), with a
    pencil to edit the raw markdown. */
 .stonetop-creature-moves.stonetop-editable { display: block; }
@@ -4895,6 +5027,19 @@ form.stonetop.sheet.steading {
    The rendered view shares improvement-group.hbs with the steading; its tracks are a read-only
    preview of the improvement's structure (real track state lives on each steading), so disable them. */
 .stonetop-improvement-preview input { pointer-events: none; }
+
+/* V2 part root: single wrapper element (HandlebarsApplicationMixin requirement) that stacks the
+   header + body and owns the sheet's scrolling (PARTS marks it scrollable).
+   .stonetop-item-sheet-part is the shared wrapper for all migrated item sheets;
+   .stonetop-improvement-sheet predates it (the pilot) and keeps identical behavior. */
+.stonetop-item-sheet-part,
+.stonetop-improvement-sheet {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	height: 100%;
+	overflow-y: auto;
+}
 
 /* -- Possession item sheet (StonetopPossessionSheet) — reuses .stonetop-insert-sheet-* layout -- */
 .stonetop-possession-outfit-list,

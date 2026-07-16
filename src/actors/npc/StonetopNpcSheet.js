@@ -1,4 +1,5 @@
 import { enrichRichTextTree } from "../../utils/enrichRichText.js";
+import { bindAll } from "../../utils/bindAll.js";
 
 export function createStonetopNpcSheetClass(Base) {
     return class StonetopNpcSheet extends Base {
@@ -8,80 +9,68 @@ export function createStonetopNpcSheetClass(Base) {
             this._stonetopNpc = this.actor.typedActor;
         }
 
-        static get defaultOptions() {
-            return foundry.utils.mergeObject(super.defaultOptions, {
-                classes: ["stonetop", "sheet", "actor", "npc"],
-                tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }],
-                dragDrop: [{ dragSelector: ".items-list .item" }],
-				width: 315,
-				height: 425,
-            });
+        static DEFAULT_OPTIONS = {
+            classes: ["npc"],
+            position: { width: 315, height: 425 },
+        };
+
+        static PARTS = {
+            form: {
+                // No `scrollable`: the card's border frame is an inset:0 ::before, so the card
+                // itself must not scroll — .window-content is the scroll container instead, and
+                // it persists across V2 re-renders, so its scrollTop survives without part-level
+                // restore.
+                template: "systems/stonetop/templates/actor/npc.hbs",
+            },
+        };
+
+        async _prepareContext(options) {
+            const context = await super._prepareContext(options);
+            context.actor = this.actor;
+            context.editable = this.isEditable;
+            context.stonetop = await this._stonetopNpc.buildSnapshot();
+            await enrichRichTextTree(context.stonetop, this.actor?.getRollData?.() ?? {});
+            return context;
         }
 
-        async getData() {
-			const ctx = await super.getData();
-			ctx.stonetop = await this._stonetopNpc.buildSnapshot();
-			await enrichRichTextTree(ctx.stonetop, this.actor?.getRollData?.() ?? {});
-			return ctx;
-		}
+        // Direct bindings to the card's controls — re-run per render (part content is replaced).
+        // Root-delegated behavior (edit toggles, steppers, comboboxes, rollables) lives in the base.
+        _onRender(context, options) {
+            super._onRender(context, options);
+            if (!this.isEditable) return;
+            const root = this.element;
+            const npc  = this._stonetopNpc;
 
-        activateListeners(html) {
-			super.activateListeners(html);
-			if (!this.isEditable) return;
+            // Creature core
+            bindAll(root, "#npc-hp", "change", ev => npc.setHp(ev.currentTarget.value));
+            bindAll(root, "#npc-max-hp", "change", ev => npc.setMaxHp(ev.currentTarget.value));
+            bindAll(root, "#npc-armor", "change", ev => npc.setArmor(ev.currentTarget.value));
+            bindAll(root, "#npc-damage", "change", ev => npc.setDamage(ev.currentTarget.value));
+            bindAll(root, "#npc-special-qualities", "change", ev => npc.setSpecialQuality(ev.currentTarget.value));
 
-			// HP
-			html.find("#npc-hp").on("change", async ev => {
-				await this._stonetopNpc.setHp(ev.currentTarget.value);
-			});
+            // Selection chips (tags) — toggle on click, add via free-text box.
+            bindAll(root, ".stonetop-tag-chip", "click", ev => {
+                const wrap = ev.currentTarget.closest(".stonetop-tags");
+                return npc.toggleSelection(wrap?.dataset.field, ev.currentTarget.dataset.tag);
+            });
+            bindAll(root, ".stonetop-tag-add", "change", ev => {
+                const input = ev.currentTarget;
+                const value = input.value.trim();
+                if (!value) return;
+                // Clear the box before toggling: pressing Enter fires TWO change events — the
+                // browser's native value-commit change AND comboBox's synthetic one — and a
+                // *toggle* handler that ran twice would add then immediately remove the tag
+                // (leaving the box blank, the tag uncommitted). Blanking the input makes the
+                // second change no-op via the guard above (matches the V1 character sheet).
+                input.value = "";
+                return npc.toggleSelection(input.dataset.field, value);
+            });
+            // Instinct (single-select input + dropdown, not chips)
+            bindAll(root, ".stonetop-npc-instinct", "change", ev => npc.setInstinct(ev.currentTarget.value.trim()));
 
-			// HP
-			html.find("#npc-max-hp").on("change", async ev => {
-				await this._stonetopNpc.setMaxHp(ev.currentTarget.value);
-			});
-
-            // Armor
-			html.find("#npc-armor").on("change", async ev => {
-				await this._stonetopNpc.setArmor(ev.currentTarget.value);
-			});
-
-            // Damage
-			html.find("#npc-damage").on("change", async ev => {
-				await this._stonetopNpc.setDamage(ev.currentTarget.value);
-			});
-
-            // Special Quality
-			html.find("#npc-special-qualities").on("change", async ev => {
-				await this._stonetopNpc.setSpecialQuality(ev.currentTarget.value);
-			});
-
-			// Selection chips (tags, instinct) — toggle on click, add via free-text box.
-			html.find(".stonetop-tag-chip").on("click", async ev => {
-				const wrap = ev.currentTarget.closest(".stonetop-tags");
-				await this._stonetopNpc.toggleSelection(wrap?.dataset.field, ev.currentTarget.dataset.tag);
-			});
-			html.find(".stonetop-tag-add").on("change", async ev => {
-				const value = ev.currentTarget.value.trim();
-				if (value) await this._stonetopNpc.toggleSelection(ev.currentTarget.dataset.field, value);
-			});
-			// Instinct (single-select input + dropdown, not chips)
-			html.find(".stonetop-npc-instinct").on("change", async ev => {
-				await this._stonetopNpc.setInstinct(ev.currentTarget.value.trim());
-			});
-
-			// Moves
-			html.find("#npc-moves").on("change", async ev => {
-				await this._stonetopNpc.setMoves(ev.currentTarget.value);
-			});
-
-			 // Description
-			html.find(".stonetop-follower-description-textarea").on("change", async ev => {
-				await this._stonetopNpc.setDescription(ev.currentTarget.value);
-			});
-
-		}
-
-        get template() {
-            return "systems/stonetop/templates/actor/npc.hbs";
+            // Moves + description
+            bindAll(root, "#npc-moves", "change", ev => npc.setMoves(ev.currentTarget.value));
+            bindAll(root, ".stonetop-follower-description-textarea", "change", ev => npc.setDescription(ev.currentTarget.value));
         }
 
     };

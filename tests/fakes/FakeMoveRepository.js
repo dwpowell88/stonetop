@@ -23,6 +23,14 @@ export class FakeMoveRepository {
 		return this.getMovesByType("basic");
 	}
 
+	// Pack-only reference source (mirrors the real repo): world moves are NOT included, so seeding
+	// never picks up a homebrew/dragged-out copy. `_basicMoves` stands in for the compendium here.
+	async getReferenceMovesByType(moveType) {
+		return this._basicMoves
+			.filter(m => (m.system?.moveType ?? "basic") === moveType)
+			.map(m => new Move(m));
+	}
+
 	addBasic(move) {
 		this._basicMoves.push(move);
 		return this;

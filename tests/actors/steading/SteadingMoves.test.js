@@ -14,9 +14,11 @@ function homefront(name, opts = {}) {
 	return b.build();
 }
 
+// Homefront reference moves live in the compendium (pack), not the world — that's the set seeding
+// draws from. (`addBasic` stands in for the compendium in FakeMoveRepository.)
 function repoWith(...moves) {
 	const repo = new FakeMoveRepository();
-	moves.forEach(m => repo.addWorld(m));
+	moves.forEach(m => repo.addBasic(m));
 	return repo;
 }
 
@@ -48,6 +50,14 @@ describe("SteadingMoves.buildSnapshot", () => {
 		expect(await moves.buildSnapshot()).toBeNull();
 	});
 
+	// Regression guard: seeding happens once at actor creation, NOT on render. buildSnapshot must
+	// only READ embedded moves — reading it on an unseeded steading creates nothing and returns null.
+	it("does not seed — an unseeded steading yields null and no embedded moves", async () => {
+		const { moves, actor } = makeMoves(repoWith(homefront("Trade"), homefront("Stand Watch")));
+		expect(await moves.buildSnapshot()).toBeNull();
+		expect([...actor.items].filter(i => i.system?.categoryKey === "homefront")).toHaveLength(0);
+	});
+
 	it("builds a homefront category from the embedded items with an ownedId per move", async () => {
 		const { moves } = makeMoves(repoWith(homefront("Trade", { rollStat: "prosperity" })));
 		await moves.seedHomefrontMoves();
@@ -59,6 +69,13 @@ describe("SteadingMoves.buildSnapshot", () => {
 		expect(move.ownedId).toBeTruthy();          // resolvable for rolling → result tiers
 		expect(move.rollStat).toBe("prosperity");
 		expect(move.selection.value).toBe(1);        // checked by default
+	});
+
+	it("lists the moves alphabetically by name, regardless of seed order", async () => {
+		const { moves } = makeMoves(repoWith(homefront("Trade"), homefront("Bolster"), homefront("Stand Watch")));
+		await moves.seedHomefrontMoves();
+		const names = (await moves.buildSnapshot()).moves.map(m => m.name);
+		expect(names).toEqual(["Bolster", "Stand Watch", "Trade"]);
 	});
 
 	it("leaves the description as an un-enriched RichText for the shared enrich pass", async () => {

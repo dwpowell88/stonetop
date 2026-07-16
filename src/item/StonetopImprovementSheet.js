@@ -6,8 +6,11 @@
 //
 // The view and the steading sheet render an improvement through the SAME snapshot (ChoiceGroup) +
 // improvement-group.hbs partial — one render path. The editor's choice-group reuses the shared
-// choiceGroupEdit helpers + choiceGroupEditorMixin + choice-group-editor partial. Foundry's ItemSheet
-// auto-saves `name`/`system.*` form fields. Editor layout reuses the .stonetop-insert-sheet-* classes.
+// choiceGroupEdit helpers + choiceGroupEditorMixin + choice-group-editor partial. The V2 form's
+// submitOnChange auto-saves `name`/`system.*` form fields.
+//
+// First sheet on ApplicationV2 (the migration pilot — see docs/appv2-migration.md). Expects the
+// createStonetopItemSheetV2BaseClass() base, not the V1 ItemSheetBase.
 
 import * as CG from "../utils/choiceGroupEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
@@ -16,21 +19,25 @@ import { enrichRichTextTree } from "../utils/enrichRichText.js";
 
 export function createStonetopImprovementSheetClass(Base) {
 	return class StonetopImprovementSheet extends Base {
-		static get defaultOptions() {
-			return foundry.utils.mergeObject(super.defaultOptions, {
-				classes: ["stonetop", "sheet", "item", "improvement"],
-				width:  600,
-				height: 600,
-				resizable: true,
-			});
-		}
+		static DEFAULT_OPTIONS = {
+			classes: ["improvement"], // concatenated onto the base's ["stonetop", "sheet", "item"]
+			position: { width: 600, height: 600 },
+			actions: {
+				toggleEditMode: StonetopImprovementSheet.#onToggleEditMode,
+			},
+		};
 
-		get template() {
-			return "systems/stonetop/templates/item/improvement.hbs";
-		}
+		static PARTS = {
+			form: {
+				template: "systems/stonetop/templates/item/improvement.hbs",
+				// The part's single root element (.stonetop-improvement-sheet) is the scroll
+				// container; "" is HandlebarsApplicationMixin's "the part root itself" selector.
+				scrollable: [""],
+			},
+		};
 
-		async getData() {
-			const context = await super.getData();
+		async _prepareContext(options) {
+			const context = await super._prepareContext(options);
 			// The catalog namespaces each improvement's track values by its choice group's slug, so
 			// every custom improvement needs a stable, unique slug. Generate one once (not name-derived,
 			// so a rename can't collide) and seed the choices group with the same slug.
@@ -39,7 +46,9 @@ export function createStonetopImprovementSheetClass(Base) {
 				await this.item.update({ "system.slug": slug, "system.choices": CG.newGroup(slug) });
 			}
 			const sys = this.item.system;
+			context.item = this.item;
 			context.system = sys;
+			context.editable = this.isEditable;
 			context.choicesGroup = {
 				slug:   sys.choices?.slug ?? sys.slug,
 				cgPath: "system.choices",
@@ -60,17 +69,18 @@ export function createStonetopImprovementSheetClass(Base) {
 			return context;
 		}
 
-		activateListeners(html) {
-			super.activateListeners(html);
-
-			// Edit/view toggle — only rendered when editable, so it needs no isEditable guard.
-			html.find(".improvement-edit-toggle").on("click", ev => {
-				this._editMode = ev.currentTarget.dataset.mode === "edit";
-				this.render(false);
-			});
-
+		// Bound directly to the current editor controls, which every render replaces — so this
+		// re-runs per render (NOT once in _onFirstRender; see docs/appv2-migration.md).
+		_onRender(context, options) {
+			super._onRender(context, options);
 			if (!this.isEditable) return;
-			activateChoiceGroupEditors(this, html); // entry/pick row editing for the single choices group
+			activateChoiceGroupEditors(this, this.element); // entry/pick row editing for the single choices group
+		}
+
+		// Edit/view toggle — only rendered when editable, so it needs no isEditable guard.
+		static #onToggleEditMode(_event, target) {
+			this._editMode = target.dataset.mode === "edit";
+			this.render();
 		}
 	};
 }

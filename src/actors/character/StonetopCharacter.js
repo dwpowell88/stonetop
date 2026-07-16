@@ -69,8 +69,13 @@ export class StonetopCharacter {
 		return this._playbook.getData();
 	}
 
-	async buildSnapshot() {
+	// Seed the character's reference moves (basic/special/follower). Called once, from the
+	// CreateActor hook — not on render — so the moves become owned items the GM controls.
+	async seedReferenceMoves() {
 		await this._moves.initBasicMoves();
+	}
+
+	async buildSnapshot() {
 		const level = this._vitals.level;
 		const {checked} = this._inventory;
 		const actor = this._actor;
