@@ -64,9 +64,12 @@ function hullArea(pts) {
  *     hull-ratio test that separates circles from curved diamonds separates these too.
  * Everything else — filled swirls and the swirl+triangle/arrow list bullets — is left alone (the
  * lists detect themselves). Returns `[{x, y, w, h, kind}]` in page coordinates.
+ *
+ * `flattenedCurves` (Book I only) also admits a curved outline whose arcs the vendor's export has
+ * flattened to `lineto` — see `isFlattened`.
  */
-export function parseMarkers(xml) {
-	const out = [];
+export function parseMarkers(xml, { flattenedCurves = false } = {}) {
+	const shapes = [];
 	const re = /<stroke_path ([^>]*)>([\s\S]*?)<\/stroke_path>/g;
 	let m;
 	while ((m = re.exec(xml))) {
@@ -79,21 +82,43 @@ export function parseMarkers(xml) {
 		const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
 		const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
 		if (w < 2 || w >= 16 || h >= 16) continue;
-		const curves = (body.match(/curveto/g) || []).length;
-		const lines = (body.match(/lineto/g) || []).length;
+		shapes.push({
+			x: +t[1], y: +t[2], w, h,
+			curves: (body.match(/curveto/g) || []).length,
+			lines: (body.match(/lineto/g) || []).length,
+			fill: hullArea(pts) / (w * h),
+		});
+	}
+
+	const isCurved = (s) => s.curves >= 3 && s.lines === 0;
+	// Book I's 2-up build draws some of these outlines with one or two of the four arcs flattened to
+	// a `lineto` (their control points come out collinear), so the same ◇ arrives as curveto=3/
+	// lineto=1 or 2/2 and matches neither family — silently dropped, losing ~10 diamonds a chapter.
+	// Re-admit a four-segment shape that still has arcs, but only at the footprint of a marker that
+	// parsed cleanly on the *same page*: these pages also carry unrelated 2-curve/2-line shapes (a
+	// bigger 6.6-6.7pt glyph, present in both the 1-up and 2-up builds) that are not markers, and
+	// size is what separates them. Note the flattened arcs also cost the hull its corner control
+	// points, so the fill ratio only stays reliable because a marker is compared against its own
+	// clean twin — don't widen this to shapes with no twin.
+	const clean = flattenedCurves ? shapes.filter(isCurved) : [];
+	const isFlattened = (s) => s.curves >= 2 && s.curves + s.lines === 4
+		&& clean.some((c) => Math.abs(s.w - c.w) < 0.3 && Math.abs(s.h - c.h) < 0.3);
+
+	const out = [];
+	for (const s of shapes) {
 		let kind;
-		if (curves >= 3 && lines === 0) kind = hullArea(pts) / (w * h) < 0.7 ? "diamond" : "circle"; // curved outline
-		else if (lines >= 3 && Math.abs(w - h) <= Math.max(w, h) * 0.35)                             // straight-sided box
-			kind = hullArea(pts) / (w * h) < 0.7 ? "diamond" : "square";                             // upright □ vs rotated ◇
+		if (isCurved(s) || isFlattened(s)) kind = s.fill < 0.7 ? "diamond" : "circle";               // curved outline
+		else if (s.lines >= 3 && Math.abs(s.w - s.h) <= Math.max(s.w, s.h) * 0.35)                   // straight-sided box
+			kind = s.fill < 0.7 ? "diamond" : "square";                                              // upright □ vs rotated ◇
 		else continue;
-		out.push({ x: +t[1], y: +t[2], w, h, kind });
+		out.push({ x: s.x, y: s.y, w: s.w, h: s.h, kind });
 	}
 	return out;
 }
 
 /** Run `mutool trace` for a page and return its check-marker positions. */
-export function loadMarkers(pdfPath, page) {
-	return parseMarkers(execFileSync("mutool", ["trace", pdfPath, String(page)], { encoding: "utf8", maxBuffer: 1 << 26 }));
+export function loadMarkers(pdfPath, page, opts) {
+	return parseMarkers(execFileSync("mutool", ["trace", pdfPath, String(page)], { encoding: "utf8", maxBuffer: 1 << 26 }), opts);
 }
 
 /**

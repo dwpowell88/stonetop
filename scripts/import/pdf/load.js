@@ -31,7 +31,7 @@ export function articleBoundaries(pdf, r) {
 /** Load one PDF page for extraction: stext lines with the swirl/marker glyphs injected from the
  *  vector layer, plus its dividers and extracted illustrations. Shared by the spread-aware Book II
  *  article loader below and the Book I section loader (which has no spreads to crop). */
-export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f, dedup } = {}) {
+export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f, dedup, markers } = {}) {
 	const pg = loadStext(pdf, String(p))[0];
 	// Tag each list item with its swirl bullet (plain spiral vs pointing) via a marker span.
 	for (const sw of loadBullets(pdf, p)) {
@@ -53,7 +53,7 @@ export function loadPage(pdf, p, { imgDir, imgPrefix = "art", mapFile = (f) => f
 	// it precedes its item and never sits at a line's end — so it only attaches to a line that
 	// starts at/right of it. Circles can be inline (potency dots inside "(○○○ uses)"), so they
 	// keep the wider match.
-	for (const mk of loadMarkers(pdf, p)) {
+	for (const mk of loadMarkers(pdf, p, markers)) {
 		const mid = (l) => (l.bbox[1] + l.bbox[3]) / 2;
 		let line;
 		if (mk.kind === "square") {

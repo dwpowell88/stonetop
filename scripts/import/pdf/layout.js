@@ -169,8 +169,36 @@ function collectSettlementBlock(rows, i, base) {
 }
 
 // ─── geometry ────────────────────────────────────────────────────────────────
+
+/**
+ * Cluster left edges into column bases, in reading order.
+ *
+ * New column only on a gap wider than an intra-column indent (~130px max) but narrower than the
+ * real ~168px column pitch — so indented content (settlement values, hanging lists) stays in its
+ * column instead of spawning a spurious narrow column.
+ *
+ * Pass `pageW` (Book I only, via `splitSpread`) to cluster the two printed pages of a 2-up spread
+ * independently, so that a column may never straddle the gutter. The gap rule only looks at gaps,
+ * so per page this is identical to what it does on a 1-up page — but across the gutter a stray glyph
+ * (an injected ◇/□ marker sitting in the outer margin, say) can bridge the left page's last column
+ * into the right page's first, which interleaves the two pages' text and drags content across a
+ * section split. Left-to-right over the halves is also the spread's reading order, so the bases stay
+ * ordered. Book II is *not* clustered this way: its wide tables and decor deliberately span the
+ * gutter, and upstream's packs are rendered with a single global pass.
+ */
+export function clusterColumns(xs, pageW = 0, pageH = 0) {
+	const cluster = (v) => {
+		const bases = [];
+		for (const x of [...v].sort((a, b) => a - b)) if (!bases.length || x - bases[bases.length - 1] > 150) bases.push(x);
+		return bases;
+	};
+	if (!(pageW > pageH)) return cluster(xs);
+	const mid = pageW / 2;
+	return [...cluster(xs.filter((x) => x < mid)), ...cluster(xs.filter((x) => x >= mid))];
+}
+
 /** Strip furniture, cluster columns; return `{ columns:[{base,lines,rules,images}], pageNumbers }`. */
-export function orderColumns(page, rules = [], images = []) {
+export function orderColumns(page, rules = [], images = [], { splitSpread = false } = {}) {
 	const H = page.height;
 	const pageNumbers = [];
 	const body = [];
@@ -181,12 +209,7 @@ export function orderColumns(page, rules = [], images = []) {
 		if (isAvara(line.font) && line.size < TITLE_MIN && y0 < 70) continue; // running header
 		body.push(line);
 	}
-	const xs = body.map((l) => l.bbox[0]).sort((a, b) => a - b);
-	const bases = [];
-	// New column only on a gap wider than an intra-column indent (~130px max) but narrower than the
-	// real ~168px column pitch — so indented content (settlement values, hanging lists) stays in
-	// its column instead of spawning a spurious narrow column.
-	for (const x of xs) if (!bases.length || x - bases[bases.length - 1] > 150) bases.push(x);
+	const bases = clusterColumns(body.map((l) => l.bbox[0]), splitSpread ? page.width : 0, H);
 	const colOf = (x0) => { let i = 0; while (i + 1 < bases.length && bases[i + 1] <= x0 + 8) i++; return i; };
 	const cols = bases.map((base) => ({ base, lines: [], rules: [], images: [] }));
 	for (const line of body) cols[colOf(line.bbox[0])].lines.push(line);
@@ -495,7 +518,7 @@ function mergeSplitTables(cols) {
  * (from mutool trace). Blocks are the typed objects from `segmentColumn`; assets are referenced by
  * the position object (carrying `.file`) and resolved at render time.
  */
-export function extractArticle(pages, { title, pageRules = [], pageImages = [] } = {}) {
+export function extractArticle(pages, { title, pageRules = [], pageImages = [], splitSpread = false } = {}) {
 	const pageNumbers = [];
 	let bookTitle = "";
 	const byY = (a, b) => a.y - b.y;
@@ -509,7 +532,7 @@ export function extractArticle(pages, { title, pageRules = [], pageImages = [] }
 		// page's columns; ≤1.5 columns (≤~33%) stays inline.
 		const banners = imgs.filter((im) => im.w >= page.width * 0.40);
 		const colImgs = imgs.filter((im) => im.w < page.width * 0.40);
-		const { columns, pageNumbers: nums } = orderColumns(page, pageRules[idx] || [], colImgs);
+		const { columns, pageNumbers: nums } = orderColumns(page, pageRules[idx] || [], colImgs, { splitSpread });
 		pageNumbers.push(...nums);
 
 		const cols = columns.map((col) => ({

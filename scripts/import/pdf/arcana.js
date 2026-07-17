@@ -4,10 +4,17 @@
 // Conservative by design (the user's call): exact proper-noun match only, arcana pack only.
 import { readdirSync, readFileSync } from "fs";
 import path from "path";
+import { deterministicId } from "../ids.js";
+import { toSlug } from "../../../src/utils/slug.js";
+import { htmlToMarkdown, NPC_TAGS } from "../build-artifacts.js";
 
 const SYSTEM = "stonetop";
 export const ARCANA_PACK = "arcana";
-const arcanaUuid = (id) => `Compendium.${SYSTEM}.${ARCANA_PACK}.Item.${id}`;
+// The Wider World's embedded artifacts live in the possessions pack (not arcana — no front/back
+// model), but their names deserve the same mention-linking as arcana.
+export const ARTIFACTS_DIR = "packs/src/possessions/artifacts";
+const itemUuid = (pack, id) => `Compendium.${SYSTEM}.${pack}.Item.${id}`;
+const arcanaUuid = (id) => itemUuid(ARCANA_PACK, id);
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -18,20 +25,21 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  * are distinctive proper nouns ("Mindgem", "Ring of Daagon"), matched on the name alone. Sorted
  * longest-first so a multi-word name matches before any shorter name contained within it.
  */
-export function loadArcanaIndex(dir = "packs/src/arcana") {
+export function loadArcanaIndex(dir = "packs/src/arcana", artifactsDir = ARTIFACTS_DIR) {
 	const out = [];
-	const walk = (d) => {
+	const walk = (d, type, pack) => {
 		for (const e of readdirSync(d, { withFileTypes: true })) {
-			if (e.isDirectory()) { if (!e.name.startsWith("_")) walk(path.join(d, e.name)); }
+			if (e.isDirectory()) { if (!e.name.startsWith("_")) walk(path.join(d, e.name), type, pack); }
 			else if (e.name.endsWith(".json")) {
 				const it = JSON.parse(readFileSync(path.join(d, e.name), "utf8"));
 				const name = it.name?.trim();
-				if (it.type === "arcanum" && name)
-					out.push({ name, uuid: arcanaUuid(it._id), descriptive: /^(a|an|the)\b/i.test(name) || name.length < 5 });
+				if (it.type === type && name)
+					out.push({ name, uuid: itemUuid(pack, it._id), descriptive: /^(a|an|the)\b/i.test(name) || name.length < 5 });
 			}
 		}
 	};
-	walk(dir);
+	walk(dir, "arcanum", ARCANA_PACK);
+	try { walk(artifactsDir, "possession", "possessions"); } catch { /* no artifacts pack — fine */ }
 	out.sort((a, b) => b.name.length - a.name.length);
 	return out;
 }
@@ -78,5 +86,28 @@ export function linkArcana(html, index) {
 			return `@UUID[${byLower.get(key)}]{${name}}`;
 		});
 	}
+	return { html: out, linked };
+}
+
+/**
+ * Link each artifact stat-block heading to its possession item. linkArcana already wraps the
+ * proper-noun artifact headings (their heading is the name's first mention), but descriptive
+ * names ("A lead bracelet") only mention-link next to a page citation — their headings stay
+ * plain. Every artifact block heading should open the item, so wrap whatever linkArcana left
+ * bare; the ids are deterministic (same recipe as build-artifacts), so no pack lookup is needed.
+ * NPC-shaped blocks (spirits/followers share the markup) are left alone. Run AFTER linkArcana —
+ * an already-wrapped heading contains "@" and is skipped, avoiding a double link.
+ */
+export function linkArtifactHeadings(html) {
+	let linked = 0;
+	const out = html.replace(
+		/(<h3>)((?:<img[^>]*>)?)\s*([^<@]+?)\s*(<\/h3>\s*<p class="artifact-tags">)(.*?)(<\/p>)/g,
+		(m, h3, icon, name, mid, tags, end) => {
+			if (NPC_TAGS.test(htmlToMarkdown(tags))) return m;
+			const label = htmlToMarkdown(name);
+			const id = deterministicId("possessions", `artifact:${toSlug(label)}`);
+			linked++;
+			return `${h3}${icon}@UUID[${itemUuid("possessions", id)}]{${label}}${mid}${tags}${end}`;
+		});
 	return { html: out, linked };
 }
