@@ -1,13 +1,8 @@
-import { applySteadfast, loadSteadfast } from "../actors/steading/applySteadfast.js";
-
-// Seed a brand-new steading with the Stonetop steadfast, so it opens with the same out-of-the-box
-// values steadings used to get from hardcoded schema defaults. A steading that already has a steadfast
-// (e.g. duplicated, imported, or created from a template) is left alone. Only the creating client runs
-// it, once. Post-create (not preCreate) because loading the steadfast from its pack is async.
+// Post-create, once, on the creating client only — async pack loads are why this can't run
+// preCreate. Each typed actor owns its own creation logic (StonetopSteading: default steadfast +
+// homefront moves; StonetopCharacter: reference moves; StonetopNpc: nothing) — the hook just
+// dispatches. `?.` covers actor types with no typed class, not a capability probe.
 export async function onCreateActor(document, options, userId) {
-	if (document.type !== "steading") return;
 	if (game.user?.id !== userId) return;
-	if (document.system?.steadfast) return;
-	const steadfast = await loadSteadfast("stonetop");
-	if (steadfast) await applySteadfast(document, steadfast);
+	await document.typedActor?.onCreate();
 }

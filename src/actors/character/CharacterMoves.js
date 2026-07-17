@@ -9,6 +9,7 @@ import {
 	decrementMove,
 	buildMoveSnapshot,
 } from "../embeddedMoves.js";
+import { ReferenceMoveSeeder } from "../ReferenceMoveSeeder.js";
 import { toSlug } from "../../utils/slug.js";
 
 export class CharacterMoves {
@@ -17,30 +18,19 @@ export class CharacterMoves {
 		this._actor              = actor;
 		this._resourceController = resourceController;
 		this._factory            = factory;
+		this._seeder             = new ReferenceMoveSeeder(actor, moveRepo);
 	}
 
 	setVitals(vitals) { this._vitals = vitals; }
 
 	// Reference moves are seeded onto every character and shown in the sidebar (not the moves
-	// tab): basic, plus the universal special moves and follower moves.
+	// tab): basic, plus the universal special moves and follower moves. Seeded once at actor
+	// creation (CreateActor hook), NOT on render — thereafter they are ordinary owned items the GM
+	// can edit, delete, or re-add via drag-drop.
 	async initBasicMoves() {
 		for (const moveType of ["basic", "special", "follower"]) {
-			await this._seedReferenceMoves(moveType);
+			await this._seeder.seed(moveType);
 		}
-	}
-
-	async _seedReferenceMoves(moveType) {
-		const entries = await this._moveRepo.getMovesByType(moveType);
-		const existing = [...this._actor.items].filter(i => i.type === "move" && i.system?.categoryKey === moveType);
-		const existingSlugs = new Set(existing.map(i => toSlug(i.name)));
-		const newEntries = entries.filter(m => !existingSlugs.has(m.slug));
-		if (!newEntries.length) return;
-		const docs = await Promise.all(newEntries.map(m => this._moveRepo.getReferencedMoveDocument(m.id)));
-		await this._actor.createEmbeddedDocuments("Item",
-			docs.filter(Boolean).map((d, i) =>
-				withCategoryFields(d.toObject(), moveType, true, { sortOrder: existing.length + i, compendiumId: d._id ?? null })
-			)
-		);
 	}
 
 	// A playbook owns its moves by slug (playbookData.moves) and marks a subset as starting

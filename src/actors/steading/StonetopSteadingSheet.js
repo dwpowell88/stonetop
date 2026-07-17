@@ -1,7 +1,10 @@
 import { enrichRichTextTree } from "../../utils/enrichRichText.js";
-import { confirmDelete } from "../../utils/confirmDelete.js";
-import { applySteadfast, loadSteadfast, loadAllSteadfasts, matchSteadfastByName } from "./applySteadfast.js";
+import { bindAll } from "../../utils/bindAll.js";
+import { bindConfirmedDeletes } from "../../utils/bindConfirmedDeletes.js";
+import { loadAllSteadfasts } from "./applySteadfast.js";
 
+// View adapter only: every handler reads values off the event and calls ONE named method on the
+// typed steading (or a composed part of it) — parsing, matching, and routing decisions live there.
 export function createStonetopSteadingSheetClass(Base) {
 	return class StonetopSteadingSheet extends Base {
 		constructor(...args) {
@@ -9,34 +12,37 @@ export function createStonetopSteadingSheetClass(Base) {
 			this._stonetopSteading = this.actor.typedActor;
 		}
 
-		static get defaultOptions() {
-			return foundry.utils.mergeObject(super.defaultOptions, {
-				classes: ["stonetop", "sheet", "actor", "steading"],
-				width:   1180,
-				height:  760,
-				scrollY: [".window-content"],
-				tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "overview" }],
-				submitOnChange: true,
-			});
-		}
+		static DEFAULT_OPTIONS = {
+			// The base supplies `stonetop sheet actor themed theme-light`; add the steading class.
+			classes: ["steading"],
+			position: { width: 1180, height: 760 },
+		};
 
-		get template() {
-			return "systems/stonetop/templates/actor/steading.hbs";
-		}
+		// Core tab machinery end to end: tabGroups seeds from `initial`, the nav anchors carry
+		// data-action="tab" (core's built-in action → changeTab), and context.tabs comes out of
+		// super._prepareContext via _prepareTabs.
+		static TABS = {
+			primary: {
+				tabs: [
+					{ id: "overview" }, { id: "residents" }, { id: "neighbors" },
+					{ id: "improvements" }, { id: "moves" }, { id: "notes" },
+				],
+				initial: "overview",
+			},
+		};
 
-		// A steadfast dropped on a steading isn't embedded as an owned item — it re-seeds the steading's
-		// definition (the same as picking one from the sheet's dropdown). Anything else drops as normal.
-		async _onDropItem(event, data) {
-			const item = await Item.implementation.fromDropData(data);
-			if (item?.type === "steadfast") {
-				if (this.isEditable) await applySteadfast(this.actor, item);
-				return;
-			}
-			return super._onDropItem(event, data);
-		}
+		static PARTS = {
+			form: {
+				// No `scrollable`: like the NPC card, scrolling lives on .window-content (which
+				// persists across V2 re-renders), not on the part content that gets replaced.
+				template: "systems/stonetop/templates/actor/steading.hbs",
+			},
+		};
 
-		async getData() {
-			const ctx = await super.getData();
+		async _prepareContext(options) {
+			const ctx = await super._prepareContext(options);
+			ctx.actor    = this.actor;
+			ctx.editable = this.isEditable;
 			ctx.stonetop = await this._stonetopSteading.buildSnapshot();
 			await enrichRichTextTree(ctx.stonetop, this.actor?.getRollData?.() ?? {});
 			// The steadfast picker at the top of the sheet: every steadfast + the one this steading uses.
@@ -46,198 +52,183 @@ export function createStonetopSteadingSheetClass(Base) {
 			return ctx;
 		}
 
-		activateListeners(html) {
-			super.activateListeners(html);
-			if (!this.isEditable) return;
+		// A steadfast or move dropped on the steading is handled by the typed steading (re-seed the
+		// definition / join the homefront list); anything else embeds through core's default
+		// pipeline. Core ActorSheetV2 wires the drop listeners itself — never wire `drop` manually
+		// here, or every drop is handled twice.
+		async _onDropItem(event, item) {
+			if (!this.isEditable) return null;
+			if (await this._stonetopSteading.applyDroppedItem(item)) return null;
+			return super._onDropItem(event, item);
+		}
 
-			// Destructive deletes route through the shared confirm gate: left-click asks first
-			// (showing the row's `data-name`), right-click skips — same convention as the character sheet.
-			const withConfirm = (selector, run) => {
-				html.find(selector)
-					.on("click", async ev => {
-						if (await confirmDelete(ev.currentTarget.dataset.name)) await run(ev);
-					})
-					.on("contextmenu", async ev => {
-						ev.preventDefault();
-						await run(ev);
-					});
-			};
+		// Root-delegated, one-time wiring — the V2 root persists across re-renders. Editability is
+		// checked per event, not at wiring time, so a sheet that becomes editable later just works.
+		async _onFirstRender(context, options) {
+			await super._onFirstRender(context, options);
+			const root = this.element;
 
-			// Name combobox — typing/picking a value that matches a steadfast name applies it (re-seeds the
-			// definition fields and adopts its name; runtime state like residents/debilities is preserved).
-			// Any other value is just the steading's own name. Dropping a steadfast routes through the same
-			// applySteadfast (see _onDropItem).
-			html.find(".steading-steadfast-input").on("change", async ev => {
-				const value = ev.currentTarget.value.trim();
-				const match = matchSteadfastByName(value, this._availableSteadfasts ?? []);
-				if (match) {
-					const steadfast = await loadSteadfast(match.slug);
-					if (steadfast) await applySteadfast(this.actor, steadfast);
-				} else if (value && value !== this.actor.name) {
-					await this.actor.update({ name: value });
-				}
-			});
-
-			// Roll mode
-			html.find("[name=stonetop-roll-mode]").on("change", ev => {
-				this._stonetopSteading.setRollMode(ev.currentTarget.value);
-			});
-
-			// Fortunes
-			html.find(".steading-box-input[name='stonetop-fortunes']").on("change", async ev => {
-				await this._stonetopSteading.setFortunes(parseInt(ev.currentTarget.value));
-			});
-
-			// Surplus
-			html.find(".steading-surplus-input").on("change", async ev => {
-				await this._stonetopSteading.setSurplus(parseInt(ev.currentTarget.value) || 0);
-			});
-
-			// Attributes (size, population, prosperity, defenses). Ratings store an actual number; size
-			// stores its tier string.
-			html.find(".steading-box-input[data-attr]").on("change", async ev => {
-				const { attr } = ev.currentTarget.dataset;
-				const raw = ev.currentTarget.value;
-				await this._stonetopSteading.attributes.setValue(attr, attr === "size" ? raw : parseInt(raw));
-			});
-			html.find(".stonetop-attr-extra-add").on("click", async ev => {
-				await this._stonetopSteading.attributes.addNewItemToAttribute(ev.currentTarget.dataset.attr);
-			});
-			withConfirm(".stonetop-attr-extra-remove", async ev => {
-				const { attr, index } = ev.currentTarget.dataset;
-				await this._stonetopSteading.attributes.removeItemFromAttribute(attr, index);
-			});
-			html.find(".stonetop-attr-extra").on("change", async ev => {
-				const { attr, index } = ev.currentTarget.dataset;
-				await this._stonetopSteading.attributes.updateItemOnAttribute(attr, index, ev.currentTarget.value);
-			});
-
-			// Debilities
-			html.find(".steading-circle-input").on("change", async ev => {
-				await this._stonetopSteading.debilities.setDebility(ev.currentTarget.dataset.slug, ev.currentTarget.checked);
-			});
-
-			// Notes
-			html.find(".stonetop-notes").on("change", async ev => {
-				await this._stonetopSteading.setNotes(ev.currentTarget.value);
-			});
-
-
-			// Content (free-text textarea per category)
-			html.find(".stonetop-content-textarea").on("change", async ev => {
-				await this._stonetopSteading.content.updateText(ev.currentTarget.dataset.type, ev.currentTarget.value);
-			});
-
-			// Asset items
-			html.find(".stonetop-asset-item-add").on("click", async () => {
-				await this._stonetopSteading.assets.addItem();
-			});
-			withConfirm(".stonetop-asset-item-remove", async ev => {
-				await this._stonetopSteading.assets.removeItem(parseInt(ev.currentTarget.dataset.index));
-			});
-			html.find(".stonetop-asset-item").on("change", async ev => {
-				await this._stonetopSteading.assets.updateItem(parseInt(ev.currentTarget.dataset.index), ev.currentTarget.value);
-			});
-
-			// Coinage
-			html.find(".stonetop-coinage-purses").on("change", async ev => {
-				await this._stonetopSteading.assets.updatePurses(ev.currentTarget.dataset.title, parseInt(ev.currentTarget.value) || 0);
-			});
-			html.find(".stonetop-coinage-handfuls").on("change", async ev => {
-				await this._stonetopSteading.assets.updateHandfuls(ev.currentTarget.dataset.title, parseInt(ev.currentTarget.value) || 0);
-			});
-			html.find(".stonetop-coinage-coins").on("change", async ev => {
-				await this._stonetopSteading.assets.updateCoins(ev.currentTarget.dataset.title, parseInt(ev.currentTarget.value) || 0);
-			});
-
-			// Residents
-			html.find(".stonetop-resident-add").on("click", async () => {
-				await this._stonetopSteading.residents.add();
-			});
-			withConfirm(".stonetop-resident-remove", async ev => {
-				await this._stonetopSteading.residents.remove(ev.currentTarget.dataset.id);
-			});
-			html.find(".stonetop-resident-name").on("change", async ev => {
-				await this._stonetopSteading.residents.updateName(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-			html.find(".stonetop-resident-occupation").on("change", async ev => {
-				await this._stonetopSteading.residents.updateOccupation(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-			html.find(".stonetop-resident-traits").on("change", async ev => {
-				await this._stonetopSteading.residents.updateTraits(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-
-
-			// NPC traits source textarea
-			html.find(".steading-npc-traits-source").on("change", async ev => {
-				const traits = ev.currentTarget.value.split("\n").map(t => t.trim()).filter(Boolean);
-				await this._actor.update({"system.residents.traits": traits});
-			});
-
-			// Neighbors — people
-			html.find(".stonetop-neighbor-person-add").on("click", async () => {
-				await this._stonetopSteading.neighborPeople.add();
-			});
-			withConfirm(".stonetop-neighbor-person-remove", async ev => {
-				await this._stonetopSteading.neighborPeople.remove(ev.currentTarget.dataset.id);
-			});
-			html.find(".stonetop-neighbor-person-name").on("change", async ev => {
-				await this._stonetopSteading.neighborPeople.updateName(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-			html.find(".stonetop-neighbor-person-occupation").on("change", async ev => {
-				await this._stonetopSteading.neighborPeople.updateOccupation(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-			html.find(".stonetop-neighbor-person-traits").on("change", async ev => {
-				await this._stonetopSteading.neighborPeople.updateTraits(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-			html.find(".stonetop-neighbor-person-home").on("change", async ev => {
-				await this._stonetopSteading.neighborPeople.updateHome(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-
-			// Neighbors — places
-			html.find(".stonetop-neighbor-place-note").on("change", async ev => {
-				await this._stonetopSteading.neighborPlaces.updateNote(ev.currentTarget.dataset.id, ev.currentTarget.value);
-			});
-
-			// Places of Interest
-			html.find(".stonetop-place-add").on("click", async () => {
-				await this._stonetopSteading.placesOfInterest.addBlankPlace();
-			});
-			html.find(".stonetop-place-field").on("change", async ev => {
-				await this._stonetopSteading.placesOfInterest.setPlaceValue(parseInt(ev.currentTarget.dataset.index), ev.currentTarget.value);
-			});
-
-			// Improvements
-			html[0].addEventListener("change", async ev => {
+			// Improvements — the tracks are checkbox groups; capture so the group's own toggle logic
+			// doesn't swallow the change first.
+			root.addEventListener("change", async ev => {
+				if (!this.isEditable) return;
 				const el = ev.target.closest(".stonetop-cg-track");
 				if (!el || el.dataset.cgContext !== "improvement") return;
 				const { cgGroup, cgOption, cgIndex } = el.dataset;
-				const count = el.checked ? parseInt(cgIndex) + 1 : parseInt(cgIndex);
-				await this._stonetopSteading.improvements.setTrack(cgGroup, cgOption, count);
+				await this._stonetopSteading.improvements.toggleTrack(cgGroup, cgOption, cgIndex, el.checked);
 			}, true);
 
-			// Homefront moves go through the standard embedded-move flow: the acquisition checkbox
-			// toggles the owned move, the resource pips/input track its per-move resource state. Roll
-			// clicks (.rollable) are handled by the inherited StonetopActorSheet listener.
-			html.find(".stonetop-move-check").on("change", async ev => {
-				const { moveSlug } = ev.currentTarget.dataset;
-				if (ev.currentTarget.checked) await this._stonetopSteading.moves.incrementMove(moveSlug);
-				else                          await this._stonetopSteading.moves.decrementMove(moveSlug);
-			});
-			html[0].addEventListener("click", async ev => {
+			// Homefront move resource pips (click) + free-text resource (change). Roll clicks
+			// (.rollable) are handled by the base's delegated rollable listener.
+			root.addEventListener("click", async ev => {
+				if (!this.isEditable) return;
 				const btn = ev.target.closest(".stonetop-item-resource-check");
 				if (!btn || btn.dataset.moveSlug === undefined) return;
 				ev.stopPropagation();
 				ev.stopImmediatePropagation();
-				const isChecked = btn.classList.contains("is-checked");
-				const current = isChecked ? Number(btn.dataset.index) : Number(btn.dataset.index) + 1;
-				await this._stonetopSteading.moves.setMoveResourceCurrent(btn.dataset.moveSlug, current);
+				await this._stonetopSteading.moves.toggleResourcePip(
+					btn.dataset.moveSlug, btn.dataset.index, btn.classList.contains("is-checked"));
 			}, true);
-			html[0].addEventListener("change", async ev => {
+			root.addEventListener("change", async ev => {
+				if (!this.isEditable) return;
 				const el = ev.target.closest(".stonetop-resource-input");
 				if (!el || el.dataset.moveSlug === undefined) return;
 				await this._stonetopSteading.moves.setMoveResourceText(el.dataset.moveSlug, el.value);
 			}, true);
+		}
+
+		// Direct bindings to the current controls — re-run per render (part content is replaced).
+		_onRender(context, options) {
+			super._onRender(context, options);
+			if (!this.isEditable) return;
+			const root = this.element;
+			const s    = this._stonetopSteading;
+
+			// Name combobox / steadfast picker — the typed steading decides whether a value applies a
+			// steadfast or just renames. Dropping a steadfast routes through the same apply (_onDropItem).
+			bindAll(root, ".steading-steadfast-input", "change", async ev => {
+				await s.renameOrApplySteadfast(ev.currentTarget.value, this._availableSteadfasts ?? []);
+			});
+
+			// Roll mode
+			bindAll(root, "[name=stonetop-roll-mode]", "change", ev => s.setRollMode(ev.currentTarget.value));
+
+			// Fortunes / Surplus
+			bindAll(root, ".steading-box-input[name='stonetop-fortunes']", "change", async ev => {
+				await s.setFortunes(parseInt(ev.currentTarget.value));
+			});
+			bindAll(root, ".steading-surplus-input", "change", async ev => {
+				await s.setSurplus(parseInt(ev.currentTarget.value) || 0);
+			});
+
+			// Attributes (size, population, prosperity, defenses). Ratings store an actual number; size
+			// stores its tier string.
+			bindAll(root, ".steading-box-input[data-attr]", "change", async ev => {
+				const { attr } = ev.currentTarget.dataset;
+				const raw = ev.currentTarget.value;
+				await s.attributes.setValue(attr, attr === "size" ? raw : parseInt(raw));
+			});
+			bindAll(root, ".stonetop-attr-extra-add", "click", async ev => {
+				await s.attributes.addNewItemToAttribute(ev.currentTarget.dataset.attr);
+			});
+			bindConfirmedDeletes(root, ".stonetop-attr-extra-remove", async ev => {
+				const { attr, index } = ev.currentTarget.dataset;
+				await s.attributes.removeItemFromAttribute(attr, index);
+			});
+			bindAll(root, ".stonetop-attr-extra", "change", async ev => {
+				const { attr, index } = ev.currentTarget.dataset;
+				await s.attributes.updateItemOnAttribute(attr, index, ev.currentTarget.value);
+			});
+
+			// Debilities
+			bindAll(root, ".steading-circle-input", "change", async ev => {
+				await s.debilities.setDebility(ev.currentTarget.dataset.slug, ev.currentTarget.checked);
+			});
+
+			// Notes
+			bindAll(root, ".stonetop-notes", "change", async ev => s.setNotes(ev.currentTarget.value));
+
+			// Content (free-text textarea per category)
+			bindAll(root, ".stonetop-content-textarea", "change", async ev => {
+				await s.content.updateText(ev.currentTarget.dataset.type, ev.currentTarget.value);
+			});
+
+			// Asset items
+			bindAll(root, ".stonetop-asset-item-add", "click", async () => { await s.assets.addItem(); });
+			bindConfirmedDeletes(root, ".stonetop-asset-item-remove", async ev => {
+				await s.assets.removeItem(parseInt(ev.currentTarget.dataset.index));
+			});
+			bindAll(root, ".stonetop-asset-item", "change", async ev => {
+				await s.assets.updateItem(parseInt(ev.currentTarget.dataset.index), ev.currentTarget.value);
+			});
+
+			// Coinage
+			bindAll(root, ".stonetop-coinage-purses", "change", async ev => {
+				await s.assets.updatePurses(ev.currentTarget.dataset.title, parseInt(ev.currentTarget.value) || 0);
+			});
+			bindAll(root, ".stonetop-coinage-handfuls", "change", async ev => {
+				await s.assets.updateHandfuls(ev.currentTarget.dataset.title, parseInt(ev.currentTarget.value) || 0);
+			});
+			bindAll(root, ".stonetop-coinage-coins", "change", async ev => {
+				await s.assets.updateCoins(ev.currentTarget.dataset.title, parseInt(ev.currentTarget.value) || 0);
+			});
+
+			// Residents
+			bindAll(root, ".stonetop-resident-add", "click", async () => { await s.residents.add(); });
+			bindConfirmedDeletes(root, ".stonetop-resident-remove", async ev => {
+				await s.residents.remove(ev.currentTarget.dataset.id);
+			});
+			bindAll(root, ".stonetop-resident-name", "change", async ev => {
+				await s.residents.updateName(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+			bindAll(root, ".stonetop-resident-occupation", "change", async ev => {
+				await s.residents.updateOccupation(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+			bindAll(root, ".stonetop-resident-traits", "change", async ev => {
+				await s.residents.updateTraits(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+
+			// Resident traits source textarea — Residents owns the one-per-line parse.
+			bindAll(root, ".steading-npc-traits-source", "change", async ev => {
+				await s.residents.updateTraitsSource(ev.currentTarget.value);
+			});
+
+			// Neighbors — people
+			bindAll(root, ".stonetop-neighbor-person-add", "click", async () => { await s.neighborPeople.add(); });
+			bindConfirmedDeletes(root, ".stonetop-neighbor-person-remove", async ev => {
+				await s.neighborPeople.remove(ev.currentTarget.dataset.id);
+			});
+			bindAll(root, ".stonetop-neighbor-person-name", "change", async ev => {
+				await s.neighborPeople.updateName(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+			bindAll(root, ".stonetop-neighbor-person-occupation", "change", async ev => {
+				await s.neighborPeople.updateOccupation(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+			bindAll(root, ".stonetop-neighbor-person-traits", "change", async ev => {
+				await s.neighborPeople.updateTraits(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+			bindAll(root, ".stonetop-neighbor-person-home", "change", async ev => {
+				await s.neighborPeople.updateHome(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+
+			// Neighbors — places
+			bindAll(root, ".stonetop-neighbor-place-note", "change", async ev => {
+				await s.neighborPlaces.updateNote(ev.currentTarget.dataset.id, ev.currentTarget.value);
+			});
+
+			// Places of Interest
+			bindAll(root, ".stonetop-place-add", "click", async () => { await s.placesOfInterest.addBlankPlace(); });
+			bindAll(root, ".stonetop-place-field", "change", async ev => {
+				await s.placesOfInterest.setPlaceValue(parseInt(ev.currentTarget.dataset.index), ev.currentTarget.value);
+			});
+
+			// Homefront moves: the acquisition checkbox toggles the owned move. Resource pips/text are
+			// wired once (delegated) in _onFirstRender.
+			bindAll(root, ".stonetop-move-check", "change", async ev => {
+				const { moveSlug } = ev.currentTarget.dataset;
+				if (ev.currentTarget.checked) await s.moves.incrementMove(moveSlug);
+				else                          await s.moves.decrementMove(moveSlug);
+			});
 		}
 	};
 }

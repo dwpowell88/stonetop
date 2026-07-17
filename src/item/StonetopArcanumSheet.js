@@ -3,16 +3,17 @@
 // choices; major-only: mystery moves, consequences, unlockAt) + major/weight. The three choice groups
 // (front.unlock, back.choices, back.consequences) reuse the shared choiceGroupEdit helpers +
 // choiceGroupEditorMixin + choice-group-editor partial; the mystery-moves list uses arcanumMoveEdit.
-// Foundry's ItemSheet auto-saves `name`/`system.*` form inputs and auto-activates the `data-edit`
-// rich editors.
+// The V2 form's submitOnChange auto-saves `name`/`system.*` inputs, including the two named
+// <prose-mirror> descriptions.
 //
-// front/back are opaque ObjectFields: nested writes (name= inputs, data-edit, the cg mixin's
+// front/back are opaque ObjectFields: nested writes (name= inputs, prose-mirror, the cg mixin's
 // `item.update({"system.front.unlock": group})`) rely on Foundry's recursive merge to preserve
-// siblings. getData initialises front/back to {} so there is always a merge target.
+// siblings. _prepareContext initialises front/back to {} so there is always a merge target.
 
 import * as CG from "../utils/choiceGroupEdit.js";
 import * as AME from "../utils/arcanumMoveEdit.js";
 import { activateChoiceGroupEditors } from "./choiceGroupEditorMixin.js";
+import { bindAll } from "../utils/bindAll.js";
 import { Arcanum } from "../model/data/character/Arcanum.js";
 import { buildArcanumSnapshot, buildArcanumMoveSnapshot } from "../actors/character/arcanumSnapshot.js";
 import { FoundryMoveRepository } from "../actors/character/repositories/FoundryMoveRepository.js";
@@ -34,31 +35,38 @@ function isArcanumBlank(front = {}, back = {}) {
 
 export function createStonetopArcanumSheetClass(Base) {
 	return class StonetopArcanumSheet extends Base {
-		static get defaultOptions() {
-			return foundry.utils.mergeObject(super.defaultOptions, {
-				classes: ["stonetop", "sheet", "item", "arcanum"],
-				width:  980,
-				height: 760,
-				resizable: true,
-			});
+		static DEFAULT_OPTIONS = {
+			classes: ["arcanum"],
+			position: { width: 980, height: 760 },
+			actions: {
+				// Both fire on a locked (non-editable) compendium arcanum too: the buttons carry
+				// data-view-state, which the base's _toggleDisabled keeps enabled.
+				flipPreview:    StonetopArcanumSheet.#onFlipPreview,
+				toggleEditMode: StonetopArcanumSheet.#onToggleEditMode,
+			},
+		};
+
+		static PARTS = {
+			form: {
+				template: "systems/stonetop/templates/item/arcanum.hbs",
+				scrollable: [""],
+			},
+		};
+
+		static #onFlipPreview() {
+			this._previewFlipped = !this._previewFlipped;
+			this.render();
 		}
 
-		get template() {
-			return "systems/stonetop/templates/item/arcanum.hbs";
+		static #onToggleEditMode(_event, target) {
+			this._editMode = target.dataset.mode === "edit";
+			this.render();
 		}
 
-		async _render(force, options) {
-			await super._render(force, options);
-			// FormApplication._disableFields() disables EVERY button on a non-editable sheet (a locked
-			// compendium arcanum). The flip / view-toggle buttons are pure view state, not edits — keep
-			// them clickable so a locked arcanum can still show its back.
-			this.element?.[0]
-				?.querySelectorAll(".arcanum-preview-flip, .arcanum-edit-toggle")
-				.forEach(btn => { btn.disabled = false; });
-		}
-
-		async getData() {
-			const context = await super.getData();
+		async _prepareContext(options) {
+			const context = await super._prepareContext(options);
+			context.item     = this.item;
+			context.editable = this.isEditable;
 			// One-time initialisation: a stable slug + front/back as objects (so nested edits merge).
 			const init = {};
 			if (!this.item.system.slug)          init["system.slug"]  = `custom-arcanum-${foundry.utils.randomID(8)}`;
@@ -112,44 +120,36 @@ export function createStonetopArcanumSheetClass(Base) {
 			return context;
 		}
 
-		activateListeners(html) {
-			super.activateListeners(html);
-
-			// Flip + edit/view toggle must work even on a locked (non-editable) compendium arcanum.
-			html.find(".arcanum-preview-flip").on("click", () => {
-				this._previewFlipped = !this._previewFlipped;
-				this.render(false);
-			});
-			html.find(".arcanum-edit-toggle").on("click", ev => {
-				this._editMode = ev.currentTarget.dataset.mode === "edit";
-				this.render(false);
-			});
-
+		// Direct bindings to the current editor controls — re-run per render (part content is replaced).
+		// (Flip + edit/view toggle are data-action buttons — see DEFAULT_OPTIONS.actions.)
+		_onRender(context, options) {
+			super._onRender(context, options);
 			if (!this.isEditable) return;
+			const root = this.element;
 
-			activateChoiceGroupEditors(this, html); // edits front.unlock / back.choices / back.consequences
+			activateChoiceGroupEditors(this, root); // edits front.unlock / back.choices / back.consequences
 
 			// Choice-group lifecycle (create / remove a whole group at a given path).
 			const setGroup = (path, group) => this.item.update({ [path]: group });
-			html.find(".arcanum-group-add").on("click", ev =>
+			bindAll(root, ".arcanum-group-add", "click", ev =>
 				setGroup(ev.currentTarget.dataset.path, CG.newGroup(ev.currentTarget.dataset.slug || "choices")));
-			html.find(".arcanum-group-remove").on("click", ev =>
+			bindAll(root, ".arcanum-group-remove", "click", ev =>
 				setGroup(ev.currentTarget.dataset.path, null));
 
 			// Optional item definition (front.item / back.item) — toggle on/off.
-			html.find(".arcanum-item-toggle").on("click", ev => {
+			bindAll(root, ".arcanum-item-toggle", "click", ev => {
 				const path = ev.currentTarget.dataset.path;
 				const has  = foundry.utils.getProperty(this.item, path) != null;
 				this.item.update({ [path]: has ? null : { ...BLANK_ITEM(), name: this.item.name } });
 			});
 
 			// Optional resource (a pool / track) at the given base path — toggle on/off + labels list.
-			html.find(".arcanum-resource-toggle").on("click", ev => {
+			bindAll(root, ".arcanum-resource-toggle", "click", ev => {
 				const path = ev.currentTarget.dataset.path;
 				const has  = foundry.utils.getProperty(this.item, path) != null;
 				this.item.update({ [path]: has ? null : BLANK_RESOURCE() });
 			});
-			html.find(".arcanum-resource-labels").on("change", ev => {
+			bindAll(root, ".arcanum-resource-labels", "change", ev => {
 				const path   = ev.currentTarget.dataset.path;
 				const labels = ev.currentTarget.value ? ev.currentTarget.value.split(",").map(s => s.trim()).filter(Boolean) : [];
 				this.item.update({ [`${path}.labels`]: labels });
@@ -159,12 +159,12 @@ export function createStonetopArcanumSheetClass(Base) {
 			const moves    = () => this.item.system.back?.moves ?? [];
 			const setMoves = list => this.item.update({ "system.back.moves": list });
 			const idx      = ev => Number(ev.currentTarget.dataset.index);
-			html.find(".arcanum-move-add").on("click",            ()  => setMoves(AME.addMove(moves())));
-			html.find(".arcanum-move-remove").on("click",         ev  => setMoves(AME.removeMove(moves(), idx(ev))));
-			html.find(".arcanum-move-up").on("click",             ev  => setMoves(AME.moveMove(moves(), idx(ev), -1)));
-			html.find(".arcanum-move-down").on("click",           ev  => setMoves(AME.moveMove(moves(), idx(ev), 1)));
-			html.find(".arcanum-move-toggle-tracker").on("click", ev  => setMoves(AME.toggleTracker(moves(), idx(ev))));
-			html.find(".arcanum-move-field").on("change", ev => {
+			bindAll(root, ".arcanum-move-add", "click",            ()  => setMoves(AME.addMove(moves())));
+			bindAll(root, ".arcanum-move-remove", "click",         ev  => setMoves(AME.removeMove(moves(), idx(ev))));
+			bindAll(root, ".arcanum-move-up", "click",             ev  => setMoves(AME.moveMove(moves(), idx(ev), -1)));
+			bindAll(root, ".arcanum-move-down", "click",           ev  => setMoves(AME.moveMove(moves(), idx(ev), 1)));
+			bindAll(root, ".arcanum-move-toggle-tracker", "click", ev  => setMoves(AME.toggleTracker(moves(), idx(ev))));
+			bindAll(root, ".arcanum-move-field", "change", ev => {
 				const el = ev.currentTarget;
 				const value = el.type === "number" ? (el.value ? Number(el.value) : null) : (el.value || null);
 				setMoves(AME.setMoveField(moves(), { index: Number(el.dataset.index), field: el.dataset.field, value }));

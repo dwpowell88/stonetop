@@ -1,47 +1,51 @@
-<form class="stonetop sheet item improvement" autocomplete="off">
+{{!-- ApplicationV2 part: the sheet root IS the <form> (DocumentSheetV2 tag) and carries the
+      stonetop/sheet/item/improvement classes from DEFAULT_OPTIONS. HandlebarsApplicationMixin
+      requires each part to render a SINGLE root element — hence this wrapper div. --}}
+<div class="stonetop-improvement-sheet">
 
-	{{#unless editMode}}
-	{{!-- ---- Rendered view: the improvement exactly as it appears on the steading ---- --}}
-	<header class="stonetop-insert-sheet-header">
-		<img class="stonetop-insert-sheet-icon" src="{{data.img}}" title="{{data.name}}" alt="">
-		<span class="stonetop-insert-sheet-name">{{data.name}}</span>
-		{{#if editable}}
-		<button type="button" class="improvement-edit-toggle" data-mode="edit">{{localize "stonetop.improvement.edit"}}</button>
-		{{/if}}
-	</header>
+{{#unless editMode}}
+{{!-- ---- Rendered view: the improvement exactly as it appears on the steading ---- --}}
+<header class="stonetop-insert-sheet-header">
+	<img class="stonetop-insert-sheet-icon" src="{{item.img}}" title="{{item.name}}" alt="">
+	<span class="stonetop-insert-sheet-name">{{item.name}}</span>
+	{{#if editable}}
+	<button type="button" class="improvement-edit-toggle" data-action="toggleEditMode" data-mode="edit">{{localize "stonetop.improvement.edit"}}</button>
+	{{/if}}
+</header>
 
-	<div class="stonetop-improvement-preview">
-		{{> "stonetop.improvement-group" preview}}
-	</div>
+<div class="stonetop-improvement-preview">
+	{{> "stonetop.improvement-group" preview}}
+</div>
 
-	{{else}}
-	{{!-- ---- Editor ---- --}}
-	<header class="stonetop-insert-sheet-header">
-		<img class="stonetop-insert-sheet-icon" src="{{data.img}}" data-edit="img" title="{{data.name}}" alt="">
-		<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{data.name}}"
-		       placeholder="{{localize 'stonetop.improvement.namePlaceholder'}}"
-		       {{#unless editable}}disabled{{/unless}}>
-		<button type="button" class="improvement-edit-toggle" data-mode="view">{{localize "stonetop.improvement.done"}}</button>
-	</header>
+{{else}}
+{{!-- ---- Editor ---- --}}
+<header class="stonetop-insert-sheet-header">
+	<img class="stonetop-insert-sheet-icon" src="{{item.img}}" data-edit="img" data-action="editImage" title="{{item.name}}" alt="">
+	<input class="stonetop-insert-sheet-name" type="text" name="name" value="{{item.name}}"
+	       placeholder="{{localize 'stonetop.improvement.namePlaceholder'}}"
+	       {{#unless editable}}disabled{{/unless}}>
+	<button type="button" class="improvement-edit-toggle" data-action="toggleEditMode" data-mode="view">{{localize "stonetop.improvement.done"}}</button>
+</header>
 
-	<div class="stonetop-insert-sheet-body">
+<div class="stonetop-insert-sheet-body">
 
-		<section class="stonetop-insert-sheet-section">
-			<div class="stonetop-insert-sheet-section-head">
-				<label class="stonetop-insert-sheet-label">{{localize "stonetop.improvement.sortOrder"}}</label>
-				<input type="number" name="system.sortOrder" value="{{system.sortOrder}}"
-				       placeholder="{{localize 'stonetop.improvement.sortOrderPlaceholder'}}"
-				       {{#unless editable}}disabled{{/unless}}>
-			</div>
-		</section>
+	<section class="stonetop-insert-sheet-section">
+		<div class="stonetop-insert-sheet-section-head">
+			<label class="stonetop-insert-sheet-label">{{localize "stonetop.improvement.sortOrder"}}</label>
+			<input type="number" name="system.sortOrder" value="{{system.sortOrder}}"
+			       placeholder="{{localize 'stonetop.improvement.sortOrderPlaceholder'}}"
+			       {{#unless editable}}disabled{{/unless}}>
+		</div>
+	</section>
 
-		<section class="stonetop-insert-sheet-section">
-			<label class="stonetop-insert-sheet-label">{{localize "stonetop.improvement.choices"}}</label>
-			<div class="stonetop-insert-sheet-choices-group">
-				{{> "stonetop.choice-group-editor" cgPath=choicesGroup.cgPath rows=choicesGroup.rows}}
-			</div>
-		</section>
+	<section class="stonetop-insert-sheet-section">
+		<label class="stonetop-insert-sheet-label">{{localize "stonetop.improvement.choices"}}</label>
+		<div class="stonetop-insert-sheet-choices-group">
+			{{> "stonetop.choice-group-editor" cgPath=choicesGroup.cgPath rows=choicesGroup.rows}}
+		</div>
+	</section>
 
-	</div>
-	{{/unless}}
-</form>
+</div>
+{{/unless}}
+
+</div>
