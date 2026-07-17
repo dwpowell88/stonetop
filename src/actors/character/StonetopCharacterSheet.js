@@ -106,6 +106,9 @@ export function createStonetopCharacterSheetClass(Base) {
 				addInventoryItem: editOnly(function (ev, target) {
 					return this._onAddInventoryItem(target);
 				}),
+				levelUp: editOnly(function () {
+					return this._onLevelUp();
+				}),
 
 				// --- resource pips (current checked state → the domain does the ±1 math) ---
 				moveResourcePip: editOnly(function (ev, target) {
@@ -362,6 +365,35 @@ export function createStonetopCharacterSheetClass(Base) {
 			if (!this.isEditable || actor?.type !== "npc") return null;
 			await this._stonetopCharacter.addFollowerFromActor(actor);
 			return null;
+		}
+
+		async _onLevelUp() {
+			const snap = await this._stonetopCharacter.buildSnapshot();
+			const { xp, level, canLevelUp } = snap.vitals;
+			if (!canLevelUp) return;
+			const L = (k, data) => game.i18n.format(`stonetop.character.levelUp.${k}`, data);
+			const slug = this._stonetopCharacter.playbookSlug;
+			const lines = [
+				`<p>${L("prompt", { spent: xp.max, level: level + 1, xp: xp.value, remaining: xp.value - xp.max })}</p>`,
+				`<p>${L("pickMove")}</p>`,
+			];
+			if (slug === "the-blessed")     lines.push(`<p><em>${L("blessedExtra")}</em></p>`);
+			if (slug === "the-lightbearer") lines.push(`<p><em>${L("lightbearerExtra")}</em></p>`);
+			// DialogV2.confirm defaults the No button and resolves undefined on dismissal — a strict
+			// true check covers both cancel paths.
+			const confirmed = await foundry.applications.api.DialogV2.confirm({
+				window: { title: L("title") },
+				content: lines.join(""),
+				yes: { label: L("confirm") },
+				no:  { label: game.i18n.localize("Cancel") },
+			});
+			if (confirmed !== true) return;
+			const result = await this._stonetopCharacter.levelUp();
+			if (!result) return;
+			ChatMessage.create({
+				speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+				content: L("chat", { name: this.actor.name, ...result }),
+			});
 		}
 
 		async _onAddInventoryItem(target) {
