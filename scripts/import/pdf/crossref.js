@@ -31,14 +31,14 @@ const PAGE_REF = /\b(pages?)(\s+)(\d+(?:\s*(?:[-–]|,|\bor\b|\band\b)\s*\d+)*)/
  * didn't import (skipped appendices, maps) and self-references (a page within `selfSlug`) are left
  * as plain text. Returns `{ html, linked }` (count of links made).
  */
-export function linkPageRefs(html, pageMap, { selfSlug } = {}) {
+export function linkPageRefs(html, pageMap, { selfSlug, uuid = journalUuid } = {}) {
 	let linked = 0;
 	const out = html.replace(PAGE_REF, (whole, word, ws, nums) => {
 		const rebuilt = nums.replace(/\d+/g, (num) => {
 			const slug = pageMap.get(Number(num));
 			if (!slug || slug === selfSlug) return num;
 			linked++;
-			return `@UUID[${journalUuid(slug)}]{${num}}`;
+			return `@UUID[${uuid(slug)}]{${num}}`;
 		});
 		return `${word}${ws}${rebuilt}`;
 	});
