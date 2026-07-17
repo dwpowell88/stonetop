@@ -64,6 +64,22 @@ export class CharacterVitals {
 		return true;
 	}
 
+	/** Level Up (p. 81): triggers at XP equal to (or greater than) 6 + level × 2, SUBTRACTS that
+	 *  amount (the excess carries over), and raises the level. Returns {level, spent, remaining}
+	 *  on success, or null when the character hasn't reached the threshold. */
+	async levelUp() {
+		const attrs = this._actor.system?.attributes ?? {};
+		const level = attrs.level ?? 1;
+		const xp = attrs.xp?.value ?? 0;
+		const threshold = 6 + level * 2;
+		if (xp < threshold) return null;
+		await this._actor.update({
+			"system.attributes.level": level + 1,
+			"system.attributes.xp.value": xp - threshold,
+		});
+		return { level: level + 1, spent: threshold, remaining: xp - threshold };
+	}
+
 	async setLevel(level) {
 		await this._actor.update({ "system.attributes.level": Math.max(1, toInt(level)) });
 	}

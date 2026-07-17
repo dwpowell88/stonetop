@@ -571,6 +571,16 @@ export class StonetopCharacter {
 		await this._vitals.setLevel(level);
 	}
 
+	/** Level Up (p. 81): spend 6 + level × 2 XP (excess carries over), gain a level.
+	 *  Returns {level, spent, remaining} or null below the threshold. */
+	async levelUp() {
+		return this._vitals.levelUp();
+	}
+
+	get playbookSlug() {
+		return this._playbook.getSlug();
+	}
+
 	async setMaxHP(max) {
 		await this._vitals.setMaxHP(max);
 	}

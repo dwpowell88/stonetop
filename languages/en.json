@@ -353,6 +353,16 @@
 				"xp": "XP",
 				"level": "Level"
 			},
+			"levelUp": {
+				"button": "Level Up!",
+				"title": "Level Up",
+				"prompt": "Spend {spent} XP to reach level {level}? You have {xp} XP — {remaining} will carry over.",
+				"pickMove": "Then mark a new move from your playbook (playbook tab).",
+				"blessedExtra": "The Blessed: your max Stock increases by 1.",
+				"lightbearerExtra": "The Lightbearer: on even levels you also gain a new Invocation.",
+				"confirm": "Level Up",
+				"chat": "{name} levels up to level {level}! ({spent} XP spent, {remaining} carried over — pick a new move.)"
+			},
 			"gear": {
 				"specialPossessions": "Special Possessions"
 			},
