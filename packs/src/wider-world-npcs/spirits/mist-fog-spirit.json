@@ -1,0 +1,45 @@
+{
+	"_id": "2H8w2CmCMyFOlrpr",
+	"_key": "!actors!2H8w2CmCMyFOlrpr",
+	"name": "Mist/fog spirit",
+	"type": "npc",
+	"img": "stonetop-art/wonders/412d163e957670ed186f655b60944233033e6ed1005937d0dd8f449bb0cf099e.png",
+	"system": {
+		"slug": "mist-fog-spirit",
+		"reference": "spirits-of-the-wild",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"presumptuous",
+				"hazy"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to get intimate, blur boundaries"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.HOWpYxmR8Q44qS3E]{Spirits of the wild} (Book p.356-371)",
+		"notes": "Hushed, dripping voice; spaced-out; touchy-feely."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

@@ -1,0 +1,45 @@
+{
+	"_id": "iVzLfqXNFTXHdu5r",
+	"_key": "!actors!iVzLfqXNFTXHdu5r",
+	"name": "God of the Cistern",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-swirl.png",
+	"system": {
+		"slug": "god-of-the-cistern",
+		"reference": "gods-and-religion",
+		"tagList": {
+			"selected": [
+				"Solitary",
+				"spirit",
+				"gloomy",
+				"patient"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [
+				"to keep secrets"
+			],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "**Manifests** as an echo in the dark, as a misty figure.\n\n**Expects** water, snow, coins, wishes.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.ixv4UMnNgm2a0ECI]{Gods and religion} (Book p.178-185)",
+		"notes": "Desperately wants to know how various tales end(ed)."
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}

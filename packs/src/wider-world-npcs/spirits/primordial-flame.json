@@ -1,0 +1,42 @@
+{
+	"_id": "9nvqOFoAEY6fZR1I",
+	"_key": "!actors!9nvqOFoAEY6fZR1I",
+	"name": "Primordial flame",
+	"type": "npc",
+	"img": "systems/stonetop/assets/content/wonders/markers/marker-danger.png",
+	"system": {
+		"slug": "primordial-flame",
+		"reference": "primordial-powers",
+		"tagList": {
+			"selected": [
+				"Primordial",
+				"terrifying",
+				"magical"
+			],
+			"options": [],
+			"multi": true,
+			"allowCustom": true
+		},
+		"hp": {
+			"value": 0,
+			"max": 0
+		},
+		"armor": "",
+		"damage": "1d12 w/advantage (hand, messy, ignores armor)",
+		"specialQuality": "",
+		"instinct": {
+			"selected": [],
+			"options": [],
+			"multi": false,
+			"allowCustom": true
+		},
+		"moves": "- Radiate blistering heat, 1d10 damage (*reach*, *area*)\n- Start normal fires nearby\n- Reduce what it touches to ash\n\nA tongue of perfect blue fire, somehow brought into the world. It is likely found held in stasis by some potent magic or artifice. For while it consumes and destroys all it touches, it cannot last long in contact with base reality.",
+		"description": "Source: @UUID[Compendium.stonetop.wider-world-and-other-wonders.JournalEntry.YxQdXyd9EDRJyEKv]{Primordial powers} (Book p.298-313)",
+		"notes": ""
+	},
+	"ownership": {
+		"default": 0
+	},
+	"flags": {},
+	"folder": "bZjX6JvUtGDAtnSK"
+}
