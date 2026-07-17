@@ -1,6 +1,8 @@
 {
 	"TYPES": {
 		"Actor": {
+			"character": "Character",
+			"npc": "NPC",
 			"steading": "Steading"
 		},
 		"Item": {
